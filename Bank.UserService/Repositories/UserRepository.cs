@@ -1,0 +1,64 @@
+﻿using Bank.Application.Domain;
+using Bank.Application.Queries;
+using Bank.UserService.Database;
+using Bank.UserService.Models;
+
+using Microsoft.EntityFrameworkCore;
+
+namespace Bank.UserService.Repositories;
+
+public interface IUserRepository
+{
+    Task<List<User>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable);
+
+    Task<User?> FindById(Guid id);
+
+    Task<User?> FindByEmail(string email);
+
+    Task<User> Add(User user);
+}
+
+public class UserRepository(ApplicationContext context) : IUserRepository
+{
+    private readonly ApplicationContext m_Context = context;
+
+    public async Task<List<User>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
+    {
+        var userQuery = m_Context.Users.AsQueryable();
+
+        if (!string.IsNullOrEmpty(userFilterQuery.FirstName))
+            userQuery = userQuery.Where(user => EF.Functions.ILike(user.FirstName, $"%{userFilterQuery.FirstName}%"));
+
+        if (!string.IsNullOrEmpty(userFilterQuery.LastName))
+            userQuery = userQuery.Where(user => EF.Functions.ILike(user.LastName, $"%{userFilterQuery.LastName}%"));
+
+        if (!string.IsNullOrEmpty(userFilterQuery.Email))
+            userQuery = userQuery.Where(user => EF.Functions.ILike(user.Email, $"%{userFilterQuery.Email}%"));
+
+        if (userFilterQuery.Role != Role.Invalid)
+            userQuery = userQuery.Where(user => user.Role == userFilterQuery.Role);
+
+        return await userQuery.Skip((pageable.Page - 1) * pageable.Size)
+                              .Take(pageable.Size)
+                              .ToListAsync();
+    }
+
+    public async Task<User?> FindById(Guid id)
+    {
+        return await m_Context.Users.FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<User?> FindByEmail(string email)
+    {
+        return await m_Context.Users.FirstOrDefaultAsync(u => u.Email == email);
+    }
+
+    public async Task<User> Add(User user)
+    {
+        var addedUser = await m_Context.Users.AddAsync(user);
+
+        await m_Context.SaveChangesAsync();
+
+        return addedUser.Entity;
+    }
+}
