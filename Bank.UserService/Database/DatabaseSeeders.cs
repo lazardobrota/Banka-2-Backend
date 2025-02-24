@@ -6,7 +6,7 @@ public static class DatabaseSeeders
     {
         if (context.Users.Any())
             return;
-        
+
         //TODO: add User seed
     }
 
@@ -14,7 +14,7 @@ public static class DatabaseSeeders
     {
         if (context.Accounts.Any())
             return;
-        
+
         //TODO: add Account seed
     }
 }
