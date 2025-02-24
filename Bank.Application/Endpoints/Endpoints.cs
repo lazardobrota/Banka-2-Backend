@@ -27,7 +27,16 @@ public static partial class Endpoints
 
 public static partial class Endpoints
 {
-    public static class Client { }
+    public static class Client
+    {
+        public const string Base = $"{ApiBase}/clinets";
+
+        public const string GetAll = $"{Base}";
+        // TODO
+        // public const string GetOne   = $"{Base}/{{id:guid}}";
+        // public const string Login    = $"{Base}/login";
+        // public const string Activate = $"{Base}/activate";
+    }
 }
 
 #endregion
