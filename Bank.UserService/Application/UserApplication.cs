@@ -1,4 +1,9 @@
-﻿namespace Bank.UserService.Application;
+﻿using Bank.UserService.Database;
+using Bank.UserService.HostedServices;
+
+using Microsoft.EntityFrameworkCore;
+
+namespace Bank.UserService.Application;
 
 public class UserApplication
 {
@@ -6,6 +11,7 @@ public class UserApplication
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddServiceApplication();
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -23,5 +29,19 @@ public class UserApplication
         app.MapControllers();
 
         app.Run();
+    }
+}
+
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddServiceApplication(this IServiceCollection services)
+    {
+        services.AddSingleton<DatabaseHostedService>();
+
+        services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(DatabaseConfig.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
+        
+        services.AddHostedService<ApplicationHostedService>();
+
+        return services;
     }
 }
