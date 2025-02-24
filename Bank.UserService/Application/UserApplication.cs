@@ -1,4 +1,5 @@
 ﻿using Bank.UserService.Database;
+using Bank.UserService.HostedServices;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -35,7 +36,11 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServiceApplication(this IServiceCollection services)
     {
+        services.AddSingleton<DatabaseHostedService>();
+
         services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(DatabaseConfig.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
+        
+        services.AddHostedService<ApplicationHostedService>();
 
         return services;
     }
