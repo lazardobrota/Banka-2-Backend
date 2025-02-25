@@ -53,4 +53,54 @@ public static class UserMapper
                    Activated                  = user.Activated
                };
     }
+
+    public static Employee ToEmployee(this User user)
+    {
+        return new Employee
+               {
+                   Id                         = user.Id,
+                   FirstName                  = user.FirstName,
+                   LastName                   = user.LastName,
+                   DateOfBirth                = user.DateOfBirth,
+                   Gender                     = user.Gender,
+                   UniqueIdentificationNumber = user.UniqueIdentificationNumber,
+                   Email                      = user.Email,
+                   Username                   = user.Username,
+                   PhoneNumber                = user.PhoneNumber,
+                   Address                    = user.Address,
+                   Password                   = user.Password,
+                   Salt                       = user.Salt,
+                   Role                       = user.Role,
+                   Department                 = user.Department!,
+                   CreatedAt                  = user.CreatedAt,
+                   ModifiedAt                 = user.ModifiedAt,
+                   Employed                   = user.Employed ?? true,
+                   Activated                  = user.Activated
+               };
+    }
+
+    public static User ToUser(this Employee employee)
+    {
+        return new User
+               {
+                   Id                         = employee.Id,
+                   FirstName                  = employee.FirstName,
+                   LastName                   = employee.LastName,
+                   DateOfBirth                = employee.DateOfBirth,
+                   Gender                     = employee.Gender,
+                   UniqueIdentificationNumber = employee.UniqueIdentificationNumber,
+                   Email                      = employee.Email,
+                   Username                   = employee.Username,
+                   PhoneNumber                = employee.PhoneNumber,
+                   Address                    = employee.Address,
+                   Password                   = employee.Password,
+                   Salt                       = employee.Salt,
+                   Role                       = employee.Role,
+                   Department                 = employee.Department,
+                   CreatedAt                  = employee.CreatedAt,
+                   ModifiedAt                 = employee.ModifiedAt,
+                   Employed                   = employee.Employed,
+                   Activated                  = employee.Activated
+               };
+    }
 }
