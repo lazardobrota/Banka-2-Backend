@@ -23,7 +23,7 @@ public class TokenProvider
         var claims = new List<Claim>
                      {
                          new ("id",   user.Id.ToString()),
-                         new ("auth", user.Role.ToString())
+                         new ("role", user.Role.ToString())
                      };
 
         var tokenDescriptor = new SecurityTokenDescriptor
