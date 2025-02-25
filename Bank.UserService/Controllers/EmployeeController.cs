@@ -24,4 +24,12 @@ public class EmployeeController(IEmployeeService employeeService) : ControllerBa
 
         return result.ActionResult;
     }
+
+    [HttpPut(Endpoints.Employee.Update)]
+    public async Task<IActionResult> Update([FromBody] EmployeeUpdateRequest employeeUpdateRequest, [FromRoute] Guid id)
+    {
+        var result = await employeeService.Update(employeeUpdateRequest, id);
+
+        return result.ActionResult;
+    }
 }

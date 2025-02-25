@@ -2,6 +2,8 @@
 using Bank.Application.Responses;
 using Bank.UserService.Models;
 
+using EmployeeResponse = Bank.Application.Responses.EmployeeResponse;
+
 namespace Bank.UserService.Mappers;
 
 public static class UserMapper
@@ -148,6 +150,29 @@ public static class UserMapper
                    CreatedAt                  = DateTime.UtcNow,
                    ModifiedAt                 = DateTime.UtcNow,
                    Activated                  = false,
+               };
+    }
+
+    public static Employee ToEmployee(this EmployeeUpdateRequest employeeUpdateRequest, Employee oldEmployee)
+    {
+        return new Employee
+               {
+                   FirstName                  = employeeUpdateRequest.FirstName,
+                   LastName                   = employeeUpdateRequest.LastName,
+                   Username                   = employeeUpdateRequest.Username,
+                   PhoneNumber                = employeeUpdateRequest.PhoneNumber,
+                   Address                    = employeeUpdateRequest.Address,
+                   Role                       = employeeUpdateRequest.Role,
+                   Department                 = employeeUpdateRequest.Department,
+                   Employed                   = employeeUpdateRequest.Employed,
+                   Activated                  = employeeUpdateRequest.Activated,
+                   Id                         = oldEmployee.Id,
+                   DateOfBirth                = oldEmployee.DateOfBirth,
+                   Gender                     = oldEmployee.Gender,
+                   UniqueIdentificationNumber = oldEmployee.UniqueIdentificationNumber,
+                   Email                      = oldEmployee.Email,
+                   CreatedAt                  = oldEmployee.CreatedAt,
+                   ModifiedAt                 = DateTime.UtcNow
                };
     }
 }
