@@ -1,4 +1,6 @@
-﻿using Bank.Application.Endpoints;
+﻿using Bank.Application.Domain;
+using Bank.Application.Endpoints;
+using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.Application.Utilities;
@@ -9,6 +11,8 @@ namespace Bank.UserService.Services;
 
 public interface IUserService
 {
+    Task<Result<IEnumerable<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
+
     Task<Result<UserResponse>> GetOne(Guid id);
 
     Task<Result<UserResponse>> Login(UserLoginRequest userLoginRequest);
@@ -17,6 +21,13 @@ public interface IUserService
 public class UserService(IUserRepository userRepository) : IUserService
 {
     private readonly IUserRepository m_UserRepository = userRepository;
+
+    public async Task<Result<IEnumerable<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
+    {
+        var users = await m_UserRepository.FindAll(userFilterQuery, pageable);
+
+        return Result.Ok(users.Select(user => user.ToResponse()));
+    }
 
     public async Task<Result<UserResponse>> GetOne(Guid id)
     {
