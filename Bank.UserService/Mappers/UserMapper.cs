@@ -1,4 +1,5 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Mappers;
@@ -101,6 +102,52 @@ public static class UserMapper
                    ModifiedAt                 = employee.ModifiedAt,
                    Employed                   = employee.Employed,
                    Activated                  = employee.Activated
+               };
+    }
+
+    public static EmployeeResponse ToResponse(this Employee employee)
+    {
+        return new EmployeeResponse
+               {
+                   Id                         = employee.Id,
+                   FirstName                  = employee.FirstName,
+                   LastName                   = employee.LastName,
+                   DateOfBirth                = employee.DateOfBirth,
+                   Gender                     = employee.Gender,
+                   UniqueIdentificationNumber = employee.UniqueIdentificationNumber,
+                   Email                      = employee.Email,
+                   Username                   = employee.Username,
+                   PhoneNumber                = employee.PhoneNumber,
+                   Address                    = employee.Address,
+                   Role                       = employee.Role,
+                   Department                 = employee.Department,
+                   CreatedAt                  = employee.CreatedAt,
+                   ModifiedAt                 = employee.ModifiedAt,
+                   Employed                   = employee.Employed,
+                   Activated                  = employee.Activated
+               };
+    }
+
+    public static Employee ToEmployee(this EmployeeCreateRequest employeeCreateRequest)
+    {
+        return new Employee
+               {
+                   FirstName                  = employeeCreateRequest.FirstName,
+                   LastName                   = employeeCreateRequest.LastName,
+                   DateOfBirth                = employeeCreateRequest.DateOfBirth,
+                   Gender                     = employeeCreateRequest.Gender,
+                   UniqueIdentificationNumber = employeeCreateRequest.UniqueIdentificationNumber,
+                   Email                      = employeeCreateRequest.Email,
+                   Username                   = employeeCreateRequest.Username,
+                   PhoneNumber                = employeeCreateRequest.PhoneNumber,
+                   Address                    = employeeCreateRequest.Address,
+                   Role                       = employeeCreateRequest.Role,
+                   Department                 = employeeCreateRequest.Department,
+                   Employed                   = employeeCreateRequest.Employed,
+                   Id                         = Guid.NewGuid(),
+                   CreatedAt                  = DateTime.UtcNow,
+                   ModifiedAt                 = DateTime.UtcNow,
+                   Activated                  = false,
                };
     }
 }
