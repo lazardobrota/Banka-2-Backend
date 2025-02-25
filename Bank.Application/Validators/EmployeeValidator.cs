@@ -20,12 +20,16 @@ public class EmployeeValidator
             RuleFor(employeeRequest => employeeRequest.FirstName)
             .NotEmpty()
             .WithMessage("First name is required.")
+            .MaximumLength(32)
+            .WithMessage("First name must be at most 32 characters long.")
             .Must(ValidatorUtilities.ValidateName)
             .WithMessage("First name is not valid.");
 
             RuleFor(employeeRequest => employeeRequest.LastName)
             .NotEmpty()
             .WithMessage("Last name is required.")
+            .MaximumLength(32)
+            .WithMessage("Last name must be at most 32 characters long.")
             .Must(ValidatorUtilities.ValidateName)
             .WithMessage("Last name is not valid.");
 
@@ -117,12 +121,16 @@ public class EmployeeValidator
             RuleFor(employeeRequest => employeeRequest.FirstName)
             .NotEmpty()
             .WithMessage("First name is required.")
+            .MaximumLength(32)
+            .WithMessage("First name must be at most 32 characters long.")
             .Must(ValidatorUtilities.ValidateName)
             .WithMessage("First name is not valid.");
 
             RuleFor(employeeRequest => employeeRequest.LastName)
             .NotEmpty()
             .WithMessage("Last name is required.")
+            .MaximumLength(32)
+            .WithMessage("Last name must be at most 32 characters long.")
             .Must(ValidatorUtilities.ValidateName)
             .WithMessage("Last name is not valid.");
 
