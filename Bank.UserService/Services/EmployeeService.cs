@@ -11,6 +11,8 @@ public interface IEmployeeService
     Task<Result<EmployeeResponse>> GetOne(Guid id);
 
     Task<Result<EmployeeResponse>> Create(EmployeeCreateRequest employeeCreateRequest);
+
+    Task<Result<EmployeeResponse>> Update(EmployeeUpdateRequest employeeUpdateRequest, Guid id);
 }
 
 public class EmployeeService(IUserRepository userRepository) : IEmployeeService
@@ -32,6 +34,20 @@ public class EmployeeService(IUserRepository userRepository) : IEmployeeService
     {
         var user = await m_UserRepository.Add(employeeCreateRequest.ToEmployee()
                                                                    .ToUser());
+
+        return Result.Ok(user.ToEmployee()
+                             .ToResponse());
+    }
+
+    public async Task<Result<EmployeeResponse>> Update(EmployeeUpdateRequest employeeUpdateRequest, Guid id)
+    {
+        var oldUser = await m_UserRepository.FindById(id);
+
+        if (oldUser is null)
+            return Result.NotFound<EmployeeResponse>($"No Employee found with Id: {id}");
+
+        var user = await m_UserRepository.Update(oldUser, employeeUpdateRequest.ToEmployee(oldUser.ToEmployee())
+                                                                               .ToUser());
 
         return Result.Ok(user.ToEmployee()
                              .ToResponse());

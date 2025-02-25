@@ -16,6 +16,8 @@ public interface IUserRepository
     Task<User?> FindByEmail(string email);
 
     Task<User> Add(User user);
+
+    Task<User> Update(User oldUser, User user);
 }
 
 public class UserRepository(ApplicationContext context) : IUserRepository
@@ -60,5 +62,17 @@ public class UserRepository(ApplicationContext context) : IUserRepository
         await m_Context.SaveChangesAsync();
 
         return addedUser.Entity;
+    }
+
+    public async Task<User> Update(User oldUser, User user)
+    {
+        m_Context.Users.Entry(oldUser)
+                 .State = EntityState.Detached;
+
+        var updatedUser = m_Context.Users.Update(user);
+
+        await m_Context.SaveChangesAsync();
+
+        return updatedUser.Entity;
     }
 }

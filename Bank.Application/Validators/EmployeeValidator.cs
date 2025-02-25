@@ -111,4 +111,48 @@ public class EmployeeValidator
             return !(value[9] - '0' < 5 ^ m_Gender == 0);
         }
     }
+
+    public class Update : AbstractValidator<EmployeeUpdateRequest>
+    {
+        public Update()
+        {
+            RuleFor(userRequest => userRequest.FirstName)
+            .NotEmpty()
+            .WithMessage("First name is required.")
+            .MaximumLength(32)
+            .WithMessage("Password must be at most 32 characters long.")
+            .Must(ValidatorUtilities.ValidateName)
+            .WithMessage("First name is not valid.");
+
+            RuleFor(userRequest => userRequest.LastName)
+            .NotEmpty()
+            .WithMessage("Last name is required.")
+            .Must(ValidatorUtilities.ValidateName)
+            .WithMessage("Last name is not valid.");
+
+            RuleFor(userRequest => userRequest.Username)
+            .Must(ValidatorUtilities.ValidateUsername)
+            .WithMessage("Invalid username.");
+
+            RuleFor(userRequest => userRequest.PhoneNumber)
+            .NotEmpty()
+            .WithMessage("Phone number is required.")
+            .Must(ValidatorUtilities.ValidatePhoneNumber)
+            .WithMessage("Phone number is not valid.")
+            .MinimumLength(12)
+            .WithMessage("Phone number does not have enough digits.")
+            .MaximumLength(13)
+            .WithMessage("Phone number has more than 13 digits.");
+
+            RuleFor(userRequest => userRequest.Address)
+            .NotEmpty()
+            .WithMessage("Address is required.")
+            .Must(ValidatorUtilities.ValidateNameWithNumbers)
+            .WithMessage("Address is not valid.");
+
+            RuleFor(userRequest => userRequest.Department)
+            .Must(ValidatorUtilities.ValidateNameWithNumbers)
+            .WithMessage("Department name is not valid.");
+        }
+    }
 }
