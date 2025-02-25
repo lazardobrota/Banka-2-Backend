@@ -19,75 +19,75 @@ public class EmployeeValidator
         {
             RuleFor(employeeRequest => employeeRequest.FirstName)
             .NotEmpty()
-            .WithMessage("First name is required.")
+            .WithMessage(ValidationErrorMessage.Global.FirstNameRequired)
             .MaximumLength(32)
-            .WithMessage("First name must be at most 32 characters long.")
+            .WithMessage(ValidationErrorMessage.Global.FirstNameLength)
             .Must(ValidatorUtilities.ValidateName)
-            .WithMessage("First name is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.FirstNameInvalid);
 
             RuleFor(employeeRequest => employeeRequest.LastName)
             .NotEmpty()
-            .WithMessage("Last name is required.")
+            .WithMessage(ValidationErrorMessage.Global.LastNameRequired)
             .MaximumLength(32)
-            .WithMessage("Last name must be at most 32 characters long.")
+            .WithMessage(ValidationErrorMessage.Global.LastNameLength)
             .Must(ValidatorUtilities.ValidateName)
-            .WithMessage("Last name is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.LastNameInvalid);
 
             RuleFor(employeeRequest => employeeRequest.Gender)
             .NotEqual(Gender.Invalid)
-            .WithMessage("Gender is required.");
+            .WithMessage(ValidationErrorMessage.Global.GenderRequired);
 
             RuleFor(employeeRequest => employeeRequest.UniqueIdentificationNumber)
             .NotEmpty()
-            .WithMessage("Unique identification number is required.")
+            .WithMessage(ValidationErrorMessage.Global.UINRequired)
             .Must(ValidatorUtilities.MatchUniqueIdentificationNumberRule)
-            .WithMessage("Unique identification number must be 13 digits.")
+            .WithMessage(ValidationErrorMessage.Global.UINLength)
             .Must(ValidateUniqueIdentificationNumberDate)
-            .WithMessage("Unique identification number does not contain a valid date.")
+            .WithMessage(ValidationErrorMessage.Global.UINInvalidDate)
             .Must(ValidateGender)
-            .WithMessage("Unique identification number does not contain a valid gender.")
+            .WithMessage(ValidationErrorMessage.Global.UINInvalidGender)
             .Must(ValidatorUtilities.ValidateControlNumber)
-            .WithMessage("Unique identification number does not have a valid control digit.");
+            .WithMessage(ValidationErrorMessage.Global.UINInvalidControlDigit);
 
             RuleFor(employeeRequest => employeeRequest.DateOfBirth)
             .NotEqual(DateOnly.MinValue)
-            .WithMessage("Date of birth is required.")
+            .WithMessage(ValidationErrorMessage.Global.DOBRequired)
             .Must(ValidatorUtilities.ValidateDateOfBirth)
-            .WithMessage("Date of birth is not valid.")
+            .WithMessage(ValidationErrorMessage.Global.DOBInvalid)
             .Must(DatesMatch)
-            .WithMessage("Date of birth doesn't match date of unique identification number.");
+            .WithMessage(ValidationErrorMessage.Global.DOBMismatch);
 
             RuleFor(employeeRequest => employeeRequest.Email)
             .EmailAddress()
-            .WithMessage("Email is not a valid email address.");
+            .WithMessage(ValidationErrorMessage.Global.EmailInvalid);
 
             RuleFor(employeeRequest => employeeRequest.Username)
             .Must(ValidatorUtilities.ValidateUsername)
-            .WithMessage("Invalid username.");
+            .WithMessage(ValidationErrorMessage.Global.UsernameInvalid);
 
             RuleFor(employeeRequest => employeeRequest.PhoneNumber)
             .NotEmpty()
-            .WithMessage("Phone number is required.")
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberRequired)
             .Must(ValidatorUtilities.ValidatePhoneNumber)
-            .WithMessage("Phone number is not valid.")
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberInvalid)
             .MinimumLength(12)
-            .WithMessage("Phone number does not have enough digits.")
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberMinLength)
             .MaximumLength(13)
-            .WithMessage("Phone number has more than 13 digits.");
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberMaxLength);
 
             RuleFor(employeeRequest => employeeRequest.Address)
             .NotEmpty()
-            .WithMessage("Address is required.")
+            .WithMessage(ValidationErrorMessage.Global.AddressRequired)
             .Must(ValidatorUtilities.ValidateNameWithNumbers)
-            .WithMessage("Address is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.AddressInvalid);
 
             RuleFor(employeeRequest => employeeRequest.Role)
             .NotEqual(Role.Invalid)
-            .WithMessage("Role is required.");
+            .WithMessage(ValidationErrorMessage.Global.RoleRequired);
 
             RuleFor(employeeRequest => employeeRequest.Department)
             .Must(ValidatorUtilities.ValidateNameWithNumbers)
-            .WithMessage("Department name is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.DepartmentInvalid);
         }
 
         private bool ValidateUniqueIdentificationNumberDate(string value)
@@ -120,43 +120,43 @@ public class EmployeeValidator
         {
             RuleFor(employeeRequest => employeeRequest.FirstName)
             .NotEmpty()
-            .WithMessage("First name is required.")
+            .WithMessage(ValidationErrorMessage.Global.FirstNameRequired)
             .MaximumLength(32)
-            .WithMessage("First name must be at most 32 characters long.")
+            .WithMessage(ValidationErrorMessage.Global.FirstNameLength)
             .Must(ValidatorUtilities.ValidateName)
-            .WithMessage("First name is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.FirstNameInvalid);
 
             RuleFor(employeeRequest => employeeRequest.LastName)
             .NotEmpty()
-            .WithMessage("Last name is required.")
+            .WithMessage(ValidationErrorMessage.Global.LastNameRequired)
             .MaximumLength(32)
-            .WithMessage("Last name must be at most 32 characters long.")
+            .WithMessage(ValidationErrorMessage.Global.LastNameLength)
             .Must(ValidatorUtilities.ValidateName)
-            .WithMessage("Last name is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.LastNameInvalid);
 
             RuleFor(employeeRequest => employeeRequest.Username)
             .Must(ValidatorUtilities.ValidateUsername)
-            .WithMessage("Invalid username.");
+            .WithMessage(ValidationErrorMessage.Global.UsernameInvalid);
 
             RuleFor(employeeRequest => employeeRequest.PhoneNumber)
             .NotEmpty()
-            .WithMessage("Phone number is required.")
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberRequired)
             .Must(ValidatorUtilities.ValidatePhoneNumber)
-            .WithMessage("Phone number is not valid.")
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberInvalid)
             .MinimumLength(12)
-            .WithMessage("Phone number does not have enough digits.")
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberMinLength)
             .MaximumLength(13)
-            .WithMessage("Phone number has more than 13 digits.");
+            .WithMessage(ValidationErrorMessage.Global.PhoneNumberMaxLength);
 
             RuleFor(employeeRequest => employeeRequest.Address)
             .NotEmpty()
-            .WithMessage("Address is required.")
+            .WithMessage(ValidationErrorMessage.Global.AddressRequired)
             .Must(ValidatorUtilities.ValidateNameWithNumbers)
-            .WithMessage("Address is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.AddressInvalid);
 
             RuleFor(employeeRequest => employeeRequest.Department)
             .Must(ValidatorUtilities.ValidateNameWithNumbers)
-            .WithMessage("Department name is not valid.");
+            .WithMessage(ValidationErrorMessage.Global.DepartmentInvalid);
         }
     }
 }
