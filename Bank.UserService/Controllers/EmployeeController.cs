@@ -1,11 +1,9 @@
-﻿using Bank.Application;
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.UserService.Services;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.UserService.Controllers;
@@ -21,7 +19,7 @@ public class EmployeeController(IEmployeeService employeeService) : ControllerBa
 
         return result.ActionResult;
     }
-    
+
     [HttpGet(Endpoints.Employee.GetOne)]
     public async Task<IActionResult> GetOne([FromRoute] Guid id)
     {

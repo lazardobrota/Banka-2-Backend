@@ -11,12 +11,12 @@ namespace Bank.UserService.Services;
 public interface IEmployeeService
 {
     Task<Result<List<EmployeeResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
+
     Task<Result<EmployeeResponse>> GetOne(Guid id);
 
     Task<Result<EmployeeResponse>> Create(EmployeeCreateRequest employeeCreateRequest);
 
     Task<Result<EmployeeResponse>> Update(EmployeeUpdateRequest employeeUpdateRequest, Guid id);
-    
 }
 
 public class EmployeeService(IUserRepository userRepository) : IEmployeeService
@@ -34,7 +34,7 @@ public class EmployeeService(IUserRepository userRepository) : IEmployeeService
                                                   .ToResponse())
                               .ToList());
     }
-    
+
     public async Task<Result<EmployeeResponse>> GetOne(Guid id)
     {
         var user = await m_UserRepository.FindById(id);

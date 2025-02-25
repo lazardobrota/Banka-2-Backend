@@ -8,4 +8,3 @@ public static class EnvironmentVariable
     public const string ExpirationInMinutes          = "BANK_JWT_TIMER";
     public const string ExpirationInMinutesElseValue = "30";
 }
-

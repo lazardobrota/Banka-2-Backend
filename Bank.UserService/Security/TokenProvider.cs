@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text;
 
-using Bank.Application;
 using Bank.UserService.Application;
 using Bank.UserService.Models;
 
@@ -22,8 +21,8 @@ public class TokenProvider
 
         var claims = new List<Claim>
                      {
-                         new ("id",   user.Id.ToString()),
-                         new ("role", user.Role.ToString())
+                         new("id", user.Id.ToString()),
+                         new("role", user.Role.ToString())
                      };
 
         var tokenDescriptor = new SecurityTokenDescriptor

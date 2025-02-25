@@ -59,11 +59,12 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IAccountRepository, AccountRepository>();
         services.AddTransient<IUserService, Services.UserService>();
+        services.AddTransient<IClientService, ClientService>();
         services.AddTransient<IEmployeeService, EmployeeService>();
-
         services.AddSingleton<TokenProvider>();
 
         services.AddSingleton<DatabaseHostedService>();
+        Console.WriteLine(DatabaseConfig.GetConnectionString());
 
         services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(DatabaseConfig.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
 
@@ -93,8 +94,5 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static void ConfigureAuthorizationOptions(AuthorizationOptions jwtOptions)
-    {
-        
-    }
+    private static void ConfigureAuthorizationOptions(AuthorizationOptions jwtOptions) { }
 }

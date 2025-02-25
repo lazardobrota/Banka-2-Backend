@@ -1,4 +1,5 @@
-﻿using Bank.Application.Requests;
+﻿using Bank.Application.Domain;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Models;
 
@@ -173,6 +174,115 @@ public static class UserMapper
                    Email                      = oldEmployee.Email,
                    CreatedAt                  = oldEmployee.CreatedAt,
                    ModifiedAt                 = DateTime.UtcNow
+               };
+    }
+
+    public static ClientResponse ToResponse(this Client client)
+    {
+        return new ClientResponse
+               {
+                   Id                         = client.Id,
+                   FirstName                  = client.FirstName,
+                   LastName                   = client.LastName,
+                   DateOfBirth                = client.DateOfBirth,
+                   Gender                     = client.Gender,
+                   UniqueIdentificationNumber = client.UniqueIdentificationNumber,
+                   Email                      = client.Email,
+                   PhoneNumber                = client.PhoneNumber,
+                   Address                    = client.Address,
+                   Role                       = client.Role,
+                   CreatedAt                  = client.CreatedAt,
+                   ModifiedAt                 = client.ModifiedAt,
+                   Activated                  = client.Activated
+               };
+    }
+
+    public static Client ToClient(this ClientCreateRequest clientCreateRequest)
+    {
+        return new Client
+               {
+                   Id                         = Guid.NewGuid(),
+                   FirstName                  = clientCreateRequest.FirstName,
+                   LastName                   = clientCreateRequest.LastName,
+                   DateOfBirth                = clientCreateRequest.DateOfBirth,
+                   Gender                     = clientCreateRequest.Gender,
+                   UniqueIdentificationNumber = clientCreateRequest.UniqueIdentificationNumber,
+                   Email                      = clientCreateRequest.Email,
+                   PhoneNumber                = clientCreateRequest.PhoneNumber,
+                   Salt                       = Guid.NewGuid(),
+                   Address                    = clientCreateRequest.Address,
+                   Role                       = Role.Client,
+                   CreatedAt                  = DateTime.UtcNow,
+                   ModifiedAt                 = DateTime.UtcNow,
+                   Activated                  = false
+               };
+    }
+
+    public static Client ToClient(this ClientUpdateRequest clientUpdateRequest, Client oldClient)
+    {
+        return new Client
+               {
+                   Id                         = oldClient.Id,
+                   FirstName                  = clientUpdateRequest.FirstName,
+                   LastName                   = clientUpdateRequest.LastName,
+                   PhoneNumber                = clientUpdateRequest.PhoneNumber,
+                   Address                    = clientUpdateRequest.Address,
+                   Activated                  = clientUpdateRequest.Activated,
+                   DateOfBirth                = oldClient.DateOfBirth,
+                   Gender                     = oldClient.Gender,
+                   UniqueIdentificationNumber = oldClient.UniqueIdentificationNumber,
+                   Email                      = oldClient.Email,
+                   Salt                       = oldClient.Salt,
+                   Role                       = oldClient.Role,
+                   CreatedAt                  = oldClient.CreatedAt,
+                   ModifiedAt                 = DateTime.UtcNow
+               };
+    }
+
+    public static User ToUser(this Client client)
+    {
+        return new User
+               {
+                   Id                         = client.Id,
+                   FirstName                  = client.FirstName,
+                   LastName                   = client.LastName,
+                   DateOfBirth                = client.DateOfBirth,
+                   Gender                     = client.Gender,
+                   UniqueIdentificationNumber = client.UniqueIdentificationNumber,
+                   Email                      = client.Email,
+                   Username                   = "",
+                   PhoneNumber                = client.PhoneNumber,
+                   Address                    = client.Address,
+                   Password                   = client.Password,
+                   Salt                       = client.Salt,
+                   Role                       = client.Role,
+                   Department                 = null,
+                   CreatedAt                  = client.CreatedAt,
+                   ModifiedAt                 = client.ModifiedAt,
+                   Employed                   = null,
+                   Activated                  = client.Activated
+               };
+    }
+
+    public static Client ToClient(this User user)
+    {
+        return new Client
+               {
+                   Id                         = user.Id,
+                   FirstName                  = user.FirstName,
+                   LastName                   = user.LastName,
+                   DateOfBirth                = user.DateOfBirth,
+                   Gender                     = user.Gender,
+                   UniqueIdentificationNumber = user.UniqueIdentificationNumber,
+                   Email                      = user.Email,
+                   PhoneNumber                = user.PhoneNumber,
+                   Address                    = user.Address,
+                   Password                   = user.Password,
+                   Salt                       = user.Salt,
+                   Role                       = user.Role,
+                   CreatedAt                  = user.CreatedAt,
+                   ModifiedAt                 = user.ModifiedAt,
+                   Activated                  = user.Activated
                };
     }
 }
