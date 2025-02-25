@@ -9,6 +9,14 @@ namespace Bank.UserService.Controllers;
 [ApiController]
 public class EmployeeController(IEmployeeService employeeService) : ControllerBase
 {
+    [HttpGet(Endpoints.Employee.GetOne)]
+    public async Task<IActionResult> GetOne([FromRoute] Guid id)
+    {
+        var result = await employeeService.GetOne(id);
+
+        return result.ActionResult;
+    }
+
     [HttpPost(Endpoints.Employee.Create)]
     public async Task<IActionResult> Create([FromBody] EmployeeCreateRequest employeeCreateRequest)
     {
