@@ -12,9 +12,9 @@ public static class UserValidator
         {
             RuleFor(userRequest => userRequest.Email)
             .NotEmpty()
-            .WithMessage("Email is required.")
+            .WithMessage(ValidationErrorMessage.Global.EmailRequired)
             .EmailAddress()
-            .WithMessage("Email is invalid.");
+            .WithMessage(ValidationErrorMessage.Global.EmailInvalid);
         }
     }
 }

@@ -6,6 +6,7 @@ using Bank.Application.Responses;
 using Bank.Application.Utilities;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
+using Bank.UserService.Security;
 
 namespace Bank.UserService.Services;
 
@@ -15,10 +16,10 @@ public interface IUserService
 
     Task<Result<UserResponse>> GetOne(Guid id);
 
-    Task<Result<UserResponse>> Login(UserLoginRequest userLoginRequest);
+    Task<Result<TokenResponse>> Login(UserLoginRequest userLoginRequest);
 }
 
-public class UserService(IUserRepository userRepository) : IUserService
+public class UserService(IUserRepository userRepository, TokenProvider tokenProvider) : IUserService
 {
     private readonly IUserRepository m_UserRepository = userRepository;
 
@@ -39,19 +40,21 @@ public class UserService(IUserRepository userRepository) : IUserService
         return Result.Ok(user.ToResponse());
     }
 
-    public async Task<Result<UserResponse>> Login(UserLoginRequest userLoginRequest)
+    public async Task<Result<TokenResponse>> Login(UserLoginRequest userLoginRequest)
     {
         var user = await m_UserRepository.FindByEmail(userLoginRequest.Email);
 
         if (user == null)
-            return Result.NotFound<UserResponse>("User with the specified email address was not found.");
+            return Result.NotFound<TokenResponse>("User with the specified email address was not found.");
 
         if (!user.Activated)
-            return Result.Forbidden<UserResponse>("To proceed, the account has to be activated.");
+            return Result.Forbidden<TokenResponse>("To proceed, the account has to be activated.");
 
         if (user.Password != HashingUtilities.HashPassword(userLoginRequest.Password, user.Salt))
-            return Result.BadRequest<UserResponse>("The password is incorrect.");
+            return Result.BadRequest<TokenResponse>("The password is incorrect.");
 
-        return Result.Ok(user.ToResponse());
+        string token = tokenProvider.Create(user);
+
+        return Result.Ok(new TokenResponse { Token = token });
     }
 }
