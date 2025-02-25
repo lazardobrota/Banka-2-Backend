@@ -40,10 +40,9 @@ public static partial class Endpoints
         public const string Base = $"{ApiBase}/clinets";
 
         public const string GetAll = $"{Base}";
-        // TODO
-        // public const string GetOne   = $"{Base}/{{id:guid}}";
-        // public const string Login    = $"{Base}/login";
-        // public const string Activate = $"{Base}/activate";
+        public const string Create = $"{Base}";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Update = $"{Base}/{{id:guid}}";
     }
 }
 
