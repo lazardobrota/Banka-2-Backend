@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.UserService", "Bank.UserService\Bank.UserService.csproj", "{8FED183D-5C94-4072-80ED-39911D08F2FC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A9E722D2-75D0-4FC8-9CD4-2248C1A5E90D}"

@@ -1,4 +1,6 @@
-﻿using Bank.Application.Endpoints;
+﻿using Bank.Application.Domain;
+using Bank.Application.Endpoints;
+using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.UserService.Services;
 
@@ -10,6 +12,14 @@ namespace Bank.UserService.Controllers;
 public class UserController(IUserService userService) : ControllerBase
 {
     private readonly IUserService m_UserService = userService;
+
+    [HttpGet(Endpoints.User.GetAll)]
+    public async Task<IActionResult> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
+    {
+        var result = await m_UserService.GetAll(userFilterQuery, pageable);
+
+        return result.ActionResult;
+    }
 
     [HttpGet(Endpoints.User.GetOne)]
     public async Task<IActionResult> GetOne(Guid id)
