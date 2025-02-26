@@ -1,4 +1,6 @@
-﻿using Bank.Application.Domain;
+﻿using System.IdentityModel.Tokens.Jwt;
+
+using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
@@ -17,6 +19,10 @@ public interface IUserService
     Task<Result<UserResponse>> GetOne(Guid id);
 
     Task<Result<TokenResponse>> Login(UserLoginRequest userLoginRequest);
+
+    Task<Result> Activate(UserActivationRequest userActivationRequest, string token);
+
+    Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token);
 }
 
 public class UserService(IUserRepository userRepository, TokenProvider tokenProvider) : IUserService
@@ -54,7 +60,30 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
             return Result.BadRequest<TokenResponse>("The password is incorrect.");
 
         string token = tokenProvider.Create(user);
-
+        
         return Result.Ok(new TokenResponse { Token = token });
+    }
+
+    public async Task<Result> Activate(UserActivationRequest userActivationRequest, string token)
+    {
+        var handler  = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+
+        var userIdClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "id");
+
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var id))
+            return Result.BadRequest("Invalid token");
+
+        if (userActivationRequest.Password != userActivationRequest.ConfirmPassword)
+            return Result.BadRequest("Passwords do not match.");
+
+        await m_UserRepository.SetPassword(id, userActivationRequest.Password);
+
+        return Result.Accepted();
+    }
+    
+    public async Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token)
+    {
+        return await Activate(new UserActivationRequest { Password = userPasswordResetRequest.Password, ConfirmPassword = userPasswordResetRequest.ConfirmPassword }, token);
     }
 }

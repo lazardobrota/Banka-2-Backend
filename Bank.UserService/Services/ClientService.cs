@@ -5,6 +5,7 @@ using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
+using Bank.UserService.Security;
 
 namespace Bank.UserService.Services;
 
@@ -27,10 +28,7 @@ public class ClientService(IUserRepository repository) : IClientService
     {
         var clients = await m_UserRepository.FindAll(userFilterQuery, pageable);
 
-        if (clients == null)
-            return Result.NotFound<List<ClientResponse>>();
-
-        var clientResponses = clients.Where(client => client.Role == Role.Client) // ✅ Filtrira samo klijente sa Role.Client
+        var clientResponses = clients.Where(client => client.Role == Role.Client)
                                      .Select(client => client.ToClient()
                                                              .ToResponse())
                                      .ToList();
@@ -53,7 +51,10 @@ public class ClientService(IUserRepository repository) : IClientService
     {
         var user = await m_UserRepository.Add(clientCreateRequest.ToClient()
                                                                  .ToUser());
-
+        
+        //TODO: Send Activation Mail
+        Console.WriteLine(TokenProvider.GenerateToken(user));
+        
         return Result.Ok(user.ToClient()
                              .ToResponse());
     }

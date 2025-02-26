@@ -1,5 +1,6 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Queries;
+using Bank.Application.Utilities;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
@@ -18,6 +19,8 @@ public interface IUserRepository
     Task<User> Add(User user);
 
     Task<User> Update(User oldUser, User user);
+    
+    Task<User> SetPassword(Guid id, string password);
 }
 
 public class UserRepository(ApplicationContext context) : IUserRepository
@@ -74,5 +77,20 @@ public class UserRepository(ApplicationContext context) : IUserRepository
         await m_Context.SaveChangesAsync();
 
         return updatedUser.Entity;
+    }
+
+    public async Task<User> SetPassword(Guid id, string password)
+    {
+        var user = FindById(id).Result;
+
+        if (user == null)
+            throw new Exception("User not found.");
+        
+        user.Password  = HashingUtilities.HashPassword(password, user.Salt);
+        user.Activated = true;
+
+        await m_Context.SaveChangesAsync();
+
+        return user;
     }
 }

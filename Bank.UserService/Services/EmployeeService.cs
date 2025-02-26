@@ -5,6 +5,7 @@ using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
+using Bank.UserService.Security;
 
 namespace Bank.UserService.Services;
 
@@ -50,6 +51,8 @@ public class EmployeeService(IUserRepository userRepository) : IEmployeeService
     {
         var user = await m_UserRepository.Add(employeeCreateRequest.ToEmployee()
                                                                    .ToUser());
+        //TODO: Send Activation Mail
+        Console.WriteLine(TokenProvider.GenerateToken(user));
 
         return Result.Ok(user.ToEmployee()
                              .ToResponse());

@@ -36,4 +36,20 @@ public class UserController(IUserService userService) : ControllerBase
 
         return result.ActionResult;
     }
+    
+    [HttpPost(Endpoints.User.Activate)]
+    public async Task<IActionResult> Activate([FromBody] UserActivationRequest userActivationRequest, [FromQuery] string token)
+    {
+        var result = await m_UserService.Activate(userActivationRequest, token);
+
+        return result.ActionResult;
+    }
+    
+    [HttpPost(Endpoints.User.PasswordReset)]
+    public async Task<IActionResult> PasswordReset([FromBody] UserPasswordResetRequest userPasswordResetRequest, [FromQuery] string token)
+    {
+        var result = await m_UserService.PasswordReset(userPasswordResetRequest, token);
+
+        return result.ActionResult;
+    }
 }
