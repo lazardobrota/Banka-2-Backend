@@ -2,6 +2,7 @@
 using System.Text;
 
 using Bank.Application;
+using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.HostedServices;
 using Bank.UserService.Repositories;
@@ -28,6 +29,7 @@ public class UserApplication
         builder.Services.AddAuthenticationAndAuthorization();
 
         builder.Services.AddServiceApplication();
+        builder.Services.AddApplicationCors();
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -39,6 +41,8 @@ public class UserApplication
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.UseAuthentication();
         app.UseAuthorization();
@@ -70,6 +74,15 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(DatabaseConfig.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
 
         services.AddHostedService<ApplicationHostedService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddApplicationCors(this IServiceCollection services)
+    {
+        services.AddCors(options => options.AddPolicy(Configuration.Policy.FrontendApplication, policy => policy.WithOrigins(Configuration.Frontend.BaseUrl)
+                                                                                                                .AllowAnyHeader()
+                                                                                                                .AllowAnyMethod()));
 
         return services;
     }
