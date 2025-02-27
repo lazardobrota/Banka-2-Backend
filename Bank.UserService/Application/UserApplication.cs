@@ -2,6 +2,7 @@
 using System.Text;
 
 using Bank.Application;
+using Bank.Application.Domain;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.HostedServices;
@@ -13,7 +14,6 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -26,7 +26,8 @@ public class UserApplication
         var builder = WebApplication.CreateBuilder(args);
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-        builder.Services.AddAuthenticationAndAuthorization();
+        builder.Services.AddApplicationAuthentication();
+        builder.Services.AddApplicationAuthorization();
 
         builder.Services.AddServiceApplication();
         builder.Services.AddApplicationCors();
@@ -87,7 +88,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddAuthenticationAndAuthorization(this IServiceCollection services)
+    public static IServiceCollection AddApplicationAuthentication(this IServiceCollection services)
     {
         var secretKey = Environment.GetEnvironmentVariable(EnvironmentVariable.SecretKey) ?? EnvironmentVariable.SecretKeyElseValue;
 
@@ -103,10 +104,16 @@ public static class ServiceCollectionExtensions
                                                                                        ClockSkew                = TimeSpan.Zero
                                                                                    });
 
-        services.AddAuthorization(ConfigureAuthorizationOptions);
-
         return services;
     }
 
-    private static void ConfigureAuthorizationOptions(AuthorizationOptions jwtOptions) { }
+    public static IServiceCollection AddApplicationAuthorization(this IServiceCollection services)
+    {
+        services.AddAuthorizationBuilder()
+                .AddPolicy(Configuration.Policy.Role.Admin,    policy => policy.RequireRole(nameof(Role.Admin)))
+                .AddPolicy(Configuration.Policy.Role.Employee, policy => policy.RequireRole(nameof(Role.Employee)))
+                .AddPolicy(Configuration.Policy.Role.Client,   policy => policy.RequireRole(nameof(Role.Client)));
+
+        return services;
+    }
 }

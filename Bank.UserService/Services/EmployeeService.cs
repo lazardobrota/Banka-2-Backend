@@ -26,10 +26,9 @@ public class EmployeeService(IUserRepository userRepository, IEmailService email
 
     public async Task<Result<Page<EmployeeResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
-        var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
+        userFilterQuery.Role = Role.Employee;
 
-        if (page.Items.Count == 0)
-            return Result.NoContent<Page<EmployeeResponse>>();
+        var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
 
         var employeeResponses = page.Items.Select(user => user.ToEmployee()
                                                               .ToResponse())

@@ -4,7 +4,10 @@ using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.UserService.Services;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
 
 namespace Bank.UserService.Controllers;
 
@@ -14,6 +17,7 @@ public class UserController(IUserService userService) : ControllerBase
     private readonly IUserService m_UserService = userService;
 
     [HttpGet(Endpoints.User.GetAll)]
+    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
         var result = await m_UserService.GetAll(userFilterQuery, pageable);
@@ -21,6 +25,7 @@ public class UserController(IUserService userService) : ControllerBase
         return result.ActionResult;
     }
 
+    [Authorize]
     [HttpGet(Endpoints.User.GetOne)]
     public async Task<IActionResult> GetOne(Guid id)
     {
