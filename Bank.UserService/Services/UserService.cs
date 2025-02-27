@@ -60,7 +60,7 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
             return Result.BadRequest<TokenResponse>("The password is incorrect.");
 
         string token = tokenProvider.Create(user);
-        
+
         return Result.Ok(new TokenResponse { Token = token });
     }
 
@@ -81,7 +81,7 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
 
         return Result.Accepted();
     }
-    
+
     public async Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token)
     {
         return await Activate(new UserActivationRequest { Password = userPasswordResetRequest.Password, ConfirmPassword = userPasswordResetRequest.ConfirmPassword }, token);
