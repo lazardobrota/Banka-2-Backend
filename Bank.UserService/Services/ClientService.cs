@@ -26,15 +26,14 @@ public class ClientService(IUserRepository repository, IEmailService emailServic
 
     public async Task<Result<Page<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
+        userFilterQuery.Role = Role.Client;
+
         var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
 
         var clientResponses = page.Items.Where(client => client.Role == Role.Client)
                                   .Select(client => client.ToClient()
                                                           .ToResponse())
                                   .ToList();
-
-        if (clientResponses.Count == 0)
-            return Result.NoContent<Page<ClientResponse>>();
 
         return Result.Ok(new Page<ClientResponse>(clientResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
