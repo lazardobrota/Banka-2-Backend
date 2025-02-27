@@ -5,6 +5,7 @@ using Bank.Application.Endpoints;
 using Bank.UserService.Configurations;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
+using Bank.UserService.Security;
 
 namespace Bank.UserService.Services;
 
@@ -29,27 +30,23 @@ public class EmailService(IEmailRepository emailRepository) : IEmailService
             client.Credentials           = new NetworkCredential(Configuration.Email.Address, Configuration.Email.Password);
 
             // TODO: one day & environment variable
-            // var body = type == EmailType.UserActivateAccount
-            //            ? string.Format(email.Content, "http://localhost:5173/activate")
-            //            : string.Format(email.Content, "http://localhost:5173/reset-password");
+            var body = type == EmailType.UserActivateAccount
+                       ? email.FormatBody($"http://localhost:5173/activate?token={TokenProvider.GenerateToken(user)}")
+                       : email.FormatBody($"http://localhost:5173/reset-password?token={TokenProvider.GenerateToken(user)}");
 
             var mailMessage = new MailMessage();
             mailMessage.From       = new MailAddress(Configuration.Email.Address);
             mailMessage.Subject    = email.Subject;
-            mailMessage.Body       = email.Content;
+            mailMessage.Body       = body;
             mailMessage.IsBodyHtml = true;
             mailMessage.To.Add(user.Email);
 
-            client.Send(mailMessage);
-
-            Console.WriteLine("Email sent");
+            await client.SendMailAsync(mailMessage);
 
             return Result.Ok();
         }
-        catch (Exception ex)
+        catch (Exception _)
         {
-            Console.WriteLine("Error email");
-            Console.WriteLine(ex);
             return Result.BadRequest();
         }
     }

@@ -142,6 +142,7 @@ public static class UserMapper
                    UniqueIdentificationNumber = employeeCreateRequest.UniqueIdentificationNumber,
                    Email                      = employeeCreateRequest.Email,
                    Username                   = employeeCreateRequest.Username,
+                   Salt                       = Guid.NewGuid(),
                    PhoneNumber                = employeeCreateRequest.PhoneNumber,
                    Address                    = employeeCreateRequest.Address,
                    Role                       = employeeCreateRequest.Role,
