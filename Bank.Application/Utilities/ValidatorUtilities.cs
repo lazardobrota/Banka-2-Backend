@@ -50,7 +50,7 @@ public static partial class ValidatorUtilities
 
             return controlNumber == value[12] - '0';
         }
-        
+
         public static bool ContainAtLeastTwoDigits(string password)
         {
             return password.Count(char.IsDigit) >= 2;
@@ -58,12 +58,12 @@ public static partial class ValidatorUtilities
 
         public static bool ContainAtLeastOneLowercaseCharacter(string password)
         {
-            return password.Any(char.IsLower) == true;
+            return password.Any(char.IsLower);
         }
 
         public static bool ContainAtLeastOneUppercaseCharacter(string password)
         {
-            return password.Any(char.IsUpper) == true;
+            return password.Any(char.IsUpper);
         }
     }
 }
