@@ -11,7 +11,7 @@ namespace Bank.UserService.Services;
 
 public interface IEmployeeService
 {
-    Task<Result<List<EmployeeResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
+    Task<Result<Page<EmployeeResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
 
     Task<Result<EmployeeResponse>> GetOne(Guid id);
 
@@ -23,18 +23,18 @@ public interface IEmployeeService
 public class EmployeeService(IUserRepository userRepository) : IEmployeeService
 {
     private readonly IUserRepository m_UserRepository = userRepository;
-
-    public async Task<Result<List<EmployeeResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
+    public async Task<Result<Page<EmployeeResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
-        var users = await m_UserRepository.FindAll(userFilterQuery, pageable);
+        var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
 
-        if (users.Count == 0)
-            return Result.NoContent<List<EmployeeResponse>>();
+        if (page.Items.Count == 0)
+            return Result.NoContent<Page<EmployeeResponse>>();
 
-        return Result.Ok(users.Select(user => user.ToEmployee()
-                                                  .ToResponse())
-                              .ToList());
+        var employeeResponses = page.Items.Select(user => user.ToEmployee().ToResponse()).ToList();
+
+        return Result.Ok(new Page<EmployeeResponse>(employeeResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
+
 
     public async Task<Result<EmployeeResponse>> GetOne(Guid id)
     {
