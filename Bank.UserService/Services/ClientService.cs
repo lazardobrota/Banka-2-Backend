@@ -10,7 +10,7 @@ namespace Bank.UserService.Services;
 
 public interface IClientService
 {
-    Task<Result<List<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable);
+    Task<Result<Page<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable);
 
     Task<Result<ClientResponse>> GetOne(Guid id);
 
@@ -24,16 +24,19 @@ public class ClientService(IUserRepository repository, IEmailService emailServic
     private readonly IUserRepository m_UserRepository = repository;
     private readonly IEmailService   m_EmailService   = emailService;
 
-    public async Task<Result<List<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
+    public async Task<Result<Page<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
-        var clients = await m_UserRepository.FindAll(userFilterQuery, pageable);
+        var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
 
-        var clientResponses = clients.Where(client => client.Role == Role.Client)
-                                     .Select(client => client.ToClient()
-                                                             .ToResponse())
-                                     .ToList();
+        var clientResponses = page.Items.Where(client => client.Role == Role.Client)
+                                  .Select(client => client.ToClient()
+                                                          .ToResponse())
+                                  .ToList();
 
-        return clientResponses.Count == 0 ? Result.NotFound<List<ClientResponse>>() : Result.Ok(clientResponses);
+        if (clientResponses.Count == 0)
+            return Result.NoContent<Page<ClientResponse>>();
+
+        return Result.Ok(new Page<ClientResponse>(clientResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
     public async Task<Result<ClientResponse>> GetOne(Guid id)

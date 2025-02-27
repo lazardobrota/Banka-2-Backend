@@ -14,7 +14,8 @@ namespace Bank.UserService.Services;
 
 public interface IUserService
 {
-    Task<Result<IEnumerable<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
+    //Task<Result<IEnumerable<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
+    Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
 
     Task<Result<UserResponse>> GetOne(Guid id);
 
@@ -29,11 +30,14 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
 {
     private readonly IUserRepository m_UserRepository = userRepository;
 
-    public async Task<Result<IEnumerable<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
+    public async Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
-        var users = await m_UserRepository.FindAll(userFilterQuery, pageable);
+        var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
 
-        return Result.Ok(users.Select(user => user.ToResponse()));
+        var userResponses = page.Items.Select(user => user.ToResponse())
+                                .ToList();
+
+        return Result.Ok(new Page<UserResponse>(userResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
     public async Task<Result<UserResponse>> GetOne(Guid id)

@@ -16,6 +16,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [HttpGet(Endpoints.Client.GetAll)]
     public async Task<IActionResult> GetAll([FromQuery] UserFilterQuery filterQuery, [FromQuery] Pageable pageable)
     {
+        filterQuery.Role = Role.Client;
         var result = await m_clientService.FindAll(filterQuery, pageable);
 
         return result.ActionResult;
