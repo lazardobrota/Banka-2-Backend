@@ -29,10 +29,9 @@ public class EmailService(IEmailRepository emailRepository) : IEmailService
             client.UseDefaultCredentials = false;
             client.Credentials           = new NetworkCredential(Configuration.Email.Address, Configuration.Email.Password);
 
-            // TODO: one day & environment variable
             var body = type == EmailType.UserActivateAccount
-                       ? email.FormatBody($"http://localhost:5173/activate?token={TokenProvider.GenerateToken(user)}")
-                       : email.FormatBody($"http://localhost:5173/reset-password?token={TokenProvider.GenerateToken(user)}");
+                       ? email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.Activate}?token={TokenProvider.GenerateToken(user)}")
+                       : email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.ResetPassword}?token={TokenProvider.GenerateToken(user)}");
 
             var mailMessage = new MailMessage();
             mailMessage.From       = new MailAddress(Configuration.Email.Address);

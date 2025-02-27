@@ -42,6 +42,13 @@ public static partial class ValidationErrorMessage
         public const string UINInvalidGender       = "Unique identification number does not contain a valid gender.";
         public const string UINInvalidControlDigit = "Unique identification number does not have a valid control digit.";
 
+        public const string PasswordRequired                   = "Password is required.";
+        public const string PasswordTooShort                   = "Password must be at least 8 charachers long.";
+        public const string PasswordTooLong                    = "Password must be at most 32 characters long.";
+        public const string PasswordTwoDigitsRequired          = "Password must contain at least two digits.";
+        public const string PasswordLowercaseCharacterRequired = "Password must contain at least one lowercase character.";
+        public const string PasswordUppercaseCharacterRequired = "Password must contain at least one uppercase character.";
+
         public const string DOBRequired = "Date of birth is required.";
         public const string DOBInvalid  = "Date of birth is not valid.";
         public const string DOBMismatch = "Date of birth doesn't match date of unique identification number.";
