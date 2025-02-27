@@ -12,6 +12,11 @@ public class UserActivationRequest
     public required string ConfirmPassword { set; get; }
 }
 
+public class UserRequestPasswordResetRequest
+{
+    public required string Email { set; get; }
+}
+
 public class UserPasswordResetRequest
 {
     public required string Password        { set; get; }

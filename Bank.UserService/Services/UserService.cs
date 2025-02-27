@@ -14,7 +14,6 @@ namespace Bank.UserService.Services;
 
 public interface IUserService
 {
-    //Task<Result<IEnumerable<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
     Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
 
     Task<Result<UserResponse>> GetOne(Guid id);
@@ -23,12 +22,15 @@ public interface IUserService
 
     Task<Result> Activate(UserActivationRequest userActivationRequest, string token);
 
+    Task<Result> RequestPasswordReset(UserRequestPasswordResetRequest passwordResetRequest);
+
     Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token);
 }
 
-public class UserService(IUserRepository userRepository, TokenProvider tokenProvider) : IUserService
+public class UserService(IUserRepository userRepository, TokenProvider tokenProvider, IEmailService emailService) : IUserService
 {
     private readonly IUserRepository m_UserRepository = userRepository;
+    private readonly IEmailService   m_EmailService   = emailService;
 
     public async Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
@@ -82,6 +84,21 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
             return Result.BadRequest("Passwords do not match.");
 
         await m_UserRepository.SetPassword(id, userActivationRequest.Password);
+
+        return Result.Accepted();
+    }
+
+    public async Task<Result> RequestPasswordReset(UserRequestPasswordResetRequest passwordResetRequest)
+    {
+        var user = await m_UserRepository.FindByEmail(passwordResetRequest.Email);
+
+        if (user == null)
+            return Result.BadRequest("User with the specified email address was not found.");
+
+        if (!user.Activated)
+            return Result.Forbidden("To reset password, the account has to be activated.");
+
+        await m_EmailService.Send(EmailType.UserResetPassword, user);
 
         return Result.Accepted();
     }
