@@ -11,7 +11,7 @@ namespace Bank.UserService.Repositories;
 public interface IUserRepository
 {
     Task<Page<User>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable);
-    
+
     Task<User?> FindById(Guid id);
 
     Task<User?> FindByEmail(string email);
@@ -19,13 +19,14 @@ public interface IUserRepository
     Task<User> Add(User user);
 
     Task<User> Update(User oldUser, User user);
-    
+
     Task<User> SetPassword(Guid id, string password);
 }
 
 public class UserRepository(ApplicationContext context) : IUserRepository
 {
     private readonly ApplicationContext m_Context = context;
+
     public async Task<Page<User>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
         var userQuery = m_Context.Users.AsQueryable();
@@ -43,7 +44,7 @@ public class UserRepository(ApplicationContext context) : IUserRepository
             userQuery = userQuery.Where(user => user.Role == userFilterQuery.Role);
 
         int totalElements = await userQuery.CountAsync();
-    
+
         var users = await userQuery.Skip((pageable.Page - 1) * pageable.Size)
                                    .Take(pageable.Size)
                                    .ToListAsync();
@@ -84,11 +85,12 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 
     public async Task<User> SetPassword(Guid id, string password)
     {
-        var user = FindById(id).Result;
+        var user = FindById(id)
+        .Result;
 
         if (user == null)
             throw new Exception("User not found.");
-        
+
         user.Password  = HashingUtilities.HashPassword(password, user.Salt);
         user.Activated = true;
 

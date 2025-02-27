@@ -23,12 +23,14 @@ public interface IClientService
 public class ClientService(IUserRepository repository) : IClientService
 {
     private readonly IUserRepository m_UserRepository = repository;
+
     public async Task<Result<Page<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
         var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
 
         var clientResponses = page.Items.Where(client => client.Role == Role.Client)
-                                  .Select(client => client.ToClient().ToResponse())
+                                  .Select(client => client.ToClient()
+                                                          .ToResponse())
                                   .ToList();
 
         if (clientResponses.Count == 0)
@@ -36,7 +38,6 @@ public class ClientService(IUserRepository repository) : IClientService
 
         return Result.Ok(new Page<ClientResponse>(clientResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
-
 
     public async Task<Result<ClientResponse>> GetOne(Guid id)
     {
@@ -53,10 +54,10 @@ public class ClientService(IUserRepository repository) : IClientService
     {
         var user = await m_UserRepository.Add(clientCreateRequest.ToClient()
                                                                  .ToUser());
-        
+
         //TODO: Send Activation Mail
         Console.WriteLine(TokenProvider.GenerateToken(user));
-        
+
         return Result.Ok(user.ToClient()
                              .ToResponse());
     }

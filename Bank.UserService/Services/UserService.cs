@@ -15,8 +15,7 @@ namespace Bank.UserService.Services;
 public interface IUserService
 {
     //Task<Result<IEnumerable<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
-    Task<Result<Page<UserResponse>>>        GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
-
+    Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable);
 
     Task<Result<UserResponse>> GetOne(Guid id);
 
@@ -30,11 +29,14 @@ public interface IUserService
 public class UserService(IUserRepository userRepository, TokenProvider tokenProvider) : IUserService
 {
     private readonly IUserRepository m_UserRepository = userRepository;
+
     public async Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
-        var page          = await m_UserRepository.FindAll(userFilterQuery, pageable);
-        var userResponses = page.Items.Select(user => user.ToResponse()).ToList();
-    
+        var page = await m_UserRepository.FindAll(userFilterQuery, pageable);
+
+        var userResponses = page.Items.Select(user => user.ToResponse())
+                                .ToList();
+
         return Result.Ok(new Page<UserResponse>(userResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
@@ -62,7 +64,7 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
             return Result.BadRequest<TokenResponse>("The password is incorrect.");
 
         string token = tokenProvider.Create(user);
-        
+
         return Result.Ok(new TokenResponse { Token = token });
     }
 
@@ -83,7 +85,7 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
 
         return Result.Accepted();
     }
-    
+
     public async Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token)
     {
         return await Activate(new UserActivationRequest { Password = userPasswordResetRequest.Password, ConfirmPassword = userPasswordResetRequest.ConfirmPassword }, token);
