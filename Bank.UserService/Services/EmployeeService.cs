@@ -40,7 +40,7 @@ public class EmployeeService(IUserRepository userRepository) : IEmployeeService
     {
         var user = await m_UserRepository.FindById(id);
 
-        if (user == null)
+        if (user == null || user.Role != Role.Employee)
             return Result.NotFound<EmployeeResponse>($"No Employee found with Id: {id}");
 
         return Result.Ok(user.ToEmployee()
