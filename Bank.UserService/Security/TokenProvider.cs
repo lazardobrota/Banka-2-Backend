@@ -36,7 +36,7 @@ public class TokenProvider
 
         return handler.CreateToken(tokenDescriptor);
     }
-    
+
     public static string GenerateToken(User user)
     {
         var expirationInMinutes = Convert.ToInt32(Environment.GetEnvironmentVariable(EnvironmentVariable.ExpirationInMinutes) ?? EnvironmentVariable.ExpirationInMinutesElseValue);

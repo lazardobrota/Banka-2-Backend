@@ -5,7 +5,6 @@ using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
-using Bank.UserService.Security;
 
 namespace Bank.UserService.Services;
 
@@ -20,9 +19,10 @@ public interface IClientService
     Task<Result<ClientResponse>> Update(ClientUpdateRequest clientUpdateRequest, Guid id);
 }
 
-public class ClientService(IUserRepository repository) : IClientService
+public class ClientService(IUserRepository repository, IEmailService emailService) : IClientService
 {
     private readonly IUserRepository m_UserRepository = repository;
+    private readonly IEmailService   m_EmailService   = emailService;
 
     public async Task<Result<Page<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
@@ -55,8 +55,7 @@ public class ClientService(IUserRepository repository) : IClientService
         var user = await m_UserRepository.Add(clientCreateRequest.ToClient()
                                                                  .ToUser());
 
-        //TODO: Send Activation Mail
-        Console.WriteLine(TokenProvider.GenerateToken(user));
+        await m_EmailService.Send(EmailType.UserActivateAccount, user);
 
         return Result.Ok(user.ToClient()
                              .ToResponse());

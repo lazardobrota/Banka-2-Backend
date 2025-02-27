@@ -85,8 +85,7 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 
     public async Task<User> SetPassword(Guid id, string password)
     {
-        var user = FindById(id)
-        .Result;
+        var user = await FindById(id);
 
         if (user == null)
             throw new Exception("User not found.");

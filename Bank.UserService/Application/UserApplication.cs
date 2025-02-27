@@ -61,8 +61,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserService, Services.UserService>();
         services.AddTransient<IClientService, ClientService>();
         services.AddTransient<IEmployeeService, EmployeeService>();
-        services.AddSingleton<TokenProvider>();
+        services.AddTransient<IEmailRepository, EmailRepository>();
+        services.AddTransient<IEmailService, EmailService>();
 
+        services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
 
         services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(DatabaseConfig.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
