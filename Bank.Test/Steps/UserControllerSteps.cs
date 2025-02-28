@@ -180,7 +180,7 @@ public class UserControllerSteps
     [Then(@"the response should return status 200 OK")]
     public void ThenTheResponseShouldReturnStatus200OK()
     {
-        var result = _scenarioContext.Get<Result<TokenResponse>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<UserLoginResponse>>("ApiResponse");
 
         Assert.IsInstanceOf<OkObjectResult>(result.ActionResult, "Očekivan odgovor je 200 OK.");
     }
@@ -188,7 +188,7 @@ public class UserControllerSteps
     [Then(@"the response should contain a valid token")]
     public void ThenTheResponseShouldContainAValidToken()
     {
-        var result = _scenarioContext.Get<Result<TokenResponse>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<UserLoginResponse>>("ApiResponse");
 
         Assert.IsNotNull(result.Value, "TokenResponse nije vraćen.");
         Assert.IsFalse(string.IsNullOrEmpty(result.Value.Token), "Token je prazan.");
@@ -197,7 +197,7 @@ public class UserControllerSteps
     [Then(@"the response should return status 404 Not Found")]
     public void ThenTheResponseShouldReturnStatus404NotFound()
     {
-        var result = _scenarioContext.Get<Result<TokenResponse>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<UserLoginResponse>>("ApiResponse");
 
         Assert.IsInstanceOf<NotFoundObjectResult>(result.ActionResult, "Očekivan odgovor je 404 Not Found.");
     }
@@ -205,7 +205,7 @@ public class UserControllerSteps
     [Then(@"the response should contain the message ""(.*)""")]
     public void ThenTheResponseShouldContainTheMessage(string expectedMessage)
     {
-        var result = _scenarioContext.Get<Result<TokenResponse>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<UserLoginResponse>>("ApiResponse");
 
         if (result.ActionResult is NotFoundObjectResult notFoundResult)
         {
@@ -236,7 +236,7 @@ public class UserControllerSteps
     [Then(@"the response should return status 400 Bad Request")]
     public void ThenTheResponseShouldReturnStatus400BadRequest()
     {
-        var result = _scenarioContext.Get<Result<TokenResponse>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<UserLoginResponse>>("ApiResponse");
 
         Assert.IsInstanceOf<BadRequestObjectResult>(result.ActionResult, "Očekivan odgovor je 400 Bad Request.");
     }
@@ -244,7 +244,7 @@ public class UserControllerSteps
     [Then(@"the response should contain the message: The password is incorrect\.")]
     public void ThenTheResponseShouldContainTheMessageThePasswordIsIncorrect()
     {
-        var result = _scenarioContext.Get<Result<TokenResponse>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<UserLoginResponse>>("ApiResponse");
 
         // Proveravamo da li je rezultat BadRequestObjectResult
         if (result.ActionResult is BadRequestObjectResult badRequestResult)

@@ -46,4 +46,3 @@ public class UserLoginResponse
     public required string       Token { set; get; }
     public required UserResponse User  { set; get; }
 }
-

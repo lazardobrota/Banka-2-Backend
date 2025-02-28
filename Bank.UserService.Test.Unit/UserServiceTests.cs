@@ -33,9 +33,9 @@ public class UserServiceTests
 
     public UserServiceTests()
     {
-        m_EmailService = new EmailService(m_EmailRepository);
+        m_EmailService  = new EmailService(m_EmailRepository);
         m_TokenProvider = new TokenProvider();
-        m_Sut = new Services.UserService(m_UserRepository, m_TokenProvider, m_EmailService);
+        m_Sut           = new Services.UserService(m_UserRepository, m_TokenProvider, m_EmailService);
         var now = DateTime.UtcNow;
 
         mockUsers =
@@ -383,9 +383,10 @@ public class UserServiceTests
 
         user.Password = HashingUtilities.HashPassword(user.Password!, user.Salt);
 
-        var tokenResponse = new TokenResponse()
+        var tokenResponse = new UserLoginResponse()
                             {
-                                Token = m_TokenProvider.Create(user)
+                                Token = m_TokenProvider.Create(user),
+                                User  = user.ToResponse()
                             };
 
         m_UserRepository.FindByEmail(user.Email)

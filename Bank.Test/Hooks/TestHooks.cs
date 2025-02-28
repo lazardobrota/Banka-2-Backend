@@ -21,7 +21,7 @@ public class TestHooks
     {
         _objectContainer = objectContainer;
     }
-    
+
     private class DontSendEmailService : IEmailService
     {
         public Task<Result> Send(EmailType type, User user) => Task.FromResult(Result.Ok());
@@ -37,7 +37,7 @@ public class TestHooks
         dbContext.Database.EnsureCreated(); // Kreira bazu ako ne postoji
 
         var userRepository  = new UserRepository(new ApplicationContext(options));
-        var tokenProvider   = new TokenProvider();                                                 // Instanciraj TokenProvider
+        var tokenProvider   = new TokenProvider(); // Instanciraj TokenProvider
         var emailService    = new DontSendEmailService();
         var userService     = new UserService.Services.UserService(userRepository, tokenProvider, emailService); // Sada prosleđujemo oba parametra
         var employeeService = new EmployeeService(userRepository, emailService);
