@@ -62,13 +62,13 @@ public static class ServiceCollectionExtensions
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<AssemblyInfo>();
 
-        services.AddTransient<IUserRepository, UserRepository>();
-        services.AddTransient<IAccountRepository, AccountRepository>();
-        services.AddTransient<IUserService, Services.UserService>();
-        services.AddTransient<IClientService, ClientService>();
-        services.AddTransient<IEmployeeService, EmployeeService>();
-        services.AddTransient<IEmailRepository, EmailRepository>();
-        services.AddTransient<IEmailService, EmailService>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<IUserService, Services.UserService>();
+        services.AddScoped<IClientService, ClientService>();
+        services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IEmailRepository, EmailRepository>();
+        services.AddScoped<IEmailService, EmailService>();
 
         services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
