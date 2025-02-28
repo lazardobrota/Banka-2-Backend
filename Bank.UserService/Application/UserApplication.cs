@@ -9,6 +9,7 @@ using Bank.UserService.HostedServices;
 using Bank.UserService.Repositories;
 using Bank.UserService.Security;
 using Bank.UserService.Services;
+using Bank.UserService.Swagger.SchemeFilters;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -86,6 +87,11 @@ public static class ServiceCollectionExtensions
                                {
                                    config.SwaggerDoc("v1", new OpenApiInfo() { Title = "UserService", Version = "v1" });
 
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.ActivationRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.LoginRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.PasswordResetRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.RequestPasswordResetRequest>();
+                                   
                                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                                                                           {
                                                                               Description = "Authorization: Bearer {token}",
