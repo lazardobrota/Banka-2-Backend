@@ -91,7 +91,7 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.User.LoginRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.User.PasswordResetRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.User.RequestPasswordResetRequest>();
-                                   
+
                                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                                                                           {
                                                                               Description = "Authorization: Bearer {token}",
