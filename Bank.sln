@@ -31,6 +31,7 @@ Global
 		{41B48A49-14E0-4544-9954-BB72CF58F762}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41B48A49-14E0-4544-9954-BB72CF58F762}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C328B3D2-9265-42A4-81F5-CF9D941F8234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C328B3D2-9265-42A4-81F5-CF9D941F8234}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C328B3D2-9265-42A4-81F5-CF9D941F8234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
