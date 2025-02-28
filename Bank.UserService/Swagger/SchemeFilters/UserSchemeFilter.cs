@@ -91,6 +91,13 @@ file static class Example
                                                                        ModifiedAt                 = ModifiedAt,
                                                                        Activated                  = Activated
                                                                    };
+
+        public static readonly UserLoginResponse LoginResponse = new()
+                                                                 {
+                                                                     Token =
+                                                                     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDA3ODIyNjAsImlkIjoiNjFlMTY1OTMtM2EyNC00ZDVkLTg3MmMtMTdlMjJhMzQxZDMzIiwicm9sZSI6IkFkbWluIiwiaWF0IjoxNzQwNzgwNDYwLCJuYmYiOjE3NDA3ODA0NjB9.3DsroWriDMpHvuBNOSAiFq8gxdo4TEkc9WK1r2f0Ou0",
+                                                                     User = null!
+                                                                 };
     }
 }
 
@@ -194,6 +201,20 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.CreatedAt)]                  = new OpenApiDateTime(Example.CreatedAt),
                            [nameof(Example.ModifiedAt)]                 = new OpenApiDateTime(Example.ModifiedAt),
                            [nameof(Example.Activated)]                  = new OpenApiBoolean(Example.Activated)
+                       };
+            }
+        }
+
+        public class LoginResponse() : SwaggerSchemaFilter<UserLoginResponse>(SchemeFilters.Example.User.LoginResponse)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                var user = context.SchemaRepository.Schemas[nameof(UserResponse)].Example;
+
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.Token)] = new OpenApiString(Example.Token),
+                           [nameof(Example.User)]  = user
                        };
             }
         }

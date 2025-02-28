@@ -95,18 +95,16 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.User.LoginRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.User.PasswordResetRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.User.RequestPasswordResetRequest>();
-
                                    config.SchemaFilter<SwaggerSchemaFilter.User.Response>();
                                    config.SchemaFilter<SwaggerSchemaFilter.User.SimpleResponse>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.LoginResponse>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.CreateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.UpdateRequest>();
-
                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.UpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.CreateRequest>();
-
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Account.SimpleResponse>();
