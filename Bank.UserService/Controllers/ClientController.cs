@@ -2,6 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Authorization;
@@ -14,13 +15,13 @@ namespace Bank.UserService.Controllers;
 [ApiController]
 public class ClientController(IClientService clientService) : ControllerBase
 {
-    private readonly IClientService m_clientService = clientService;
+    private readonly IClientService m_ClientService = clientService;
 
     [HttpGet(Endpoints.Client.GetAll)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> GetAll([FromQuery] UserFilterQuery filterQuery, [FromQuery] Pageable pageable)
     {
-        var result = await m_clientService.FindAll(filterQuery, pageable);
+        var result = await m_ClientService.FindAll(filterQuery, pageable);
 
         return result.ActionResult;
     }
@@ -29,7 +30,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [HttpGet(Endpoints.Client.GetOne)]
     public async Task<IActionResult> GetOne([FromRoute] Guid id)
     {
-        var result = await m_clientService.GetOne(id);
+        var result = await m_ClientService.GetOne(id);
 
         return result.ActionResult;
     }
@@ -38,7 +39,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> Create([FromBody] ClientCreateRequest clientCreateRequest)
     {
-        var result = await m_clientService.Create(clientCreateRequest);
+        var result = await m_ClientService.Create(clientCreateRequest);
 
         return result.ActionResult;
     }
@@ -47,7 +48,7 @@ public class ClientController(IClientService clientService) : ControllerBase
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> Update([FromBody] ClientUpdateRequest clientUpdateRequest, [FromRoute] Guid id)
     {
-        var result = await m_clientService.Update(clientUpdateRequest, id);
+        var result = await m_ClientService.Update(clientUpdateRequest, id);
 
         return result.ActionResult;
     }

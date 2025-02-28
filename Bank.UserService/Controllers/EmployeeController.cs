@@ -14,11 +14,13 @@ namespace Bank.UserService.Controllers;
 [ApiController]
 public class EmployeeController(IEmployeeService employeeService) : ControllerBase
 {
+    private readonly IEmployeeService m_EmployeeService = employeeService;
+
     [HttpGet(Endpoints.Employee.GetAll)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
-        var result = await employeeService.GetAll(userFilterQuery, pageable);
+        var result = await m_EmployeeService.GetAll(userFilterQuery, pageable);
 
         return result.ActionResult;
     }
@@ -27,7 +29,7 @@ public class EmployeeController(IEmployeeService employeeService) : ControllerBa
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> GetOne([FromRoute] Guid id)
     {
-        var result = await employeeService.GetOne(id);
+        var result = await m_EmployeeService.GetOne(id);
 
         return result.ActionResult;
     }
@@ -36,7 +38,7 @@ public class EmployeeController(IEmployeeService employeeService) : ControllerBa
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> Create([FromBody] EmployeeCreateRequest employeeCreateRequest)
     {
-        var result = await employeeService.Create(employeeCreateRequest);
+        var result = await m_EmployeeService.Create(employeeCreateRequest);
 
         return result.ActionResult;
     }
@@ -45,7 +47,7 @@ public class EmployeeController(IEmployeeService employeeService) : ControllerBa
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<IActionResult> Update([FromBody] EmployeeUpdateRequest employeeUpdateRequest, [FromRoute] Guid id)
     {
-        var result = await employeeService.Update(employeeUpdateRequest, id);
+        var result = await m_EmployeeService.Update(employeeUpdateRequest, id);
 
         return result.ActionResult;
     }
