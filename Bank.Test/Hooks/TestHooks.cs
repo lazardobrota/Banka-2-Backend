@@ -1,4 +1,6 @@
-﻿using Bank.UserService.Database;
+﻿using Bank.Application.Endpoints;
+using Bank.UserService.Database;
+using Bank.UserService.Models;
 using Bank.UserService.Repositories;
 using Bank.UserService.Security;
 using Bank.UserService.Services;
@@ -19,11 +21,16 @@ public class TestHooks
     {
         _objectContainer = objectContainer;
     }
+    
+    private class DontSendEmailService : IEmailService
+    {
+        public Task<Result> Send(EmailType type, User user) => Task.FromResult(Result.Ok());
+    }
 
     [BeforeScenario]
     public void RegisterDependencies()
     {
-        var options = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql("Host=localhost;Database=bank_users;Username=postgres;Password=pogodi123;")
+        var options = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql(DatabaseConfig.GetConnectionString())
                                                                        .Options;
 
         var dbContext = new ApplicationContext(options);
@@ -31,8 +38,9 @@ public class TestHooks
 
         var userRepository  = new UserRepository(new ApplicationContext(options));
         var tokenProvider   = new TokenProvider();                                                 // Instanciraj TokenProvider
-        var userService     = new UserService.Services.UserService(userRepository, tokenProvider); // Sada prosleđujemo oba parametra
-        var employeeService = new EmployeeService(userRepository);
+        var emailService    = new DontSendEmailService();
+        var userService     = new UserService.Services.UserService(userRepository, tokenProvider, emailService); // Sada prosleđujemo oba parametra
+        var employeeService = new EmployeeService(userRepository, emailService);
 
         // 🔹 Registracija u Reqnroll DI kontejner
         _objectContainer.RegisterInstanceAs<ApplicationContext>(dbContext);

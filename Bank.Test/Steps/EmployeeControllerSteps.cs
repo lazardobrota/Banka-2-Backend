@@ -94,24 +94,24 @@ public class EmployeeControllerSteps
     [Then(@"the response should contain a list of employees")]
     public void ThenTheResponseShouldContainAListOfEmployees()
     {
-        var result = _scenarioContext.Get<Result<List<EmployeeResponse>>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<Page<EmployeeResponse>>>("ApiResponse");
 
         Assert.IsNotNull(result.Value, "Lista zaposlenih ne sme biti null.");
-        Assert.IsTrue(result.Value.Count > 0, "Lista zaposlenih treba da sadrži barem jednog zaposlenog.");
+        Assert.IsTrue(result.Value.Items.Count > 0, "Lista zaposlenih treba da sadrži barem jednog zaposlenog.");
     }
 
     [Then(@"all employees should have the role Employee")]
     public void ThenAllEmployeesShouldHaveTheRoleEmployee()
     {
-        var result = _scenarioContext.Get<Result<List<EmployeeResponse>>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<Page<EmployeeResponse>>>("ApiResponse");
 
-        Assert.IsTrue(result.Value.All(e => e.Role == Role.Employee), "Svi zaposleni u odgovoru treba da imaju ulogu Employee.");
+        Assert.IsTrue(result.Value.Items.All(e => e.Role == Role.Employee), "Svi zaposleni u odgovoru treba da imaju ulogu Employee.");
     }
 
     [Then(@"the API should respond with status 200 OK")]
     public void ThenTheAPIShouldRespondWithStatus200OK()
     {
-        var result = _scenarioContext.Get<Result<List<EmployeeResponse>>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<Page<EmployeeResponse>>>("ApiResponse");
 
         Assert.IsInstanceOf<OkObjectResult>(result.ActionResult, "Očekivan odgovor je 200 OK.");
     }

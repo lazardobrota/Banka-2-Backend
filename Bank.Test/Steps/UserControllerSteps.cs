@@ -127,10 +127,10 @@ public class UserControllerSteps
     [Then(@"the response should contain at least (.*) user")]
     public void ThenTheResponseShouldContainAtLeastUser(int expectedCount)
     {
-        var result = _scenarioContext.Get<Result<IEnumerable<UserResponse>>>("ApiResponse");
+        var result = _scenarioContext.Get<Result<Page<UserResponse>>>("ApiResponse");
 
         Assert.IsInstanceOf<OkObjectResult>(result.ActionResult, "Očekivan odgovor je 200 OK.");
-        Assert.IsTrue(result.Value.Count() >= expectedCount, "API nije vratio dovoljno korisnika.");
+        Assert.IsTrue(result.Value.Items.Count() >= expectedCount, "API nije vratio dovoljno korisnika.");
     }
 
     // 📌 Given - Dodavanje korisnika u bazu
