@@ -18,7 +18,7 @@ public interface IUserService
 
     Task<Result<UserResponse>> GetOne(Guid id);
 
-    Task<Result<TokenResponse>> Login(UserLoginRequest userLoginRequest);
+    Task<Result<UserLoginResponse>> Login(UserLoginRequest userLoginRequest);
 
     Task<Result> Activate(UserActivationRequest userActivationRequest, string token);
 
@@ -52,22 +52,22 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
         return Result.Ok(user.ToResponse());
     }
 
-    public async Task<Result<TokenResponse>> Login(UserLoginRequest userLoginRequest)
+    public async Task<Result<UserLoginResponse>> Login(UserLoginRequest userLoginRequest)
     {
         var user = await m_UserRepository.FindByEmail(userLoginRequest.Email);
 
         if (user == null)
-            return Result.NotFound<TokenResponse>("User with the specified email address was not found.");
+            return Result.NotFound<UserLoginResponse>("User with the specified email address was not found.");
 
         if (!user.Activated)
-            return Result.Forbidden<TokenResponse>("To proceed, the account has to be activated.");
+            return Result.Forbidden<UserLoginResponse>("To proceed, the account has to be activated.");
 
         if (user.Password != HashingUtilities.HashPassword(userLoginRequest.Password, user.Salt))
-            return Result.BadRequest<TokenResponse>("The password is incorrect.");
+            return Result.BadRequest<UserLoginResponse>("The password is incorrect.");
 
         string token = tokenProvider.Create(user);
 
-        return Result.Ok(new TokenResponse { Token = token });
+        return Result.Ok(new UserLoginResponse { Token = token, User = user.ToResponse() });
     }
 
     public async Task<Result> Activate(UserActivationRequest userActivationRequest, string token)

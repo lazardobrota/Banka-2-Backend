@@ -40,3 +40,10 @@ public class UserSimpleResponse
     public required DateTime ModifiedAt                 { set; get; }
     public required bool     Activated                  { set; get; }
 }
+
+public class UserLoginResponse
+{
+    public required string       Token { set; get; }
+    public required UserResponse User  { set; get; }
+}
+
