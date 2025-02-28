@@ -156,7 +156,7 @@ public static partial class SwaggerSchemaFilter
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
-                var accounts = new OpenApiArray { context.SchemaRepository.Schemas[nameof(AccountResponse)].Example };
+                var accounts = new OpenApiArray { context.SchemaRepository.Schemas[nameof(AccountSimpleResponse)].Example };
 
                 return new OpenApiObject()
                        {

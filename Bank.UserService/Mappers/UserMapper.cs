@@ -192,6 +192,7 @@ public static class UserMapper
                    PhoneNumber                = client.PhoneNumber,
                    Address                    = client.Address,
                    Role                       = client.Role,
+                   Accounts                   = MapAccounts(client.Accounts),
                    CreatedAt                  = client.CreatedAt,
                    ModifiedAt                 = client.ModifiedAt,
                    Activated                  = client.Activated

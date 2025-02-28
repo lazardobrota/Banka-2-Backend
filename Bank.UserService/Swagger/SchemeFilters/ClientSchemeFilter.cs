@@ -60,6 +60,7 @@ file static class Example
                                                              PhoneNumber                = PhoneNumber,
                                                              Address                    = Address,
                                                              Role                       = Role,
+                                                             Accounts                   = [],
                                                              CreatedAt                  = CreatedAt,
                                                              ModifiedAt                 = ModifiedAt,
                                                              Activated                  = Activated
@@ -108,6 +109,8 @@ public static partial class SwaggerSchemaFilter
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
+                var accounts = new OpenApiArray { context.SchemaRepository.Schemas[nameof(AccountSimpleResponse)].Example };
+
                 return new OpenApiObject()
                        {
                            [nameof(Example.Id)]                         = new OpenApiString(Example.Id.ToString()),
@@ -120,6 +123,7 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.PhoneNumber)]                = new OpenApiString(Example.PhoneNumber),
                            [nameof(Example.Address)]                    = new OpenApiString(Example.Address),
                            [nameof(Example.Role)]                       = new OpenApiInteger((int)Example.Role),
+                           [nameof(Example.Accounts)]                   = accounts,
                            [nameof(Example.CreatedAt)]                  = new OpenApiDateTime(Example.CreatedAt),
                            [nameof(Example.ModifiedAt)]                 = new OpenApiDateTime(Example.ModifiedAt),
                            [nameof(Example.Activated)]                  = new OpenApiBoolean(Example.Activated)
