@@ -1,12 +1,14 @@
-﻿namespace Bank.UserService.Configurations;
+﻿using Bank.Application.Utilities;
+
+namespace Bank.UserService.Configurations;
 
 public static partial class Configuration
 {
     public static class Email
     {
-        public static readonly string Address  = Environment.GetEnvironmentVariable("BANK_USER_EMAIL_ADDRESS")  ?? "";
-        public static readonly string Password = Environment.GetEnvironmentVariable("BANK_USER_EMAIL_PASSWORD") ?? "";
-        public static readonly string Server   = Environment.GetEnvironmentVariable("BANK_USER_EMAIL_SERVER")   ?? "smtp.gmail.com";
-        public static readonly int    Port     = int.Parse(Environment.GetEnvironmentVariable("BANK_USER_EMAIL_PORT") ?? "587");
+        public static readonly string Address  = EnvironmentUtilities.GetStringVariable("BANK_USER_EMAIL_ADDRESS");
+        public static readonly string Password = EnvironmentUtilities.GetStringVariable("BANK_USER_EMAIL_PASSWORD");
+        public static readonly string Server   = EnvironmentUtilities.GetStringVariable("BANK_USER_EMAIL_SERVER");
+        public static readonly int    Port     = EnvironmentUtilities.GetIntVariable("BANK_USER_EMAIL_PORT");
     }
 }

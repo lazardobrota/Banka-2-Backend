@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Endpoints;
+using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
@@ -30,7 +31,7 @@ public class TestHooks
     [BeforeScenario]
     public void RegisterDependencies()
     {
-        var options = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql(DatabaseConfig.GetConnectionString())
+        var options = new DbContextOptionsBuilder<ApplicationContext>().UseNpgsql(Configuration.Database.GetConnectionString())
                                                                        .Options;
 
         var dbContext = new ApplicationContext(options);

@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Text;
 
-using Bank.UserService.Application;
+using Bank.UserService.Configurations;
 using Bank.UserService.Models;
 
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -13,9 +13,8 @@ public class TokenProvider
 {
     public string Create(User user)
     {
-        var expirationInMinutes = Convert.ToInt32(Environment.GetEnvironmentVariable(EnvironmentVariable.ExpirationInMinutes) ?? EnvironmentVariable.ExpirationInMinutesElseValue);
-        var secretKey           = Environment.GetEnvironmentVariable(EnvironmentVariable.SecretKey) ?? EnvironmentVariable.SecretKeyElseValue;
-        var securityKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var expirationInMinutes = Configuration.Jwt.ExpirationTimeInMinutes;
+        var securityKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt.SecretKey));
 
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -39,9 +38,8 @@ public class TokenProvider
 
     public static string GenerateToken(User user)
     {
-        var expirationInMinutes = Convert.ToInt32(Environment.GetEnvironmentVariable(EnvironmentVariable.ExpirationInMinutes) ?? EnvironmentVariable.ExpirationInMinutesElseValue);
-        var secretKey           = Environment.GetEnvironmentVariable(EnvironmentVariable.SecretKey) ?? EnvironmentVariable.SecretKeyElseValue;
-        var securityKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var expirationInMinutes = Configuration.Jwt.ExpirationTimeInMinutes;
+        var securityKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt.SecretKey));
 
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
