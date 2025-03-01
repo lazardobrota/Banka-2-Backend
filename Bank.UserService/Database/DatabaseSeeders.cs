@@ -575,6 +575,100 @@ public static class DatabaseSeeders
                     };
 
         await context.Cards.AddRangeAsync(cards);
+    private static readonly List<Currency> s_Currencies =
+    [
+        new()
+        {
+            Id          = Guid.Parse("b4354f8d-5e1c-48cb-9923-b7139e599558"),
+            Name        = "Euro",
+            Code        = "EUR",
+            Symbol      = "€",
+            Countries   = [],
+            Description = "The official currency of the Eurozone.",
+            Status      = true,
+            CreatedAt   = DateTime.UtcNow,
+            ModifiedAt  = DateTime.UtcNow
+        },
+        new()
+        {
+            Id          = Guid.Parse("84ec8c8b-b62c-46c7-b2ab-0f4a4d5930ad"),
+            Name        = "Swiss Franc",
+            Code        = "CHF",
+            Symbol      = "CHF",
+            Countries   = [],
+            Description = "The official currency of Switzerland.",
+            Status      = true,
+            CreatedAt   = DateTime.UtcNow,
+            ModifiedAt  = DateTime.UtcNow
+        },
+        new()
+        {
+            Id          = Guid.Parse("7f3d5f0e-4cd6-40a3-bb5a-d8e028d7e77e"),
+            Name        = "US Dollar",
+            Code        = "USD",
+            Symbol      = "$",
+            Countries   = [],
+            Description = "The official currency of the United States of America.",
+            Status      = true,
+            CreatedAt   = DateTime.UtcNow,
+            ModifiedAt  = DateTime.UtcNow
+        },
+        new()
+        {
+            Id          = Guid.Parse("0f173c9d-e212-4f8f-b6f5-0e299dbe53ad"),
+            Name        = "British Pound",
+            Code        = "GBP",
+            Symbol      = "£",
+            Countries   = [],
+            Description = "The official currency of the United Kingdom.",
+            Status      = true,
+            CreatedAt   = DateTime.UtcNow,
+            ModifiedAt  = DateTime.UtcNow
+        },
+        new()
+        {
+            Id          = Guid.Parse("bcd35b3c-b6fd-45a3-94a0-7a5bdbf6169e"),
+            Name        = "Japanese Yen",
+            Code        = "JPY",
+            Symbol      = "¥",
+            Countries   = [],
+            Description = "The official currency of Japan.",
+            Status      = true,
+            CreatedAt   = DateTime.UtcNow,
+            ModifiedAt  = DateTime.UtcNow
+        },
+        new()
+        {
+            Id          = Guid.Parse("ad8797e7-d028-44db-b585-b07b1b7c21c2"),
+            Name        = "Canadian Dollar",
+            Code        = "CAD",
+            Symbol      = "$",
+            Countries   = [],
+            Description = "The official currency of Canada.",
+            Status      = true,
+            CreatedAt   = DateTime.UtcNow,
+            ModifiedAt  = DateTime.UtcNow
+        },
+        new()
+        {
+            Id          = Guid.Parse("7cfcf410-e90b-4a9c-80b0-13215b69c11d"),
+            Name        = "Australian Dollar",
+            Code        = "AUD",
+            Symbol      = "$",
+            Countries   = [],
+            Description = "The official currency of Australia.",
+            Status      = true,
+            CreatedAt   = DateTime.UtcNow,
+            ModifiedAt  = DateTime.UtcNow
+        }
+    ];
+
+    public static async Task SeedCurrency(this ApplicationContext context)
+    {
+        if (context.Currencies.Any())
+            return;
+
+        await context.Currencies.AddRangeAsync(s_Currencies);
         await context.SaveChangesAsync();
     }
 }
