@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bank.UserService.Repositories;
 
-
 public interface ICurrencyRepository
 {
     Task<Page<Currency>> FindAll(Pageable pageable);

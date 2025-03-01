@@ -444,7 +444,7 @@ public static class DatabaseSeeders
 
     private static readonly List<Currency> s_Currencies =
     [
-        new() 
+        new()
         {
             Id          = Guid.Parse("b4354f8d-5e1c-48cb-9923-b7139e599558"),
             Name        = "Euro",
@@ -456,7 +456,7 @@ public static class DatabaseSeeders
             CreatedAt   = DateTime.UtcNow,
             ModifiedAt  = DateTime.UtcNow
         },
-        new() 
+        new()
         {
             Id          = Guid.Parse("84ec8c8b-b62c-46c7-b2ab-0f4a4d5930ad"),
             Name        = "Swiss Franc",
@@ -468,7 +468,7 @@ public static class DatabaseSeeders
             CreatedAt   = DateTime.UtcNow,
             ModifiedAt  = DateTime.UtcNow
         },
-        new() 
+        new()
         {
             Id          = Guid.Parse("7f3d5f0e-4cd6-40a3-bb5a-d8e028d7e77e"),
             Name        = "US Dollar",
@@ -480,7 +480,7 @@ public static class DatabaseSeeders
             CreatedAt   = DateTime.UtcNow,
             ModifiedAt  = DateTime.UtcNow
         },
-        new() 
+        new()
         {
             Id          = Guid.Parse("0f173c9d-e212-4f8f-b6f5-0e299dbe53ad"),
             Name        = "British Pound",
@@ -492,7 +492,7 @@ public static class DatabaseSeeders
             CreatedAt   = DateTime.UtcNow,
             ModifiedAt  = DateTime.UtcNow
         },
-        new() 
+        new()
         {
             Id          = Guid.Parse("bcd35b3c-b6fd-45a3-94a0-7a5bdbf6169e"),
             Name        = "Japanese Yen",
@@ -504,7 +504,7 @@ public static class DatabaseSeeders
             CreatedAt   = DateTime.UtcNow,
             ModifiedAt  = DateTime.UtcNow
         },
-        new() 
+        new()
         {
             Id          = Guid.Parse("ad8797e7-d028-44db-b585-b07b1b7c21c2"),
             Name        = "Canadian Dollar",
@@ -538,6 +538,4 @@ public static class DatabaseSeeders
         await context.Currencies.AddRangeAsync(s_Currencies);
         await context.SaveChangesAsync();
     }
-    
-    
 }

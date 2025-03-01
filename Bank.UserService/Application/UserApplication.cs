@@ -75,7 +75,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmailRepository, EmailRepository>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<ICurrencyRepository, CurrencyRepository>();
-        
+
         services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
 
@@ -157,8 +157,9 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
-                                                                                                                                                    .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
+                                                                                                                                       .Jwt
+                                                                                                                                       .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,
