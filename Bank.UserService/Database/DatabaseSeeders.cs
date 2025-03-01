@@ -441,4 +441,140 @@ public static class DatabaseSeeders
 
         await context.SaveChangesAsync();
     }
+    
+    public static async Task SeedCardTypes(this ApplicationContext context)
+    {
+        if (context.CardTypes.Any())
+            return;
+
+        var now = DateTime.UtcNow;
+        var cardTypes = new List<CardType>
+        {
+            new()
+            {
+                Id = Guid.Parse("a1b2c3d4-e5f6-4a5b-8c9d-1e2f3a4b5c6d"),
+                Name = "Visa Debit",
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e"),
+                Name = "MasterCard Gold",
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("c3d4e5f6-a7b8-4c5d-9e0f-1a2b3c4d5e6f"),
+                Name = "DinaCard Standard",
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("d4e5f6a7-b8c9-4d5e-9f0a-1b2c3d4e5f6a"),
+                Name = "Visa Business",
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("e5f6a7b8-c9d0-4e5f-9a0b-1c2d3e4f5a6b"),
+                Name = "American Express Platinum",
+                CreatedAt = now,
+                ModifiedAt = now
+            }
+        };
+
+        await context.CardTypes.AddRangeAsync(cardTypes);
+        await context.SaveChangesAsync();
+    }
+
+    public static async Task SeedCards(this ApplicationContext context)
+    {
+        if (context.Cards.Any())
+            return;
+
+        var now = DateTime.UtcNow;
+        var expireDate = new DateOnly(2028, 12, 31);
+        
+        var cards = new List<Card>
+        {
+            new()
+            {
+                Id = Guid.Parse("f5f6a7b8-c9d0-4e5f-9a0b-1c2d3e4f5a6b"),
+                Number = "4111111111111111",
+                Type = await context.CardTypes.FindAsync(Guid.Parse("a1b2c3d4-e5f6-4a5b-8c9d-1e2f3a4b5c6d")),
+                Name = "Peter Parker Personal Card",
+                ExpiresAt = expireDate,
+                Account = await context.Accounts.FindAsync(Guid.Parse("1234abcd-5678-4a5b-9c0d-ef0123456789")),
+                CVV = "123",
+                Limit = 10000.00m,
+                Status = true,
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("f6a7b8c9-d0e1-4f6a-9b0c-1d2e3f4a5b6c"),
+                Number = "5111111111111118",
+                Type = await context.CardTypes.FindAsync(Guid.Parse("b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e")),
+                Name = "Mary Watson Premium Card",
+                ExpiresAt = expireDate,
+                Account = await context.Accounts.FindAsync(Guid.Parse("abcd1234-5678-4a5b-9c0d-ef9876543210")),
+                CVV = "456",
+                Limit = 15000.00m,
+                Status = true,
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("a7b8c9d0-e1f2-4a7b-9c0d-1e2f3a4b5c6d"),
+                Number = "9891111111111116",
+                Type = await context.CardTypes.FindAsync(Guid.Parse("c3d4e5f6-a7b8-4c5d-9e0f-1a2b3c4d5e6f")),
+                Name = "Mary Watson Secondary Card",
+                ExpiresAt = expireDate,
+                Account = await context.Accounts.FindAsync(Guid.Parse("efab1234-5678-4c5d-9e0f-12345abcdef0")),
+                CVV = "789",
+                Limit = 5000.00m,
+                Status = true,
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("b8c9d0e1-f2a3-4b8c-9d0e-1f2a3b4c5d6e"),
+                Number = "4111222233334444",
+                Type = await context.CardTypes.FindAsync(Guid.Parse("d4e5f6a7-b8c9-4d5e-9f0a-1b2c3d4e5f6a")),
+                Name = "Marko Jovanović Business Card",
+                ExpiresAt = expireDate,
+                Account = await context.Accounts.FindAsync(Guid.Parse("1a2b3c4d-5e6f-4a5b-8c9d-1e2f3a4b5c6d")),
+                CVV = "321",
+                Limit = 25000.00m,
+                Status = true,
+                CreatedAt = now,
+                ModifiedAt = now
+            },
+            new()
+            {
+                Id = Guid.Parse("c9d0e1f2-a3b4-4c9d-0e1f-2a3b4c5d6e7f"),
+                Number = "371122223333444", 
+                Type = await context.CardTypes.FindAsync(Guid.Parse("e5f6a7b8-c9d0-4e5f-9a0b-1c2d3e4f5a6b")),
+                Name = "Jelena Petrović Platinum Card",
+                ExpiresAt = expireDate,
+                Account = await context.Accounts.FindAsync(Guid.Parse("2b3c4d5e-6f7a-4b5c-9d0e-1f2a3b4c5d6e")),
+                CVV = "4567", 
+                Limit = 50000.00m,
+                Status = true,
+                CreatedAt = now,
+                ModifiedAt = now
+            }
+        };
+
+        await context.Cards.AddRangeAsync(cards);
+        await context.SaveChangesAsync();
+    }
+    
 }
