@@ -9,10 +9,12 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<User>    Users    { init; get; }
     public DbSet<Account> Accounts { init; get; }
+    public DbSet<Currency> Currencies { init; get; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfiguration(new UserEntityConfiguration());
         builder.ApplyConfiguration(new AccountEntityConfiguration());
+        builder.ApplyConfiguration(new CurrencyEntityConfiguration());
     }
 }
