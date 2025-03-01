@@ -3,6 +3,7 @@ using Bank.Application.Queries;
 using Bank.Application.Utilities;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank.UserService.Repositories;
@@ -10,12 +11,19 @@ namespace Bank.UserService.Repositories;
 public interface ICardRepository
 {
     Task<Page<Card>> FindAll(CardFilterQuery cardFilterQuery, Pageable pageable);
+
     Task<Card?> FindById(Guid id);
+
     Task<List<Card>> FindByAccountId(Guid accountId);
+
     Task<Card?> FindByNumber(string number);
+
     Task<Card> Add(Card card);
+
     Task<Card> Update(Card oldCard, Card card);
+
     Task<Card> UpdateStatus(Guid id, bool status);
+
     Task<Card> UpdateLimit(Guid id, decimal limit);
 }
 
@@ -25,8 +33,7 @@ public class CardRepository(ApplicationContext context) : ICardRepository
 
     public async Task<Page<Card>> FindAll(CardFilterQuery cardFilterQuery, Pageable pageable)
     {
-        var cardQuery = m_Context.Cards
-                                 .Include(card => card.Type)
+        var cardQuery = m_Context.Cards.Include(card => card.Type)
                                  .Include(card => card.Account)
                                  .AsQueryable();
 
@@ -35,7 +42,7 @@ public class CardRepository(ApplicationContext context) : ICardRepository
 
         if (!string.IsNullOrEmpty(cardFilterQuery.Name))
             cardQuery = cardQuery.Where(card => EF.Functions.ILike(card.Name, $"%{cardFilterQuery.Name}%"));
-    
+
         if (!string.IsNullOrEmpty(cardFilterQuery.CardTypeName))
             cardQuery = cardQuery.Where(card => EF.Functions.ILike(card.Type.Name, $"%{cardFilterQuery.CardTypeName}%"));
 
@@ -59,26 +66,23 @@ public class CardRepository(ApplicationContext context) : ICardRepository
 
     public async Task<Card?> FindById(Guid id)
     {
-        return await m_Context.Cards
-            .Include(card => card.Type)
-            .Include(card => card.Account)
-            .FirstOrDefaultAsync(x => x.Id == id);
+        return await m_Context.Cards.Include(card => card.Type)
+                              .Include(card => card.Account)
+                              .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<List<Card>> FindByAccountId(Guid accountId)
     {
-        return await m_Context.Cards
-            .Include(card => card.Type)
-            .Where(card => card.Account.Id == accountId)
-            .ToListAsync();
+        return await m_Context.Cards.Include(card => card.Type)
+                              .Where(card => card.Account.Id == accountId)
+                              .ToListAsync();
     }
 
     public async Task<Card?> FindByNumber(string number)
     {
-        return await m_Context.Cards
-            .Include(card => card.Type)
-            .Include(card => card.Account)
-            .FirstOrDefaultAsync(card => card.Number == number);
+        return await m_Context.Cards.Include(card => card.Type)
+                              .Include(card => card.Account)
+                              .FirstOrDefaultAsync(card => card.Number == number);
     }
 
     public async Task<Card> Add(Card card)
@@ -91,7 +95,7 @@ public class CardRepository(ApplicationContext context) : ICardRepository
     public async Task<Card> Update(Card oldCard, Card card)
     {
         m_Context.Cards.Entry(oldCard)
-                .State = EntityState.Detached;
+                 .State = EntityState.Detached;
 
         var updatedCard = m_Context.Cards.Update(card);
         await m_Context.SaveChangesAsync();
@@ -101,13 +105,13 @@ public class CardRepository(ApplicationContext context) : ICardRepository
     public async Task<Card> UpdateStatus(Guid id, bool status)
     {
         var card = await FindById(id);
-        
+
         if (card == null)
             throw new Exception("Card not found.");
-        
-        card.Status = status;
+
+        card.Status     = status;
         card.ModifiedAt = DateTime.UtcNow;
-        
+
         await m_Context.SaveChangesAsync();
         return card;
     }
@@ -115,15 +119,14 @@ public class CardRepository(ApplicationContext context) : ICardRepository
     public async Task<Card> UpdateLimit(Guid id, decimal limit)
     {
         var card = await FindById(id);
-        
+
         if (card == null)
             throw new Exception("Card not found.");
-        
-        card.Limit = limit;
+
+        card.Limit      = limit;
         card.ModifiedAt = DateTime.UtcNow;
-        
+
         await m_Context.SaveChangesAsync();
         return card;
     }
 }
-

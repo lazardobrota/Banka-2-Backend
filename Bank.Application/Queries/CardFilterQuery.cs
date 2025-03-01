@@ -10,5 +10,4 @@ public class CardFilterQuery
     public Guid    AccountId    { get; set; }
     public bool?   Status       { get; set; }
     public string? CardTypeName { get; set; }
-
 }
