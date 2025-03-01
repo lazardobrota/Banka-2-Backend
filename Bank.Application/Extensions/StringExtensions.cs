@@ -25,4 +25,9 @@ public static class StringExtensions
     {
         return int.TryParse(value, out var result) ? result : defaultValue;
     }
+
+    public static string ToCamelCase(this string value)
+    {
+        return string.IsNullOrEmpty(value) ? value : char.ToLower(value[0]) + value[1..];
+    }
 }

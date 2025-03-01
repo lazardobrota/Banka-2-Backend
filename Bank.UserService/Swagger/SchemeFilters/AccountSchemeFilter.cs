@@ -1,4 +1,5 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Extensions;
+using Bank.Application.Responses;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -41,9 +42,9 @@ public static partial class SwaggerSchemaFilter
 
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Id)]            = new OpenApiString(Example.Id.ToString()),
-                           [nameof(Example.AccountNumber)] = new OpenApiString(Example.AccountNumber),
-                           [nameof(Example.User)]          = user
+                           [nameof(Example.Id).ToCamelCase()]            = new OpenApiString(Example.Id.ToString()),
+                           [nameof(Example.AccountNumber).ToCamelCase()] = new OpenApiString(Example.AccountNumber),
+                           [nameof(Example.User).ToCamelCase()]          = user
                        };
             }
         }
@@ -54,8 +55,8 @@ public static partial class SwaggerSchemaFilter
             {
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Id)]            = new OpenApiString(Example.Id.ToString()),
-                           [nameof(Example.AccountNumber)] = new OpenApiString(Example.AccountNumber),
+                           [nameof(Example.Id).ToCamelCase()]            = new OpenApiString(Example.Id.ToString()),
+                           [nameof(Example.AccountNumber).ToCamelCase()] = new OpenApiString(Example.AccountNumber),
                        };
             }
         }
