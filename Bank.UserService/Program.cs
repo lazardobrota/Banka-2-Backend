@@ -7,5 +7,6 @@ public class Program
     public static void Main(string[] args)
     {
         UserApplication.Run(args);
+        UserApplication.Run(args);
     }
 }
