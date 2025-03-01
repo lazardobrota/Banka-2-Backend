@@ -18,7 +18,7 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
     {
         builder.ApplyConfiguration(new UserEntityConfiguration());
         builder.ApplyConfiguration(new AccountEntityConfiguration());
-        builder.ApplyConfiguration(new CardEntityConfiguration());
         builder.ApplyConfiguration(new CardTypeEntityConfiguration());
+        builder.ApplyConfiguration(new CardEntityConfiguration());
     }
 }

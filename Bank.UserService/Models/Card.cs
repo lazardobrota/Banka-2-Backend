@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bank.UserService.Models;
+﻿namespace Bank.UserService.Models;
 
 public class Card
 {

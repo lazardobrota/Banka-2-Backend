@@ -1,6 +1,4 @@
-﻿using Bank.Application.Domain;
-
-namespace Bank.Application.Queries;
+﻿namespace Bank.Application.Queries;
 
 public class CardFilterQuery
 {

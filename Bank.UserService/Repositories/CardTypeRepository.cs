@@ -1,5 +1,4 @@
 ﻿using Bank.Application.Domain;
-using Bank.Application.Utilities;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
