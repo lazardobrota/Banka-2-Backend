@@ -74,7 +74,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<IEmailRepository, EmailRepository>();
         services.AddScoped<IEmailService, EmailService>();
-
+        services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+        
         services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
 
