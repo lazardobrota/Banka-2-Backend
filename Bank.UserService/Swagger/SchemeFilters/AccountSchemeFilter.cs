@@ -42,9 +42,12 @@ public static partial class SwaggerSchemaFilter
 
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Id).ToCamelCase()]            = new OpenApiString(Example.Id.ToString()),
-                           [nameof(Example.AccountNumber).ToCamelCase()] = new OpenApiString(Example.AccountNumber),
-                           [nameof(Example.User).ToCamelCase()]          = user
+                           [nameof(Example.Id)
+                            .ToCamelCase()] = new OpenApiString(Example.Id.ToString()),
+                           [nameof(Example.AccountNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.AccountNumber),
+                           [nameof(Example.User)
+                            .ToCamelCase()] = user
                        };
             }
         }
@@ -55,8 +58,10 @@ public static partial class SwaggerSchemaFilter
             {
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Id).ToCamelCase()]            = new OpenApiString(Example.Id.ToString()),
-                           [nameof(Example.AccountNumber).ToCamelCase()] = new OpenApiString(Example.AccountNumber),
+                           [nameof(Example.Id)
+                            .ToCamelCase()] = new OpenApiString(Example.Id.ToString()),
+                           [nameof(Example.AccountNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.AccountNumber),
                        };
             }
         }

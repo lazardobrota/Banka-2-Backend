@@ -112,8 +112,10 @@ public static partial class SwaggerSchemaFilter
             {
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Email).ToCamelCase()]    = new OpenApiString(Example.Email),
-                           [nameof(Example.Password).ToCamelCase()] = new OpenApiString(Example.Password)
+                           [nameof(Example.Email)
+                            .ToCamelCase()] = new OpenApiString(Example.Email),
+                           [nameof(Example.Password)
+                            .ToCamelCase()] = new OpenApiString(Example.Password)
                        };
             }
         }
@@ -124,8 +126,10 @@ public static partial class SwaggerSchemaFilter
             {
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Password).ToCamelCase()]        = new OpenApiString(Example.Password),
-                           [nameof(Example.ConfirmPassword).ToCamelCase()] = new OpenApiString(Example.ConfirmPassword)
+                           [nameof(Example.Password)
+                            .ToCamelCase()] = new OpenApiString(Example.Password),
+                           [nameof(Example.ConfirmPassword)
+                            .ToCamelCase()] = new OpenApiString(Example.ConfirmPassword)
                        };
             }
         }
@@ -147,8 +151,10 @@ public static partial class SwaggerSchemaFilter
             {
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Password).ToCamelCase()]        = new OpenApiString(Example.Password),
-                           [nameof(Example.ConfirmPassword).ToCamelCase()] = new OpenApiString(Example.ConfirmPassword)
+                           [nameof(Example.Password)
+                            .ToCamelCase()] = new OpenApiString(Example.Password),
+                           [nameof(Example.ConfirmPassword)
+                            .ToCamelCase()] = new OpenApiString(Example.ConfirmPassword)
                        };
             }
         }
@@ -161,22 +167,38 @@ public static partial class SwaggerSchemaFilter
 
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Id).ToCamelCase()]                         = new OpenApiString(Example.Id.ToString()),
-                           [nameof(Example.FirstName).ToCamelCase()]                  = new OpenApiString(Example.FirstName),
-                           [nameof(Example.LastName).ToCamelCase()]                   = new OpenApiString(Example.LastName),
-                           [nameof(Example.DateOfBirth).ToCamelCase()]                = new OpenApiDate(new DateTime(Example.DateOfBirth, TimeOnly.MinValue)),
-                           [nameof(Example.Gender).ToCamelCase()]                     = new OpenApiInteger((int)Example.Gender),
-                           [nameof(Example.UniqueIdentificationNumber).ToCamelCase()] = new OpenApiString(Example.UniqueIdentificationNumber),
-                           [nameof(Example.Username).ToCamelCase()]                   = new OpenApiString(Example.Username),
-                           [nameof(Example.Email).ToCamelCase()]                      = new OpenApiString(Example.Email),
-                           [nameof(Example.PhoneNumber).ToCamelCase()]                = new OpenApiString(Example.PhoneNumber),
-                           [nameof(Example.Address).ToCamelCase()]                    = new OpenApiString(Example.Address),
-                           [nameof(Example.Role).ToCamelCase()]                       = new OpenApiInteger((int)Example.Role),
-                           [nameof(Example.Department).ToCamelCase()]                 = new OpenApiString(Example.Department),
-                           [nameof(Example.Accounts).ToCamelCase()]                   = accounts,
-                           [nameof(Example.CreatedAt).ToCamelCase()]                  = new OpenApiDateTime(Example.CreatedAt),
-                           [nameof(Example.ModifiedAt).ToCamelCase()]                 = new OpenApiDateTime(Example.ModifiedAt),
-                           [nameof(Example.Activated).ToCamelCase()]                  = new OpenApiBoolean(Example.Activated)
+                           [nameof(Example.Id)
+                            .ToCamelCase()] = new OpenApiString(Example.Id.ToString()),
+                           [nameof(Example.FirstName)
+                            .ToCamelCase()] = new OpenApiString(Example.FirstName),
+                           [nameof(Example.LastName)
+                            .ToCamelCase()] = new OpenApiString(Example.LastName),
+                           [nameof(Example.DateOfBirth)
+                            .ToCamelCase()] = new OpenApiDate(new DateTime(Example.DateOfBirth, TimeOnly.MinValue)),
+                           [nameof(Example.Gender)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Gender),
+                           [nameof(Example.UniqueIdentificationNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.UniqueIdentificationNumber),
+                           [nameof(Example.Username)
+                            .ToCamelCase()] = new OpenApiString(Example.Username),
+                           [nameof(Example.Email)
+                            .ToCamelCase()] = new OpenApiString(Example.Email),
+                           [nameof(Example.PhoneNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.PhoneNumber),
+                           [nameof(Example.Address)
+                            .ToCamelCase()] = new OpenApiString(Example.Address),
+                           [nameof(Example.Role)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Role),
+                           [nameof(Example.Department)
+                            .ToCamelCase()] = new OpenApiString(Example.Department),
+                           [nameof(Example.Accounts)
+                            .ToCamelCase()] = accounts,
+                           [nameof(Example.CreatedAt)
+                            .ToCamelCase()] = new OpenApiDateTime(Example.CreatedAt),
+                           [nameof(Example.ModifiedAt)
+                            .ToCamelCase()] = new OpenApiDateTime(Example.ModifiedAt),
+                           [nameof(Example.Activated)
+                            .ToCamelCase()] = new OpenApiBoolean(Example.Activated)
                        };
             }
         }
@@ -187,21 +209,36 @@ public static partial class SwaggerSchemaFilter
             {
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Id).ToCamelCase()]                         = new OpenApiString(Example.Id.ToString()),
-                           [nameof(Example.FirstName).ToCamelCase()]                  = new OpenApiString(Example.FirstName),
-                           [nameof(Example.LastName).ToCamelCase()]                   = new OpenApiString(Example.LastName),
-                           [nameof(Example.DateOfBirth).ToCamelCase()]                = new OpenApiDate(new DateTime(Example.DateOfBirth, TimeOnly.MinValue)),
-                           [nameof(Example.Gender).ToCamelCase()]                     = new OpenApiInteger((int)Example.Gender),
-                           [nameof(Example.UniqueIdentificationNumber).ToCamelCase()] = new OpenApiString(Example.UniqueIdentificationNumber),
-                           [nameof(Example.Username).ToCamelCase()]                   = new OpenApiString(Example.Username),
-                           [nameof(Example.Email).ToCamelCase()]                      = new OpenApiString(Example.Email),
-                           [nameof(Example.PhoneNumber).ToCamelCase()]                = new OpenApiString(Example.PhoneNumber),
-                           [nameof(Example.Address).ToCamelCase()]                    = new OpenApiString(Example.Address),
-                           [nameof(Example.Role).ToCamelCase()]                       = new OpenApiInteger((int)Example.Role),
-                           [nameof(Example.Department).ToCamelCase()]                 = new OpenApiString(Example.Department),
-                           [nameof(Example.CreatedAt).ToCamelCase()]                  = new OpenApiDateTime(Example.CreatedAt),
-                           [nameof(Example.ModifiedAt).ToCamelCase()]                 = new OpenApiDateTime(Example.ModifiedAt),
-                           [nameof(Example.Activated).ToCamelCase()]                  = new OpenApiBoolean(Example.Activated)
+                           [nameof(Example.Id)
+                            .ToCamelCase()] = new OpenApiString(Example.Id.ToString()),
+                           [nameof(Example.FirstName)
+                            .ToCamelCase()] = new OpenApiString(Example.FirstName),
+                           [nameof(Example.LastName)
+                            .ToCamelCase()] = new OpenApiString(Example.LastName),
+                           [nameof(Example.DateOfBirth)
+                            .ToCamelCase()] = new OpenApiDate(new DateTime(Example.DateOfBirth, TimeOnly.MinValue)),
+                           [nameof(Example.Gender)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Gender),
+                           [nameof(Example.UniqueIdentificationNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.UniqueIdentificationNumber),
+                           [nameof(Example.Username)
+                            .ToCamelCase()] = new OpenApiString(Example.Username),
+                           [nameof(Example.Email)
+                            .ToCamelCase()] = new OpenApiString(Example.Email),
+                           [nameof(Example.PhoneNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.PhoneNumber),
+                           [nameof(Example.Address)
+                            .ToCamelCase()] = new OpenApiString(Example.Address),
+                           [nameof(Example.Role)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Role),
+                           [nameof(Example.Department)
+                            .ToCamelCase()] = new OpenApiString(Example.Department),
+                           [nameof(Example.CreatedAt)
+                            .ToCamelCase()] = new OpenApiDateTime(Example.CreatedAt),
+                           [nameof(Example.ModifiedAt)
+                            .ToCamelCase()] = new OpenApiDateTime(Example.ModifiedAt),
+                           [nameof(Example.Activated)
+                            .ToCamelCase()] = new OpenApiBoolean(Example.Activated)
                        };
             }
         }
@@ -214,8 +251,10 @@ public static partial class SwaggerSchemaFilter
 
                 return new OpenApiObject()
                        {
-                           [nameof(Example.Token).ToCamelCase()] = new OpenApiString(Example.Token),
-                           [nameof(Example.User).ToCamelCase()]  = user
+                           [nameof(Example.Token)
+                            .ToCamelCase()] = new OpenApiString(Example.Token),
+                           [nameof(Example.User)
+                            .ToCamelCase()] = user
                        };
             }
         }
