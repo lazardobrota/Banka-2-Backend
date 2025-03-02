@@ -15,4 +15,10 @@ public static class EnvironmentUtilities
         return Environment.GetEnvironmentVariable(variableName)
                           .ParseIntOrDefault(defaultValue);
     }
+    
+    public static bool GetBoolVariable(string variableName, bool defaultValue = false)
+    {
+        return Environment.GetEnvironmentVariable(variableName)
+                          .ParseBoolOrDefault(defaultValue);
+    }
 }

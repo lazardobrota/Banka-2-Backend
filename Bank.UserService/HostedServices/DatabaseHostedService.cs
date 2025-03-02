@@ -1,4 +1,5 @@
-﻿using Bank.UserService.Database;
+﻿using Bank.UserService.Configurations;
+using Bank.UserService.Database;
 
 namespace Bank.UserService.HostedServices;
 
@@ -12,6 +13,10 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
 
     public void OnApplicationStarted()
     {
+        if (Configuration.Database.CreateDrop)
+            Context.Database.EnsureDeletedAsync()
+                   .Wait();
+
         Context.Database.EnsureCreatedAsync()
                .Wait();
 
