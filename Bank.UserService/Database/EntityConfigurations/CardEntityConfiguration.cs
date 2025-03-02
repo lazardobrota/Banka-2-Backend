@@ -21,7 +21,7 @@ public class CardEntityConfiguration : IEntityTypeConfiguration<Card>
 
         builder.HasOne(card => card.Type)
                .WithMany()
-               .HasForeignKey(card => card.Type.Id)
+               .HasForeignKey(card => card.TypeId)
                .IsRequired();
 
         builder.Property(card => card.Name)
@@ -33,7 +33,7 @@ public class CardEntityConfiguration : IEntityTypeConfiguration<Card>
 
         builder.HasOne(card => card.Account)
                .WithMany()
-               .HasForeignKey(card => card.Account.Id)
+               .HasForeignKey(card => card.AccountId)
                .IsRequired();
 
         builder.Property(card => card.CVV)
