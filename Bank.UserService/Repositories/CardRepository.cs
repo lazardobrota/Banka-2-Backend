@@ -32,8 +32,9 @@ public class CardRepository(ApplicationContext context) : ICardRepository
 
     public async Task<Page<Card>> FindAll(CardFilterQuery cardFilterQuery, Pageable pageable)
     {
-        var cardQuery = m_Context.Cards.Include(card => card.Type)
-                                 .Include(card => card.Account)
+        var cardQuery = m_Context.Cards.Include(c => c.Type)
+                                 .Include(c => c.Account)
+                                 .Include(c => c.Account.User)
                                  .AsQueryable();
 
         if (!string.IsNullOrEmpty(cardFilterQuery.Number))
@@ -41,18 +42,6 @@ public class CardRepository(ApplicationContext context) : ICardRepository
 
         if (!string.IsNullOrEmpty(cardFilterQuery.Name))
             cardQuery = cardQuery.Where(card => EF.Functions.ILike(card.Name, $"%{cardFilterQuery.Name}%"));
-
-        if (!string.IsNullOrEmpty(cardFilterQuery.CardTypeName))
-            cardQuery = cardQuery.Where(card => EF.Functions.ILike(card.Type.Name, $"%{cardFilterQuery.CardTypeName}%"));
-
-        if (cardFilterQuery.TypeId != Guid.Empty)
-            cardQuery = cardQuery.Where(card => card.Type.Id == cardFilterQuery.TypeId);
-
-        if (cardFilterQuery.AccountId != Guid.Empty)
-            cardQuery = cardQuery.Where(card => card.Account.Id == cardFilterQuery.AccountId);
-
-        if (cardFilterQuery.Status.HasValue)
-            cardQuery = cardQuery.Where(card => card.Status == cardFilterQuery.Status.Value);
 
         int totalElements = await cardQuery.CountAsync();
 
@@ -65,8 +54,9 @@ public class CardRepository(ApplicationContext context) : ICardRepository
 
     public async Task<Card?> FindById(Guid id)
     {
-        return await m_Context.Cards.Include(card => card.Type)
-                              .Include(card => card.Account)
+        return await m_Context.Cards.Include(c => c.Type)
+                              .Include(c => c.Account)
+                              .Include(c => c.Account.User)
                               .FirstOrDefaultAsync(x => x.Id == id);
     }
 
