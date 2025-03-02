@@ -575,6 +575,8 @@ public static class DatabaseSeeders
                     };
 
         await context.Cards.AddRangeAsync(cards);
+    }
+
     private static readonly List<Currency> s_Currencies =
     [
         new()
