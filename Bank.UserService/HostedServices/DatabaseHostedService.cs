@@ -20,6 +20,12 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
 
         Context.SeedAccounts()
                .Wait();
+
+        Context.SeedCurrency()
+               .Wait();
+
+        Context.SeedCountry()
+               .Wait();
     }
 
     public void OnApplicationStopped() { }

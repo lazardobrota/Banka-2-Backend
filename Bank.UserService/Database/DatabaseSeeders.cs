@@ -538,4 +538,57 @@ public static class DatabaseSeeders
         await context.Currencies.AddRangeAsync(s_Currencies);
         await context.SaveChangesAsync();
     }
+
+    private static readonly List<Country> s_Countries =
+    [
+        new()
+        {
+            Id         = Guid.Parse("d34c35b7-f438-4b5e-8e26-f3d9122bda7f"),
+            Name       = "Germany",
+            CurrencyId = s_Currencies[0].Id,
+            CreatedAt  = DateTime.UtcNow,
+            ModifiedAt = DateTime.UtcNow
+        },
+        new()
+        {
+            Id         = Guid.Parse("d2544b5c-79f4-47a3-8ac7-4d91e6d56fd4"),
+            Name       = "Switzerland",
+            CurrencyId = s_Currencies[1].Id,
+            CreatedAt  = DateTime.UtcNow,
+            ModifiedAt = DateTime.UtcNow
+        },
+        new()
+        {
+            Id         = Guid.Parse("f8c9d2b5-cf74-4c2f-8c2e-b0427107a510"),
+            Name       = "United States",
+            CurrencyId = s_Currencies[2].Id,
+            CreatedAt  = DateTime.UtcNow,
+            ModifiedAt = DateTime.UtcNow
+        },
+        new()
+        {
+            Id         = Guid.Parse("db5393b1-4f2e-48d0-92bb-df397f08714d"),
+            Name       = "United Kingdom",
+            CurrencyId = s_Currencies[3].Id,
+            CreatedAt  = DateTime.UtcNow,
+            ModifiedAt = DateTime.UtcNow
+        },
+        new()
+        {
+            Id         = Guid.Parse("779ff092-3c78-467a-bd5e-39df46a2da3e"),
+            Name       = "Japan",
+            CurrencyId = s_Currencies[4].Id,
+            CreatedAt  = DateTime.UtcNow,
+            ModifiedAt = DateTime.UtcNow
+        }
+    ];
+
+    public static async Task SeedCountry(this ApplicationContext context)
+    {
+        if (context.Countries.Any())
+            return;
+
+        await context.Countries.AddRangeAsync(s_Countries);
+        await context.SaveChangesAsync();
+    }
 }
