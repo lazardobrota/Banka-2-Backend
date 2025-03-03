@@ -6,8 +6,10 @@
             dockerfile: Scripts/User/Dockerfile
         env_file:
             - user.env
+        environment:
+            BANK_USER_DATABASE_PORT: ${DATABASE_EXPOSE_PORT}
         ports:
-            - "${EXPOSE_PORT}:8080"
+            - "${USER_EXPOSE_PORT}:8080"
         depends_on:
             - database
     database:
@@ -15,7 +17,7 @@
         env_file:
             - database.env
         ports:
-            - "${EXPOSE_PORT}:5432"
+            - "${DATABASE_EXPOSE_PORT}:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
         restart: unless-stopped
