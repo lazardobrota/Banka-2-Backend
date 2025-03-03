@@ -77,6 +77,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<ICardTypeService, CardTypeService>();
         services.AddScoped<ICountryRepository, CountryRepository>();
+        services.AddScoped<ICurrencyService, CurrencyService>();
         services.AddScoped<ICurrencyRepository, CurrencyRepository>();
         services.AddScoped<ICardTypeRepository, CardTypeRepository>();
         services.AddScoped<ICardRepository, CardRepository>();

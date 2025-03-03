@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Domain;
+using Bank.Application.Queries;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
@@ -8,7 +9,7 @@ namespace Bank.UserService.Repositories;
 
 public interface ICurrencyRepository
 {
-    Task<Page<Currency>> FindAll(Pageable pageable);
+    Task<Page<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery, Pageable pageable);
 
     Task<Currency?> FindById(Guid id);
 
@@ -21,9 +22,16 @@ public class CurrencyRepository(ApplicationContext context) : ICurrencyRepositor
 {
     private readonly ApplicationContext m_Context = context;
 
-    public async Task<Page<Currency>> FindAll(Pageable pageable)
+    public async Task<Page<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery, Pageable pageable)
     {
-        var currencyQuery = m_Context.Currencies.AsQueryable();
+        var currencyQuery = m_Context.Currencies.Include(c => c.Countries)
+                                     .AsQueryable();
+
+        if (!string.IsNullOrEmpty(currencyFilterQuery.Name))
+            currencyQuery = currencyQuery.Where(currency => EF.Functions.ILike(currency.Name, $"%{currencyFilterQuery.Name}%"));
+
+        if (!string.IsNullOrEmpty(currencyFilterQuery.Code))
+            currencyQuery = currencyQuery.Where(currency => EF.Functions.ILike(currency.Code, $"%{currencyFilterQuery.Code}%"));
 
         int totalElements = await currencyQuery.CountAsync();
 
@@ -36,7 +44,8 @@ public class CurrencyRepository(ApplicationContext context) : ICurrencyRepositor
 
     public async Task<Currency?> FindById(Guid id)
     {
-        return await m_Context.Currencies.FirstOrDefaultAsync(x => x.Id == id);
+        return await m_Context.Currencies.Include(c => c.Countries)
+                              .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Currency> Add(Currency currency)
