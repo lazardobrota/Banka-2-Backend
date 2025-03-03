@@ -65,5 +65,18 @@ public static partial class ValidatorUtilities
         {
             return password.Any(char.IsUpper);
         }
+
+        public static bool ValidateActivityCode(string activityCode)
+        {
+            return Regex.IsMatch(activityCode, @"^\d+(\.\d+)?$");
+        }
+    }
+
+    public static class Global
+    {
+        public static bool ContainsOnlyNumbers(string value)
+        {
+            return Regex.IsMatch(value, @"^\d+$");
+        }
     }
 }

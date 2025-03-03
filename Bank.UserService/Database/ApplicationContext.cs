@@ -13,6 +13,7 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
     public DbSet<Currency> Currencies { init; get; }
     public DbSet<CardType> CardTypes  { init; get; }
     public DbSet<Card>     Cards      { init; get; }
+    public DbSet<Company>  Companies  { init; get; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -22,5 +23,6 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
         builder.ApplyConfiguration(new CardEntityConfiguration());
         builder.ApplyConfiguration(new CountryEntityConfiguration());
         builder.ApplyConfiguration(new CurrencyEntityConfiguration());
+        builder.ApplyConfiguration(new CompanyEntityConfiguration());
     }
 }

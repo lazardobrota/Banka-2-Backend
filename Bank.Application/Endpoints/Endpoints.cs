@@ -50,6 +50,19 @@ public static partial class Endpoints
 
 public static partial class Endpoints
 {
+    public static class Company
+    {
+        public const string Base = $"{ApiBase}/companies";
+
+        public const string GetAll = $"{Base}";
+        public const string Create = $"{Base}";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Update = $"{Base}/{{id:guid}}";
+    }
+}
+
+public static partial class Endpoints
+{
     public static class Currency
     {
         public const string Base   = $"{ApiBase}/currencies";
