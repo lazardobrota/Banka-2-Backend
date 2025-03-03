@@ -7,7 +7,7 @@
         env_file:
             - user.env
         ports:
-            - "8080:8080"
+            - "${EXPOSE_PORT}:8080"
         depends_on:
             - database
     database:
@@ -15,7 +15,7 @@
         env_file:
             - database.env
         ports:
-            - "3031:5432"
+            - "${EXPOSE_PORT}:5432"
         volumes:
             - postgres_data:/var/lib/postgresql/data
         restart: unless-stopped
