@@ -1,0 +1,26 @@
+﻿services:
+    bank.user:
+        image: bank.user
+        build:
+            context: ..
+            dockerfile: Scripts/User/Dockerfile
+        env_file:
+            - user.env
+        environment:
+            BANK_USER_DATABASE_PORT: ${DATABASE_EXPOSE_PORT}
+        ports:
+            - "${USER_EXPOSE_PORT}:8080"
+        depends_on:
+            - database
+    database:
+        image: postgres:latest
+        env_file:
+            - database.env
+        ports:
+            - "${DATABASE_EXPOSE_PORT}:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        restart: unless-stopped
+
+volumes:
+    postgres_data:
