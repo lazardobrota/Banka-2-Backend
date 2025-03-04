@@ -25,7 +25,7 @@ public static class StringExtensions
     {
         return int.TryParse(value, out var result) ? result : defaultValue;
     }
-    
+
     public static bool ParseBoolOrDefault(this string? value, bool defaultValue = false)
     {
         return bool.TryParse(value, out var result) ? result : defaultValue;

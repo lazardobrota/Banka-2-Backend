@@ -50,6 +50,26 @@ public static partial class Endpoints
 
 public static partial class Endpoints
 {
+    public static class Currency
+    {
+        public const string Base   = $"{ApiBase}/currencies";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string GetAll = $"{Base}";
+    }
+}
+
+public static partial class Endpoints
+{
+    public static class Country
+    {
+        public const string Base   = $"{ApiBase}/countries";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string GetAll = $"{Base}";
+    }
+}
+
+public static partial class Endpoints
+{
     public static class Card
     {
         public const string Base   = $"{ApiBase}/cards";
