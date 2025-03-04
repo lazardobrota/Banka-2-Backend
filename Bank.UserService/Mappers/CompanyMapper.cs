@@ -16,7 +16,7 @@ public static class CompanyMapper
                    TaxIdentificationNumber = company.TaxIdentificationNumber,
                    ActivityCode            = company.ActivityCode,
                    Address                 = company.Address,
-                   MajorityOwner           = company.MajorityOwner.ToSimpleResponse()
+                   MajorityOwner           = company.MajorityOwner?.ToSimpleResponse()
                };
     }
 
