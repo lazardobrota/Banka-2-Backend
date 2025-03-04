@@ -727,4 +727,57 @@ public static class DatabaseSeeders
         await context.Countries.AddRangeAsync(s_Countries);
         await context.SaveChangesAsync();
     }
+
+    public static async Task SeedCompany(this ApplicationContext context)
+    {
+        if (context.Companies.Any())
+            return;
+
+        var companies = new List<Company>
+                        {
+                            new()
+                            {
+                                Id                      = Guid.Parse("c0e4e2f2-8ce6-40da-8ec7-f1abb153baa1"),
+                                Name                    = "Tech Innovators",
+                                RegistrationNumber      = "12345678",
+                                TaxIdentificationNumber = "987654321",
+                                ActivityCode            = "1234",
+                                Address                 = "123 Tech Street, Innovate City",
+                                MajorityOwnerId         = Guid.Parse("c9d0e1f2-a3b4-4c9d-0e1f-2a3b4c5d6e7f"),
+                            },
+                            new()
+                            {
+                                Id                      = Guid.Parse("61a0cbaa-2678-41b1-b0f9-9294c9dcfb9f"),
+                                Name                    = "Global Solutions",
+                                RegistrationNumber      = "23456789",
+                                TaxIdentificationNumber = "876543210",
+                                ActivityCode            = "5678",
+                                Address                 = "456 Global Ave, Solution Town",
+                                MajorityOwnerId         = Guid.Parse("f63d4dae-b9d7-4d5a-9d5a-6b831c7e8b9a"),
+                            },
+                            new()
+                            {
+                                Id                      = Guid.Parse("2457c5a3-8ebb-4550-902a-132947e6072e"),
+                                Name                    = "Creative Ventures",
+                                RegistrationNumber      = "34567890",
+                                TaxIdentificationNumber = "765432109",
+                                ActivityCode            = "2345",
+                                Address                 = "789 Creative Blvd, Dream City",
+                                MajorityOwnerId         = Guid.Parse("9e2b3a6c-7d8e-4f1a-b2c3-d4e5f6a7b8c9"),
+                            },
+                            new()
+                            {
+                                Id                      = Guid.Parse("91236bca-d078-402e-bb07-22da18448641"),
+                                Name                    = "Future Enterprises",
+                                RegistrationNumber      = "45678901",
+                                TaxIdentificationNumber = "654321098",
+                                ActivityCode            = "3456",
+                                Address                 = "101 Future Rd, Progress Town",
+                                MajorityOwnerId         = Guid.Parse("a7b8c9d0-e1f2-4a7b-9c0d-1e2f3a4b5c6d"),
+                            }
+                        };
+
+        await context.Companies.AddRangeAsync(companies);
+        await context.SaveChangesAsync();
+    }
 }

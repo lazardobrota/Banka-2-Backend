@@ -71,3 +71,25 @@ public static partial class ValidationErrorMessage
         public const string DepartmentInvalid = "Department name is not valid.";
     }
 }
+
+public static partial class ValidationErrorMessage
+{
+    public static class Company
+    {
+        public const string NameNull   = "Name can't be null.";
+        public const string NameEmpty  = "Name can't be empty.";
+        public const string NameLength = "Name must be at most 32 characters long.";
+
+        public const string RegistrationNumberNull        = "Registration Number can't be null.";
+        public const string RegistrationNumberLength      = "Registration Number must be exactly 8 characters long.";
+        public const string RegistrationNumberTextInvalid = "Registration Number must contains only numbers.";
+
+        public const string TINNull        = "Tax Identification Number can't be null.";
+        public const string TINLength      = "Tax Identification Number must be exactly 9 characters long.";
+        public const string TINTextInvalid = "Tax Identification Number must contains only numbers.";
+
+        public const string ActivityCodeNull        = "Activity Code can't be null.";
+        public const string ActivityCodeLength      = "Activity Code must be exactly 4 or 5 characters long.";
+        public const string ActivityCodeTextInvalid = "Activity Code must contain only . and numbers.";
+    }
+}

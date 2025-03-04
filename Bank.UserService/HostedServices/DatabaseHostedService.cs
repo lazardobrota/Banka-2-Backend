@@ -37,6 +37,9 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
 
         Context.SeedCountry()
                .Wait();
+
+        Context.SeedCompany()
+               .Wait();
     }
 
     public void OnApplicationStopped() { }
