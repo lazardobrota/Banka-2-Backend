@@ -76,6 +76,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<ICardTypeService, CardTypeService>();
+        services.AddScoped<ICardService, CardService>();
         services.AddScoped<ICountryRepository, CountryRepository>();
         services.AddScoped<ICurrencyService, CurrencyService>();
         services.AddScoped<ICurrencyRepository, CurrencyRepository>();
