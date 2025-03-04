@@ -68,4 +68,24 @@ public static partial class Endpoints
     }
 }
 
+public static partial class Endpoints
+{
+    public static class Card
+    {
+        public const string Base   = $"{ApiBase}/cards";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string GetAll = $"{Base}";
+    }
+}
+
+public static partial class Endpoints
+{
+    public static class CardType
+    {
+        public const string Base   = $"{ApiBase}/cards/types";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string GetAll = $"{Base}";
+    }
+}
+
 #endregion
