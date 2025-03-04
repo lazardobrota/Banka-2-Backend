@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Domain;
+using Bank.Application.Queries;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
@@ -8,7 +9,7 @@ namespace Bank.UserService.Repositories;
 
 public interface ICardTypeRepository
 {
-    Task<Page<CardType>> FindAll(string? name, Pageable pageable);
+    Task<Page<CardType>> FindAll(CardTypeFilterQuery query, Pageable pageable);
 
     Task<CardType?> FindById(Guid id);
 
@@ -23,12 +24,12 @@ public class CardTypeRepository(ApplicationContext context) : ICardTypeRepositor
 {
     private readonly ApplicationContext m_Context = context;
 
-    public async Task<Page<CardType>> FindAll(string? name, Pageable pageable)
+    public async Task<Page<CardType>> FindAll(CardTypeFilterQuery query, Pageable pageable)
     {
         var cardTypeQuery = m_Context.CardTypes.AsQueryable();
 
-        if (!string.IsNullOrEmpty(name))
-            cardTypeQuery = cardTypeQuery.Where(cardType => EF.Functions.ILike(cardType.Name, $"%{name}%"));
+        if (!string.IsNullOrEmpty(query.Name))
+            cardTypeQuery = cardTypeQuery.Where(cardType => EF.Functions.ILike(cardType.Name, $"%{query.Name}%"));
 
         int totalElements = await cardTypeQuery.CountAsync();
 

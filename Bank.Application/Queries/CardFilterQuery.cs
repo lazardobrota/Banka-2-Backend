@@ -9,3 +9,8 @@ public class CardFilterQuery
     public bool?   Status       { get; set; }
     public string? CardTypeName { get; set; }
 }
+
+public class CardTypeFilterQuery
+{
+    public string? Name { get; set; }
+}
