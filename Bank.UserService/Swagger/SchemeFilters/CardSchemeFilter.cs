@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Extensions;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 
 using Microsoft.OpenApi.Any;
@@ -13,6 +14,8 @@ file static class Example
     public static class Card
     {
         public static readonly Guid     Id         = Guid.Parse("987e6543-e21b-45d3-a123-654321abcdef");
+        public static readonly Guid     CardTypeId = Guid.Parse("c3d4e5f6-a7b8-1234-5678-9abcdef01234");
+        public static readonly Guid     AccountId  = Guid.Parse("d4e5f6a7-b8c9-1234-5678-abcdef012345");
         public const           string   Number     = "1234-5678-9876-5437";
         public const           string   Name       = "Credit Card";
         public static readonly DateOnly ExpiresAt  = new(2028, 5, 31);
@@ -36,6 +39,25 @@ file static class Example
                                                            CreatedAt  = CreatedAt,
                                                            ModifiedAt = ModifiedAt
                                                        };
+
+        public static readonly CardCreateRequest CreateRequest = new()
+                                                                 {
+                                                                     CardTypeId = CardTypeId,
+                                                                     AccountId  = AccountId,
+                                                                     Name       = Name,
+                                                                     Limit      = Limit,
+                                                                     Status     = Status
+                                                                 };
+
+        public static readonly CardStatusUpdateRequest StatusUpdateRequest = new()
+                                                                             {
+                                                                                 Status = Status
+                                                                             };
+
+        public static readonly CardLimitUpdateRequest LimitUpdateRequest = new()
+                                                                           {
+                                                                               Limit = Limit
+                                                                           };
     }
 }
 
@@ -43,6 +65,50 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Card
     {
+        public class CreateRequest() : SwaggerSchemaFilter<CardCreateRequest>(SchemeFilters.Example.Card.CreateRequest)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.CardTypeId)
+                            .ToCamelCase()] = new OpenApiString(Example.CardTypeId.ToString()),
+                           [nameof(Example.AccountId)
+                            .ToCamelCase()] = new OpenApiString(Example.AccountId.ToString()),
+                           [nameof(Example.Name)
+                            .ToCamelCase()] = new OpenApiString(Example.Name),
+                           [nameof(Example.Limit)
+                            .ToCamelCase()] = new OpenApiDouble((double)Example.Limit),
+                           [nameof(Example.Status)
+                            .ToCamelCase()] = new OpenApiBoolean(Example.Status)
+                       };
+            }
+        }
+
+        public class StatusUpdateRequest() : SwaggerSchemaFilter<CardStatusUpdateRequest>(SchemeFilters.Example.Card.StatusUpdateRequest)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.Status)
+                            .ToCamelCase()] = new OpenApiBoolean(Example.Status)
+                       };
+            }
+        }
+
+        public class LimitUpdateRequest() : SwaggerSchemaFilter<CardLimitUpdateRequest>(SchemeFilters.Example.Card.LimitUpdateRequest)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.Limit)
+                            .ToCamelCase()] = new OpenApiDouble((double)Example.Limit)
+                       };
+            }
+        }
+
         public class Response() : SwaggerSchemaFilter<CardResponse>(SchemeFilters.Example.Card.Response)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)

@@ -108,9 +108,21 @@ public static class ServiceCollectionExtensions
                                {
                                    config.SwaggerDoc("v1", new OpenApiInfo() { Title = "UserService", Version = "v1" });
 
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.UpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.Response>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Account.SimpleResponse>();
-                                   //config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
 
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.UpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountType.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Card.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Card.LimitUpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Card.StatusUpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Card.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.CardType.Response>();
@@ -118,6 +130,7 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.UpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.CreateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.Response>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Client.SimpleResponse>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Company.CreateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Company.UpdateRequest>();
@@ -133,6 +146,7 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.CreateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.UpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.Response>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.SimpleResponse>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.User.ActivationRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.User.LoginRequest>();
@@ -189,9 +203,8 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
-                                                                                                                                       .Jwt
-                                                                                                                                       .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
+                                                                                                                                                    .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,
