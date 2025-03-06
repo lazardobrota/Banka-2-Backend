@@ -18,18 +18,22 @@ public static class AccountMapper
                    AvailableBalance = account.AvailableBalance,
                    Employee = account.Employee.ToEmployee()
                                      .ToSimpleResponse(),
-                   Currency = null,
-                   Type     = account.Type.ToResponse(),
-                   //TODO: accountCurrency
-                   DailyLimit     = 0,
-                   MonthlyLimit   = 0,
-                   CreationDate   = account.CreationDate,
-                   ExpirationDate = account.ExpirationDate,
-                   Status         = account.Status,
-                   CreatedAt      = account.CreatedAt,
-                   ModifiedAt     = account.ModifiedAt
+                   Currency          = null,
+                   Type              = account.Type.ToResponse(),
+                   AccountCurrencies = MapAccountCurrencies(account.AccountCurrencies),
+                   DailyLimit        = 0,
+                   MonthlyLimit      = 0,
+                   CreationDate      = account.CreationDate,
+                   ExpirationDate    = account.ExpirationDate,
+                   Status            = account.Status,
+                   CreatedAt         = account.CreatedAt,
+                   ModifiedAt        = account.ModifiedAt
                };
     }
+
+    private static List<AccountCurrencyResponse> MapAccountCurrencies(List<AccountCurrency> accountCurrencies) =>
+    accountCurrencies.Select(accountCurrency => accountCurrency.ToResponse())
+                     .ToList();
 
     public static AccountSimpleResponse ToSimpleResponse(this Account account)
     {

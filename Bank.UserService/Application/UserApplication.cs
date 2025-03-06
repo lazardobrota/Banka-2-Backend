@@ -87,6 +87,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IAccountTypeRepository, AccountTypeRepository>();
         services.AddScoped<IAccountTypeService, AccountTypeService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IAccountCurrencyService, AccountCurrencyService>();
 
         services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
