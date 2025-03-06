@@ -33,9 +33,9 @@ public class UserServiceTests
 
     public UserServiceTests()
     {
-        m_EmailService  = new EmailService(m_EmailRepository);
+        m_EmailService  = new EmailService(m_EmailRepository, null); //TODO: AuthorizationService
         m_TokenProvider = new TokenProvider();
-        m_Sut           = new Services.UserService(m_UserRepository, m_TokenProvider, m_EmailService);
+        m_Sut           = new Services.UserService(m_UserRepository, m_EmailService, null); //TODO: AuthorizationService
         var now = DateTime.UtcNow;
 
         mockUsers =

@@ -131,6 +131,29 @@ public static class UserMapper
                };
     }
 
+    public static EmployeeSimpleResponse ToSimpleResponse(this Employee employee)
+    {
+        return new EmployeeSimpleResponse
+               {
+                   Id                         = employee.Id,
+                   FirstName                  = employee.FirstName,
+                   LastName                   = employee.LastName,
+                   DateOfBirth                = employee.DateOfBirth,
+                   Gender                     = employee.Gender,
+                   UniqueIdentificationNumber = employee.UniqueIdentificationNumber,
+                   Email                      = employee.Email,
+                   Username                   = employee.Username,
+                   PhoneNumber                = employee.PhoneNumber,
+                   Address                    = employee.Address,
+                   Role                       = employee.Role,
+                   Department                 = employee.Department,
+                   CreatedAt                  = employee.CreatedAt,
+                   ModifiedAt                 = employee.ModifiedAt,
+                   Employed                   = employee.Employed,
+                   Activated                  = employee.Activated
+               };
+    }
+
     public static Employee ToEmployee(this EmployeeCreateRequest employeeCreateRequest)
     {
         return new Employee
@@ -195,6 +218,26 @@ public static class UserMapper
                    Address                    = client.Address,
                    Role                       = client.Role,
                    Accounts                   = MapAccounts(client.Accounts),
+                   CreatedAt                  = client.CreatedAt,
+                   ModifiedAt                 = client.ModifiedAt,
+                   Activated                  = client.Activated
+               };
+    }
+
+    public static ClientSimpleResponse ToSimpleResponse(this Client client)
+    {
+        return new ClientSimpleResponse
+               {
+                   Id                         = client.Id,
+                   FirstName                  = client.FirstName,
+                   LastName                   = client.LastName,
+                   DateOfBirth                = client.DateOfBirth,
+                   Gender                     = client.Gender,
+                   UniqueIdentificationNumber = client.UniqueIdentificationNumber,
+                   Email                      = client.Email,
+                   PhoneNumber                = client.PhoneNumber,
+                   Address                    = client.Address,
+                   Role                       = client.Role,
                    CreatedAt                  = client.CreatedAt,
                    ModifiedAt                 = client.ModifiedAt,
                    Activated                  = client.Activated

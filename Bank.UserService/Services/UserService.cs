@@ -8,7 +8,6 @@ using Bank.Application.Responses;
 using Bank.Application.Utilities;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
-using Bank.UserService.Security;
 
 namespace Bank.UserService.Services;
 
@@ -27,10 +26,11 @@ public interface IUserService
     Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token);
 }
 
-public class UserService(IUserRepository userRepository, TokenProvider tokenProvider, IEmailService emailService) : IUserService
+public class UserService(IUserRepository userRepository, IEmailService emailService, IAuthorizationService authorizationService) : IUserService
 {
-    private readonly IUserRepository m_UserRepository = userRepository;
-    private readonly IEmailService   m_EmailService   = emailService;
+    private readonly IUserRepository       m_UserRepository       = userRepository;
+    private readonly IEmailService         m_EmailService         = emailService;
+    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
 
     public async Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
@@ -65,7 +65,7 @@ public class UserService(IUserRepository userRepository, TokenProvider tokenProv
         if (user.Password != HashingUtilities.HashPassword(userLoginRequest.Password, user.Salt))
             return Result.BadRequest<UserLoginResponse>("The password is incorrect.");
 
-        string token = tokenProvider.Create(user);
+        string token = m_AuthorizationService.GenerateTokenFor(user);
 
         return Result.Ok(new UserLoginResponse { Token = token, User = user.ToResponse() });
     }
