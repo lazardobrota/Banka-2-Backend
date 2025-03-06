@@ -23,7 +23,7 @@ public static class AccountCurrencyMapper
                    ModifiedAt       = accountCurrency.ModifiedAt
                };
     }
-    
+
     public static AccountCurrency ToAccountCurrency(this AccountCurrencyCreateRequest accountCurrencyCreateRequest, User employee, Currency currency, Account account)
     {
         return new AccountCurrency
@@ -41,6 +41,26 @@ public static class AccountCurrencyMapper
                    MonthlyLimit     = accountCurrencyCreateRequest.MonthlyLimit,
                    CreatedAt        = DateTime.UtcNow,
                    ModifiedAt       = DateTime.UtcNow
+               };
+    }
+
+    public static AccountCurrency ToAccountCurrency(this AccountCurrencyClientUpdateRequest accountCurrencyUpdate, AccountCurrency oldAccountCurrency)
+    {
+        return new AccountCurrency
+               {
+                   Id               = oldAccountCurrency.Id,
+                   DailyLimit       = accountCurrencyUpdate.DailyLimit,
+                   MonthlyLimit     = accountCurrencyUpdate.MonthlyLimit,
+                   CreatedAt        = oldAccountCurrency.CreatedAt,
+                   ModifiedAt       = DateTime.UtcNow,
+                   Account          = oldAccountCurrency.Account,
+                   AccountId        = oldAccountCurrency.AccountId,
+                   Employee         = oldAccountCurrency.Employee,
+                   EmployeeId       = oldAccountCurrency.EmployeeId,
+                   Currency         = oldAccountCurrency.Currency,
+                   CurrencyId       = oldAccountCurrency.CurrencyId,
+                   Balance          = oldAccountCurrency.Balance,
+                   AvailableBalance = oldAccountCurrency.AvailableBalance
                };
     }
 }

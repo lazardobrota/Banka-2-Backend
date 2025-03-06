@@ -9,17 +9,22 @@ namespace Bank.UserService.Services;
 
 public interface IAccountCurrencyService
 {
-    Task<Result<AccountCurrencyResponse>>       GetOne(Guid                         id);
-    Task<Result<Page<AccountCurrencyResponse>>> GetAll(Pageable                     pageable);
-    Task<Result<AccountCurrencyResponse>>       Create(AccountCurrencyCreateRequest accountCurrencyCreateRequest);
+    Task<Result<AccountCurrencyResponse>> GetOne(Guid id);
 
+    Task<Result<Page<AccountCurrencyResponse>>> GetAll(Pageable pageable);
+
+    Task<Result<AccountCurrencyResponse>> Create(AccountCurrencyCreateRequest accountCurrencyCreateRequest);
+
+    Task<Result<AccountCurrencyResponse>> Update(AccountCurrencyClientUpdateRequest accountClientUpdateRequest, Guid id);
 }
 
-public class AccountCurrencyService(IAccountCurrencyRepository accountCurrencyRepository,
-                                    IAccountRepository         accountRepository,
-                                    ICurrencyRepository        currencyRepository,
-                                    IUserRepository            userRepository,
-                                    IAuthorizationService      authorizationService) : IAccountCurrencyService
+public class AccountCurrencyService(
+    IAccountCurrencyRepository accountCurrencyRepository,
+    IAccountRepository         accountRepository,
+    ICurrencyRepository        currencyRepository,
+    IUserRepository            userRepository,
+    IAuthorizationService      authorizationService
+) : IAccountCurrencyService
 {
     private readonly IAccountCurrencyRepository m_AccountCurrencyRepository = accountCurrencyRepository;
     private readonly IAccountRepository         m_AccountRepository         = accountRepository;
@@ -46,7 +51,7 @@ public class AccountCurrencyService(IAccountCurrencyRepository accountCurrencyRe
 
         return Result.Ok(new Page<AccountCurrencyResponse>(accountCurrencyResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
-    
+
     public async Task<Result<AccountCurrencyResponse>> Create(AccountCurrencyCreateRequest accountCurrencyCreateRequest)
     {
         var account  = await m_AccountRepository.FindById(accountCurrencyCreateRequest.AccountId);
@@ -57,6 +62,18 @@ public class AccountCurrencyService(IAccountCurrencyRepository accountCurrencyRe
             return Result.BadRequest<AccountCurrencyResponse>("Invalid data.");
 
         var accountCurrency = await m_AccountCurrencyRepository.Add(accountCurrencyCreateRequest.ToAccountCurrency(employee, currency, account));
+
+        return Result.Ok(accountCurrency.ToResponse());
+    }
+
+    public async Task<Result<AccountCurrencyResponse>> Update(AccountCurrencyClientUpdateRequest accountClientUpdateRequest, Guid id)
+    {
+        var oldAccountCurrency = await m_AccountCurrencyRepository.FindById(id);
+
+        if (oldAccountCurrency is null)
+            return Result.NotFound<AccountCurrencyResponse>($"No AccountCurrency found with Id: {id}");
+
+        var accountCurrency = await m_AccountCurrencyRepository.Update(oldAccountCurrency, accountClientUpdateRequest.ToAccountCurrency(oldAccountCurrency));
 
         return Result.Ok(accountCurrency.ToResponse());
     }

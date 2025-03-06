@@ -9,3 +9,8 @@ public class AccountCurrencyCreateRequest
     public required decimal MonthlyLimit { set; get; }
 }
 
+public class AccountCurrencyClientUpdateRequest
+{
+    public required decimal DailyLimit   { set; get; }
+    public required decimal MonthlyLimit { set; get; }
+}
