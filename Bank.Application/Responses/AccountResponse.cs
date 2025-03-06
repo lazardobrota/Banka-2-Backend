@@ -13,14 +13,14 @@ public class AccountResponse
 
     public required AccountTypeResponse Type { set; get; }
 
-    //TODO: accountCurrency
-    public required decimal  DailyLimit     { set; get; }
-    public required decimal  MonthlyLimit   { set; get; }
-    public required DateOnly CreationDate   { set; get; }
-    public required DateOnly ExpirationDate { set; get; }
-    public required bool     Status         { set; get; }
-    public required DateTime CreatedAt      { set; get; }
-    public required DateTime ModifiedAt     { set; get; }
+    public required List<AccountCurrencyResponse> AccountCurrencies { init; get; } = [];
+    public required decimal                       DailyLimit        { set;  get; }
+    public required decimal                       MonthlyLimit      { set;  get; }
+    public required DateOnly                      CreationDate      { set;  get; }
+    public required DateOnly                      ExpirationDate    { set;  get; }
+    public required bool                          Status            { set;  get; }
+    public required DateTime                      CreatedAt         { set;  get; }
+    public required DateTime                      ModifiedAt        { set;  get; }
 }
 
 public class AccountSimpleResponse
