@@ -75,6 +75,64 @@ public static class AccountMapper
         return account;
     }
 
+    public static Account ToAccount(this AccountUpdateClientRequest accountUpdate, Account oldAccount)
+    {
+        return new Account
+               {
+                   Id                = oldAccount.Id,
+                   CreatedAt         = oldAccount.CreatedAt,
+                   ModifiedAt        = DateTime.UtcNow,
+                   Employee          = oldAccount.Employee,
+                   EmployeeId        = oldAccount.EmployeeId,
+                   Currency          = oldAccount.Currency,
+                   CurrencyId        = oldAccount.CurrencyId,
+                   Balance           = oldAccount.Balance,
+                   AvailableBalance  = oldAccount.AvailableBalance,
+                   Client            = oldAccount.Client,
+                   ClientId          = oldAccount.ClientId,
+                   Number            = oldAccount.Number,
+                   Name              = accountUpdate.Name,
+                   Type              = oldAccount.Type,
+                   AccountTypeId     = oldAccount.AccountTypeId,
+                   AccountCurrencies = oldAccount.AccountCurrencies,
+                   CreationDate      = oldAccount.CreationDate,
+                   ExpirationDate    = oldAccount.ExpirationDate,
+                   DailyLimit        = accountUpdate.DailyLimit,
+                   MonthlyLimit      = accountUpdate.MonthlyLimit,
+                   Status            = oldAccount.Status
+               };
+    }
+
+    public static Account ToAccount(this AccountUpdateEmployeeRequest accountUpdate, Account oldAccount)
+    {
+        oldAccount.Status = accountUpdate.Status;
+
+        return new Account
+               {
+                   Id                = oldAccount.Id,
+                   CreatedAt         = oldAccount.CreatedAt,
+                   ModifiedAt        = DateTime.UtcNow,
+                   Employee          = oldAccount.Employee,
+                   EmployeeId        = oldAccount.EmployeeId,
+                   Currency          = oldAccount.Currency,
+                   CurrencyId        = oldAccount.CurrencyId,
+                   Balance           = oldAccount.Balance,
+                   AvailableBalance  = oldAccount.AvailableBalance,
+                   Client            = oldAccount.Client,
+                   ClientId          = oldAccount.ClientId,
+                   Number            = oldAccount.Number,
+                   Name              = oldAccount.Name,
+                   Type              = oldAccount.Type,
+                   AccountTypeId     = oldAccount.AccountTypeId,
+                   AccountCurrencies = oldAccount.AccountCurrencies,
+                   CreationDate      = oldAccount.CreationDate,
+                   ExpirationDate    = oldAccount.ExpirationDate,
+                   DailyLimit        = oldAccount.DailyLimit,
+                   MonthlyLimit      = oldAccount.MonthlyLimit,
+                   Status            = accountUpdate.Status
+               };
+    }
+
     private static string GenerateAccountNumber()
     {
         Random random       = new Random();

@@ -11,3 +11,15 @@ public class AccountCreateRequest
     public required decimal MonthlyLimit  { set; get; }
     public required bool    Status        { set; get; }
 }
+
+public class AccountUpdateEmployeeRequest
+{
+    public required bool Status { set; get; }
+}
+
+public class AccountUpdateClientRequest
+{
+    public required string  Name         { set; get; }
+    public required decimal DailyLimit   { set; get; }
+    public required decimal MonthlyLimit { set; get; }
+}

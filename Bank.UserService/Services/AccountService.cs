@@ -15,6 +15,10 @@ public interface IAccountService
     Task<Result<AccountResponse>> GetOne(Guid id);
 
     Task<Result<AccountResponse>> Create(AccountCreateRequest accountCreateRequest);
+
+    Task<Result<AccountResponse>> Update(AccountUpdateClientRequest accountUpdateRequest, Guid id);
+
+    Task<Result<AccountResponse>> Update(AccountUpdateEmployeeRequest accountUpdateRequest, Guid id);
 }
 
 public class AccountService(
@@ -62,6 +66,30 @@ public class AccountService(
             return Result.BadRequest<AccountResponse>("Invalid data.");
 
         var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(employee, client, currency, accountType));
+
+        return Result.Ok(account.ToResponse());
+    }
+
+    public async Task<Result<AccountResponse>> Update(AccountUpdateClientRequest accountUpdateRequest, Guid id)
+    {
+        var oldAccount = await m_AccountRepository.FindById(id);
+
+        if (oldAccount is null)
+            return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
+
+        var account = await m_AccountRepository.Update(oldAccount, accountUpdateRequest.ToAccount(oldAccount));
+
+        return Result.Ok(account.ToResponse());
+    }
+
+    public async Task<Result<AccountResponse>> Update(AccountUpdateEmployeeRequest accountUpdateRequest, Guid id)
+    {
+        var oldAccount = await m_AccountRepository.FindById(id);
+
+        if (oldAccount is null)
+            return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
+
+        var account = await m_AccountRepository.Update(oldAccount, accountUpdateRequest.ToAccount(oldAccount));
 
         return Result.Ok(account.ToResponse());
     }
