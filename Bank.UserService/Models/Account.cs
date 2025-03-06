@@ -15,13 +15,12 @@ public class Account
     public required Guid                  CurrencyId        { set;  get; }
     public required AccountType           Type              { set;  get; }
     public required Guid                  AccountTypeId     { set;  get; }
-    //TODO: accountCurrency
-    public required decimal               DailyLimit        { set;  get; }
-    public required decimal               MonthlyLimit      { set;  get; }
-    public required DateOnly              CreationDate      { set;  get; }
-    public required DateOnly              ExpirationDate    { set;  get; }
-    public required bool                  Status            { set;  get; }
-    public required DateTime              CreatedAt         { set;  get; }
-    public required DateTime              ModifiedAt        { set;  get; }
-
+    public required List<AccountCurrency> AccountCurrencies { init; get; } = [];
+    public required decimal  DailyLimit     { set; get; }
+    public required decimal  MonthlyLimit   { set; get; }
+    public required DateOnly CreationDate   { set; get; }
+    public required DateOnly ExpirationDate { set; get; }
+    public required bool     Status         { set; get; }
+    public required DateTime CreatedAt      { set; get; }
+    public required DateTime ModifiedAt     { set; get; }
 }

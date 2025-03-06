@@ -78,6 +78,9 @@ public class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
                .HasForeignKey(account => account.AccountTypeId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        //TODO: accountCurrency
+        builder.HasMany(account => account.AccountCurrencies)
+               .WithOne(accountCurrency => accountCurrency.Account)
+               .HasForeignKey(accountCurrency => accountCurrency.AccountId)
+               .OnDelete(DeleteBehavior.Cascade);
     }
 }
