@@ -1,4 +1,5 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Mappers;
@@ -42,5 +43,47 @@ public static class AccountMapper
                    Id            = account.Id,
                    AccountNumber = account.Number
                };
+    }
+
+    public static Account ToAccount(this AccountCreateRequest accountCreateRequest, User employee, User client, Currency currency, AccountType accountType)
+    {
+        var account = new Account
+                      {
+                          Id                = Guid.NewGuid(),
+                          EmployeeId        = employee.Id,
+                          Employee          = employee,
+                          CurrencyId        = currency.Id,
+                          Currency          = currency,
+                          Balance           = accountCreateRequest.Balance,
+                          AvailableBalance  = accountCreateRequest.Balance,
+                          DailyLimit        = accountCreateRequest.DailyLimit,
+                          MonthlyLimit      = accountCreateRequest.MonthlyLimit,
+                          CreatedAt         = DateTime.UtcNow,
+                          ModifiedAt        = DateTime.UtcNow,
+                          Client            = client,
+                          ClientId          = client.Id,
+                          Name              = accountCreateRequest.Name,
+                          Number            = GenerateAccountNumber(),
+                          Type              = accountType,
+                          AccountTypeId     = accountType.Id,
+                          AccountCurrencies = [],
+                          CreationDate      = DateOnly.FromDateTime(DateTime.UtcNow),
+                          ExpirationDate    = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(5)),
+                          Status            = accountCreateRequest.Status
+                      };
+
+        return account;
+    }
+
+    private static string GenerateAccountNumber()
+    {
+        Random random       = new Random();
+        string randomDigits = "";
+
+        for (int i = 0; i < 9; i++)
+            randomDigits += random.Next(0, 10)
+                                  .ToString();
+
+        return randomDigits;
     }
 }

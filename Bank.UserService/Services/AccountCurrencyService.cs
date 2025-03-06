@@ -8,9 +8,9 @@ namespace Bank.UserService.Services;
 
 public interface IAccountCurrencyService
 {
-    Task<Result<AccountCurrencyResponse>>       GetOne(Guid     id);
-    Task<Result<Page<AccountCurrencyResponse>>> GetAll(Pageable pageable);
+    Task<Result<AccountCurrencyResponse>> GetOne(Guid id);
 
+    Task<Result<Page<AccountCurrencyResponse>>> GetAll(Pageable pageable);
 }
 
 public class AccountCurrencyService(IAccountCurrencyRepository accountCurrencyRepository) : IAccountCurrencyService
@@ -26,6 +26,7 @@ public class AccountCurrencyService(IAccountCurrencyRepository accountCurrencyRe
 
         return Result.Ok(accountCurrency.ToResponse());
     }
+
     public async Task<Result<Page<AccountCurrencyResponse>>> GetAll(Pageable pageable)
     {
         var page = await m_AccountCurrencyRepository.FindAll(pageable);

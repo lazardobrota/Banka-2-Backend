@@ -22,7 +22,7 @@ public class AccountCurrencyController(IAccountCurrencyService accountCurrencySe
 
         return result.ActionResult;
     }
-    
+
     [Authorize]
     [HttpGet(Endpoints.AccountCurrency.GetAll)]
     public async Task<ActionResult<Page>> GetAll([FromQuery] Pageable pageable)
