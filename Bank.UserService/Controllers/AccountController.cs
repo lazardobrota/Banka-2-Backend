@@ -43,4 +43,22 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
         return result.ActionResult;
     }
+
+    [HttpPut(Endpoints.Account.UpdateClient)]
+    [Authorize(Roles = $"{Role.Client}")]
+    public async Task<ActionResult<AccountResponse>> Update([FromBody] AccountUpdateClientRequest accountUpdateClientRequest, [FromRoute] Guid id)
+    {
+        var result = await m_AccountService.Update(accountUpdateClientRequest, id);
+
+        return result.ActionResult;
+    }
+
+    [HttpPut(Endpoints.Account.UpdateEmployee)]
+    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
+    public async Task<ActionResult<AccountResponse>> Update([FromBody] AccountUpdateEmployeeRequest accountUpdateEmployeeRequest, [FromRoute] Guid id)
+    {
+        var result = await m_AccountService.Update(accountUpdateEmployeeRequest, id);
+
+        return result.ActionResult;
+    }
 }
