@@ -11,3 +11,13 @@ public class CardCreateRequest
 
     public bool Status { get; set; }
 }
+
+public class CardStatusUpdateRequest
+{
+    public bool Status { get; set; }
+}
+
+public class CardLimitUpdateRequest
+{
+    public decimal Limit { get; set; }
+}

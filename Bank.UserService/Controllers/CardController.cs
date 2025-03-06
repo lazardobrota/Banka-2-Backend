@@ -29,10 +29,29 @@ public class CardController(ICardService service) : ControllerBase
     }
 
     [HttpPost(Endpoints.Card.Create)]
+    //[Authorize(Roles = $"{Role.Employee}")]
     public async Task<ActionResult<CardResponse>> Create([FromBody] CardCreateRequest cardRequest)
     {
         var card = await m_cardService.Create(cardRequest);
 
         return card.ActionResult;
+    }
+
+    [HttpPut(Endpoints.Card.UpdateStatus)]
+    //[Authorize(Roles = $"{Role.Employee}")]
+    public async Task<ActionResult<CardResponse>> UpdateStatus([FromBody] CardStatusUpdateRequest cardStatusUpdateRequest, [FromRoute] Guid id)
+    {
+        var result = await m_cardService.Update(cardStatusUpdateRequest, id);
+
+        return result.ActionResult;
+    }
+
+    [HttpPut(Endpoints.Card.UpdateLimit)]
+    //[Authorize(Roles = $"{Role.Client}")]
+    public async Task<ActionResult<CardResponse>> UpdateLimit([FromBody] CardLimitUpdateRequest cardLimitUpdateRequest, [FromRoute] Guid id)
+    {
+        var result = await m_cardService.Update(cardLimitUpdateRequest, id);
+
+        return result.ActionResult;
     }
 }

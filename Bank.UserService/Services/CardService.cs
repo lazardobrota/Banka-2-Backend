@@ -15,6 +15,10 @@ public interface ICardService
     Task<Result<CardResponse>> GetOne(Guid id);
 
     Task<Result<CardResponse>> Create(CardCreateRequest request);
+
+    Task<Result<CardResponse>> Update(CardStatusUpdateRequest request, Guid id);
+
+    Task<Result<CardResponse>> Update(CardLimitUpdateRequest request, Guid id);
 }
 
 public class CardService(ICardRepository repository, ICardTypeRepository cardTypeRepository, IAccountRepository accountRepository) : ICardService
@@ -56,6 +60,30 @@ public class CardService(ICardRepository repository, ICardTypeRepository cardTyp
             return Result.BadRequest<CardResponse>();
 
         var card = await m_CardRepository.Add(cardCreateRequest.ToCard(cardType, account));
+
+        return Result.Ok(card.ToResponse());
+    }
+
+    public async Task<Result<CardResponse>> Update(CardStatusUpdateRequest request, Guid id)
+    {
+        var oldCard = await m_CardRepository.FindById(id);
+
+        if (oldCard is null)
+            return Result.NotFound<CardResponse>($"No Card found with Id: {id}");
+
+        var card = await m_CardRepository.Update(oldCard, request.ToCard(oldCard));
+
+        return Result.Ok(card.ToResponse());
+    }
+
+    public async Task<Result<CardResponse>> Update(CardLimitUpdateRequest request, Guid id)
+    {
+        var oldCard = await m_CardRepository.FindById(id);
+
+        if (oldCard is null)
+            return Result.NotFound<CardResponse>($"No Card found with Id: {id}");
+
+        var card = await m_CardRepository.Update(oldCard, request.ToCard(oldCard));
 
         return Result.Ok(card.ToResponse());
     }

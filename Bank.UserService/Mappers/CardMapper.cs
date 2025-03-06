@@ -54,6 +54,42 @@ public static class CardMapper
                };
     }
 
+    public static Card ToCard(this CardStatusUpdateRequest card, Card oldCard)
+    {
+        return new Card
+               {
+                   Id         = oldCard.Id,
+                   Name       = oldCard.Name,
+                   CreatedAt  = oldCard.CreatedAt,
+                   ModifiedAt = oldCard.ModifiedAt,
+                   CVV        = oldCard.CVV,
+                   Status     = card.Status,
+                   Type       = oldCard.Type,
+                   ExpiresAt  = oldCard.ExpiresAt,
+                   Account    = oldCard.Account,
+                   Limit      = oldCard.Limit,
+                   Number     = oldCard.Number,
+               };
+    }
+
+    public static Card ToCard(this CardLimitUpdateRequest card, Card oldCard)
+    {
+        return new Card
+               {
+                   Id         = oldCard.Id,
+                   Name       = oldCard.Name,
+                   CreatedAt  = oldCard.CreatedAt,
+                   ModifiedAt = oldCard.ModifiedAt,
+                   CVV        = oldCard.CVV,
+                   Status     = oldCard.Status,
+                   Type       = oldCard.Type,
+                   ExpiresAt  = oldCard.ExpiresAt,
+                   Account    = oldCard.Account,
+                   Limit      = card.Limit,
+                   Number     = oldCard.Number,
+               };
+    }
+
     private static string GenerateDummyCardNumber()
     {
         Random random = new Random();
