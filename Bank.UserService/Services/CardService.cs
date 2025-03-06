@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
@@ -12,11 +13,15 @@ public interface ICardService
     Task<Result<Page<CardResponse>>> GetAll(CardFilterQuery userFilterQuery, Pageable pageable);
 
     Task<Result<CardResponse>> GetOne(Guid id);
+
+    Task<Result<CardResponse>> Create(CardCreateRequest request);
 }
 
-public class CardService(ICardRepository repository) : ICardService
+public class CardService(ICardRepository repository, ICardTypeRepository cardTypeRepository, IAccountRepository accountRepository) : ICardService
 {
-    private readonly ICardRepository m_CardRepository = repository;
+    private readonly ICardRepository     m_CardRepository     = repository;
+    private readonly ICardTypeRepository m_CardTypeRepository = cardTypeRepository;
+    private readonly IAccountRepository  m_AccountRepository  = accountRepository;
 
     public async Task<Result<Page<CardResponse>>> GetAll(CardFilterQuery cardFilterQuery, Pageable pageable)
     {
@@ -34,6 +39,23 @@ public class CardService(ICardRepository repository) : ICardService
 
         if (card == null)
             return Result.NotFound<CardResponse>();
+
+        return Result.Ok(card.ToResponse());
+    }
+
+    public async Task<Result<CardResponse>> Create(CardCreateRequest cardCreateRequest)
+    {
+        var cardType = await m_CardTypeRepository.FindById(cardCreateRequest.CardTypeId);
+
+        if (cardType == null)
+            return Result.BadRequest<CardResponse>();
+
+        var account = await m_AccountRepository.FindById(cardCreateRequest.AccountId);
+
+        if (account == null)
+            return Result.BadRequest<CardResponse>();
+
+        var card = await m_CardRepository.Add(cardCreateRequest.ToCard(cardType, account));
 
         return Result.Ok(card.ToResponse());
     }

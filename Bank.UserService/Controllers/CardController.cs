@@ -1,6 +1,8 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
+using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Mvc;
@@ -24,5 +26,13 @@ public class CardController(ICardService service) : ControllerBase
     {
         var cardType = await m_cardService.GetAll(filterQuery, pageable);
         return cardType.ActionResult;
+    }
+
+    [HttpPost(Endpoints.Card.Create)]
+    public async Task<ActionResult<CardResponse>> Create([FromBody] CardCreateRequest cardRequest)
+    {
+        var card = await m_cardService.Create(cardRequest);
+
+        return card.ActionResult;
     }
 }

@@ -7,7 +7,9 @@ namespace Bank.UserService.Repositories;
 
 public interface IAccountRepository
 {
-    public Task<IEnumerable<Account>> FindAll(Guid userId); //todo page
+    public Task<IEnumerable<Account>> FindAll(Guid userId); //todo 
+
+    public Task<Account?> FindById(Guid id);
 }
 
 public class AccountRepository(ApplicationContext context) : IAccountRepository
@@ -18,5 +20,11 @@ public class AccountRepository(ApplicationContext context) : IAccountRepository
     {
         return await m_Context.Accounts.Where(a => a.UserId == userId)
                               .ToListAsync();
+    }
+
+    public async Task<Account?> FindById(Guid id)
+    {
+        return await m_Context.Accounts.Where(a => a.Id == id)
+                              .FirstOrDefaultAsync();
     }
 }

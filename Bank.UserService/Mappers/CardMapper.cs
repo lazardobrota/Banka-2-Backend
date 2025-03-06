@@ -1,4 +1,5 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Mappers;
@@ -32,5 +33,77 @@ public static class CardMapper
                    Limit      = card.Limit,
                    Number     = card.Number,
                };
+    }
+
+    public static Card ToCard(this CardCreateRequest card, CardType type, Account account)
+    {
+        return new Card
+               {
+                   Id         = Guid.NewGuid(),
+                   TypeId     = card.CardTypeId,
+                   Name       = card.Name,
+                   Limit      = card.Limit,
+                   Status     = card.Status,
+                   CreatedAt  = DateTime.UtcNow,
+                   ModifiedAt = DateTime.UtcNow,
+                   Number     = GenerateDummyCardNumber(),
+                   CVV        = GenerateRandomCVV(),
+                   ExpiresAt  = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(1)),
+                   Account    = account, // TODO: ADD USER TO REQUEST 
+                   Type       = type,
+               };
+    }
+
+    private static string GenerateDummyCardNumber()
+    {
+        Random random = new Random();
+
+        // Common card prefix for testing (Visa format)
+        string prefix = "4";
+
+        string middle = "";
+
+        for (int i = 0; i < 14; i++)
+        {
+            middle += random.Next(0, 10)
+                            .ToString();
+        }
+
+        string number = prefix + middle;
+
+        int  sum       = 0;
+        bool alternate = false;
+
+        for (int i = number.Length - 1; i >= 0; i--)
+        {
+            int digit = int.Parse(number[i]
+                                  .ToString());
+
+            if (alternate)
+            {
+                digit *= 2;
+
+                if (digit > 9)
+                {
+                    digit -= 9;
+                }
+            }
+
+            sum       += digit;
+            alternate =  !alternate;
+        }
+
+        // Calculate check digit
+        int checkDigit = (10 - (sum % 10)) % 10;
+
+        return number + checkDigit;
+    }
+
+    public static string GenerateRandomCVV()
+    {
+        Random random = new Random();
+
+        return random.Next(100, 1000)
+                     .ToString();
     }
 }
