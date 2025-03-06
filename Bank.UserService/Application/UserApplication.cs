@@ -72,6 +72,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, Services.UserService>();
         services.AddScoped<IClientService, ClientService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IAccountCurrencyRepository, AccountCurrencyRepository>();
         services.AddScoped<IEmailRepository, EmailRepository>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<ICountryService, CountryService>();
