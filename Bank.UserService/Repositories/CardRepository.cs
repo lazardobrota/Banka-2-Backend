@@ -34,7 +34,7 @@ public class CardRepository(ApplicationContext context) : ICardRepository
     {
         var cardQuery = m_Context.Cards.Include(c => c.Type)
                                  .Include(c => c.Account)
-                                 .Include(c => c.Account.User)
+                                 .Include(c => c.Account.Client)
                                  .AsQueryable();
 
         if (!string.IsNullOrEmpty(cardFilterQuery.Number))
@@ -56,7 +56,7 @@ public class CardRepository(ApplicationContext context) : ICardRepository
     {
         return await m_Context.Cards.Include(c => c.Type)
                               .Include(c => c.Account)
-                              .Include(c => c.Account.User)
+                              .Include(c => c.Account.Client)
                               .FirstOrDefaultAsync(x => x.Id == id);
     }
 

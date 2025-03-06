@@ -76,8 +76,8 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<User>
                .IsRequired();
 
         builder.HasMany(user => user.Accounts)
-               .WithOne(account => account.User)
-               .HasForeignKey(account => account.UserId)
+               .WithOne(account => account.Client)
+               .HasForeignKey(account => account.ClientId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

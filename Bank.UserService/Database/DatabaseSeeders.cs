@@ -395,49 +395,9 @@ public static class DatabaseSeeders
         if (context.Accounts.Any())
             return;
 
-        var list = new List<Account>
-                   {
-                       new()
-                       {
-                           Id            = Guid.Parse("1234abcd-5678-4a5b-9c0d-ef0123456789"),
-                           AccountNumber = "1234-5678-9012",
-                           UserId        = Guid.Parse("a1b2c3d4-e5f6-4a5b-8c9d-1e2f3a4b5c6d"),
-                           User          = null
-                       },
+        
 
-                       new()
-                       {
-                           Id            = Guid.Parse("abcd1234-5678-4a5b-9c0d-ef9876543210"),
-                           AccountNumber = "2345-6789-0123",
-                           UserId        = Guid.Parse("b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e"),
-                           User          = null
-                       },
-                       new()
-                       {
-                           Id            = Guid.Parse("efab1234-5678-4c5d-9e0f-12345abcdef0"),
-                           AccountNumber = "3456-7890-1234",
-                           UserId        = Guid.Parse("b2c3d4e5-f6a7-4b5c-9d0e-1f2a3b4c5d6e"),
-                           User          = null
-                       },
-
-                       new()
-                       {
-                           Id            = Guid.Parse("1a2b3c4d-5e6f-4a5b-8c9d-1e2f3a4b5c6d"),
-                           AccountNumber = "4567-8901-2345",
-                           UserId        = Guid.Parse("c3d4e5f6-a7b8-4c5d-9e0f-1a2b3c4d5e6f"),
-                           User          = null
-                       },
-
-                       new()
-                       {
-                           Id            = Guid.Parse("2b3c4d5e-6f7a-4b5c-9d0e-1f2a3b4c5d6e"),
-                           AccountNumber = "5678-9012-3456",
-                           UserId        = Guid.Parse("d4e5f6a7-b8c9-4d5e-9f0a-1b2c3d4e5f6a"),
-                           User          = null
-                       }
-                   };
-
-        await context.Accounts.AddRangeAsync(list);
+        await context.Accounts.AddRangeAsync();
 
         await context.SaveChangesAsync();
     }

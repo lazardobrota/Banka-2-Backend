@@ -10,8 +10,8 @@ public static class AccountMapper
         return new AccountResponse
                {
                    Id            = account.Id,
-                   AccountNumber = account.AccountNumber,
-                   User          = account.User.ToSimpleResponse()
+                   AccountNumber = account.Number,
+                   User          = account.Client.ToSimpleResponse()
                };
     }
 
@@ -20,7 +20,7 @@ public static class AccountMapper
         return new AccountSimpleResponse
                {
                    Id            = account.Id,
-                   AccountNumber = account.AccountNumber,
+                   AccountNumber = account.Number,
                };
     }
 }
