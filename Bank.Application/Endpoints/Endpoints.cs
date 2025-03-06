@@ -98,8 +98,8 @@ public static partial class Endpoints
     {
         public const string Base   = $"{ApiBase}/accounts";
         public const string GetAll = $"{Base}";
-
         public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Create = $"{Base}";
     }
 }
 

@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
@@ -12,11 +13,23 @@ public interface IAccountService
     Task<Result<Page<AccountResponse>>> GetAll(AccountFilterQuery accountFilterQuery, Pageable pageable);
 
     Task<Result<AccountResponse>> GetOne(Guid id);
+
+    Task<Result<AccountResponse>> Create(AccountCreateRequest accountCreateRequest);
 }
 
-public class AccountService(IAccountRepository accountRepository) : IAccountService
+public class AccountService(
+    IAccountRepository     accountRepository,
+    IAccountTypeRepository accountTypeRepository,
+    ICurrencyRepository    currencyRepository,
+    IUserRepository        userRepository,
+    IAuthorizationService  authorizationService
+) : IAccountService
 {
-    private readonly IAccountRepository m_AccountRepository = accountRepository;
+    private readonly IAccountRepository     m_AccountRepository     = accountRepository;
+    private readonly IAccountTypeRepository m_AccountTypeRepository = accountTypeRepository;
+    private readonly IUserRepository        m_UserRepository        = userRepository;
+    private readonly ICurrencyRepository    m_CurrencyRepository    = currencyRepository;
+    private readonly IAuthorizationService  m_AuthorizationService  = authorizationService;
 
     public async Task<Result<Page<AccountResponse>>> GetAll(AccountFilterQuery accountFilterQuery, Pageable pageable)
     {
@@ -34,6 +47,21 @@ public class AccountService(IAccountRepository accountRepository) : IAccountServ
 
         if (account is null)
             return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
+
+        return Result.Ok(account.ToResponse());
+    }
+
+    public async Task<Result<AccountResponse>> Create(AccountCreateRequest accountCreateRequest)
+    {
+        var accountType = await m_AccountTypeRepository.FindById(accountCreateRequest.AccountTypeId);
+        var client      = await m_UserRepository.FindById(accountCreateRequest.ClientId);
+        var currency    = await m_CurrencyRepository.FindById(accountCreateRequest.CurrencyId);
+        var employee    = await m_UserRepository.FindById(m_AuthorizationService.UserId);
+
+        if (accountType == null || client == null || currency == null || employee == null)
+            return Result.BadRequest<AccountResponse>("Invalid data.");
+
+        var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(employee, client, currency, accountType));
 
         return Result.Ok(account.ToResponse());
     }

@@ -1,11 +1,14 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
 
 namespace Bank.UserService.Controllers;
 
@@ -28,6 +31,15 @@ public class AccountController(IAccountService accountService) : ControllerBase
     public async Task<ActionResult<AccountResponse>> GetOne([FromQuery] Guid id)
     {
         var result = await m_AccountService.GetOne(id);
+
+        return result.ActionResult;
+    }
+
+    [HttpPost(Endpoints.Account.Create)]
+    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
+    public async Task<ActionResult<AccountResponse>> Create([FromBody] AccountCreateRequest accountCreateRequest)
+    {
+        var result = await m_AccountService.Create(accountCreateRequest);
 
         return result.ActionResult;
     }
