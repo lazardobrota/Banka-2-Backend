@@ -121,9 +121,12 @@ public static partial class Endpoints
 {
     public static class Card
     {
-        public const string Base   = $"{ApiBase}/cards";
-        public const string GetOne = $"{Base}/{{id:guid}}";
-        public const string GetAll = $"{Base}";
+        public const string Base         = $"{ApiBase}/cards";
+        public const string GetOne       = $"{Base}/{{id:guid}}";
+        public const string GetAll       = $"{Base}";
+        public const string Create       = $"{Base}";
+        public const string UpdateStatus = $"{Base}/status/{{id:guid}}";
+        public const string UpdateLimit  = $"{Base}/limit/{{id:guid}}";
     }
 }
 

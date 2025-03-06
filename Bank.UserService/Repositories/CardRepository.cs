@@ -78,7 +78,13 @@ public class CardRepository(ApplicationContext context) : ICardRepository
     {
         var addedCard = await m_Context.Cards.AddAsync(card);
         await m_Context.SaveChangesAsync();
-        return addedCard.Entity;
+
+        var result = await m_Context.Cards.Include(c => c.Account)
+                                    .ThenInclude(a => a.Client)
+                                    .Include(c => c.Type)
+                                    .FirstOrDefaultAsync(c => c.Id == card.Id);
+
+        return result;
     }
 
     public async Task<Card> Update(Card oldCard, Card card)
