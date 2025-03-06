@@ -19,7 +19,7 @@ public static class AccountMapper
                    AvailableBalance = account.AvailableBalance,
                    Employee = account.Employee.ToEmployee()
                                      .ToSimpleResponse(),
-                   Currency          = null,
+                   Currency          = account.Currency.ToResponse(),
                    Type              = account.Type.ToResponse(),
                    AccountCurrencies = MapAccountCurrencies(account.AccountCurrencies),
                    DailyLimit        = 0,
