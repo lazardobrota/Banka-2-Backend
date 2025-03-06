@@ -40,7 +40,7 @@ public class TestHooks
         var userRepository  = new UserRepository(new ApplicationContext(options));
         var tokenProvider   = new TokenProvider(); // Instanciraj TokenProvider
         var emailService    = new DontSendEmailService();
-        var userService     = new UserService.Services.UserService(userRepository, tokenProvider, emailService); // Sada prosleđujemo oba parametra
+        var userService     = new UserService.Services.UserService(userRepository, emailService, null); //TODO: AuthorizationService
         var employeeService = new EmployeeService(userRepository, emailService);
 
         // 🔹 Registracija u Reqnroll DI kontejner

@@ -5,7 +5,6 @@ using Bank.Application.Endpoints;
 using Bank.UserService.Configurations;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
-using Bank.UserService.Security;
 
 namespace Bank.UserService.Services;
 
@@ -14,9 +13,10 @@ public interface IEmailService
     public Task<Result> Send(EmailType type, User user);
 }
 
-public class EmailService(IEmailRepository emailRepository) : IEmailService
+public class EmailService(IEmailRepository emailRepository, IAuthorizationService authorizationService) : IEmailService
 {
-    private readonly IEmailRepository m_EmailRepository = emailRepository;
+    private readonly IEmailRepository      m_EmailRepository      = emailRepository;
+    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
 
     public async Task<Result> Send(EmailType type, User user)
     {
@@ -30,8 +30,8 @@ public class EmailService(IEmailRepository emailRepository) : IEmailService
             client.Credentials           = new NetworkCredential(Configuration.Email.Address, Configuration.Email.Password);
 
             var body = type == EmailType.UserActivateAccount
-                       ? email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.Activate}?token={TokenProvider.GenerateToken(user)}")
-                       : email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.ResetPassword}?token={TokenProvider.GenerateToken(user)}");
+                       ? email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.Activate}?token={m_AuthorizationService.GenerateTokenFor(user)}")
+                       : email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.ResetPassword}?token={m_AuthorizationService.GenerateTokenFor(user)}");
 
             var mailMessage = new MailMessage();
             mailMessage.From       = new MailAddress(Configuration.Email.Address);
