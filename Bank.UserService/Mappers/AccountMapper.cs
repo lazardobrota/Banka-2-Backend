@@ -11,7 +11,23 @@ public static class AccountMapper
                {
                    Id            = account.Id,
                    AccountNumber = account.Number,
-                   User          = account.Client.ToSimpleResponse()
+                   Name          = account.Name,
+                   Client = account.Client.ToClient()
+                                   .ToSimpleResponse(),
+                   Balance          = account.Balance,
+                   AvailableBalance = account.AvailableBalance,
+                   Employee = account.Employee.ToEmployee()
+                                     .ToSimpleResponse(),
+                   Currency = null,
+                   Type     = account.Type.ToResponse(),
+                   //TODO: accountCurrency
+                   DailyLimit     = 0,
+                   MonthlyLimit   = 0,
+                   CreationDate   = account.CreationDate,
+                   ExpirationDate = account.ExpirationDate,
+                   Status         = account.Status,
+                   CreatedAt      = account.CreatedAt,
+                   ModifiedAt     = account.ModifiedAt
                };
     }
 
@@ -20,7 +36,7 @@ public static class AccountMapper
         return new AccountSimpleResponse
                {
                    Id            = account.Id,
-                   AccountNumber = account.Number,
+                   AccountNumber = account.Number
                };
     }
 }

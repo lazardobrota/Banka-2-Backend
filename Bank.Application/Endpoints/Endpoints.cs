@@ -93,6 +93,16 @@ public static partial class Endpoints
 
 public static partial class Endpoints
 {
+    public static class Account
+    {
+        public const string Base = $"{ApiBase}/accounts";
+
+        public const string GetOne = $"{Base}/{{id:guid}}";
+    }
+}
+
+public static partial class Endpoints
+{
     public static class Card
     {
         public const string Base   = $"{ApiBase}/cards";

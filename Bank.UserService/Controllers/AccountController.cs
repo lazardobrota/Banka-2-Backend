@@ -1,0 +1,23 @@
+﻿using Bank.Application.Endpoints;
+using Bank.Application.Responses;
+using Bank.UserService.Services;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Bank.UserService.Controllers;
+
+[ApiController]
+public class AccountController(IAccountService accountService) : ControllerBase
+{
+    private readonly IAccountService m_AccountService = accountService;
+
+    [Authorize]
+    [HttpGet(Endpoints.Account.GetOne)]
+    public async Task<ActionResult<AccountResponse>> GetOne([FromQuery] Guid id)
+    {
+        var result = await m_AccountService.GetOne(id);
+
+        return result.ActionResult;
+    }
+}

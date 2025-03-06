@@ -121,7 +121,7 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Account.SimpleResponse>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
+                                   //config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
 
                                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                                                                           {
