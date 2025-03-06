@@ -15,12 +15,12 @@ file static class Example
         public static readonly Guid   Id            = Guid.Parse("8cf284fa-d8f2-44f5-872a-cfa47a0f7199");
         public const           string AccountNumber = "222-0001123456789-10";
 
-        public static readonly AccountResponse Response = new()
-                                                          {
-                                                              Id            = Id,
-                                                              AccountNumber = AccountNumber,
-                                                              User          = null!
-                                                          };
+        // public static readonly AccountResponse Response = new()
+        //                                                   {
+        //                                                       Id            = Id,
+        //                                                       AccountNumber = AccountNumber,
+        //                                                       User          = null!
+        //                                                   };
 
         public static readonly AccountSimpleResponse SimpleResponse = new()
                                                                       {
@@ -34,23 +34,23 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Account
     {
-        public class Response() : SwaggerSchemaFilter<AccountResponse>(SchemeFilters.Example.Account.Response)
-        {
-            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
-            {
-                var user = context.SchemaRepository.Schemas[nameof(UserSimpleResponse)].Example;
-
-                return new OpenApiObject()
-                       {
-                           [nameof(Example.Id)
-                            .ToCamelCase()] = new OpenApiString(Example.Id.ToString()),
-                           [nameof(Example.AccountNumber)
-                            .ToCamelCase()] = new OpenApiString(Example.AccountNumber),
-                           [nameof(Example.User)
-                            .ToCamelCase()] = user
-                       };
-            }
-        }
+        // public class Response() : SwaggerSchemaFilter<AccountResponse>(SchemeFilters.Example.Account.Response)
+        // {
+        //     protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+        //     {
+        //         var user = context.SchemaRepository.Schemas[nameof(UserSimpleResponse)].Example;
+        //
+        //         return new OpenApiObject()
+        //                {
+        //                    [nameof(Example.Id)
+        //                     .ToCamelCase()] = new OpenApiString(Example.Id.ToString()),
+        //                    [nameof(Example.AccountNumber)
+        //                     .ToCamelCase()] = new OpenApiString(Example.AccountNumber),
+        //                    [nameof(Example.User)
+        //                     .ToCamelCase()] = user
+        //                };
+        //     }
+        // }
 
         public class SimpleResponse() : SwaggerSchemaFilter<AccountSimpleResponse>(SchemeFilters.Example.Account.SimpleResponse)
         {
