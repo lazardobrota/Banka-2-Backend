@@ -86,6 +86,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IAccountTypeRepository, AccountTypeRepository>();
+        services.AddScoped<IAccountTypeService, AccountTypeService>();
 
         services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
@@ -168,9 +169,8 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
-                                                                                                                                       .Jwt
-                                                                                                                                       .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
+                                                                                                                                                    .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,

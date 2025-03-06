@@ -395,8 +395,6 @@ public static class DatabaseSeeders
         if (context.Accounts.Any())
             return;
 
-        
-
         await context.Accounts.AddRangeAsync();
 
         await context.SaveChangesAsync();
