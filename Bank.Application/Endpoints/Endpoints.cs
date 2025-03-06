@@ -96,7 +96,8 @@ public static partial class Endpoints
 {
     public static class Account
     {
-        public const string Base = $"{ApiBase}/accounts";
+        public const string Base   = $"{ApiBase}/accounts";
+        public const string GetAll = $"{Base}";
 
         public const string GetOne = $"{Base}/{{id:guid}}";
     }
