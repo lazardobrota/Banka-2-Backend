@@ -1,4 +1,5 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Mappers;
@@ -13,13 +14,33 @@ public static class AccountCurrencyMapper
                    Account = accountCurrency.Account.ToSimpleResponse(),
                    Employee = accountCurrency.Employee.ToEmployee()
                                              .ToSimpleResponse(),
-                   Currency         = null,
+                   Currency         = accountCurrency.Currency.ToResponse(),
                    Balance          = accountCurrency.Balance,
                    AvailableBalance = accountCurrency.AvailableBalance,
                    DailyLimit       = accountCurrency.DailyLimit,
                    MonthlyLimit     = accountCurrency.MonthlyLimit,
                    CreatedAt        = accountCurrency.CreatedAt,
                    ModifiedAt       = accountCurrency.ModifiedAt
+               };
+    }
+    
+    public static AccountCurrency ToAccountCurrency(this AccountCurrencyCreateRequest accountCurrencyCreateRequest, User employee, Currency currency, Account account)
+    {
+        return new AccountCurrency
+               {
+                   Id               = Guid.NewGuid(),
+                   AccountId        = account.Id,
+                   Account          = account,
+                   EmployeeId       = employee.Id,
+                   Employee         = employee,
+                   CurrencyId       = currency.Id,
+                   Currency         = currency,
+                   Balance          = 0,
+                   AvailableBalance = 0,
+                   DailyLimit       = accountCurrencyCreateRequest.DailyLimit,
+                   MonthlyLimit     = accountCurrencyCreateRequest.MonthlyLimit,
+                   CreatedAt        = DateTime.UtcNow,
+                   ModifiedAt       = DateTime.UtcNow
                };
     }
 }

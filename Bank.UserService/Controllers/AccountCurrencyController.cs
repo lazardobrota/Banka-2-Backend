@@ -1,11 +1,14 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
 
 namespace Bank.UserService.Controllers;
 
@@ -28,6 +31,15 @@ public class AccountCurrencyController(IAccountCurrencyService accountCurrencySe
     public async Task<ActionResult<Page>> GetAll([FromQuery] Pageable pageable)
     {
         var result = await m_AccountCurrencyService.GetAll(pageable);
+
+        return result.ActionResult;
+    }
+    
+    [HttpPost(Endpoints.AccountCurrency.Create)]
+    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
+    public async Task<ActionResult<AccountCurrencyResponse>> Create([FromBody] AccountCurrencyCreateRequest accountCurrencyCreateRequest)
+    {
+        var result = await m_AccountCurrencyService.Create(accountCurrencyCreateRequest);
 
         return result.ActionResult;
     }
