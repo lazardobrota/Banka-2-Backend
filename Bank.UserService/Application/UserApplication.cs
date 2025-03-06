@@ -72,6 +72,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, Services.UserService>();
         services.AddScoped<IClientService, ClientService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IAccountCurrencyRepository, AccountCurrencyRepository>();
         services.AddScoped<IEmailRepository, EmailRepository>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<ICountryService, CountryService>();
@@ -84,6 +85,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICardRepository, CardRepository>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<ICompanyRepository, CompanyRepository>();
+        services.AddScoped<IAccountTypeRepository, AccountTypeRepository>();
+        services.AddScoped<IAccountTypeService, AccountTypeService>();
+        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IAccountCurrencyService, AccountCurrencyService>();
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
 
         services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
@@ -118,7 +124,7 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.Client.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Account.SimpleResponse>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
+                                   //config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
 
                                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                                                                           {
