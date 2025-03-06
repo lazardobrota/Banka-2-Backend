@@ -90,7 +90,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IAccountCurrencyService, AccountCurrencyService>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
-
+        
+        services.AddHttpContextAccessor();
+        
         services.AddSingleton<TokenProvider>();
         services.AddSingleton<DatabaseHostedService>();
 

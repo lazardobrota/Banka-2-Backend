@@ -80,7 +80,7 @@ public class CardRepository(ApplicationContext context) : ICardRepository
         await m_Context.SaveChangesAsync();
 
         var result = await m_Context.Cards.Include(c => c.Account)
-                                    .ThenInclude(a => a.User)
+                                    .ThenInclude(a => a.Client)
                                     .Include(c => c.Type)
                                     .FirstOrDefaultAsync(c => c.Id == card.Id);
 
