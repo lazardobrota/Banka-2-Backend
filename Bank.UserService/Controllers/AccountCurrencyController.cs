@@ -34,12 +34,21 @@ public class AccountCurrencyController(IAccountCurrencyService accountCurrencySe
 
         return result.ActionResult;
     }
-    
+
     [HttpPost(Endpoints.AccountCurrency.Create)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<ActionResult<AccountCurrencyResponse>> Create([FromBody] AccountCurrencyCreateRequest accountCurrencyCreateRequest)
     {
         var result = await m_AccountCurrencyService.Create(accountCurrencyCreateRequest);
+
+        return result.ActionResult;
+    }
+
+    [Authorize(Roles = $"{Role.Client}")]
+    [HttpPut(Endpoints.AccountCurrency.UpdateClient)]
+    public async Task<ActionResult<AccountCurrencyResponse>> Update([FromBody] AccountCurrencyClientUpdateRequest accountCurrencyClientUpdateRequest, [FromRoute] Guid id)
+    {
+        var result = await m_AccountCurrencyService.Update(accountCurrencyClientUpdateRequest, id);
 
         return result.ActionResult;
     }
