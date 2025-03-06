@@ -1,5 +1,4 @@
-﻿using Bank.Application.Requests;
-using Bank.Application.Responses;
+﻿using Bank.Application.Responses;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Mappers;
@@ -23,5 +22,4 @@ public static class AccountCurrencyMapper
                    ModifiedAt       = accountCurrency.ModifiedAt
                };
     }
-
 }

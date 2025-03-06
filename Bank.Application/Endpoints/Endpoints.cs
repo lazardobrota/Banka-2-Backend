@@ -87,6 +87,7 @@ public static partial class Endpoints
     {
         public const string Base = $"{ApiBase}/accounts/types";
 
+        public const string GetAll = $"{Base}";
         public const string GetOne = $"{Base}/{{id:guid}}";
     }
 }
@@ -106,9 +107,9 @@ public static partial class Endpoints
     public static class AccountCurrency
     {
         public const string Base = $"{ApiBase}/accounts/currencies";
-        
-        public const string GetOne         = $"{Base}/{{id:guid}}";
-   }
+
+        public const string GetOne = $"{Base}/{{id:guid}}";
+    }
 }
 
 public static partial class Endpoints
