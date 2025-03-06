@@ -1,4 +1,6 @@
-﻿using Bank.Application.Endpoints;
+﻿using Bank.Application.Domain;
+using Bank.Application.Endpoints;
+using Bank.Application.Queries;
 using Bank.Application.Responses;
 using Bank.UserService.Services;
 
@@ -11,6 +13,15 @@ namespace Bank.UserService.Controllers;
 public class AccountController(IAccountService accountService) : ControllerBase
 {
     private readonly IAccountService m_AccountService = accountService;
+
+    [Authorize]
+    [HttpGet(Endpoints.Account.GetAll)]
+    public async Task<ActionResult<Page<AccountResponse>>> GetAll([FromQuery] AccountFilterQuery accountFilterQuery, [FromQuery] Pageable pageable)
+    {
+        var result = await m_AccountService.GetAll(accountFilterQuery, pageable);
+
+        return result.ActionResult;
+    }
 
     [Authorize]
     [HttpGet(Endpoints.Account.GetOne)]
