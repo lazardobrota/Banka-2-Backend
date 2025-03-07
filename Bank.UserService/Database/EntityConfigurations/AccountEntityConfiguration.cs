@@ -17,7 +17,7 @@ public class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(account => account.Name)
                .HasMaxLength(64)
                .IsRequired();
-        
+
         builder.Property(account => account.Number)
                .HasMaxLength(9)
                .IsFixedLength()

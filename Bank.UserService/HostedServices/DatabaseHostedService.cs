@@ -30,7 +30,7 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
                .Wait();
 
         // Context.SeedCards()
-               // .Wait();
+        // .Wait();
 
         Context.SeedCurrency()
                .Wait();

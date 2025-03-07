@@ -6,7 +6,6 @@ using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
 
