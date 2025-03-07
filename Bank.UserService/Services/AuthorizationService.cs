@@ -28,7 +28,7 @@ public class AuthorizationService : IAuthorizationService
     public AuthorizationService(IHttpContextAccessor httpContextAccessor)
     {
         var userId = httpContextAccessor.HttpContext?.User.FindFirst("id");
-        var role   = httpContextAccessor.HttpContext?.User.FindFirst("permission");
+        var role   = httpContextAccessor.HttpContext?.User.FindFirst("role");
 
         UserId = userId != null ? Guid.Parse(userId.Value) : Guid.Empty;
         Role   = role   != null ? Enum.TryParse(role.Value, out Role myRole) ? myRole : Role.Invalid : Role.Invalid;
@@ -48,7 +48,7 @@ public class AuthorizationService : IAuthorizationService
         var claims = new List<Claim>
                      {
                          new("id", userId.ToString()),
-                         new("permission", role.ToString())
+                         new("role", role.ToString())
                      };
 
         var tokenDescriptor = new SecurityTokenDescriptor
