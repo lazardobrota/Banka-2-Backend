@@ -29,8 +29,8 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
         Context.SeedCardTypes()
                .Wait();
 
-        Context.SeedCards()
-               .Wait();
+        // Context.SeedCards()
+        // .Wait();
 
         Context.SeedCurrency()
                .Wait();

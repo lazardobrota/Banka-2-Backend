@@ -6,7 +6,6 @@ using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
 
@@ -18,19 +17,19 @@ public class AccountCurrencyController(IAccountCurrencyService accountCurrencySe
     private readonly IAccountCurrencyService m_AccountCurrencyService = accountCurrencyService;
 
     [Authorize]
-    [HttpGet(Endpoints.AccountCurrency.GetOne)]
-    public async Task<ActionResult<AccountCurrencyResponse>> GetOne([FromQuery] Guid id)
+    [HttpGet(Endpoints.AccountCurrency.GetAll)]
+    public async Task<ActionResult<Page<AccountCurrencyResponse>>> GetAll([FromQuery] Pageable pageable)
     {
-        var result = await m_AccountCurrencyService.GetOne(id);
+        var result = await m_AccountCurrencyService.GetAll(pageable);
 
         return result.ActionResult;
     }
 
     [Authorize]
-    [HttpGet(Endpoints.AccountCurrency.GetAll)]
-    public async Task<ActionResult<Page>> GetAll([FromQuery] Pageable pageable)
+    [HttpGet(Endpoints.AccountCurrency.GetOne)]
+    public async Task<ActionResult<AccountCurrencyResponse>> GetOne([FromQuery] Guid id)
     {
-        var result = await m_AccountCurrencyService.GetAll(pageable);
+        var result = await m_AccountCurrencyService.GetOne(id);
 
         return result.ActionResult;
     }
