@@ -144,10 +144,11 @@ public static partial class SwaggerSchemaFilter
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
-                var client      = context.SchemaRepository.Schemas[nameof(ClientSimpleResponse)].Example;
-                var employee    = context.SchemaRepository.Schemas[nameof(EmployeeSimpleResponse)].Example;
-                var currency    = context.SchemaRepository.Schemas[nameof(CurrencyResponse)].Example;
-                var accountType = context.SchemaRepository.Schemas[nameof(AccountTypeResponse)].Example;
+                var client            = context.SchemaRepository.Schemas[nameof(ClientSimpleResponse)].Example;
+                var employee          = context.SchemaRepository.Schemas[nameof(EmployeeSimpleResponse)].Example;
+                var currency          = context.SchemaRepository.Schemas[nameof(CurrencyResponse)].Example;
+                var accountType       = context.SchemaRepository.Schemas[nameof(AccountTypeResponse)].Example;
+                var accountCurrencies = new OpenApiArray { context.SchemaRepository.Schemas[nameof(AccountCurrencyResponse)].Example };
 
                 return new OpenApiObject()
                        {
@@ -170,7 +171,7 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.Type)
                             .ToCamelCase()] = accountType,
                            [nameof(Example.AccountCurrencies)
-                            .ToCamelCase()] = new OpenApiArray(),
+                            .ToCamelCase()] = accountCurrencies,
                            [nameof(Example.DailyLimit)
                             .ToCamelCase()] = new OpenApiDouble((double)Example.DailyLimit),
                            [nameof(Example.MonthlyLimit)
