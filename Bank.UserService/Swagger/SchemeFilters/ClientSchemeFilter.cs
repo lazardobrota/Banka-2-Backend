@@ -66,6 +66,23 @@ file static class Example
                                                              ModifiedAt                 = ModifiedAt,
                                                              Activated                  = Activated
                                                          };
+
+        public static readonly ClientSimpleResponse SimpleResponse = new()
+                                                                     {
+                                                                         Id                         = Id,
+                                                                         FirstName                  = FirstName,
+                                                                         LastName                   = LastName,
+                                                                         DateOfBirth                = DateOfBirth,
+                                                                         Gender                     = Gender,
+                                                                         UniqueIdentificationNumber = UniqueIdentificationNumber,
+                                                                         Email                      = Email,
+                                                                         PhoneNumber                = PhoneNumber,
+                                                                         Address                    = Address,
+                                                                         Role                       = Role,
+                                                                         CreatedAt                  = CreatedAt,
+                                                                         ModifiedAt                 = ModifiedAt,
+                                                                         Activated                  = Activated
+                                                                     };
     }
 }
 
@@ -149,6 +166,42 @@ public static partial class SwaggerSchemaFilter
                             .ToCamelCase()] = new OpenApiInteger((int)Example.Role),
                            [nameof(Example.Accounts)
                             .ToCamelCase()] = accounts,
+                           [nameof(Example.CreatedAt)
+                            .ToCamelCase()] = new OpenApiDateTime(Example.CreatedAt),
+                           [nameof(Example.ModifiedAt)
+                            .ToCamelCase()] = new OpenApiDateTime(Example.ModifiedAt),
+                           [nameof(Example.Activated)
+                            .ToCamelCase()] = new OpenApiBoolean(Example.Activated)
+                       };
+            }
+        }
+
+        public class SimpleResponse() : SwaggerSchemaFilter<ClientSimpleResponse>(SchemeFilters.Example.Client.SimpleResponse)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.Id)
+                            .ToCamelCase()] = new OpenApiString(Example.Id.ToString()),
+                           [nameof(Example.FirstName)
+                            .ToCamelCase()] = new OpenApiString(Example.FirstName),
+                           [nameof(Example.LastName)
+                            .ToCamelCase()] = new OpenApiString(Example.LastName),
+                           [nameof(Example.DateOfBirth)
+                            .ToCamelCase()] = new OpenApiDate(new DateTime(Example.DateOfBirth, TimeOnly.MinValue)),
+                           [nameof(Example.Gender)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Gender),
+                           [nameof(Example.UniqueIdentificationNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.UniqueIdentificationNumber),
+                           [nameof(Example.Email)
+                            .ToCamelCase()] = new OpenApiString(Example.Email),
+                           [nameof(Example.PhoneNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.PhoneNumber),
+                           [nameof(Example.Address)
+                            .ToCamelCase()] = new OpenApiString(Example.Address),
+                           [nameof(Example.Role)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Role),
                            [nameof(Example.CreatedAt)
                             .ToCamelCase()] = new OpenApiDateTime(Example.CreatedAt),
                            [nameof(Example.ModifiedAt)

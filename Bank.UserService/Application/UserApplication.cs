@@ -108,52 +108,85 @@ public static class ServiceCollectionExtensions
         services.AddSwaggerGen(config =>
                                {
                                    config.SwaggerDoc("v1", new OpenApiInfo() { Title = "UserService", Version = "v1" });
-                                   
-                                    config.SchemaFilter<SwaggerSchemaFilter.User.ActivationRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.User.LoginRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.User.PasswordResetRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.User.RequestPasswordResetRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.User.Response>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.User.SimpleResponse>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.User.LoginResponse>();
-                                   
-                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.CreateRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.UpdateRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.Employee.Response>();
-                                   
-                                    config.SchemaFilter<SwaggerSchemaFilter.Client.UpdateRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.Client.CreateRequest>();
-                                    config.SchemaFilter<SwaggerSchemaFilter.Client.Response>();
-                                   
-                                    config.SchemaFilter<SwaggerSchemaFilter.Account.SimpleResponse>();
-                                   // config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
 
-                                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                                                                           {
-                                                                               Description = "Authorization: Bearer {token}",
-                                                                               Name        = "Authorization",
-                                                                               In          = ParameterLocation.Header,
-                                                                               Type        = SecuritySchemeType.ApiKey,
-                                                                               Scheme      = "Bearer"
-                                                                           });
-                                   
-                                    config.AddSecurityRequirement(new OpenApiSecurityRequirement
-                                                                  {
-                                                                      {
-                                                                          new OpenApiSecurityScheme
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.UpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Account.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Account.UpdateClientRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Account.UpdateEmployeeRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Account.SimpleResponse>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.UpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.AccountType.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Card.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Card.LimitUpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Card.StatusUpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Card.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.CardType.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Client.UpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Client.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Client.Response>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Client.SimpleResponse>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Company.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Company.UpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Company.SimpleResponse>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Company.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Country.SimpleResponse>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Country.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Currency.SimpleResponse>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Currency.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.CreateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.UpdateRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.Response>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.SimpleResponse>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.ActivationRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.LoginRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.PasswordResetRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.RequestPasswordResetRequest>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.Response>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.SimpleResponse>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.User.LoginResponse>();
+
+                                   config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                                                                           {
-                                                                              Reference = new OpenApiReference
-                                                                                          {
-                                                                                              Type =
-                                                                                              ReferenceType
-                                                                                              .SecurityScheme,
-                                                                                              Id =
-                                                                                              "Bearer"
-                                                                                          }
-                                                                          },
-                                                                          []
-                                                                      }
-                                                                  });
+                                                                              Description = "Authorization: Bearer {token}",
+                                                                              Name        = "Authorization",
+                                                                              In          = ParameterLocation.Header,
+                                                                              Type        = SecuritySchemeType.ApiKey,
+                                                                              Scheme      = "Bearer"
+                                                                          });
+
+                                   config.AddSecurityRequirement(new OpenApiSecurityRequirement
+                                                                 {
+                                                                     {
+                                                                         new OpenApiSecurityScheme
+                                                                         {
+                                                                             Reference = new OpenApiReference
+                                                                                         {
+                                                                                             Type =
+                                                                                             ReferenceType
+                                                                                             .SecurityScheme,
+                                                                                             Id =
+                                                                                             "Bearer"
+                                                                                         }
+                                                                         },
+                                                                         []
+                                                                     }
+                                                                 });
                                });
 
         return services;
