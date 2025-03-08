@@ -16,7 +16,7 @@ file static class Example
         public static readonly Guid     Id               = Guid.Parse("3f4b1e6e-a2f5-4e3b-8f88-2f70a6b42b19");
         public static readonly Guid     ClientId         = Guid.Parse("f39d319e-db3e-4af5-bada-6bcb908b29e3");
         public static readonly Guid     CurrencyId       = Guid.Parse("e8ea1dd5-45a4-4837-9bd6-f41b049217f5");
-        public static readonly Guid     AccountTypeId    = Guid.Parse("8a2b3c4d-5e6f-7g8h-9i10-j11k12l13m14");
+        public static readonly Guid     AccountTypeId    = Guid.Parse("1e94b664-de60-490c-94c2-c2952b9e9e22");
         public const           string   AccountNumber    = "1234567890123456";
         public const           string   Name             = "Štedni račun";
         public static readonly decimal  Balance          = 5000.75m;

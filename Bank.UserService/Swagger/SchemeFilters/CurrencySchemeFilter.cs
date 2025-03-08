@@ -12,7 +12,7 @@ file static class Example
 {
     public static class Currency
     {
-        public static readonly Guid     Id          = Guid.Parse("1a2b3c4d-5e6f-7g8h-9i10-jklmnopqrst");
+        public static readonly Guid     Id          = Guid.Parse("5efa312a-5ab6-4950-9579-0f605aeab4f8");
         public const           string   Name        = "Dolar";
         public const           string   Code        = "USD";
         public const           string   Symbol      = "$";
