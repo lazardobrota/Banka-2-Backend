@@ -82,7 +82,7 @@ public static partial class Seeder
 
         public static readonly AccountTypeModel BusinessFoundationAccount = new()
                                                                             {
-                                                                                Id         = Guid.Parse("69a5c811-e024-4d73-863a-7c7e4eabcff5"),
+                                                                                Id         = Guid.Parse("3aa7ad0a-db84-41a9-be59-962e430c6c4c"),
                                                                                 Name       = "Foundation",
                                                                                 Code       = "23",
                                                                                 CreatedAt  = DateTime.UtcNow,
