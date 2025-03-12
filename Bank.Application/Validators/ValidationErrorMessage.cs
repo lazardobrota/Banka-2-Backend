@@ -69,6 +69,16 @@ public static partial class ValidationErrorMessage
         public const string RoleRequired = "Role is required.";
 
         public const string DepartmentInvalid = "Department name is not valid.";
+        
+        public static string FieldIsInvalid(string fieldName) => $"{fieldName} is not valid.";
+
+        public static string FieldIsRequired(string fieldName) => $"{fieldName} is required.";
+
+        public static string TextTooLong(string fieldName, int maxLength) => $"{fieldName} must be at most {maxLength} characters long.";
+
+        public static string TextTooShort(string fieldName, int minLength) => $"{fieldName} must be at least {minLength} characters long.";
+
+        public static string TextFixedLength(string fieldName, int length) => $"{fieldName} must be exactly {length} characters long.";
     }
 }
 
