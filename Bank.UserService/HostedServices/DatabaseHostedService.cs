@@ -1,4 +1,5 @@
-﻿using Bank.UserService.Configurations;
+﻿using Bank.LoanService.Database.Seeders;
+using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.Database.Seeders;
 
@@ -42,6 +43,9 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
         Context.SeedAccount()
                .Wait();
 
+        Context.SeedLoanTypes()
+               .Wait();
+
         Context.SeedAccountCurrency()
                .Wait();
 
@@ -49,6 +53,9 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
                .Wait();
 
         Context.SeedCard()
+               .Wait();
+
+        Context.SeedTransactionCode()
                .Wait();
     }
 

@@ -44,7 +44,7 @@ public class ClientService(IUserRepository repository, IEmailService emailServic
     public async Task<Result<Page<AccountResponse>>> FindAllAccounts(Guid clientId, AccountFilterQuery filter, Pageable pageable)
     {
         var page = await m_AccountRepository.FindAllByClientId(clientId, pageable);
-        
+
         var accountResponses = page.Items.Select(account => account.ToResponse())
                                    .ToList();
 

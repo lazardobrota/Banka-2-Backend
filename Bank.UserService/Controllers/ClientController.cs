@@ -34,7 +34,7 @@ public class ClientController(IClientService clientService) : ControllerBase
 
         return result.ActionResult;
     }
-    
+
     [Authorize]
     [HttpGet(Endpoints.Client.GetOne)]
     public async Task<ActionResult<ClientResponse>> GetOne([FromRoute] Guid id)

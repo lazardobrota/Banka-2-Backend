@@ -25,7 +25,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
         return result.ActionResult;
     }
-    
+
     [Authorize]
     [HttpGet(Endpoints.Account.GetAllCards)]
     public async Task<ActionResult<Page<AccountResponse>>> GetAllCards([FromRoute] Guid id, [FromQuery] CardFilterQuery filter, [FromQuery] Pageable pageable)

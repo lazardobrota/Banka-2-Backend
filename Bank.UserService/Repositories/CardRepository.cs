@@ -71,7 +71,7 @@ public class CardRepository(ApplicationContext context) : ICardRepository
                                    .ToListAsync();
 
         var totalElements = await m_Context.Cards.CountAsync();
-        
+
         return new Page<Card>(cards, pageable.Page, pageable.Size, totalElements);
     }
 
