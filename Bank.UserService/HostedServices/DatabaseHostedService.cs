@@ -5,9 +5,10 @@ using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.HostedServices;
 
-public class DatabaseHostedService(IServiceProvider serviceProvider)
+public class DatabaseHostedService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory)
 {
-    private readonly IServiceProvider m_ServiceProvider = serviceProvider;
+    private readonly IServiceProvider   m_ServiceProvider   = serviceProvider;
+    private readonly IHttpClientFactory m_HttpClientFactory = httpClientFactory;
 
     private ApplicationContext Context =>
     m_ServiceProvider.CreateScope()
@@ -56,6 +57,9 @@ public class DatabaseHostedService(IServiceProvider serviceProvider)
                .Wait();
 
         Context.SeedTransactionCode()
+               .Wait();
+
+        Context.SeedExchange(httpClientFactory.CreateClient())
                .Wait();
     }
 

@@ -17,7 +17,7 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
     public DbSet<CardType>            CardTypes            { init; get; }
     public DbSet<Card>                Cards                { init; get; }
     public DbSet<Company>             Companies            { init; get; }
-    public DbSet<ExchangeRate>        ExchangeRates        { init; get; }
+    public DbSet<Exchange>            Exchanges            { init; get; }
     public DbSet<TransactionCode>     TransactionCodes     { init; get; }
     public DbSet<TransactionTemplate> TransactionTemplates { init; get; }
     public DbSet<Transaction>         Transactions         { init; get; }
@@ -41,9 +41,9 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
         builder.ApplyConfiguration(new LoanEntityConfiguration());
         builder.ApplyConfiguration(new InstallmentEntityConfiguration());
         builder.ApplyConfiguration(new LoanTypeEntityConfiguration());
-        builder.ApplyConfiguration(new ExchangeRateEntityConfiguration());
         builder.ApplyConfiguration(new TransactionCodeEntityConfiguration());
         builder.ApplyConfiguration(new TransactionTemplateEntityConfiguration());
         builder.ApplyConfiguration(new TransactionEntityConfiguration());
+        builder.ApplyConfiguration(new ExchangeEntityConfiguration());
     }
 }
