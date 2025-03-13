@@ -20,6 +20,7 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
     public DbSet<ExchangeRate>        ExchangeRates        { init; get; }
     public DbSet<TransactionCode>     TransactionCodes     { init; get; }
     public DbSet<TransactionTemplate> TransactionTemplates { init; get; }
+    public DbSet<Transaction>         Transactions         { init; get; }
 
     public DbSet<Loan> Loans { init; get; }
 
@@ -43,5 +44,6 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
         builder.ApplyConfiguration(new ExchangeRateEntityConfiguration());
         builder.ApplyConfiguration(new TransactionCodeEntityConfiguration());
         builder.ApplyConfiguration(new TransactionTemplateEntityConfiguration());
+        builder.ApplyConfiguration(new TransactionEntityConfiguration());
     }
 }
