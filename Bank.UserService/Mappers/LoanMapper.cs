@@ -1,4 +1,5 @@
-﻿using Bank.Application.Requests;
+﻿using Bank.Application.Domain;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Models;
 
@@ -21,7 +22,7 @@ public static class LoanMapper
                    MaturityDate = CalculateMaturityDate(now, request.Period),
                    CurrencyId   = request.CurrencyId,
                    Status       = LoanStatus.Pending,
-                   InterestType = (InterestType)request.InterestType,
+                   InterestType = request.InterestType,
                    CreatedAt    = now,
                    ModifiedAt   = now
                };
@@ -39,8 +40,8 @@ public static class LoanMapper
                    CreationDate = DateOnly.FromDateTime(loan.CreationDate),
                    MaturityDate = DateOnly.FromDateTime(loan.MaturityDate),
                    Currency     = loan.Currency.ToResponse(),
-                   Status       = (int)loan.Status,
-                   InterestType = (int)loan.InterestType,
+                   Status       = loan.Status,
+                   InterestType = loan.InterestType,
                    CreatedAt    = loan.CreatedAt,
                    ModifiedAt   = loan.ModifiedAt
                };
@@ -65,6 +66,27 @@ public static class LoanMapper
                    Margin     = request.Margin,
                    CreatedAt  = DateTime.UtcNow,
                    ModifiedAt = DateTime.UtcNow
+               };
+    }
+
+    public static Loan ToLoan(this LoanUpdateRequest request, Loan oldLoan)
+    {
+        return new Loan()
+               {
+                   Id           = oldLoan.Id,
+                   TypeId       = oldLoan.TypeId,
+                   Account      = oldLoan.Account,
+                   Amount       = oldLoan.Amount,
+                   Period       = oldLoan.Period,
+                   CreationDate = oldLoan.CreationDate,
+                   MaturityDate = oldLoan.MaturityDate,
+                   Currency     = oldLoan.Currency,
+                   Status       = request.Status,
+                   InterestType = oldLoan.InterestType,
+                   CreatedAt    = oldLoan.CreatedAt,
+                   ModifiedAt   = DateTime.UtcNow,
+                   AccountId    = oldLoan.AccountId,
+                   CurrencyId   = oldLoan.CurrencyId,
                };
     }
 

@@ -15,7 +15,7 @@ public static class InstallmentMapper
                    InterestRate    = request.InterestRate,
                    ExpectedDueDate = request.ExpectedDueDate.ToDateTime(TimeOnly.MinValue),
                    ActualDueDate   = request.ActualDueDate.ToDateTime(TimeOnly.MinValue),
-                   Status          = (InstallmentStatus)request.Status,
+                   Status          = request.Status,
                    CreatedAt       = DateTime.UtcNow,
                    ModifiedAt      = DateTime.UtcNow
                };
@@ -30,7 +30,7 @@ public static class InstallmentMapper
                    InterestRate    = installment.InterestRate,
                    ExpectedDueDate = DateOnly.FromDateTime(installment.ExpectedDueDate),
                    ActualDueDate   = DateOnly.FromDateTime(installment.ActualDueDate),
-                   Status          = (int)installment.Status,
+                   Status          = installment.Status,
                    CreatedAt       = installment.CreatedAt,
                    ModifiedAt      = installment.ModifiedAt
                };

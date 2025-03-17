@@ -20,7 +20,7 @@ file static class Example
         public static readonly LoanTypeRequest Request = new()
                                                          {
                                                              Name   = Name,
-                                                             Margin = Margin
+                                                             Margin = Margin,
                                                          };
 
         public static readonly LoanTypeResponse Response = new()
