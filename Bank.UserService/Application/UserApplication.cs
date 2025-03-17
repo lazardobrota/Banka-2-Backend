@@ -102,6 +102,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITransactionTemplateService, TransactionTemplateService>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ITransactionService, TransactionService>();
+        services.AddScoped<ILoanService, Services.LoanService>();
+        services.AddScoped<IInstallmentService, InstallmentService>();
+        services.AddScoped<ILoanTypeService, LoanTypeService>();
 
         services.AddHttpContextAccessor();
 
@@ -172,6 +175,15 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.Exchange.UpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Exchange.BetweenRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Exchange.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Installment.Request>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Installment.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.Loan.Request>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Loan.Response>();
+
+                                   config.SchemaFilter<SwaggerSchemaFilter.LoanType.Request>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.LoanType.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.TransactionCode.Response>();
 
