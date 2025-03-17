@@ -23,7 +23,12 @@ public class InstallmentRepository(ApplicationContext context) : IInstallmentRep
 
     public async Task<Page<Installment>> FindAllByLoanId(Guid loanId, Pageable pageable)
     {
-        var query = m_Context.Installments.Where(i => i.LoanId == loanId)
+        var query = m_Context.Installments.Include(i => i.Loan)
+                             .Include(i => i.Loan.Account)
+                             .Include(i => i.Loan.Account.Client)
+                             .Include(i => i.Loan.Currency)
+                             .Include(i => i.Loan.LoanType)
+                             .Where(i => i.LoanId == loanId)
                              .OrderBy(i => i.ExpectedDueDate);
 
         var total = await query.CountAsync();
@@ -38,6 +43,10 @@ public class InstallmentRepository(ApplicationContext context) : IInstallmentRep
     public async Task<Installment?> FindById(Guid id)
     {
         return await m_Context.Installments.Include(i => i.Loan)
+                              .Include(i => i.Loan.Account)
+                              .Include(i => i.Loan.Account)
+                              .Include(i => i.Loan.Currency)
+                              .Include(i => i.Loan.LoanType)
                               .FirstOrDefaultAsync(i => i.Id == id);
     }
 
@@ -51,9 +60,12 @@ public class InstallmentRepository(ApplicationContext context) : IInstallmentRep
     public async Task<Installment> Update(Installment oldInstallment, Installment installment)
     {
         m_Context.Entry(oldInstallment)
-                 .CurrentValues.SetValues(installment);
+                 .State = EntityState.Detached;
+
+        var updatedInstallment = m_Context.Installments.Update(installment);
 
         await m_Context.SaveChangesAsync();
-        return installment;
+
+        return updatedInstallment.Entity;
     }
 }

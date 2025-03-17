@@ -14,5 +14,6 @@ public class LoanRequest
 
 public class LoanUpdateRequest
 {
-    public LoanStatus Status { get; set; } = LoanStatus.Pending;
+    public DateTime?   MaturityDate { get; set; }
+    public LoanStatus? Status       { get; set; }
 }

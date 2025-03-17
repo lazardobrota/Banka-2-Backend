@@ -22,7 +22,7 @@ public class LoanController : ControllerBase
         m_LoanService = loanService;
     }
 
-    //[Authorize]
+    [Authorize]
     [HttpGet(Endpoints.Loan.GetAll)]
     public async Task<ActionResult<Page<LoanResponse>>> GetAll([FromQuery] LoanFilterQuery loanFilterQuery, [FromQuery] Pageable pageable)
     {
@@ -31,7 +31,7 @@ public class LoanController : ControllerBase
         return result.ActionResult;
     }
 
-    //[Authorize]
+    [Authorize]
     [HttpGet(Endpoints.Loan.GetOne)]
     public async Task<ActionResult<LoanResponse>> GetOne([FromRoute] Guid id)
     {
@@ -60,7 +60,7 @@ public class LoanController : ControllerBase
     }
 
     [HttpPut(Endpoints.Loan.Update)]
-    //[Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
+    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<ActionResult<LoanResponse>> Update([FromBody] LoanUpdateRequest loanRequest, [FromRoute] Guid id)
     {
         var result = await m_LoanService.Update(loanRequest, id);

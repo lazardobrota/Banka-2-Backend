@@ -11,3 +11,9 @@ public class InstallmentRequest
     public required DateOnly          ActualDueDate   { get; set; }
     public required InstallmentStatus Status          { get; set; }
 }
+
+public class InstallmentUpdateRequest
+{
+    public DateTime?          ActualDueDate { get; set; }
+    public InstallmentStatus? Status        { get; set; }
+}

@@ -35,4 +35,21 @@ public static class InstallmentMapper
                    ModifiedAt      = installment.ModifiedAt
                };
     }
+
+    public static Installment ToEntity(this InstallmentUpdateRequest request, Installment oldInstallment)
+    {
+        var updatedInstallment = new Installment
+                                 {
+                                     Id            = oldInstallment.Id,
+                                     LoanId        = oldInstallment.LoanId,
+                                     Loan          = oldInstallment.Loan,
+                                     ActualDueDate = request.ActualDueDate ?? oldInstallment.ActualDueDate,
+                                     InterestRate  = oldInstallment.InterestRate,
+                                     Status        = request.Status ?? oldInstallment.Status,
+                                     CreatedAt     = oldInstallment.CreatedAt,
+                                     ModifiedAt    = DateTime.UtcNow
+                                 };
+
+        return updatedInstallment;
+    }
 }

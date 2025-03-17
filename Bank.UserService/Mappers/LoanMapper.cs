@@ -81,13 +81,27 @@ public static class LoanMapper
                    CreationDate = oldLoan.CreationDate,
                    MaturityDate = oldLoan.MaturityDate,
                    Currency     = oldLoan.Currency,
-                   Status       = request.Status,
+                   Status       = request.Status ?? oldLoan.Status,
                    InterestType = oldLoan.InterestType,
                    CreatedAt    = oldLoan.CreatedAt,
                    ModifiedAt   = DateTime.UtcNow,
                    AccountId    = oldLoan.AccountId,
                    CurrencyId   = oldLoan.CurrencyId,
                };
+    }
+
+    public static LoanType ToEntity(this LoanTypeUpdateRequest request, LoanType oldLoanType)
+    {
+        var updatedLoanType = new LoanType
+                              {
+                                  Id         = oldLoanType.Id,
+                                  Name       = request.Name   ?? oldLoanType.Name,
+                                  Margin     = request.Margin ?? oldLoanType.Margin,
+                                  CreatedAt  = oldLoanType.CreatedAt,
+                                  ModifiedAt = DateTime.UtcNow
+                              };
+
+        return updatedLoanType;
     }
 
     private static DateTime CalculateMaturityDate(DateTime creationDate, int periodInMonths)
