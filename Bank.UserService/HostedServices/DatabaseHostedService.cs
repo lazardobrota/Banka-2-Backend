@@ -65,7 +65,7 @@ public class DatabaseHostedService(IServiceProvider serviceProvider, IHttpClient
         Context.SeedTransactionCode()
                .Wait();
 
-        Context.SeedExchange(httpClientFactory.CreateClient())
+        Context.SeedExchange(m_HttpClientFactory.CreateClient())
                .Wait();
     }
 
