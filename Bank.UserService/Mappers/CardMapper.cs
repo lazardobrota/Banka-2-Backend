@@ -38,8 +38,8 @@ public static class CardMapper
 
     public static Card ToCard(this CardCreateRequest card, CardType type, Account account)
     {
-        
-        var (cardNumber, cvv) = CardNumberGeneratorService.GenerateCardDetails(type.Name);        
+        var (cardNumber, cvv) = CardNumberGeneratorUtil.GenerateCardDetails(type.Name);
+
         return new Card
                {
                    Id         = Guid.NewGuid(),

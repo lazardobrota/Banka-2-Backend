@@ -2,27 +2,27 @@
 
 namespace Bank.UserService.Utils;
 
-public static class CardNumberGeneratorService
+public static class CardNumberGeneratorUtil
 {
-    private static readonly Dictionary<string, string> _cardPrefixes = new()
-                                                                       {
-                                                                           { "Visa Debit", "4" },
-                                                                           { "Visa Business", "4" },
-                                                                           { "MasterCard Gold", "52" },
-                                                                           { "DinaCard Standard", "9891" },
-                                                                           { "American Express Platinum", "37" }
-                                                                       };
+    private static readonly Dictionary<string, string> s_CardPrefixes = new()
+                                                                        {
+                                                                            { "Visa Debit", "4" },
+                                                                            { "Visa Business", "4" },
+                                                                            { "MasterCard Gold", "52" },
+                                                                            { "DinaCard Standard", "9891" },
+                                                                            { "American Express Platinum", "37" }
+                                                                        };
 
-    private static readonly Dictionary<string, int> _cardLengths = new()
-                                                                   {
-                                                                       { "Visa Debit", 16 },
-                                                                       { "Visa Business", 16 },
-                                                                       { "MasterCard Gold", 16 },
-                                                                       { "DinaCard Standard", 16 },
-                                                                       { "American Express Platinum", 15 }
-                                                                   };
+    private static readonly Dictionary<string, int> s_CardLengths = new()
+                                                                    {
+                                                                        { "Visa Debit", 16 },
+                                                                        { "Visa Business", 16 },
+                                                                        { "MasterCard Gold", 16 },
+                                                                        { "DinaCard Standard", 16 },
+                                                                        { "American Express Platinum", 15 }
+                                                                    };
 
-    private static readonly Random _random = new();
+    private static readonly Random s_Random = new();
 
     public static (string CardNumber, string Cvv) GenerateCardDetails(string cardTypeName)
     {
@@ -33,20 +33,18 @@ public static class CardNumberGeneratorService
 
     public static string GenerateCardNumber(string cardTypeName)
     {
-        if (!_cardPrefixes.TryGetValue(cardTypeName, out var prefix))
+        if (!s_CardPrefixes.TryGetValue(cardTypeName, out var prefix))
             throw new ArgumentException($"Unknown card type: {cardTypeName}");
 
-        var cardLength = _cardLengths[cardTypeName];
+        var cardLength = s_CardLengths[cardTypeName];
 
-        // Generate the middle digits randomly
         var partialNumber    = prefix;
         var digitsToGenerate = cardLength - prefix.Length - 1;
 
         for (var i = 0; i < digitsToGenerate; i++)
-            partialNumber += _random.Next(0, 10)
-                                    .ToString();
+            partialNumber += s_Random.Next(0, 10)
+                                     .ToString();
 
-        // Calculate the Luhn check digit
         var checkDigit = CalculateLuhnCheckDigit(partialNumber);
         var cardNumber = partialNumber + checkDigit;
 
