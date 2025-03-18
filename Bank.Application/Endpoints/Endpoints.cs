@@ -46,6 +46,7 @@ public static partial class Endpoints
         public const string Create         = $"{Base}";
         public const string GetOne         = $"{Base}/{{id:guid}}";
         public const string Update         = $"{Base}/{{id:guid}}";
+        public const string Cards          = $"{Base}/{{id:guid}}/cards";
     }
 }
 

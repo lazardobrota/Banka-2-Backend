@@ -19,13 +19,16 @@ public interface IClientService
     Task<Result<ClientResponse>> Create(ClientCreateRequest clientCreateRequest);
 
     Task<Result<ClientResponse>> Update(ClientUpdateRequest clientUpdateRequest, Guid id);
+
+    Task<Result<List<CardResponse>>> FindAllCards(Guid clientId);
 }
 
-public class ClientService(IUserRepository repository, IEmailService emailService, IAccountRepository accountRepository) : IClientService
+public class ClientService(IUserRepository repository, IEmailService emailService, IAccountRepository accountRepository, ICardRepository cardRepository) : IClientService
 {
     private readonly IUserRepository    m_UserRepository    = repository;
     private readonly IEmailService      m_EmailService      = emailService;
     private readonly IAccountRepository m_AccountRepository = accountRepository;
+    private readonly ICardRepository    m_CardRepository    = cardRepository;
 
     public async Task<Result<Page<ClientResponse>>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
@@ -85,5 +88,23 @@ public class ClientService(IUserRepository repository, IEmailService emailServic
 
         return Result.Ok(user.ToClient()
                              .ToResponse());
+    }
+
+    public async Task<Result<List<CardResponse>>> FindAllCards(Guid clientId)
+    {
+        // First verify the client exists
+        var client = await m_UserRepository.FindById(clientId);
+
+        if (client is null || client.Role != Role.Client)
+            return Result.NotFound<List<CardResponse>>($"No Client found with Id: {clientId}");
+
+        // Get all cards for the client
+        var cards = await m_CardRepository.FindAllByClientId(clientId);
+
+        // Map cards to response objects
+        var cardResponses = cards.Select(card => card.ToResponse())
+                                 .ToList();
+
+        return Result.Ok(cardResponses);
     }
 }
