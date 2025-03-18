@@ -49,7 +49,7 @@ public static class CardMapper
                    Number     = GenerateDummyCardNumber(),
                    CVV        = GenerateRandomCVV(),
                    ExpiresAt  = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(1)),
-                   Account    = account, // TODO: ADD USER TO REQUEST 
+                   Account    = account,
                    Type       = type,
                    AccountId  = account.Id,
                };

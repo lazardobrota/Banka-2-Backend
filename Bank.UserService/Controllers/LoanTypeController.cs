@@ -46,7 +46,7 @@ public class LoanTypeController(ILoanTypeService loanTypeService) : ControllerBa
 
     [HttpPut(Endpoints.LoanType.Update)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
-    public async Task<ActionResult<LoanTypeResponse>> Update([FromBody] LoanTypeRequest request, [FromRoute] Guid id)
+    public async Task<ActionResult<LoanTypeResponse>> Update([FromBody] LoanTypeUpdateRequest request, [FromRoute] Guid id)
     {
         var result = await m_LoanTypeService.Update(request, id);
 

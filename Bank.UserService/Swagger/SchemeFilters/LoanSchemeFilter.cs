@@ -1,4 +1,5 @@
-﻿using Bank.Application.Extensions;
+﻿using Bank.Application.Domain;
+using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 
@@ -13,18 +14,18 @@ file static class Example
 {
     public static class Loan
     {
-        public static readonly Guid     Id           = Guid.Parse("90a10f93-85cc-491a-8624-07c485a2b431");
-        public static readonly Guid     TypeId       = Guid.Parse("af94b480-4c67-4281-962d-0d73efe48e4a");
-        public static readonly Guid     AccountId    = Guid.Parse("69434456-99a3-4cef-a366-b98877b5d4fc");
-        public const           decimal  Amount       = 50000.00m;
-        public const           int      Period       = 60;
-        public static readonly DateOnly CreationDate = new(2024, 3, 5);
-        public static readonly DateOnly MaturityDate = new(2029, 3, 5);
-        public static readonly Guid     CurrencyId   = Guid.Parse("2ae3889c-609f-4988-a334-0a37f3992e96");
-        public const           int      Status       = 1;
-        public const           int      InterestType = 2;
-        public static readonly DateTime CreatedAt    = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime ModifiedAt   = new(2025, 3, 5, 12, 45, 0);
+        public static readonly Guid         Id           = Guid.Parse("90a10f93-85cc-491a-8624-07c485a2b431");
+        public static readonly Guid         TypeId       = Guid.Parse("af94b480-4c67-4281-962d-0d73efe48e4a");
+        public static readonly Guid         AccountId    = Guid.Parse("69434456-99a3-4cef-a366-b98877b5d4fc");
+        public const           decimal      Amount       = 50000.00m;
+        public const           int          Period       = 60;
+        public static readonly DateOnly     CreationDate = new(2024, 3, 5);
+        public static readonly DateOnly     MaturityDate = new(2029, 3, 5);
+        public static readonly Guid         CurrencyId   = Guid.Parse("2ae3889c-609f-4988-a334-0a37f3992e96");
+        public const           LoanStatus   Status       = LoanStatus.Active;
+        public const           InterestType InterestType = Bank.Application.Domain.InterestType.Mixed;
+        public static readonly DateTime     CreatedAt    = new(2024, 3, 5, 10, 30, 0);
+        public static readonly DateTime     ModifiedAt   = new(2025, 3, 5, 12, 45, 0);
 
         public static readonly LoanRequest Request = new()
                                                      {
@@ -52,6 +53,11 @@ file static class Example
                                                            ModifiedAt   = ModifiedAt
                                                        };
     }
+
+    public static readonly LoanUpdateRequest Update = new LoanUpdateRequest()
+                                                      {
+                                                          Status = LoanStatus.Active,
+                                                      };
 }
 
 public static partial class SwaggerSchemaFilter
@@ -75,10 +81,20 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.CurrencyId)
                             .ToCamelCase()] = new OpenApiString(Example.CurrencyId.ToString()),
                            [nameof(Example.InterestType)
-                            .ToCamelCase()] = new OpenApiInteger(Example.InterestType)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.InterestType)
                        };
             }
         }
+        // public class LoanUpdateRequest : SwaggerSchemaFilter<LoanUpdateRequest>(SchemeFilters.Example.Update)
+        // {
+        //     protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+        //     {
+        //         return new OpenApiObject()
+        //                {
+        //                    [nameof(Example.Status).ToCamelCase()] = new OpenApiInteger((int)Example.Loan.Status)
+        //                };
+        //     }
+        // } TODO: FIX SCHEMA FOR UPDATE 
 
         public class Response() : SwaggerSchemaFilter<LoanResponse>(SchemeFilters.Example.Loan.Response)
         {
@@ -107,9 +123,9 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.Currency)
                             .ToCamelCase()] = currency,
                            [nameof(Example.Status)
-                            .ToCamelCase()] = new OpenApiInteger(Example.Status),
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status),
                            [nameof(Example.InterestType)
-                            .ToCamelCase()] = new OpenApiInteger(Example.InterestType),
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.InterestType),
                            [nameof(Example.CreatedAt)
                             .ToCamelCase()] = new OpenApiDateTime(Example.CreatedAt),
                            [nameof(Example.ModifiedAt)

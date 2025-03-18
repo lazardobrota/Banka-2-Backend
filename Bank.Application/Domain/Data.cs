@@ -23,3 +23,28 @@ public enum TransactionStatus
     Completed,
     Failed
 }
+
+public enum LoanStatus
+{
+    Pending,
+    Active,
+    Rejected,
+    Closed,
+    DefaultWarning,
+    Default
+}
+
+public enum InterestType
+{
+    Fixed,
+    Variable,
+    Mixed
+}
+
+public enum InstallmentStatus
+{
+    Pending,
+    Paid,
+    Overdue,
+    Cancelled
+}
