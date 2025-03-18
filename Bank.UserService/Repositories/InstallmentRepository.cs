@@ -15,6 +15,16 @@ public interface IInstallmentRepository
     Task<Installment> Add(Installment installment);
 
     Task<Installment> Update(Installment oldInstallment, Installment installment);
+
+    Task<List<Installment>> GetDueInstallmentsForLoanAsync(Guid loanId, DateTime dueDate);
+
+    Task<int> GetInstallmentCountForLoanAsync(Guid loanId);
+
+    Task<int> GetPaidInstallmentsCountBeforeDateAsync(Guid loanId, DateTime date);
+
+    Task<bool> AreAllInstallmentsPaidAsync(Guid loanId);
+
+    Task<Installment?> GetLatestInstallmentForLoanAsync(Guid loanId);
 }
 
 public class InstallmentRepository(ApplicationContext context) : IInstallmentRepository
@@ -67,5 +77,34 @@ public class InstallmentRepository(ApplicationContext context) : IInstallmentRep
         await m_Context.SaveChangesAsync();
 
         return updatedInstallment.Entity;
+    }
+
+    public async Task<List<Installment>> GetDueInstallmentsForLoanAsync(Guid loanId, DateTime dueDate)
+    {
+        return await m_Context.Installments.Where(i => i.LoanId == loanId && i.ExpectedDueDate.Date <= dueDate.Date && i.Status == InstallmentStatus.Pending)
+                              .OrderBy(i => i.ExpectedDueDate)
+                              .ToListAsync();
+    }
+
+    public async Task<int> GetInstallmentCountForLoanAsync(Guid loanId)
+    {
+        return await m_Context.Installments.CountAsync(i => i.LoanId == loanId);
+    }
+
+    public async Task<int> GetPaidInstallmentsCountBeforeDateAsync(Guid loanId, DateTime date)
+    {
+        return await m_Context.Installments.CountAsync(i => i.LoanId == loanId && i.Status == InstallmentStatus.Paid && i.ExpectedDueDate < date);
+    }
+
+    public async Task<bool> AreAllInstallmentsPaidAsync(Guid loanId)
+    {
+        return !await m_Context.Installments.AnyAsync(i => i.LoanId == loanId && i.Status == InstallmentStatus.Pending);
+    }
+
+    public async Task<Installment?> GetLatestInstallmentForLoanAsync(Guid loanId)
+    {
+        return await m_Context.Installments.Where(i => i.LoanId == loanId)
+                              .OrderByDescending(i => i.ExpectedDueDate)
+                              .FirstOrDefaultAsync();
     }
 }

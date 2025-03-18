@@ -16,6 +16,8 @@ public interface ILoanRepository
     Task<Loan> Add(Loan loan);
 
     Task<Loan> Update(Loan oldLoan, Loan loan);
+
+    Task<List<Loan>> GetLoansWithDueInstallmentsAsync(DateTime dueDate);
 }
 
 public class LoanRepository(ApplicationContext context) : ILoanRepository
@@ -90,5 +92,13 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
         await m_Context.SaveChangesAsync();
 
         return updatedLoan.Entity;
+    }
+
+    public async Task<List<Loan>> GetLoansWithDueInstallmentsAsync(DateTime dueDate)
+    {
+        return await m_Context.Loans.Include(l => l.LoanType)
+                              .Include(l => l.Installments)
+                              .Where(l => l.Status == LoanStatus.Active && l.Installments.Any(i => i.ExpectedDueDate.Date <= dueDate.Date && i.Status == InstallmentStatus.Pending))
+                              .ToListAsync();
     }
 }
