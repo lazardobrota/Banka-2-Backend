@@ -46,6 +46,7 @@ public static partial class Endpoints
         public const string Create         = $"{Base}";
         public const string GetOne         = $"{Base}/{{id:guid}}";
         public const string Update         = $"{Base}/{{id:guid}}";
+        public const string Cards          = $"{Base}/{{id:guid}}/cards";
     }
 }
 
@@ -181,11 +182,12 @@ public static partial class Endpoints
 {
     public static class Transaction
     {
-        public const string Base   = $"{ApiBase}/transactions";
-        public const string GetOne = $"{Base}/{{id:guid}}";
-        public const string GetAll = $"{Base}";
-        public const string Create = $"{Base}";
-        public const string Update = $"{Base}/{{id:guid}}";
+        public const string Base             = $"{ApiBase}/transactions";
+        public const string GetAll           = $"{Base}";
+        public const string GetAllForAccount = $"{Account.Base}/{{id:guid}}/transcations";
+        public const string GetOne           = $"{Base}/{{id:guid}}";
+        public const string Create           = $"{Base}";
+        public const string Update           = $"{Base}/{{id:guid}}";
     }
 }
 

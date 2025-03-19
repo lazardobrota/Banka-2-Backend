@@ -1,4 +1,6 @@
-﻿namespace Bank.UserService.Models;
+﻿using Bank.Application.Domain;
+
+namespace Bank.UserService.Models;
 
 public class Loan
 {

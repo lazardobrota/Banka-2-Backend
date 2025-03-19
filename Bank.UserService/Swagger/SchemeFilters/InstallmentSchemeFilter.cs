@@ -1,4 +1,5 @@
-﻿using Bank.Application.Extensions;
+﻿using Bank.Application.Domain;
+using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 
@@ -13,14 +14,14 @@ file static class Example
 {
     public static class Installment
     {
-        public static readonly Guid     Id              = Guid.Parse("a52cbe51-d29e-486a-b7dd-079aa315883f");
-        public static readonly Guid     LoanId          = Guid.Parse("c6dcae29-91cd-40d5-a75c-8df6f24cc257");
-        public const           decimal  InterestRate    = 5.0m;
-        public static readonly DateOnly ExpectedDueDate = new(2025, 6, 15);
-        public static readonly DateOnly ActualDueDate   = new(2025, 6, 20);
-        public const           int      Status          = 1;
-        public static readonly DateTime CreatedAt       = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime ModifiedAt      = new(2025, 3, 5, 12, 45, 0);
+        public static readonly Guid              Id              = Guid.Parse("a52cbe51-d29e-486a-b7dd-079aa315883f");
+        public static readonly Guid              LoanId          = Guid.Parse("c6dcae29-91cd-40d5-a75c-8df6f24cc257");
+        public const           decimal           InterestRate    = 5.0m;
+        public static readonly DateOnly          ExpectedDueDate = new(2025, 6, 15);
+        public static readonly DateOnly          ActualDueDate   = new(2025, 6, 20);
+        public const           InstallmentStatus Status          = InstallmentStatus.Paid;
+        public static readonly DateTime          CreatedAt       = new(2024, 3, 5, 10, 30, 0);
+        public static readonly DateTime          ModifiedAt      = new(2025, 3, 5, 12, 45, 0);
 
         public static readonly InstallmentRequest Request = new()
                                                             {
@@ -31,6 +32,12 @@ file static class Example
                                                                 ActualDueDate   = ActualDueDate,
                                                                 Status          = Status
                                                             };
+
+        public static readonly InstallmentUpdateRequest UpdateRequest = new()
+                                                                        {
+                                                                            ActualDueDate = ActualDueDate.ToDateTime(TimeOnly.MinValue),
+                                                                            Status        = Status
+                                                                        };
 
         public static readonly InstallmentResponse Response = new()
                                                               {
@@ -67,7 +74,21 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.ActualDueDate)
                             .ToCamelCase()] = new OpenApiDate(Example.ActualDueDate.ToDateTime(TimeOnly.MinValue)),
                            [nameof(Example.Status)
-                            .ToCamelCase()] = new OpenApiInteger(Example.Status)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status)
+                       };
+            }
+        }
+
+        public class UpdateRequest() : SwaggerSchemaFilter<InstallmentUpdateRequest>(SchemeFilters.Example.Installment.UpdateRequest)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.ActualDueDate)
+                            .ToCamelCase()] = new OpenApiDate(Example.ActualDueDate ?? DateTime.MinValue),
+                           [nameof(Example.Status)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status),
                        };
             }
         }
@@ -91,7 +112,7 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.ActualDueDate)
                             .ToCamelCase()] = new OpenApiDate(Example.ActualDueDate.ToDateTime(TimeOnly.MinValue)),
                            [nameof(Example.Status)
-                            .ToCamelCase()] = new OpenApiInteger(Example.Status),
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status),
                            [nameof(Example.CreatedAt)
                             .ToCamelCase()] = new OpenApiDateTime(Example.CreatedAt),
                            [nameof(Example.ModifiedAt)

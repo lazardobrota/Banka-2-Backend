@@ -49,9 +49,12 @@ public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepositor
     public async Task<LoanType> Update(LoanType oldLoanType, LoanType loanType)
     {
         m_Context.Entry(oldLoanType)
-                 .CurrentValues.SetValues(loanType);
+                 .State = EntityState.Detached;
+
+        var updatedLoanType = m_Context.LoanTypes.Update(loanType);
 
         await m_Context.SaveChangesAsync();
-        return loanType;
+
+        return updatedLoanType.Entity;
     }
 }

@@ -18,7 +18,7 @@ public interface ILoanService
 
     Task<Result<LoanResponse>> Create(LoanRequest loanRequest);
 
-    Task<Result<LoanResponse>> Update(LoanRequest loanRequest, Guid id);
+    Task<Result<LoanResponse>> Update(LoanUpdateRequest loanRequest, Guid id);
 }
 
 public class LoanService(
@@ -85,28 +85,15 @@ public class LoanService(
         return Result.Ok(loan.ToLoanResponse());
     }
 
-    public async Task<Result<LoanResponse>> Update(LoanRequest loanRequest, Guid id)
+    public async Task<Result<LoanResponse>> Update(LoanUpdateRequest loanRequest, Guid id)
     {
         var oldLoan = await m_LoanRepository.FindById(id);
 
         if (oldLoan is null)
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
-        // Validate that the references exist
-        var loanType = await m_LoanTypeRepository.FindById(loanRequest.TypeId);
-        var account  = await m_AccountRepository.FindById(loanRequest.AccountId);
-        var currency = await m_CurrencyRepository.FindById(loanRequest.CurrencyId);
-
-        if (loanType == null || account == null || currency == null)
-            return Result.BadRequest<LoanResponse>("Invalid data. Loan type, account, or currency not found.");
-
-        var updatedLoan = loanRequest.ToLoan();
-        updatedLoan.Id           = oldLoan.Id;
-        updatedLoan.CreationDate = oldLoan.CreationDate;
-        updatedLoan.CreatedAt    = oldLoan.CreatedAt;
-        updatedLoan.ModifiedAt   = DateTime.UtcNow;
-
-        var loan = await m_LoanRepository.Update(oldLoan, updatedLoan);
+        var updatedLoan = loanRequest.ToLoan(oldLoan);
+        var loan        = await m_LoanRepository.Update(oldLoan, updatedLoan);
 
         return Result.Ok(loan.ToLoanResponse());
     }

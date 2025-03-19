@@ -12,6 +12,8 @@ public interface ITransactionRepository
 {
     Task<Page<Transaction>> FindAll(TransactionFilterQuery filter, Pageable pageable);
 
+    Task<Page<Transaction>> FindAllByAccountId(Guid accountId, TransactionFilterQuery filter, Pageable pageable);
+
     Task<Transaction?> FindById(Guid id);
 
     Task<Transaction> Add(Transaction transaction);
@@ -45,6 +47,33 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
 
         if (filter.ToDate != DateOnly.MinValue)
             transactionQuery = transactionQuery.Where(transaction => DateOnly.FromDateTime(transaction.CreatedAt) <= filter.ToDate);
+
+        var transactions = await transactionQuery.Skip((pageable.Page - 1) * pageable.Size)
+                                                 .Take(pageable.Size)
+                                                 .ToListAsync();
+
+        var totalElements = await transactionQuery.CountAsync();
+
+        return new Page<Transaction>(transactions, pageable.Page, pageable.Size, totalElements);
+    }
+
+    public async Task<Page<Transaction>> FindAllByAccountId(Guid accountId, TransactionFilterQuery filter, Pageable pageable)
+    {
+        var transactionQuery = m_Context.Transactions.Include(transaction => transaction.FromAccount)
+                                        .Include(transaction => transaction.ToAccount)
+                                        .Include(transaction => transaction.Code)
+                                        .AsQueryable();
+
+        if (filter.Status != TransactionStatus.Invalid)
+            transactionQuery = transactionQuery.Where(transaction => transaction.Status == filter.Status);
+
+        if (filter.FromDate != DateOnly.MinValue)
+            transactionQuery = transactionQuery.Where(transaction => DateOnly.FromDateTime(transaction.CreatedAt) >= filter.FromDate);
+
+        if (filter.ToDate != DateOnly.MinValue)
+            transactionQuery = transactionQuery.Where(transaction => DateOnly.FromDateTime(transaction.CreatedAt) <= filter.ToDate);
+
+        transactionQuery = transactionQuery.Where(transaction => transaction.FromAccountId == accountId || transaction.ToAccountId == accountId);
 
         var transactions = await transactionQuery.Skip((pageable.Page - 1) * pageable.Size)
                                                  .Take(pageable.Size)

@@ -61,4 +61,12 @@ public class ClientController(IClientService clientService) : ControllerBase
 
         return result.ActionResult;
     }
+
+    //[Authorize]
+    [HttpGet(Endpoints.Client.Cards)]
+    public async Task<ActionResult<CardResponse>> Cards([FromRoute] Guid id)
+    {
+        var result = await m_ClientService.FindAllCards(id);
+        return result.ActionResult;
+    }
 }
