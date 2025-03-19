@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Extensions;
+using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 
@@ -39,11 +40,11 @@ file static class Example
                                                                          Commission = Commission
                                                                      };
 
-        public static readonly ExchangeBetweenRequest BetweenRequest = new()
-                                                                       {
-                                                                           CurrencyFromCode = CurrencyFromCode,
-                                                                           CurrencyToCode   = CurrencyToCode
-                                                                       };
+        public static readonly ExchangeBetweenQuery BetweenQuery = new()
+                                                                   {
+                                                                       CurrencyFromCode = CurrencyFromCode,
+                                                                       CurrencyToCode   = CurrencyToCode
+                                                                   };
 
         public static readonly ExchangeResponse Response = new()
                                                            {
@@ -93,7 +94,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class BetweenRequest() : SwaggerSchemaFilter<ExchangeBetweenRequest>(SchemeFilters.Example.Exchange.BetweenRequest)
+        public class BetweenRequest() : SwaggerSchemaFilter<ExchangeBetweenQuery>(SchemeFilters.Example.Exchange.BetweenQuery)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

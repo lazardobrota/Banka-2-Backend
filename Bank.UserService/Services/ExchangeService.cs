@@ -14,7 +14,7 @@ public interface IExchangeService
 
     Task<Result<ExchangeResponse>> GetById(Guid id);
 
-    Task<Result<ExchangeResponse>> GetByCurrencies(ExchangeBetweenRequest exchangeBetweenRequest, ExchangeFilterQuery exchangeFilterQuery);
+    Task<Result<ExchangeResponse>> GetByCurrencies(ExchangeBetweenQuery exchangeBetweenQuery);
 
     Task<Result<ExchangeResponse>> MakeExchange(ExchangeMakeExchangeRequest exchangeMakeExchangeRequest, ExchangeFilterQuery exchangeFilterQuery);
 
@@ -72,19 +72,20 @@ public class ExchangeService(
         return Result.Ok(exchange.ToResponse());
     }
 
-    public async Task<Result<ExchangeResponse>> GetByCurrencies(ExchangeBetweenRequest exchangeBetweenRequest, ExchangeFilterQuery exchangeFilterQuery)
+    public async Task<Result<ExchangeResponse>> GetByCurrencies(ExchangeBetweenQuery exchangeBetweenQuery)
     {
-        var firstCurrency = await m_CurrencyRepository.FindByCode(exchangeBetweenRequest.CurrencyFromCode);
+        
+        var firstCurrency       = await m_CurrencyRepository.FindByCode(exchangeBetweenQuery.CurrencyFromCode);
 
         if (firstCurrency is null)
-            return Result.NotFound<ExchangeResponse>($"No Currency with code '{exchangeBetweenRequest.CurrencyFromCode}'");
+            return Result.NotFound<ExchangeResponse>($"No Currency with code '{exchangeBetweenQuery.CurrencyFromCode}'");
 
-        var secondCurrency = await m_CurrencyRepository.FindByCode(exchangeBetweenRequest.CurrencyToCode);
+        var secondCurrency = await m_CurrencyRepository.FindByCode(exchangeBetweenQuery.CurrencyToCode);
 
         if (secondCurrency is null)
-            return Result.NotFound<ExchangeResponse>($"No Currency with code '{exchangeBetweenRequest.CurrencyToCode}'");
+            return Result.NotFound<ExchangeResponse>($"No Currency with code '{exchangeBetweenQuery.CurrencyToCode}'");
 
-        var exchange = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(firstCurrency, secondCurrency, exchangeFilterQuery);
+        var exchange            = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(firstCurrency, secondCurrency, new ExchangeFilterQuery());
 
         if (exchange is null)
             return Result.NotFound<ExchangeResponse>($"No Exchange with currencies '{firstCurrency.Code}' and '{secondCurrency.Code}'");

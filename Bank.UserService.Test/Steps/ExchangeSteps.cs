@@ -165,13 +165,13 @@ public class ExchangeSteps(ScenarioContext scenarioContext, IExchangeService exc
     [When(@"exchange is fetched from the database with currencies")]
     public async Task WhenExchangeIsFetchedFromTheDatabaseWithCurrencies()
     {
-        var filter = new ExchangeBetweenRequest
+        var filter = new ExchangeBetweenQuery()
                      {
                          CurrencyFromCode = m_ScenarioContext.Get<string>(Constant.CurrencyFromCode),
                          CurrencyToCode   = m_ScenarioContext.Get<string>(Constant.CurrencyToCode)
                      };
 
-        var result = await m_ExchangeService.GetByCurrencies(filter, new ExchangeFilterQuery());
+        var result = await m_ExchangeService.GetByCurrencies(filter);
         m_ScenarioContext[Constant.GetOne]       = result;
         m_ScenarioContext[Constant.ActionResult] = result.ActionResult;
     }

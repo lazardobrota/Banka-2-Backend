@@ -40,7 +40,7 @@ public class Hooks
 
         services.AddServices();
         services.AddHttpServices();
-        services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
+        services.AddDatabase();
         services.AddHostedServices();
 
         var serviceProvider = services.BuildServiceProvider();
