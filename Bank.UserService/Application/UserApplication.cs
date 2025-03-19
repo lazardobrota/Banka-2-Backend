@@ -32,12 +32,12 @@ public class UserApplication
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+        builder.Services.AddValidation();
         builder.Services.AddServices();
         builder.Services.AddDatabase();
         builder.Services.AddHostedServices();
         builder.Services.AddHttpServices();
 
-        builder.Services.AddValidation();
         builder.Services.AddCors();
         builder.Services.AddAuthenticationServices();
         builder.Services.AddAuthorizationServices();
@@ -138,6 +138,9 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddValidation(this IServiceCollection services)
     {
+        ValidatorOptions.Global.DefaultClassLevelCascadeMode = CascadeMode.Continue;
+        ValidatorOptions.Global.DefaultRuleLevelCascadeMode  = CascadeMode.Stop;
+
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<AssemblyInfo>();
 
