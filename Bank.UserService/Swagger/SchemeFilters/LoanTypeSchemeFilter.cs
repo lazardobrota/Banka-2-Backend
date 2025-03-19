@@ -23,6 +23,12 @@ file static class Example
                                                              Margin = Margin,
                                                          };
 
+        public static readonly LoanTypeUpdateRequest UpdateRequest = new()
+                                                                     {
+                                                                         Name   = Name,
+                                                                         Margin = Margin,
+                                                                     };
+
         public static readonly LoanTypeResponse Response = new()
                                                            {
                                                                Id     = Id,
@@ -37,6 +43,20 @@ public static partial class SwaggerSchemaFilter
     public static class LoanType
     {
         public class Request() : SwaggerSchemaFilter<LoanTypeRequest>(SchemeFilters.Example.LoanType.Request)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.Name)
+                            .ToCamelCase()] = new OpenApiString(Example.Name),
+                           [nameof(Example.Margin)
+                            .ToCamelCase()] = new OpenApiDouble((double)Example.Margin)
+                       };
+            }
+        }
+
+        public class UpdateRequest() : SwaggerSchemaFilter<LoanTypeUpdateRequest>(SchemeFilters.Example.LoanType.UpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

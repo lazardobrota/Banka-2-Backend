@@ -52,12 +52,13 @@ file static class Example
                                                            CreatedAt    = CreatedAt,
                                                            ModifiedAt   = ModifiedAt
                                                        };
-    }
 
-    public static readonly LoanUpdateRequest Update = new LoanUpdateRequest()
-                                                      {
-                                                          Status = LoanStatus.Active,
-                                                      };
+        public static readonly LoanUpdateRequest UpdateRequest = new()
+                                                                 {
+                                                                     Status       = Status,
+                                                                     MaturityDate = MaturityDate.ToDateTime(TimeOnly.MinValue)
+                                                                 };
+    }
 }
 
 public static partial class SwaggerSchemaFilter
@@ -85,16 +86,20 @@ public static partial class SwaggerSchemaFilter
                        };
             }
         }
-        // public class LoanUpdateRequest : SwaggerSchemaFilter<LoanUpdateRequest>(SchemeFilters.Example.Update)
-        // {
-        //     protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
-        //     {
-        //         return new OpenApiObject()
-        //                {
-        //                    [nameof(Example.Status).ToCamelCase()] = new OpenApiInteger((int)Example.Loan.Status)
-        //                };
-        //     }
-        // } TODO: FIX SCHEMA FOR UPDATE 
+
+        public class UpdateRequest() : SwaggerSchemaFilter<LoanUpdateRequest>(SchemeFilters.Example.Loan.UpdateRequest)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.Status)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status),
+                           [nameof(Example.MaturityDate)
+                            .ToCamelCase()] = new OpenApiDateTime(Example.MaturityDate ?? DateTime.MinValue)
+                       };
+            }
+        }
 
         public class Response() : SwaggerSchemaFilter<LoanResponse>(SchemeFilters.Example.Loan.Response)
         {
