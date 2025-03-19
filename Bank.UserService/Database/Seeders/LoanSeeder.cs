@@ -1,4 +1,5 @@
-﻿using Bank.UserService.Models;
+﻿using Bank.Application.Domain;
+using Bank.UserService.Models;
 
 namespace Bank.UserService.Database.Seeders;
 

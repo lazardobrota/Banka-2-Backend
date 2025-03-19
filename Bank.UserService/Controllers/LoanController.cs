@@ -61,7 +61,7 @@ public class LoanController : ControllerBase
 
     [HttpPut(Endpoints.Loan.Update)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
-    public async Task<ActionResult<LoanResponse>> Update([FromBody] LoanRequest loanRequest, [FromRoute] Guid id)
+    public async Task<ActionResult<LoanResponse>> Update([FromBody] LoanUpdateRequest loanRequest, [FromRoute] Guid id)
     {
         var result = await m_LoanService.Update(loanRequest, id);
 

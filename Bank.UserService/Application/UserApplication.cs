@@ -241,12 +241,15 @@ public static class ServiceCollectionExtensions
                                    config.SchemaFilter<SwaggerSchemaFilter.Exchange.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Installment.Request>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Installment.UpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Installment.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.Loan.Request>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.Loan.UpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.Loan.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.LoanType.Request>();
+                                   config.SchemaFilter<SwaggerSchemaFilter.LoanType.UpdateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.LoanType.Response>();
 
                                    config.SchemaFilter<SwaggerSchemaFilter.TransactionCode.Response>();

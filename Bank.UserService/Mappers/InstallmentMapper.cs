@@ -15,7 +15,7 @@ public static class InstallmentMapper
                    InterestRate    = request.InterestRate,
                    ExpectedDueDate = request.ExpectedDueDate.ToDateTime(TimeOnly.MinValue),
                    ActualDueDate   = request.ActualDueDate.ToDateTime(TimeOnly.MinValue),
-                   Status          = (InstallmentStatus)request.Status,
+                   Status          = request.Status,
                    CreatedAt       = DateTime.UtcNow,
                    ModifiedAt      = DateTime.UtcNow
                };
@@ -30,9 +30,26 @@ public static class InstallmentMapper
                    InterestRate    = installment.InterestRate,
                    ExpectedDueDate = DateOnly.FromDateTime(installment.ExpectedDueDate),
                    ActualDueDate   = DateOnly.FromDateTime(installment.ActualDueDate),
-                   Status          = (int)installment.Status,
+                   Status          = installment.Status,
                    CreatedAt       = installment.CreatedAt,
                    ModifiedAt      = installment.ModifiedAt
                };
+    }
+
+    public static Installment ToEntity(this InstallmentUpdateRequest request, Installment oldInstallment)
+    {
+        var updatedInstallment = new Installment
+                                 {
+                                     Id            = oldInstallment.Id,
+                                     LoanId        = oldInstallment.LoanId,
+                                     Loan          = oldInstallment.Loan,
+                                     ActualDueDate = request.ActualDueDate ?? oldInstallment.ActualDueDate,
+                                     InterestRate  = oldInstallment.InterestRate,
+                                     Status        = request.Status ?? oldInstallment.Status,
+                                     CreatedAt     = oldInstallment.CreatedAt,
+                                     ModifiedAt    = DateTime.UtcNow
+                                 };
+
+        return updatedInstallment;
     }
 }
