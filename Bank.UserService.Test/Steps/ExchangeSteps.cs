@@ -25,8 +25,8 @@ public class ExchangeSteps(ScenarioContext scenarioContext, IExchangeService exc
                    "VALID_EXCHANGE_ID"        => Example.Entity.ExchangeEntity.GetExchange.Id,
                    "INVALID_EXCHANGE_ID"      => Guid.Empty,
                    "UPDATE_VALID_EXCHANGE_ID" => Example.Entity.ExchangeEntity.UpdateId,
-                   "RSD_ID"                   => Example.Entity.CurrencyEntity.SerbianDinar.Id,
-                   "EUR_ID"                   => Example.Entity.CurrencyEntity.Euro.Id,
+                   "RSD_ID"                   => Example.Entity.Currency.SerbianDinar.Id,
+                   "EUR_ID"                   => Example.Entity.Currency.Euro.Id,
                    ""                         => Guid.Empty,
                    _                          => throw new ArgumentException($"Transform unknown Id: {input}")
                };
@@ -37,8 +37,8 @@ public class ExchangeSteps(ScenarioContext scenarioContext, IExchangeService exc
     {
         return input switch
                {
-                   "RSD_CODE" => Example.Entity.CurrencyEntity.SerbianDinar.Code,
-                   "EUR_CODE" => Example.Entity.CurrencyEntity.Euro.Code,
+                   "RSD_CODE" => Example.Entity.Currency.SerbianDinar.Code,
+                   "EUR_CODE" => Example.Entity.Currency.Euro.Code,
                    ""         => "",
                    _          => throw new ArgumentException($"Transform unknown Code: {input}")
                };
