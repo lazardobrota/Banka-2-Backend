@@ -10,9 +10,9 @@ using Bank.UserService.Services;
 
 using DotNetEnv;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+using Reqnroll.BoDi;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;
 
 namespace Bank.UserService.Test.Hooks;
@@ -28,7 +28,7 @@ public class Hooks
     [BeforeTestRun]
     public static void IncreaseResolutionTimeout()
     {
-        Reqnroll.BoDi.ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromSeconds(10);
+        ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromSeconds(10);
     }
 
     [ScenarioDependencies]

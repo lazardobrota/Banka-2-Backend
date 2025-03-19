@@ -74,8 +74,7 @@ public class ExchangeService(
 
     public async Task<Result<ExchangeResponse>> GetByCurrencies(ExchangeBetweenQuery exchangeBetweenQuery)
     {
-        
-        var firstCurrency       = await m_CurrencyRepository.FindByCode(exchangeBetweenQuery.CurrencyFromCode);
+        var firstCurrency = await m_CurrencyRepository.FindByCode(exchangeBetweenQuery.CurrencyFromCode);
 
         if (firstCurrency is null)
             return Result.NotFound<ExchangeResponse>($"No Currency with code '{exchangeBetweenQuery.CurrencyFromCode}'");
@@ -85,7 +84,7 @@ public class ExchangeService(
         if (secondCurrency is null)
             return Result.NotFound<ExchangeResponse>($"No Currency with code '{exchangeBetweenQuery.CurrencyToCode}'");
 
-        var exchange            = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(firstCurrency, secondCurrency, new ExchangeFilterQuery());
+        var exchange = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(firstCurrency, secondCurrency, new ExchangeFilterQuery());
 
         if (exchange is null)
             return Result.NotFound<ExchangeResponse>($"No Exchange with currencies '{firstCurrency.Code}' and '{secondCurrency.Code}'");

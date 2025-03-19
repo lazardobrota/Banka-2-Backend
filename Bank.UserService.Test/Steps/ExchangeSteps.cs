@@ -149,7 +149,6 @@ public class ExchangeSteps(ScenarioContext scenarioContext, IExchangeService exc
         m_ScenarioContext[Constant.ActionResult] = result.ActionResult;
     }
 
-
     [Given(@"currency from (.*)")]
     public void GivenCurrencyFrom(string currencyFromCode)
     {
@@ -184,7 +183,7 @@ public class ExchangeSteps(ScenarioContext scenarioContext, IExchangeService exc
 
         var exchangeResult = m_ScenarioContext.Get<Result<ExchangeResponse>>(Constant.GetOne);
         var seeder         = Example.Entity.ExchangeEntity.GetExchange;
-    
+
         exchangeResult.Value.ShouldNotBeNull();
         exchangeResult.Value.Id.ShouldBe(seeder.Id);
         exchangeResult.Value.CurrencyFrom.Id.ShouldBe(seeder.CurrencyFromId);
