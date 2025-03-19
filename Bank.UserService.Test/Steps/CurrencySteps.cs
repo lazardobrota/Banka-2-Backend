@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-
-using Bank.Application.Endpoints;
+﻿using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
 using Bank.UserService.Services;
@@ -11,12 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 
 namespace Bank.UserService.Test.Steps;
+
 [Binding]
 public class CurrencySteps(ScenarioContext scenarioContext, ICurrencyService currencyService)
 {
     private readonly ICurrencyService m_CurrencyService = currencyService;
     private readonly ScenarioContext  m_ScenarioContext = scenarioContext;
-    
+
     [Given(@"currency get request with name filter parameter")]
     public void GivenCurrencyGetRequestWithNameFilterParameter()
     {
@@ -28,7 +27,7 @@ public class CurrencySteps(ScenarioContext scenarioContext, ICurrencyService cur
     {
         m_ScenarioContext[Constant.FilterParam] = Example.Entity.Currency.FilterQueryWithCode;
     }
-    
+
     [Given(@"currency get request with Id")]
     public void GivenCurrencyGetRequestWithId()
     {
@@ -42,19 +41,21 @@ public class CurrencySteps(ScenarioContext scenarioContext, ICurrencyService cur
         var result      = await m_CurrencyService.FindAll(filterQuery);
         m_ScenarioContext[Constant.GetResult] = result;
     }
-    
+
     [When(@"currency is fetched by Id from the database")]
     public async Task WhenCurrencyIsFetchedByIdFromTheDatabase()
     {
-        var id = m_ScenarioContext.Get<Guid>(Constant.Id);
-        var result      = await m_CurrencyService.FindById(id);
+        var id     = m_ScenarioContext.Get<Guid>(Constant.Id);
+        var result = await m_CurrencyService.FindById(id);
         m_ScenarioContext[Constant.GetResult] = result;
     }
 
     [Then(@"response should contain a list of currencies matching the name filter")]
     public void ThenResponseShouldContainAListOfCurrenciesMatchingTheNameFilter()
     {
-        var name = m_ScenarioContext.Get<CurrencyFilterQuery>(Constant.FilterParam).Name;
+        var name = m_ScenarioContext.Get<CurrencyFilterQuery>(Constant.FilterParam)
+                                    .Name;
+
         var result = m_ScenarioContext.Get<Result<List<CurrencyResponse>>>(Constant.GetResult);
         result.ActionResult.ShouldBeOfType<OkObjectResult>();
         result.Value.ShouldNotBeNull();
@@ -65,14 +66,16 @@ public class CurrencySteps(ScenarioContext scenarioContext, ICurrencyService cur
     [Then(@"response should contain a list of currencies matching the code filter")]
     public void ThenResponseShouldContainAListOfCurrenciesMatchingTheCodeFilter()
     {
-        var code = m_ScenarioContext.Get<CurrencyFilterQuery>(Constant.FilterParam).Code;
+        var code = m_ScenarioContext.Get<CurrencyFilterQuery>(Constant.FilterParam)
+                                    .Code;
+
         var result = m_ScenarioContext.Get<Result<List<CurrencyResponse>>>(Constant.GetResult);
         result.ActionResult.ShouldBeOfType<OkObjectResult>();
         result.Value.ShouldNotBeNull();
         code.ShouldNotBeNull();
         result.Value.ShouldAllBe(c => c.Code == code);
     }
-    
+
     [Then(@"response should contain the currency with the given Id")]
     public void ThenResponseShouldContainTheCurrencyWithTheGivenId()
     {
@@ -82,9 +85,10 @@ public class CurrencySteps(ScenarioContext scenarioContext, ICurrencyService cur
         result.Value.Id.ShouldBe(m_ScenarioContext.Get<Guid>(Constant.Id));
     }
 }
+
 file static class Constant
 {
     public const string FilterParam = "CurrencyFilterQuery";
     public const string Id          = "CurrencyId";
-    public const string GetResult      = "CurrancyGetResult";
+    public const string GetResult   = "CurrancyGetResult";
 }

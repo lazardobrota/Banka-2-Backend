@@ -34,8 +34,8 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
                                      .AsQueryable();
 
         if (!string.IsNullOrEmpty(exchangeFilterQuery.CurrencyCode))
-            exchangeQueue = exchangeQueue.Where(exchange => exchange.CurrencyFrom.Code.ToLower() == exchangeFilterQuery.CurrencyCode.ToLower() ||
-                                                            exchange.CurrencyTo.Code.ToLower()   == exchangeFilterQuery.CurrencyCode.ToLower());
+            exchangeQueue = exchangeQueue.Where(exchange => EF.Functions.ILike(exchange.CurrencyFrom!.Code.ToLower(), $"%{exchangeFilterQuery.CurrencyCode.ToLower()}%") ||
+                                                            EF.Functions.ILike(exchange.CurrencyTo!.Code.ToLower(),   $"%{exchangeFilterQuery.CurrencyCode.ToLower()}%"));
 
         if (exchangeFilterQuery.CurrencyId != Guid.Empty)
             exchangeQueue = exchangeQueue.Where(exchange => exchange.CurrencyFromId == exchangeFilterQuery.CurrencyId || exchange.CurrencyToId == exchangeFilterQuery.CurrencyId);
@@ -81,10 +81,12 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
 
         return await m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
                               .Include(exchange => exchange.CurrencyTo)
-                              .FirstOrDefaultAsync(exchange => ((exchange.CurrencyFrom.Code == firstCurrencyCode  && exchange.CurrencyTo.Code == secondCurrencyCode) ||
-                                                                (exchange.CurrencyFrom.Code == secondCurrencyCode && exchange.CurrencyTo.Code == firstCurrencyCode)) &&
-                                                               exchangeFilterQuery.Date                  <= DateOnly.FromDateTime(exchange.CreatedAt)                &&
-                                                               DateOnly.FromDateTime(exchange.CreatedAt) < exchangeFilterQuery.Date.AddDays(1));
+                              .FirstOrDefaultAsync(exchange =>
+                                                   ((EF.Functions.ILike(exchange.CurrencyFrom!.Code, $"%{firstCurrencyCode}%") &&
+                                                     EF.Functions.ILike(exchange.CurrencyTo!.Code,   $"secondCurrencyCode")) ||
+                                                    (EF.Functions.ILike(exchange.CurrencyFrom!.Code, $"%{secondCurrencyCode}%") &&
+                                                     exchange.CurrencyTo!.Code == firstCurrencyCode)) && exchangeFilterQuery.Date <= DateOnly.FromDateTime(exchange.CreatedAt) &&
+                                                   DateOnly.FromDateTime(exchange.CreatedAt)                                      < exchangeFilterQuery.Date.AddDays(1));
     }
 
     public async Task<Exchange> Add(Exchange exchange)
