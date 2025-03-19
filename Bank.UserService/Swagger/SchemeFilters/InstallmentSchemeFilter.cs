@@ -33,6 +33,12 @@ file static class Example
                                                                 Status          = Status
                                                             };
 
+        public static readonly InstallmentUpdateRequest UpdateRequest = new()
+                                                                        {
+                                                                            ActualDueDate = ActualDueDate.ToDateTime(TimeOnly.MinValue),
+                                                                            Status        = Status
+                                                                        };
+
         public static readonly InstallmentResponse Response = new()
                                                               {
                                                                   Id              = Id,
@@ -69,6 +75,20 @@ public static partial class SwaggerSchemaFilter
                             .ToCamelCase()] = new OpenApiDate(Example.ActualDueDate.ToDateTime(TimeOnly.MinValue)),
                            [nameof(Example.Status)
                             .ToCamelCase()] = new OpenApiInteger((int)Example.Status)
+                       };
+            }
+        }
+
+        public class UpdateRequest() : SwaggerSchemaFilter<InstallmentUpdateRequest>(SchemeFilters.Example.Installment.UpdateRequest)
+        {
+            protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
+            {
+                return new OpenApiObject()
+                       {
+                           [nameof(Example.ActualDueDate)
+                            .ToCamelCase()] = new OpenApiDate(Example.ActualDueDate ?? DateTime.MinValue),
+                           [nameof(Example.Status)
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status),
                        };
             }
         }
