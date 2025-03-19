@@ -121,6 +121,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<DatabaseHostedService>();
         services.AddSingleton<ExchangeHostedService>();
+        services.AddSingleton<LoanHostedService>();
 
         services.AddHostedService<ApplicationHostedService>();
 

@@ -124,12 +124,13 @@ public static partial class Endpoints
 {
     public static class Card
     {
-        public const string Base           = $"{ApiBase}/cards";
-        public const string GetOne         = $"{Base}/{{id:guid}}";
-        public const string GetAll         = $"{Base}";
-        public const string Create         = $"{Base}";
-        public const string UpdateEmployee = $"{Base}/{{id:guid}}/employee";
-        public const string UpdateClient   = $"{Base}/{{id:guid}}/client";
+        public const string Base                 = $"{ApiBase}/cards";
+        public const string GetOne               = $"{Base}/{{id:guid}}";
+        public const string GetAll               = $"{Base}";
+        public const string Create               = $"{Base}";
+        public const string UpdateEmployee       = $"{Base}/{{id:guid}}/employee";
+        public const string UpdateClient         = $"{Base}/{{id:guid}}/client";
+        public const string UpdateStatusAsClient = $"{Base}/{{id:guid}}/client/status";
     }
 }
 
@@ -214,7 +215,7 @@ public static partial class Endpoints
         public const string GetOne          = $"{Base}/{{id:guid}}";
         public const string Create          = $"{Base}";
         public const string Update          = $"{Base}/{{id:guid}}";
-        public const string GetByAccount    = $"{Base}/account/{{accountId:guid}}";
+        public const string GetByClient     = $"{Base}/clients/{{clientId:guid}}";
         public const string GetInstallments = $"{Base}/{{id:guid}}/installments";
     }
 }
