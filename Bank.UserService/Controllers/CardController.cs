@@ -46,6 +46,15 @@ public class CardController(ICardService service) : ControllerBase
         return result.ActionResult;
     }
 
+    [HttpPut(Endpoints.Card.UpdateStatusAsClient)]
+    //[Authorize(Roles = $"{Role.Client}")]
+    public async Task<ActionResult<CardResponse>> UpdateStatusAsClient([FromBody] CardStatusUpdateRequest cardStatusUpdateRequest, [FromRoute] Guid id)
+    {
+        var result = await m_CardService.Update(cardStatusUpdateRequest, id);
+
+        return result.ActionResult;
+    }
+
     [HttpPut(Endpoints.Card.UpdateClient)]
     //[Authorize(Roles = $"{Role.Client}")]
     public async Task<ActionResult<CardResponse>> UpdateLimit([FromBody] CardLimitUpdateRequest cardLimitUpdateRequest, [FromRoute] Guid id)

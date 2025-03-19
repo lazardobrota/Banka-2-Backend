@@ -19,6 +19,8 @@ public interface ILoanService
     Task<Result<LoanResponse>> Create(LoanRequest loanRequest);
 
     Task<Result<LoanResponse>> Update(LoanUpdateRequest loanRequest, Guid id);
+
+    Task<Result<Page<LoanResponse>>> GetByClient(Guid clientId, Pageable pageable);
 }
 
 public class LoanService(
@@ -96,5 +98,18 @@ public class LoanService(
         var loan        = await m_LoanRepository.Update(oldLoan, updatedLoan);
 
         return Result.Ok(loan.ToLoanResponse());
+    }
+
+    public async Task<Result<Page<LoanResponse>>> GetByClient(Guid clientId, Pageable pageable)
+    {
+        var page = await m_LoanRepository.FindByClientId(clientId, pageable);
+
+        if (page.Items.Count == 0)
+            return Result.NotFound<Page<LoanResponse>>($"No loans found for Client ID: {clientId}");
+
+        var loanResponses = page.Items.Select(loan => loan.ToLoanResponse())
+                                .ToList();
+
+        return Result.Ok(new Page<LoanResponse>(loanResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 }
