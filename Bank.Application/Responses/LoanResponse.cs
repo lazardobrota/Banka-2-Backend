@@ -1,4 +1,6 @@
-﻿namespace Bank.Application.Responses;
+﻿using Bank.Application.Domain;
+
+namespace Bank.Application.Responses;
 
 public class LoanResponse
 {
@@ -10,8 +12,8 @@ public class LoanResponse
     public DateOnly         CreationDate { get; set; }
     public DateOnly         MaturityDate { get; set; }
     public CurrencyResponse Currency     { get; set; }
-    public int              Status       { get; set; }
-    public int              InterestType { get; set; }
+    public LoanStatus       Status       { get; set; }
+    public InterestType     InterestType { get; set; }
     public DateTime         CreatedAt    { get; set; }
     public DateTime         ModifiedAt   { get; set; }
 }

@@ -24,6 +24,8 @@ public interface ICardRepository
     Task<Card> UpdateStatus(Guid id, bool status);
 
     Task<Card> UpdateLimit(Guid id, decimal limit);
+
+    Task<List<Card>> FindAllByClientId(Guid clientId);
 }
 
 public class CardRepository(ApplicationContext context) : ICardRepository
@@ -127,5 +129,14 @@ public class CardRepository(ApplicationContext context) : ICardRepository
 
         await m_Context.SaveChangesAsync();
         return card;
+    }
+
+    public async Task<List<Card>> FindAllByClientId(Guid clientId)
+    {
+        return await m_Context.Cards.Include(c => c.Account)
+                              .Include(c => c.Type)
+                              .Include(c => c.Account!.Client)
+                              .Where(c => c.Account != null && c.Account.ClientId == clientId)
+                              .ToListAsync();
     }
 }

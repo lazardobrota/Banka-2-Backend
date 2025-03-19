@@ -44,10 +44,6 @@ public class AccountValidator
             .NotEmpty()
             .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("AccountTypeId"));
 
-            RuleFor(accountRequest => accountRequest.Status)
-            .NotEmpty()
-            .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Status"));
-
             RuleFor(accountRequest => accountRequest.Balance)
             .NotEmpty()
             .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Balance"))

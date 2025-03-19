@@ -27,6 +27,7 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
         var query = this.m_Context.Loans.Include(l => l.LoanType)
                         .Include(l => l.Account)
                         .Include(l => l.Currency)
+                        .Include(l => l.Account.Client)
                         .AsQueryable();
 
         if (filter.LoanTypeId.HasValue)
@@ -68,6 +69,7 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
         return await this.m_Context.Loans.Include(l => l.LoanType)
                          .Include(l => l.Account)
                          .Include(l => l.Currency)
+                         .Include(l => l.Account.Client)
                          .FirstOrDefaultAsync(l => l.Id == id);
     }
 
@@ -80,10 +82,13 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
 
     public async Task<Loan> Update(Loan oldLoan, Loan loan)
     {
-        this.m_Context.Entry(oldLoan)
-            .CurrentValues.SetValues(loan);
+        m_Context.Entry(oldLoan)
+                 .State = EntityState.Detached;
+
+        var updatedLoan = m_Context.Loans.Update(loan);
 
         await m_Context.SaveChangesAsync();
-        return loan;
+
+        return updatedLoan.Entity;
     }
 }
