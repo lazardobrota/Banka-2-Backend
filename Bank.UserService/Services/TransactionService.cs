@@ -12,6 +12,8 @@ public interface ITransactionService
 {
     Task<Result<Page<TransactionResponse>>> GetAll(TransactionFilterQuery transactionFilterQuery, Pageable pageable);
 
+    Task<Result<Page<TransactionResponse>>> GetAllByAccountId(Guid accountId, TransactionFilterQuery transactionFilterQuery, Pageable pageable);
+
     Task<Result<TransactionResponse>> GetOne(Guid id);
 
     Task<Result<TransactionCreateResponse>> Create(TransactionCreateRequest transactionCreateRequest);
@@ -48,6 +50,20 @@ public class TransactionService(ITransactionRepository transactionRepository, IT
             return Result.Unauthorized<TransactionResponse>();
 
         return Result.Ok(transaction.ToResponse());
+    }
+
+    public async Task<Result<Page<TransactionResponse>>> GetAllByAccountId(Guid accountId, TransactionFilterQuery transactionFilterQuery, Pageable pageable)
+    {
+        var page = await m_TransactionRepository.FindAllByAccountId(accountId, transactionFilterQuery, pageable);
+
+        if (m_AuthorizationService.Role == Role.Client &&
+            page.Items.Any(transaction => transaction.FromAccount!.ClientId != m_AuthorizationService.UserId && transaction.ToAccount!.ClientId != m_AuthorizationService.UserId))
+            return Result.Forbidden<Page<TransactionResponse>>();
+
+        var transactionResponses = page.Items.Select(transaction => transaction.ToResponse())
+                                       .ToList();
+
+        return Result.Ok(new Page<TransactionResponse>(transactionResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
     public async Task<Result<TransactionCreateResponse>> Create(TransactionCreateRequest transactionCreateRequest)

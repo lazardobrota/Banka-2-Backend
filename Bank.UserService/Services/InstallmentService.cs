@@ -15,7 +15,7 @@ public interface IInstallmentService
 
     Task<Result<InstallmentResponse>> Create(InstallmentRequest request);
 
-    Task<Result<InstallmentResponse>> Update(InstallmentRequest request);
+    Task<Result<InstallmentResponse>> Update(InstallmentUpdateRequest request, Guid id);
 }
 
 public class InstallmentService : IInstallmentService
@@ -68,26 +68,14 @@ public class InstallmentService : IInstallmentService
         return Result.Ok(createdInstallment.ToResponse());
     }
 
-    public async Task<Result<InstallmentResponse>> Update(InstallmentRequest request)
+    public async Task<Result<InstallmentResponse>> Update(InstallmentUpdateRequest request, Guid id)
     {
-        var existingInstallment = await m_InstallmentRepository.FindById(request.InstallmentId);
+        var existingInstallment = await m_InstallmentRepository.FindById(id);
 
         if (existingInstallment == null)
-            return Result.NotFound<InstallmentResponse>($"Installment with ID {request.InstallmentId} not found");
+            return Result.NotFound<InstallmentResponse>($"Installment with ID {id} not found");
 
-        if (request.LoanId != existingInstallment.LoanId)
-        {
-            var loan = await m_LoanRepository.FindById(request.LoanId);
-
-            if (loan == null)
-                return Result.NotFound<InstallmentResponse>($"Loan with ID {request.LoanId} not found");
-        }
-
-        // TODO: Move this to mapper
-        var updatedInstallment = request.ToInstallment();
-        updatedInstallment.Id         = request.InstallmentId;
-        updatedInstallment.CreatedAt  = existingInstallment.CreatedAt;
-        updatedInstallment.ModifiedAt = DateTime.UtcNow;
+        var updatedInstallment = request.ToEntity(existingInstallment);
 
         var result = await m_InstallmentRepository.Update(existingInstallment, updatedInstallment);
 

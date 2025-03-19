@@ -46,9 +46,9 @@ public class InstallmentController(IInstallmentService installmentService) : Con
 
     [HttpPut(Endpoints.Installment.Update)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
-    public async Task<ActionResult<InstallmentResponse>> Update([FromBody] InstallmentRequest request)
+    public async Task<ActionResult<InstallmentResponse>> Update([FromBody] InstallmentUpdateRequest request, [FromRoute] Guid id)
     {
-        var result = await m_InstallmentService.Update(request);
+        var result = await m_InstallmentService.Update(request, id);
 
         return result.ActionResult;
     }

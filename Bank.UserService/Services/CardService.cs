@@ -6,6 +6,10 @@ using Bank.Application.Responses;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
 
+using Microsoft.EntityFrameworkCore;
+
+using Npgsql;
+
 namespace Bank.UserService.Services;
 
 public interface ICardService
@@ -59,9 +63,28 @@ public class CardService(ICardRepository repository, ICardTypeRepository cardTyp
         if (account == null)
             return Result.BadRequest<CardResponse>();
 
-        var card = await m_CardRepository.Add(cardCreateRequest.ToCard(cardType, account));
+        const int maxRetries = 5;
 
-        return Result.Ok(card.ToResponse());
+        for (int attempt = 0; attempt < maxRetries; attempt++)
+        {
+            try
+            {
+                var cardToCreate = cardCreateRequest.ToCard(cardType, account);
+
+                var card = await m_CardRepository.Add(cardToCreate);
+
+                return Result.Ok(card.ToResponse());
+            }
+            catch (DbUpdateException ex) when (IsDuplicateKeyException(ex))
+            {
+                if (attempt >= maxRetries - 1)
+                    return Result.BadRequest<CardResponse>("Failed to generate a unique card number after multiple attempts");
+
+                await Task.Delay(50 * (attempt + 1));
+            }
+        }
+
+        return Result.BadRequest<CardResponse>("Unexpected error creating card");
     }
 
     public async Task<Result<CardResponse>> Update(CardStatusUpdateRequest request, Guid id)
@@ -86,5 +109,11 @@ public class CardService(ICardRepository repository, ICardTypeRepository cardTyp
         var card = await m_CardRepository.Update(oldCard, request.ToCard(oldCard));
 
         return Result.Ok(card.ToResponse());
+    }
+
+    private bool IsDuplicateKeyException(DbUpdateException ex)
+    {
+        // For PostgreSQL
+        return ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505";
     }
 }
