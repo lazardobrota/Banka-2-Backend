@@ -25,6 +25,12 @@ public class Hooks
         public Task<Result> Send(EmailType type, User user) => Task.FromResult(Result.Ok());
     }
 
+    [BeforeTestRun]
+    public static void IncreaseResolutionTimeout()
+    {
+        Reqnroll.BoDi.ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromSeconds(10);
+    }
+
     [ScenarioDependencies]
     public static IServiceCollection CreateServices()
     {
@@ -34,7 +40,7 @@ public class Hooks
 
         services.AddServices();
         services.AddHttpServices();
-        services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase("test_bank_users"));
+        services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
         services.AddHostedServices();
 
         var serviceProvider = services.BuildServiceProvider();
@@ -50,8 +56,10 @@ public class Hooks
     public static void SeedDatabase(ApplicationContext context)
     {
         if (Configuration.Database.CreateDrop)
+        {
             context.Database.EnsureDeletedAsync()
                    .Wait();
+        }
 
         context.Database.EnsureCreatedAsync()
                .Wait();
@@ -99,6 +107,9 @@ public class Hooks
                .Wait();
 
         context.SeedTransactionCode()
+               .Wait();
+
+        context.SeedExchangeHardcoded()
                .Wait();
     }
 }
