@@ -1,4 +1,5 @@
 using Bank.Application.Endpoints;
+using Bank.Application.Extensions;
 using Bank.LoanService.Database.Seeders;
 using Bank.UserService.Application;
 using Bank.UserService.Configurations;
@@ -34,7 +35,12 @@ public class Hooks
     [ScenarioDependencies]
     public static IServiceCollection CreateServices()
     {
-        Env.Load(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\"));
+        var path = Directory.GetCurrentDirectory()
+                            .GetParent(3);
+
+        var beforeEnv = Configuration.Database.GetConnectionString();
+        Env.Load(Directory.GetCurrentDirectory().GetParent(3));
+        var afterEnv = Configuration.Database.GetConnectionString();
 
         var services = new ServiceCollection();
 
