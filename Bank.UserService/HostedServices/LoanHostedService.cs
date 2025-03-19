@@ -123,7 +123,7 @@ public class LoanHostedService
         }
     }
 
-    private async Task<bool> ProcessPaymentAsync(Loan loan, Installment installment, decimal paymentAmount, IAccountRepository accountRepository)
+    /*private async Task<bool> ProcessPaymentAsync(Loan loan, Installment installment, decimal paymentAmount, IAccountRepository accountRepository)
     {
         try
         {
@@ -169,7 +169,115 @@ public class LoanHostedService
             _logger.LogError(ex, $"Error processing payment for loan {loan.Id}, installment {installment.Id}");
             return false;
         }
+    }*/
+    
+    private async Task<bool> ProcessPaymentAsync(Loan loan, Installment installment, decimal paymentAmount, IAccountRepository accountRepository)
+{
+    try
+    {
+        // Get the account associated with the loan
+        var account = await accountRepository.FindById(loan.AccountId);
+
+        if (account == null)
+        {
+            _logger.LogWarning($"Account {loan.AccountId} not found for loan {loan.Id}");
+            return false;
+        }
+
+        // Check if account has sufficient funds
+        if (account.AvailableBalance < paymentAmount)
+        {
+            _logger.LogWarning($"Insufficient funds in account {account.Id} for loan payment. Available: {account.AvailableBalance}, Required: {paymentAmount}");
+            return false;
+        }
+
+        // Get necessary repositories
+        using var scope = _serviceProvider.CreateScope();
+        var transactionRepo = scope.ServiceProvider.GetRequiredService<ITransactionRepository>();
+        var transactionCodeRepo = scope.ServiceProvider.GetRequiredService<ITransactionCodeRepository>();
+        
+        // Get transaction code for loan payment
+        // Option 1: If you know the ID of the loan payment code
+        /*var loanPaymentCodeId = new Guid("known-guid-for-loan-payment-code"); // Replace with actual ID
+        var loanPaymentCode = await transactionCodeRepo.FindById(loanPaymentCodeId);*/
+        
+        var allCodes = await transactionCodeRepo.FindAll(new Pageable());  
+        var loanPaymentCode = allCodes.Items.FirstOrDefault(c => c.Code == "289");
+        
+        if (loanPaymentCode == null)
+        {
+            _logger.LogWarning("Loan payment transaction code not found");
+            return false;
+        }
+
+        // Create transaction for the loan payment
+        var transaction = new Transaction
+        {
+            Id = Guid.NewGuid(),
+            FromAccountId = account.Id,
+            ToAccountId = null, 
+            FromAmount = paymentAmount,
+            ToAmount = paymentAmount,
+            FromCurrencyId = loan.CurrencyId,
+            ToCurrencyId = loan.CurrencyId,
+            CodeId = loanPaymentCode.Id,
+            ReferenceNumber = $"LOAN-{loan.Id}-INST-{installment.Id}",
+            Purpose = $"Loan payment for loan #{loan.Id}, installment #{installment.Id}",
+            Status = TransactionStatus.Completed,
+            CreatedAt = DateTime.UtcNow,
+            ModifiedAt = DateTime.UtcNow
+        };
+
+        // Use transaction scope to ensure atomicity
+        using var transactionScope = new System.Transactions.TransactionScope(System.Transactions.TransactionScopeAsyncFlowOption.Enabled);
+        
+        try
+        {
+            // Update account balance
+            var updatedAccount = new Account
+            {
+                Id = account.Id,
+                ClientId = account.ClientId,
+                Name = account.Name,
+                Number = account.Number,
+                Balance = account.Balance - paymentAmount,
+                AvailableBalance = account.AvailableBalance - paymentAmount,
+                EmployeeId = account.EmployeeId,
+                CurrencyId = account.CurrencyId,
+                AccountTypeId = account.AccountTypeId,
+                AccountCurrencies = account.AccountCurrencies,
+                DailyLimit = account.DailyLimit,
+                MonthlyLimit = account.MonthlyLimit,
+                CreationDate = account.CreationDate,
+                ExpirationDate = account.ExpirationDate,
+                Status = account.Status,
+                CreatedAt = account.CreatedAt,
+                ModifiedAt = DateTime.UtcNow
+            };
+            
+            await accountRepository.Update(account, updatedAccount);
+            
+            // Save the transaction
+            await transactionRepo.Add(transaction);
+            
+            // Complete the transaction scope
+            transactionScope.Complete();
+            
+            _logger.LogInformation($"Payment of {paymentAmount} {loan.Currency?.Code} processed for loan {loan.Id}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error updating accounts during loan payment processing");
+            return false;
+        }
     }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, $"Error processing payment for loan {loan.Id}, installment {installment.Id}");
+        return false;
+    }
+}
 
     private async Task CreateNextInstallmentIfNeededAsync(Loan loan, Installment currentInstallment, ILoanRepository loanRepository, IInstallmentRepository installmentRepository)
     {
@@ -227,6 +335,7 @@ public class LoanHostedService
 
     private async Task<decimal> CalculateInstallmentAmount(Loan loan, Installment installment, IInstallmentRepository installmentRepository)
     {
+        
         // Get total monthly payment amount using amortization formula
         decimal monthlyPayment = CalculateMonthlyPayment(loan.Amount, loan.Period, GetEffectiveInterestRate(loan, installment));
 
@@ -253,13 +362,59 @@ public class LoanHostedService
         return effectiveRate;
     }
 
+    /*private async Task<decimal> GetRemainingPrincipal(Loan loan, Installment currentInstallment, IInstallmentRepository installmentRepository)
+        {
+            int paidInstallments = await installmentRepository.GetPaidInstallmentsCountBeforeDateAsync(loan.Id, currentInstallment.ExpectedDueDate);
+
+            // Calculate remaining principal
+            decimal principalPaidSoFar = (loan.Amount / loan.Period) * paidInstallments;
+            return loan.Amount - principalPaidSoFar;
+        }*/
+    
     private async Task<decimal> GetRemainingPrincipal(Loan loan, Installment currentInstallment, IInstallmentRepository installmentRepository)
     {
         int paidInstallments = await installmentRepository.GetPaidInstallmentsCountBeforeDateAsync(loan.Id, currentInstallment.ExpectedDueDate);
-
-        // Calculate remaining principal
-        decimal principalPaidSoFar = (loan.Amount / loan.Period) * paidInstallments;
-        return loan.Amount - principalPaidSoFar;
+    
+        if (paidInstallments == 0)
+            return loan.Amount; // No payments made yet
+    
+        // Starting values
+        decimal remainingPrincipal = loan.Amount;
+    
+        // For each paid installment, calculate how much principal was paid
+        for (int i = 0; i < paidInstallments; i++)
+        {
+            // Get the effective interest rate for this payment period
+            // This is simplified - ideally we would get the actual rate from each past installment
+            decimal effectiveRate = currentInstallment.InterestRate;
+            if (loan.InterestType == InterestType.Variable)
+            {
+                effectiveRate += loan.LoanType.Margin;
+                if (loan.Currency.Code != "RSD")
+                {
+                    // For simulation purposes, we're using a fixed rate
+                    // In reality, this would vary for each past payment
+                    effectiveRate += 3.0m; // Simplified EURIBOR estimate
+                }
+            }
+        
+            // Calculate monthly interest rate
+            decimal monthlyRate = effectiveRate / 1200;
+        
+            // Calculate interest for this period
+            decimal interestPayment = remainingPrincipal * monthlyRate;
+        
+            // Calculate total payment for this period
+            decimal monthlyPayment = CalculateMonthlyPayment(loan.Amount, loan.Period, effectiveRate);
+        
+            // Calculate principal payment (payment minus interest)
+            decimal principalPayment = monthlyPayment - interestPayment;
+        
+            // Reduce remaining principal
+            remainingPrincipal -= principalPayment;
+        }
+    
+        return remainingPrincipal;
     }
 
     private async Task<(decimal interest, decimal principal)> CalculatePaymentComponents(Loan                   loan, Installment installment, decimal paymentAmount,
@@ -314,4 +469,5 @@ public class LoanHostedService
             return loanAmount * monthlyRate * (decimal)pow / ((decimal)pow - 1);
         }
     }
+    
 }
