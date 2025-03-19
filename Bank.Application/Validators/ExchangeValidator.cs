@@ -1,4 +1,5 @@
-﻿using Bank.Application.Requests;
+﻿using Bank.Application.Queries;
+using Bank.Application.Requests;
 using Bank.Application.Utilities;
 
 using FluentValidation;
@@ -7,7 +8,7 @@ namespace Bank.Application.Validators;
 
 public static class ExchangeValidator
 {
-    public class ExchangeBetween : AbstractValidator<ExchangeBetweenRequest>
+    public class ExchangeBetween : AbstractValidator<ExchangeBetweenQuery>
     {
         public ExchangeBetween()
         {

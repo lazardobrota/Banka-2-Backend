@@ -25,10 +25,11 @@ public class TransactionController(ITransactionService transactionService) : Con
 
         return result.ActionResult;
     }
-    
+
     [Authorize]
     [HttpGet(Endpoints.Transaction.GetAllForAccount)]
-    public async Task<ActionResult<Page<TransactionResponse>>> GetAllByAccountId([FromRoute] Guid accountId, [FromQuery] TransactionFilterQuery transactionFilterQuery, [FromQuery] Pageable pageable)
+    public async Task<ActionResult<Page<TransactionResponse>>> GetAllByAccountId([FromRoute] Guid     accountId, [FromQuery] TransactionFilterQuery transactionFilterQuery,
+                                                                                 [FromQuery] Pageable pageable)
     {
         var result = await m_TransactionService.GetAllByAccountId(accountId, transactionFilterQuery, pageable);
 

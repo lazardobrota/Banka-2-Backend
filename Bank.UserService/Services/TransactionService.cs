@@ -13,7 +13,7 @@ public interface ITransactionService
     Task<Result<Page<TransactionResponse>>> GetAll(TransactionFilterQuery transactionFilterQuery, Pageable pageable);
 
     Task<Result<Page<TransactionResponse>>> GetAllByAccountId(Guid accountId, TransactionFilterQuery transactionFilterQuery, Pageable pageable);
-    
+
     Task<Result<TransactionResponse>> GetOne(Guid id);
 
     Task<Result<TransactionCreateResponse>> Create(TransactionCreateRequest transactionCreateRequest);

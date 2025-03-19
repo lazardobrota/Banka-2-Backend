@@ -30,10 +30,9 @@ public class ExchangeController(IExchangeService exchangeService) : ControllerBa
     }
 
     [HttpGet(Endpoints.Exchange.GetByCurrencies)]
-    public async Task<ActionResult<ExchangeResponse>> GetByCurrencies([FromQuery] ExchangeBetweenRequest exchangeBetweenRequest,
-                                                                      [FromQuery] ExchangeFilterQuery    exchangeFilterQuery)
+    public async Task<ActionResult<ExchangeResponse>> GetByCurrencies([FromQuery] ExchangeBetweenQuery exchangeBetweenQuery)
     {
-        var result = await m_ExchangeService.GetByCurrencies(exchangeBetweenRequest, exchangeFilterQuery);
+        var result = await m_ExchangeService.GetByCurrencies(exchangeBetweenQuery);
 
         return result.ActionResult;
     }
