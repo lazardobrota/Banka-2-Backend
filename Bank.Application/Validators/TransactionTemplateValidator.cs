@@ -48,10 +48,6 @@ public static class TransactionTemplateValidator
             .WithMessage(ValidationErrorMessage.Global.TextFixedLength("Account Number", 18))
             .Must(ValidatorUtilities.Global.ContainsOnlyNumbers)
             .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Account Number"));
-
-            RuleFor(request => request.Deleted)
-            .NotEmpty()
-            .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Deleted"));
         }
     }
 }
