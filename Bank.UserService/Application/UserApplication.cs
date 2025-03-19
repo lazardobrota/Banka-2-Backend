@@ -121,6 +121,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<DatabaseHostedService>();
         services.AddSingleton<ExchangeHostedService>();
+        services.AddSingleton<LoanHostedService>();
 
         services.AddHostedService<ApplicationHostedService>();
 
@@ -158,9 +159,8 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
-                                                                                                                                       .Jwt
-                                                                                                                                       .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
+                                                                                                                                                    .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,

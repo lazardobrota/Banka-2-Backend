@@ -18,6 +18,8 @@ public interface ILoanRepository
     Task<Loan> Update(Loan oldLoan, Loan loan);
 
     Task<List<Loan>> GetLoansWithDueInstallmentsAsync(DateTime dueDate);
+
+    Task<Page<Loan>> FindByClientId(Guid clientId, Pageable pageable);
 }
 
 public class LoanRepository(ApplicationContext context) : ILoanRepository
@@ -100,5 +102,23 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
                               .Include(l => l.Installments)
                               .Where(l => l.Status == LoanStatus.Active && l.Installments.Any(i => i.ExpectedDueDate.Date <= dueDate.Date && i.Status == InstallmentStatus.Pending))
                               .ToListAsync();
+    }
+
+    public async Task<Page<Loan>> FindByClientId(Guid clientId, Pageable pageable)
+    {
+        var query = m_Context.Loans.Include(l => l.LoanType)
+                             .Include(l => l.Account)
+                             .Include(l => l.Currency)
+                             .Include(l => l.Account.Client)
+                             .Where(l => l.Account.ClientId == clientId)
+                             .AsQueryable();
+
+        var total = await query.CountAsync();
+
+        var items = await query.Skip((pageable.Page - 1) * pageable.Size)
+                               .Take(pageable.Size)
+                               .ToListAsync();
+
+        return new Page<Loan>(items, pageable.Page, pageable.Size, total);
     }
 }

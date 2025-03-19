@@ -40,12 +40,11 @@ public class LoanController : ControllerBase
         return result.ActionResult;
     }
 
-    [Authorize]
-    [HttpGet(Endpoints.Loan.GetByAccount)]
-    public async Task<ActionResult<Page<LoanResponse>>> GetByAccount([FromRoute] Guid accountId, [FromQuery] Pageable pageable)
+    //[Authorize]
+    [HttpGet(Endpoints.Loan.GetByClient)]
+    public async Task<ActionResult<Page<LoanResponse>>> GetByClient([FromRoute] Guid clientId, [FromQuery] Pageable pageable)
     {
-        var loanFilterQuery = new LoanFilterQuery { AccountNumber = accountId.ToString() };
-        var result          = await m_LoanService.GetAll(loanFilterQuery, pageable);
+        var result = await m_LoanService.GetByClient(clientId, pageable);
 
         return result.ActionResult;
     }
