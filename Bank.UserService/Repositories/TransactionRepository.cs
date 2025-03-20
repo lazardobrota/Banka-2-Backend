@@ -48,6 +48,8 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
         if (filter.ToDate != DateOnly.MinValue)
             transactionQuery = transactionQuery.Where(transaction => DateOnly.FromDateTime(transaction.CreatedAt) <= filter.ToDate);
 
+        transactionQuery = transactionQuery.OrderByDescending(transaction => transaction.CreatedAt);
+
         var transactions = await transactionQuery.Skip((pageable.Page - 1) * pageable.Size)
                                                  .Take(pageable.Size)
                                                  .ToListAsync();
