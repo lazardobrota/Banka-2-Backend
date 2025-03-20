@@ -31,6 +31,7 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
         var query = m_Context.Loans.Include(l => l.LoanType)
                              .Include(l => l.Account)
                              .Include(l => l.Currency)
+                             .Include(l => l.Currency.Countries)
                              .Include(l => l.Account.Client)
                              .AsQueryable();
 
