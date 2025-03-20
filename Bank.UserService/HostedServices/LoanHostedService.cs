@@ -273,6 +273,7 @@ public class LoanHostedService
     public async Task<decimal> CalculateInstallmentAmount(Loan loan, Installment installment, IInstallmentRepository installmentRepository)
     {
         var loanAmountInRSD = await ConvertToRSD(loan.Amount, loan.Currency);
+        _logger.LogInformation($"Calculating installment amount for {loanAmountInRSD} AAAAAAAAAAAAAAAAAAAAAAA");
 
         var monthlyPayment = CalculateMonthlyPayment(loanAmountInRSD, loan.Period, await GetEffectiveInterestRate(loan));
 
@@ -381,6 +382,9 @@ public class LoanHostedService
 
     public async Task<decimal> ConvertToRSD(decimal amount, Currency currency)
     {
+        if (currency.Code == "RSD")
+            return amount;
+
         using var scope           = _serviceProvider.CreateScope();
         var       exchangeService = scope.ServiceProvider.GetRequiredService<IExchangeService>();
 

@@ -50,6 +50,7 @@ public class LoanController : ControllerBase
     }
 
     [HttpPost(Endpoints.Loan.Create)]
+
     [Authorize]
     public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanRequest loanRequest)
     {
@@ -69,9 +70,9 @@ public class LoanController : ControllerBase
 
     [Authorize]
     [HttpGet(Endpoints.Loan.GetInstallments)]
-    public async Task<ActionResult<Page<InstallmentResponse>>> GetInstallments([FromRoute] Guid loanId, [FromQuery] Pageable pageable)
+    public async Task<ActionResult<Page<InstallmentResponse>>> GetInstallments([FromRoute] Guid id, [FromQuery] Pageable pageable)
     {
-        var result = await m_LoanService.GetAllInstallments(loanId, pageable);
+        var result = await m_LoanService.GetAllInstallments(id, pageable);
 
         return result.ActionResult;
     }

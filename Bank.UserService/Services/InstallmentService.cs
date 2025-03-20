@@ -2,6 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.HostedServices;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
 
@@ -22,11 +23,13 @@ public class InstallmentService : IInstallmentService
 {
     private readonly IInstallmentRepository m_InstallmentRepository;
     private readonly ILoanRepository        m_LoanRepository;
+    private readonly LoanHostedService      m_LoanHostedService;
 
-    public InstallmentService(IInstallmentRepository installmentRepository, ILoanRepository loanRepository)
+    public InstallmentService(IInstallmentRepository installmentRepository, ILoanRepository loanRepository, LoanHostedService loanHostedService)
     {
         m_InstallmentRepository = installmentRepository;
         m_LoanRepository        = loanRepository;
+        m_LoanHostedService     = loanHostedService;
     }
 
     public async Task<Result<InstallmentResponse>> GetOne(Guid id)
@@ -36,7 +39,15 @@ public class InstallmentService : IInstallmentService
         if (installment == null)
             return Result.NotFound<InstallmentResponse>($"Installment with ID {id} not found");
 
-        return Result.Ok(installment.ToResponse());
+        var loan = await m_LoanRepository.FindById(installment.LoanId);
+
+        if (loan == null)
+            return Result.NotFound<InstallmentResponse>($"Loan for Installment with ID {id} not found");
+
+        var response = installment.ToResponse();
+        response.Amount = await m_LoanHostedService.CalculateInstallmentAmount(loan, installment, m_InstallmentRepository);
+
+        return Result.Ok(response);
     }
 
     public async Task<Result<Page<InstallmentResponse>>> GetAllByLoanId(Guid loanId, Pageable pageable)
@@ -48,8 +59,14 @@ public class InstallmentService : IInstallmentService
 
         var page = await m_InstallmentRepository.FindAllByLoanId(loanId, pageable);
 
-        var installmentResponses = page.Items.Select(i => i.ToResponse())
-                                       .ToList();
+        var installmentResponses = new List<InstallmentResponse>();
+
+        foreach (var installment in page.Items)
+        {
+            var response = installment.ToResponse();
+            response.Amount = await m_LoanHostedService.CalculateInstallmentAmount(loan, installment, m_InstallmentRepository);
+            installmentResponses.Add(response);
+        }
 
         return Result.Ok(new Page<InstallmentResponse>(installmentResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }

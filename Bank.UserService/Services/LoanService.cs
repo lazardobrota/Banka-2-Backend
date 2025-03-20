@@ -48,8 +48,13 @@ public class LoanService(
 
         foreach (var loan in page.Items)
         {
-            var response    = loan.ToLoanResponse();
-            var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+            var response        = loan.ToLoanResponse();
+            var currencyForLoan = await m_CurrencyRepository.FindById(loan.CurrencyId);
+
+            if (currencyForLoan == null)
+                return Result.NotFound<Page<LoanResponse>>($"No Currency for Loan found with Id: {loan.CurrencyId}");
+
+            var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, currencyForLoan);
             var nominalRate = m_LoanHostedService.GetBaseInterestRate(amountInRsd);
 
             if (loan.InterestType == InterestType.Variable)
