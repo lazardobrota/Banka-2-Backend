@@ -107,6 +107,21 @@ public class LoanHostedService
                     await installmentRepository.Update(installment, updatedInstallment);
                     _logger.LogInformation($"Installment {installment.Id} marked as paid");
 
+                    var client = await GetClientByLoan(loan, accountRepository);
+
+                    if (client != null)
+                    {
+                        // Izračunaj preostali dug
+                        var remainingBalance  = await GetRemainingPrincipal(loan, installmentRepository);
+                        var installmentAmount = await CalculateInstallmentAmount(loan, installment, installmentRepository);
+
+                        using (var scope = _serviceProvider.CreateScope())
+                        {
+                            var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                            await emailService.Send(EmailType.LoanInstallmentPaid, client, client.FirstName, installmentAmount, loan.Currency.Code, remainingBalance);
+                        }
+                    }
+
                     await CreateNextInstallmentIfNeededAsync(loan, installment, loanRepository, installmentRepository);
                 }
                 else
@@ -290,6 +305,8 @@ public class LoanHostedService
             effectiveRate += loan.LoanType.Margin;
 
             effectiveRate += GetCurrentEuriborRate();
+
+            effectiveRate /= 12;
         }
 
         return effectiveRate;
@@ -388,9 +405,6 @@ public class LoanHostedService
         using var scope           = _serviceProvider.CreateScope();
         var       exchangeService = scope.ServiceProvider.GetRequiredService<IExchangeService>();
 
-        if (currency.Code == "RSD")
-            return amount;
-
         var exchangeBetweenQuery = new ExchangeBetweenQuery
                                    {
                                        CurrencyFromCode = currency.Code,
@@ -402,5 +416,11 @@ public class LoanHostedService
         var convertedAmount = amount * result.Value.Rate;
 
         return convertedAmount;
+    }
+
+    private async Task<User?> GetClientByLoan(Loan loan, IAccountRepository accountRepository)
+    {
+        var account = await accountRepository.FindById(loan.AccountId);
+        return account?.Client;
     }
 }
