@@ -384,7 +384,7 @@ public class LoanHostedService
         using var scope           = _serviceProvider.CreateScope();
         var       exchangeService = scope.ServiceProvider.GetRequiredService<IExchangeService>();
 
-        if (currency.Name == "RSD")
+        if (currency.Code == "RSD")
             return amount;
 
         var exchangeBetweenQuery = new ExchangeBetweenQuery

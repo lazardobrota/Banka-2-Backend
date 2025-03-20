@@ -40,7 +40,7 @@ public class LoanController : ControllerBase
         return result.ActionResult;
     }
 
-    //[Authorize]
+    [Authorize]
     [HttpGet(Endpoints.Loan.GetByClient)]
     public async Task<ActionResult<Page<LoanResponse>>> GetByClient([FromRoute] Guid clientId, [FromQuery] Pageable pageable)
     {
@@ -50,7 +50,7 @@ public class LoanController : ControllerBase
     }
 
     [HttpPost(Endpoints.Loan.Create)]
-    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
+    [Authorize]
     public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanRequest loanRequest)
     {
         var result = await m_LoanService.Create(loanRequest);
