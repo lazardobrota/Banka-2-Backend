@@ -1,4 +1,5 @@
-﻿using Bank.LoanService.Database.Seeders;
+﻿using Bank.Application.Domain;
+using Bank.LoanService.Database.Seeders;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.Database.Seeders;
@@ -65,8 +66,13 @@ public class DatabaseHostedService(IServiceProvider serviceProvider, IHttpClient
         Context.SeedTransactionCode()
                .Wait();
 
-        Context.SeedExchange(m_HttpClientFactory.CreateClient())
-               .Wait();
+        if (Configuration.Application.Profile == Profile.Testing)
+            Context.SeedExchangeHardcoded()
+                   .Wait();
+
+        if (Configuration.Application.Profile != Profile.Testing)
+            Context.SeedExchange(m_HttpClientFactory.CreateClient())
+                   .Wait();
     }
 
     public void OnApplicationStopped() { }

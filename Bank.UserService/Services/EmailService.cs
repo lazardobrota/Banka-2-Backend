@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
 
+using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.UserService.Configurations;
 using Bank.UserService.Models;
@@ -40,6 +41,9 @@ public class EmailService(IEmailRepository emailRepository, IAuthorizationServic
             mailMessage.IsBodyHtml = true;
             mailMessage.To.Add(user.Email);
 
+            if (Configuration.Application.Profile == Profile.Testing)
+                return Result.Ok();
+            
             await client.SendMailAsync(mailMessage);
 
             return Result.Ok();
