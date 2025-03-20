@@ -40,7 +40,7 @@ public class LoanController : ControllerBase
         return result.ActionResult;
     }
 
-    //[Authorize]
+    [Authorize]
     [HttpGet(Endpoints.Loan.GetByClient)]
     public async Task<ActionResult<Page<LoanResponse>>> GetByClient([FromRoute] Guid clientId, [FromQuery] Pageable pageable)
     {
@@ -50,7 +50,7 @@ public class LoanController : ControllerBase
     }
 
     [HttpPost(Endpoints.Loan.Create)]
-    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
+    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}, {Role.Client}")]
     public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanRequest loanRequest)
     {
         var result = await m_LoanService.Create(loanRequest);
@@ -69,9 +69,9 @@ public class LoanController : ControllerBase
 
     [Authorize]
     [HttpGet(Endpoints.Loan.GetInstallments)]
-    public async Task<ActionResult<Page<InstallmentResponse>>> GetInstallments([FromRoute] Guid loanId, [FromQuery] Pageable pageable)
+    public async Task<ActionResult<Page<InstallmentResponse>>> GetInstallments([FromRoute] Guid id, [FromQuery] Pageable pageable)
     {
-        var result = await m_LoanService.GetAllInstallments(loanId, pageable);
+        var result = await m_LoanService.GetAllInstallments(id, pageable);
 
         return result.ActionResult;
     }
