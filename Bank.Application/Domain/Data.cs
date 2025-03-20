@@ -48,3 +48,11 @@ public enum InstallmentStatus
     Overdue,
     Cancelled
 }
+
+public enum Profile
+{
+    Development,
+    Testing,
+    Staging,
+    Production
+}

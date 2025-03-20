@@ -36,15 +36,17 @@ public static class StringExtensions
         return string.IsNullOrEmpty(value) ? value : char.ToLower(value[0]) + value[1..];
     }
 
-    public static string GetParent(this string path)
+    public static string UpDirectory(this string path)
     {
-        return Path.GetDirectoryName(path) ?? "";
+        var newPath = Path.GetDirectoryName(path);
+
+        return newPath != null ? newPath + Path.DirectorySeparatorChar : path;
     }
 
-    public static string GetParent(this string path, int count)
+    public static string UpDirectory(this string path, int count)
     {
         for (int index = 0; index < count; index++)
-            path = path.GetParent();
+            path = path[..^2].UpDirectory();
 
         return path;
     }

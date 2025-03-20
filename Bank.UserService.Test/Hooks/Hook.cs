@@ -1,10 +1,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Extensions;
-using Bank.LoanService.Database.Seeders;
 using Bank.UserService.Application;
-using Bank.UserService.Configurations;
-using Bank.UserService.Database;
-using Bank.UserService.Database.Seeders;
+using Bank.UserService.HostedServices;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
 using Bank.UserService.Services;
@@ -35,12 +32,7 @@ public class Hooks
     [ScenarioDependencies]
     public static IServiceCollection CreateServices()
     {
-        var path = Directory.GetCurrentDirectory()
-                            .GetParent(3);
-
-        var beforeEnv = Configuration.Database.GetConnectionString();
-        Env.Load(Directory.GetCurrentDirectory().GetParent(3));
-        var afterEnv = Configuration.Database.GetConnectionString();
+        Env.Load(Directory.GetCurrentDirectory().UpDirectory(3));
 
         var services = new ServiceCollection();
 
@@ -48,74 +40,12 @@ public class Hooks
         services.AddHttpServices();
         services.AddDatabase();
         services.AddHostedServices();
+        services.AddSwagger();
 
         var serviceProvider = services.BuildServiceProvider();
-
-        var context = serviceProvider.CreateScope()
-                                     .ServiceProvider.GetRequiredService<ApplicationContext>();
-
-        SeedDatabase(context);
+        
+        serviceProvider.GetRequiredService<DatabaseHostedService>().OnApplicationStarted();
 
         return services;
-    }
-
-    public static void SeedDatabase(ApplicationContext context)
-    {
-        if (Configuration.Database.CreateDrop)
-        {
-            context.Database.EnsureDeletedAsync()
-                   .Wait();
-        }
-
-        context.Database.EnsureCreatedAsync()
-               .Wait();
-
-        context.Database.EnsureCreatedAsync()
-               .Wait();
-
-        context.SeedClient()
-               .Wait();
-
-        context.SeedEmployee()
-               .Wait();
-
-        context.SeedCurrency()
-               .Wait();
-
-        context.SeedCountry()
-               .Wait();
-
-        context.SeedCompany()
-               .Wait();
-
-        context.SeedAccountType()
-               .Wait();
-
-        context.SeedAccount()
-               .Wait();
-
-        context.SeedLoanTypes()
-               .Wait();
-
-        context.SeedLoans()
-               .Wait();
-
-        context.SeedInstallments()
-               .Wait();
-
-        context.SeedAccountCurrency()
-               .Wait();
-
-        context.SeedCadType()
-               .Wait();
-
-        context.SeedCard()
-               .Wait();
-
-        context.SeedTransactionCode()
-               .Wait();
-
-        context.SeedExchangeHardcoded()
-               .Wait();
     }
 }
