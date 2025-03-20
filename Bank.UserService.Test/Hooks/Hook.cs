@@ -1,6 +1,10 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Extensions;
+using Bank.LoanService.Database.Seeders;
 using Bank.UserService.Application;
+using Bank.UserService.Configurations;
+using Bank.UserService.Database;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.HostedServices;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
@@ -32,7 +36,8 @@ public class Hooks
     [ScenarioDependencies]
     public static IServiceCollection CreateServices()
     {
-        Env.Load(Directory.GetCurrentDirectory().UpDirectory(3));
+        Env.Load(Directory.GetCurrentDirectory()
+                          .UpDirectory(3));
 
         var services = new ServiceCollection();
 
@@ -47,5 +52,68 @@ public class Hooks
         serviceProvider.GetRequiredService<DatabaseHostedService>().OnApplicationStarted();
 
         return services;
+    }
+
+    public static void SeedDatabase(ApplicationContext context)
+    {
+        if (Configuration.Database.CreateDrop)
+        {
+            context.Database.EnsureDeletedAsync()
+                   .Wait();
+        }
+
+        context.Database.EnsureCreatedAsync()
+               .Wait();
+
+        context.SeedClient()
+               .Wait();
+
+        context.SeedEmployee()
+               .Wait();
+
+        context.SeedCurrency()
+               .Wait();
+
+        context.SeedCountry()
+               .Wait();
+
+        context.SeedCompany()
+               .Wait();
+
+        context.SeedAccountType()
+               .Wait();
+
+        context.SeedAccount()
+               .Wait();
+
+        context.SeedLoanTypes()
+               .Wait();
+
+        context.SeedLoans()
+               .Wait();
+
+        context.SeedInstallments()
+               .Wait();
+
+        context.SeedAccountCurrency()
+               .Wait();
+
+        context.SeedCadType()
+               .Wait();
+
+        context.SeedCard()
+               .Wait();
+
+        context.SeedTransactionCode()
+               .Wait();
+
+        context.SeedExchangeHardcoded()
+               .Wait();
+
+        context.SeedTransaction()
+               .Wait();
+        
+        context.SeedTransactionTemplate()
+               .Wait();
     }
 }

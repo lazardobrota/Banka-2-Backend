@@ -65,8 +65,14 @@ public class DatabaseHostedService(IServiceProvider serviceProvider, IHttpClient
 
         Context.SeedTransactionCode()
                .Wait();
+        
+        Context.SeedTransaction()
+               .Wait();
+        
+        Context.SeedTransactionTemplate()
+               .Wait();
 
-        if (Configuration.Application.Profile == Profile.Testing)
+        if (Configuration.Application.Profile != Profile.Testing)
             Context.SeedExchangeHardcoded()
                    .Wait();
 
