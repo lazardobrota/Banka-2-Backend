@@ -3,6 +3,7 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.HostedServices;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
 
@@ -28,21 +29,37 @@ public class LoanService(
     ILoanTypeRepository    loanTypeRepository,
     IAccountRepository     accountRepository,
     ICurrencyRepository    currencyRepository,
-    IInstallmentRepository installmentRepository
+    IInstallmentRepository installmentRepository,
+    LoanHostedService      loanHostedService
 ) : ILoanService
 {
-    private readonly ILoanRepository        m_LoanRepository        = loanRepository;
-    private readonly ILoanTypeRepository    m_LoanTypeRepository    = loanTypeRepository;
     private readonly IAccountRepository     m_AccountRepository     = accountRepository;
     private readonly ICurrencyRepository    m_CurrencyRepository    = currencyRepository;
     private readonly IInstallmentRepository m_InstallmentRepository = installmentRepository;
+    private readonly LoanHostedService      m_LoanHostedService     = loanHostedService;
+    private readonly ILoanRepository        m_LoanRepository        = loanRepository;
+    private readonly ILoanTypeRepository    m_LoanTypeRepository    = loanTypeRepository;
 
     public async Task<Result<Page<LoanResponse>>> GetAll(LoanFilterQuery loanFilterQuery, Pageable pageable)
     {
         var page = await m_LoanRepository.FindAll(loanFilterQuery, pageable);
 
-        var loanResponses = page.Items.Select(loan => loan.ToLoanResponse())
-                                .ToList();
+        var loanResponses = new List<LoanResponse>();
+
+        foreach (var loan in page.Items)
+        {
+            var response    = loan.ToLoanResponse();
+            var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+            var nominalRate = m_LoanHostedService.GetBaseInterestRate(amountInRsd);
+
+            if (loan.InterestType == InterestType.Variable)
+                nominalRate = nominalRate + loan.LoanType.Margin;
+
+            response.RemainingAmount        = await m_LoanHostedService.GetRemainingPrincipal(loan, m_InstallmentRepository);
+            response.NominalInstallmentRate = nominalRate;
+
+            loanResponses.Add(response);
+        }
 
         return Result.Ok(new Page<LoanResponse>(loanResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
@@ -69,7 +86,17 @@ public class LoanService(
         if (loan is null)
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
-        return Result.Ok(loan.ToLoanResponse());
+        var response    = loan.ToLoanResponse();
+        var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+        var nominalRate = m_LoanHostedService.GetBaseInterestRate(amountInRsd);
+
+        if (loan.InterestType == InterestType.Variable)
+            nominalRate = nominalRate + loan.LoanType.Margin;
+
+        response.RemainingAmount        = await m_LoanHostedService.GetRemainingPrincipal(loan, m_InstallmentRepository);
+        response.NominalInstallmentRate = nominalRate;
+
+        return Result.Ok(response);
     }
 
     public async Task<Result<LoanResponse>> Create(LoanRequest loanRequest)
@@ -96,6 +123,22 @@ public class LoanService(
 
         var updatedLoan = loanRequest.ToLoan(oldLoan);
         var loan        = await m_LoanRepository.Update(oldLoan, updatedLoan);
+        var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+
+        if (loan.Status == LoanStatus.Active)
+        {
+            var installment = new InstallmentRequest
+                              {
+                                  InstallmentId   = Guid.NewGuid(),
+                                  LoanId          = loan.Id,
+                                  InterestRate    = m_LoanHostedService.GetBaseInterestRate(amountInRsd),
+                                  ExpectedDueDate = DateOnly.FromDateTime(DateTime.UtcNow.AddMonths(1)),
+                                  ActualDueDate   = DateOnly.FromDateTime(DateTime.UtcNow),
+                                  Status          = InstallmentStatus.Pending
+                              };
+
+            await m_InstallmentRepository.Add(installment.ToInstallment());
+        }
 
         return Result.Ok(loan.ToLoanResponse());
     }

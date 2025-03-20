@@ -35,4 +35,17 @@ public static class StringExtensions
     {
         return string.IsNullOrEmpty(value) ? value : char.ToLower(value[0]) + value[1..];
     }
+
+    public static string GetParent(this string path)
+    {
+        return Path.GetDirectoryName(path) ?? "";
+    }
+
+    public static string GetParent(this string path, int count)
+    {
+        for (int index = 0; index < count; index++)
+            path = path.GetParent();
+
+        return path;
+    }
 }

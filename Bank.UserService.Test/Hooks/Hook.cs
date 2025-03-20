@@ -1,4 +1,5 @@
 using Bank.Application.Endpoints;
+using Bank.Application.Extensions;
 using Bank.LoanService.Database.Seeders;
 using Bank.UserService.Application;
 using Bank.UserService.Configurations;
@@ -10,9 +11,9 @@ using Bank.UserService.Services;
 
 using DotNetEnv;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+using Reqnroll.BoDi;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;
 
 namespace Bank.UserService.Test.Hooks;
@@ -25,16 +26,27 @@ public class Hooks
         public Task<Result> Send(EmailType type, User user) => Task.FromResult(Result.Ok());
     }
 
+    [BeforeTestRun]
+    public static void IncreaseResolutionTimeout()
+    {
+        ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromSeconds(10);
+    }
+
     [ScenarioDependencies]
     public static IServiceCollection CreateServices()
     {
-        Env.Load(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\"));
+        var path = Directory.GetCurrentDirectory()
+                            .GetParent(3);
+
+        var beforeEnv = Configuration.Database.GetConnectionString();
+        Env.Load(Directory.GetCurrentDirectory().GetParent(3));
+        var afterEnv = Configuration.Database.GetConnectionString();
 
         var services = new ServiceCollection();
 
         services.AddServices();
         services.AddHttpServices();
-        services.AddDbContext<ApplicationContext>(options => options.UseInMemoryDatabase("test_bank_users"));
+        services.AddDatabase();
         services.AddHostedServices();
 
         var serviceProvider = services.BuildServiceProvider();
@@ -50,8 +62,10 @@ public class Hooks
     public static void SeedDatabase(ApplicationContext context)
     {
         if (Configuration.Database.CreateDrop)
+        {
             context.Database.EnsureDeletedAsync()
                    .Wait();
+        }
 
         context.Database.EnsureCreatedAsync()
                .Wait();
@@ -99,6 +113,9 @@ public class Hooks
                .Wait();
 
         context.SeedTransactionCode()
+               .Wait();
+
+        context.SeedExchangeHardcoded()
                .Wait();
     }
 }

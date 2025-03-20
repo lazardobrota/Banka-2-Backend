@@ -13,8 +13,8 @@ public static class InstallmentMapper
                    Id              = Guid.NewGuid(),
                    LoanId          = request.LoanId,
                    InterestRate    = request.InterestRate,
-                   ExpectedDueDate = request.ExpectedDueDate.ToDateTime(TimeOnly.MinValue),
-                   ActualDueDate   = request.ActualDueDate.ToDateTime(TimeOnly.MinValue),
+                   ExpectedDueDate = DateTime.SpecifyKind(request.ExpectedDueDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc),
+                   ActualDueDate   = DateTime.SpecifyKind(request.ActualDueDate.ToDateTime(TimeOnly.MinValue),   DateTimeKind.Utc),
                    Status          = request.Status,
                    CreatedAt       = DateTime.UtcNow,
                    ModifiedAt      = DateTime.UtcNow
