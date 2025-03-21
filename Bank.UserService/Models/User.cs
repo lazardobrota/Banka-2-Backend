@@ -17,6 +17,8 @@ public class User
     public          string?                   Password                   { set;  get; }
     public          Guid                      Salt                       { set;  get; }
     public required Role                      Role                       { set;  get; }
+    public          Bank?                     Bank                       { set;  get; }
+    public required Guid                      BankId                     { set;  get; }
     public          string?                   Department                 { set;  get; }
     public          List<Account>             Accounts                   { init; get; } = [];
     public          List<TransactionTemplate> TransactionTemplates       { init; get; } = [];
@@ -62,6 +64,8 @@ public class Client
     public          string?                   Password                   { set;  get; }
     public          Guid                      Salt                       { set;  get; }
     public required Role                      Role                       { set;  get; }
+    public          Bank?                     Bank                       { set;  get; }
+    public required Guid                      BankId                     { set;  get; }
     public          List<Account>             Accounts                   { init; get; } = [];
     public          List<TransactionTemplate> TransactionTemplates       { init; get; } = [];
 

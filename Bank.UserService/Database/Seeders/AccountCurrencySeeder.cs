@@ -109,13 +109,13 @@ public static partial class Seeder
         public static readonly AccountCurrencyModel ForeignAccount01USDollar = new()
                                                                                {
                                                                                    Id               = Guid.Parse("98dbae1e-ba52-4b84-9fea-0f4b2ef4320f"),
-                                                                                   Balance          = 0,
-                                                                                   AvailableBalance = 0,
+                                                                                   Balance          = 500,
+                                                                                   AvailableBalance = 500,
                                                                                    AccountId        = Account.ForeignAccount01.Id,
                                                                                    EmployeeId       = Employee.Employee01.Id,
                                                                                    CurrencyId       = Currency.USDollar.Id,
-                                                                                   DailyLimit       = 0,
-                                                                                   MonthlyLimit     = 0,
+                                                                                   DailyLimit       = 1000,
+                                                                                   MonthlyLimit     = 1000,
                                                                                    CreatedAt        = DateTime.UtcNow,
                                                                                    ModifiedAt       = DateTime.UtcNow,
                                                                                };
@@ -123,13 +123,13 @@ public static partial class Seeder
         public static readonly AccountCurrencyModel ForeignAccount01BritishPound = new()
                                                                                    {
                                                                                        Id               = Guid.Parse("107aa7e2-f074-42bc-bbd1-08bcacea7c42"),
-                                                                                       Balance          = 0,
-                                                                                       AvailableBalance = 0,
+                                                                                       Balance          = 200,
+                                                                                       AvailableBalance = 200,
                                                                                        AccountId        = Account.ForeignAccount01.Id,
                                                                                        EmployeeId       = Employee.Employee01.Id,
                                                                                        CurrencyId       = Currency.BritishPound.Id,
-                                                                                       DailyLimit       = 0,
-                                                                                       MonthlyLimit     = 0,
+                                                                                       DailyLimit       = 1000,
+                                                                                       MonthlyLimit     = 1000,
                                                                                        CreatedAt        = DateTime.UtcNow,
                                                                                        ModifiedAt       = DateTime.UtcNow,
                                                                                    };
@@ -137,13 +137,13 @@ public static partial class Seeder
         public static readonly AccountCurrencyModel ForeignAccount01CanadianDollar = new()
                                                                                      {
                                                                                          Id               = Guid.Parse("cae02aaa-06e5-4196-9cc9-03c11cee1516"),
-                                                                                         Balance          = 0,
-                                                                                         AvailableBalance = 0,
+                                                                                         Balance          = 100,
+                                                                                         AvailableBalance = 100,
                                                                                          AccountId        = Account.ForeignAccount01.Id,
                                                                                          EmployeeId       = Employee.Employee03.Id,
                                                                                          CurrencyId       = Currency.CanadianDollar.Id,
-                                                                                         DailyLimit       = 0,
-                                                                                         MonthlyLimit     = 0,
+                                                                                         DailyLimit       = 1000,
+                                                                                         MonthlyLimit     = 1000,
                                                                                          CreatedAt        = DateTime.UtcNow,
                                                                                          ModifiedAt       = DateTime.UtcNow,
                                                                                      };
@@ -151,13 +151,13 @@ public static partial class Seeder
         public static readonly AccountCurrencyModel ForeignAccount02CanadianDollar = new()
                                                                                      {
                                                                                          Id               = Guid.Parse("5b17f090-c895-47c5-af90-4c72892fdc40"),
-                                                                                         Balance          = 0,
-                                                                                         AvailableBalance = 0,
+                                                                                         Balance          = 900,
+                                                                                         AvailableBalance = 900,
                                                                                          AccountId        = Account.ForeignAccount02.Id,
                                                                                          EmployeeId       = Employee.Employee02.Id,
                                                                                          CurrencyId       = Currency.CanadianDollar.Id,
-                                                                                         DailyLimit       = 0,
-                                                                                         MonthlyLimit     = 0,
+                                                                                         DailyLimit       = 1000,
+                                                                                         MonthlyLimit     = 1000,
                                                                                          CreatedAt        = DateTime.UtcNow,
                                                                                          ModifiedAt       = DateTime.UtcNow,
                                                                                      };

@@ -3,6 +3,7 @@ using System.Text;
 
 using Bank.Application;
 using Bank.Application.Domain;
+using Bank.UserService.BackgroundServices;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.HostedServices;
@@ -36,6 +37,7 @@ public class UserApplication
         builder.Services.AddServices();
         builder.Services.AddDatabase();
         builder.Services.AddHostedServices();
+        builder.Services.AddBackgroundServices();
         builder.Services.AddHttpServices();
 
         builder.Services.AddCors();
@@ -69,6 +71,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddScoped<IBankRepository, BankRepository>();
+        services.AddScoped<IBankService, BankService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUserService, Services.UserService>();
@@ -107,6 +111,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInstallmentService, InstallmentService>();
         services.AddScoped<ILoanTypeService, LoanTypeService>();
 
+        return services;
+    }
+    
+    public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
+    {
+        services.AddSingleton<TransactionBackgroundService>();
+        
         return services;
     }
 
@@ -162,8 +173,9 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
-                                                                                                                                                    .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
+                                                                                                                                       .Jwt
+                                                                                                                                       .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,

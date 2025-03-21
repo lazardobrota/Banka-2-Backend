@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
 using EmployeeResponse = Bank.Application.Responses.EmployeeResponse;
@@ -100,6 +101,7 @@ public static class UserMapper
                    Password                   = employee.Password,
                    Salt                       = employee.Salt,
                    Role                       = employee.Role,
+                   BankId                     = Seeder.Bank.Bank02.Id,
                    Department                 = employee.Department,
                    CreatedAt                  = employee.CreatedAt,
                    ModifiedAt                 = employee.ModifiedAt,
@@ -259,6 +261,7 @@ public static class UserMapper
                    Salt                       = Guid.NewGuid(),
                    Address                    = clientCreateRequest.Address,
                    Role                       = Role.Client,
+                   BankId                     = Seeder.Bank.Bank02.Id,
                    CreatedAt                  = DateTime.UtcNow,
                    ModifiedAt                 = DateTime.UtcNow,
                    Activated                  = false
@@ -282,6 +285,7 @@ public static class UserMapper
                    Password                   = oldClient.Password,
                    Salt                       = oldClient.Salt,
                    Role                       = oldClient.Role,
+                   BankId                     = Seeder.Bank.Bank02.Id,
                    CreatedAt                  = oldClient.CreatedAt,
                    ModifiedAt                 = DateTime.UtcNow
                };
@@ -304,6 +308,7 @@ public static class UserMapper
                    Password                   = client.Password,
                    Salt                       = client.Salt,
                    Role                       = client.Role,
+                   BankId                     = Seeder.Bank.Bank02.Id,
                    Department                 = null,
                    CreatedAt                  = client.CreatedAt,
                    ModifiedAt                 = client.ModifiedAt,
@@ -328,6 +333,7 @@ public static class UserMapper
                    Password                   = user.Password,
                    Salt                       = user.Salt,
                    Role                       = user.Role,
+                   BankId                     = Seeder.Bank.Bank02.Id,
                    CreatedAt                  = user.CreatedAt,
                    ModifiedAt                 = user.ModifiedAt,
                    Activated                  = user.Activated

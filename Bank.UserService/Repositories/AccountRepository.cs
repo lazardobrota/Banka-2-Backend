@@ -15,6 +15,8 @@ public interface IAccountRepository
 
     Task<Account?> FindById(Guid id);
 
+    Task<Account?> FindByNumber(string number);
+
     Task<Account> Add(Account account);
 
     Task<Account> Update(Account oldAccount, Account account);
@@ -27,6 +29,7 @@ public class AccountRepository(ApplicationContext context) : IAccountRepository
     public async Task<Page<Account>> FindAll(AccountFilterQuery accountFilterQuery, Pageable pageable)
     {
         var accountQuery = m_Context.Accounts.Include(account => account.Client)
+                                    .Include(account => account.Client!.Bank)
                                     .Include(account => account.Employee)
                                     .Include(account => account.Currency)
                                     .Include(account => account.AccountCurrencies)
@@ -69,6 +72,7 @@ public class AccountRepository(ApplicationContext context) : IAccountRepository
     public async Task<Page<Account>> FindAllByClientId(Guid clientId, Pageable pageable)
     {
         var accounts = await m_Context.Accounts.Include(account => account.Client)
+                                      .Include(account => account.Client!.Bank)
                                       .Include(account => account.Employee)
                                       .Include(account => account.Currency)
                                       .Include(account => account.AccountCurrencies)
@@ -86,11 +90,23 @@ public class AccountRepository(ApplicationContext context) : IAccountRepository
     public async Task<Account?> FindById(Guid id)
     {
         return await m_Context.Accounts.Include(account => account.Client)
+                              .Include(account => account.Client!.Bank)
                               .Include(account => account.Employee)
                               .Include(account => account.Currency)
                               .Include(account => account.AccountCurrencies)
                               .Include(account => account.Type)
                               .FirstOrDefaultAsync(a => a.Id == id);
+    }
+
+    public async Task<Account?> FindByNumber(string number)
+    {
+        return await m_Context.Accounts.Include(account => account.Client)
+                              .Include(account => account.Client!.Bank)
+                              .Include(account => account.Employee)
+                              .Include(account => account.Currency)
+                              .Include(account => account.AccountCurrencies)
+                              .Include(account => account.Type)
+                              .FirstOrDefaultAsync(a => a.Number == number);
     }
 
     public async Task<Account> Add(Account account)

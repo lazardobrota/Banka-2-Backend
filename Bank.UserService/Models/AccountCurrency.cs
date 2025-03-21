@@ -1,6 +1,8 @@
-﻿namespace Bank.UserService.Models;
+﻿using Bank.UserService.Functions;
 
-public class AccountCurrency
+namespace Bank.UserService.Models;
+
+public class AccountCurrency : IAccountBalance
 {
     public required Guid      Id               { set; get; }
     public          Account?  Account          { set; get; }
@@ -15,4 +17,23 @@ public class AccountCurrency
     public required decimal   MonthlyLimit     { set; get; }
     public required DateTime  CreatedAt        { set; get; }
     public required DateTime  ModifiedAt       { set; get; }
+    
+    public bool ChangeAvailableBalance(decimal amount)
+    {
+        AvailableBalance += amount;
+        
+        return true;
+    }
+    
+    public bool ChangeBalance(decimal amount)
+    {
+        Balance += amount;
+        
+        return true;
+    }
+
+    public decimal GetAvailableBalance()
+    {
+        return AvailableBalance;
+    }
 }

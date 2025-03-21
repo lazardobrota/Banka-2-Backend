@@ -2,6 +2,7 @@
 using Bank.Application.Queries;
 using Bank.Application.Utilities;
 using Bank.UserService.Database;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,11 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 
     public async Task<Page<User>> FindAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
-        var userQuery = m_Context.Users.AsQueryable();
+        var userQuery = m_Context.Users.Include(user => user.Bank)
+                                 .Include(user => user.Accounts)
+                                 .AsQueryable();
+
+        userQuery = userQuery.Where(user => user.BankId == Seeder.Bank.Bank02.Id);
 
         if (!string.IsNullOrEmpty(userFilterQuery.FirstName))
             userQuery = userQuery.Where(user => EF.Functions.ILike(user.FirstName, $"%{userFilterQuery.FirstName}%"));
@@ -54,12 +59,16 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 
     public async Task<User?> FindById(Guid id)
     {
-        return await m_Context.Users.FirstOrDefaultAsync(x => x.Id == id);
+        return await m_Context.Users.Include(user => user.Bank)
+                              .Include(user => user.Accounts)
+                              .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<User?> FindByEmail(string email)
     {
-        return await m_Context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return await m_Context.Users.Include(user => user.Bank)
+                              .Include(user => user.Accounts)
+                              .FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<User> Add(User user)

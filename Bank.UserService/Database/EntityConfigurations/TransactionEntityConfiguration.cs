@@ -15,31 +15,34 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
                .IsRequired();
 
         builder.Property(transaction => transaction.FromAccountId)
-               .IsRequired();
+               .IsRequired(false);
 
-        builder.Property(transaction => transaction.ToAccountId)
+        builder.Property(transaction => transaction.FromCurrencyId)
                .IsRequired(false);
 
         builder.Property(transaction => transaction.FromAmount)
                .IsRequired();
 
-        builder.Property(transaction => transaction.FromCurrencyId)
-               .IsRequired();
+        builder.Property(transaction => transaction.ToAccountId)
+               .IsRequired(false);
+
+        builder.Property(transaction => transaction.ToCurrencyId)
+               .IsRequired(false);
 
         builder.Property(transaction => transaction.ToAmount)
                .IsRequired();
 
-        builder.Property(transaction => transaction.ToCurrencyId)
-               .IsRequired();
-
         builder.Property(transaction => transaction.ReferenceNumber)
                .HasMaxLength(20)
-               .IsRequired();
+               .IsRequired(false);
 
         builder.Property(transaction => transaction.Purpose)
                .HasMaxLength(1024)
-               .IsRequired();
+               .IsRequired(false);
 
+        builder.Property(transaction => transaction.CodeId)
+               .IsRequired();
+        
         builder.Property(transaction => transaction.Status)
                .IsRequired();
 
