@@ -24,6 +24,9 @@ public class DatabaseHostedService(IServiceProvider serviceProvider, IHttpClient
         Context.Database.EnsureCreatedAsync()
                .Wait();
 
+        Context.SeedBank()
+               .Wait();
+        
         Context.SeedClient()
                .Wait();
 

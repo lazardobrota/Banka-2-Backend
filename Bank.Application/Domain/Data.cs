@@ -20,6 +20,7 @@ public enum TransactionStatus
     Invalid,
     Pending,
     Canceled,
+    Affirm,
     Completed,
     Failed
 }

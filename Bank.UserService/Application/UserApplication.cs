@@ -69,6 +69,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddScoped<IBankRepository, BankRepository>();
+        services.AddScoped<IBankService, BankService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUserService, Services.UserService>();
@@ -162,8 +164,9 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
-                                                                                                                                                    .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
+                                                                                                                                       .Jwt
+                                                                                                                                       .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,
