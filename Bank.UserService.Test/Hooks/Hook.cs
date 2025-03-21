@@ -1,10 +1,6 @@
-using Bank.Application.Endpoints;
 using Bank.Application.Extensions;
 using Bank.UserService.Application;
 using Bank.UserService.HostedServices;
-using Bank.UserService.Models;
-using Bank.UserService.Repositories;
-using Bank.UserService.Services;
 
 using DotNetEnv;
 
@@ -18,11 +14,6 @@ namespace Bank.UserService.Test.Hooks;
 [Binding]
 public class Hooks
 {
-    private class DontSendEmailService : IEmailService
-    {
-        public Task<Result> Send(EmailType type, User user) => Task.FromResult(Result.Ok());
-    }
-
     [BeforeTestRun]
     public static void IncreaseResolutionTimeout()
     {
@@ -32,7 +23,8 @@ public class Hooks
     [ScenarioDependencies]
     public static IServiceCollection CreateServices()
     {
-        Env.Load(Directory.GetCurrentDirectory().UpDirectory(3));
+        Env.Load(Directory.GetCurrentDirectory()
+                          .UpDirectory(3));
 
         var services = new ServiceCollection();
 
@@ -43,8 +35,9 @@ public class Hooks
         services.AddSwagger();
 
         var serviceProvider = services.BuildServiceProvider();
-        
-        serviceProvider.GetRequiredService<DatabaseHostedService>().OnApplicationStarted();
+
+        serviceProvider.GetRequiredService<DatabaseHostedService>()
+                       .OnApplicationStarted();
 
         return services;
     }

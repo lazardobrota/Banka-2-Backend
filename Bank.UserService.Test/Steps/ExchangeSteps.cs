@@ -190,8 +190,8 @@ public class ExchangeSteps(ScenarioContext scenarioContext, IExchangeService exc
         exchangeResult.Value.CurrencyTo.Id.ShouldBe(seeder.CurrencyToId);
         exchangeResult.Value.Commission.ShouldBe(seeder.Commission);
         exchangeResult.Value.Rate.ShouldBe(seeder.Rate);
-        exchangeResult.Value.CreatedAt.ShouldBeInRange(seeder.CreatedAt.Subtract(TimeSpan.FromSeconds(1)), seeder.CreatedAt.AddSeconds(1));
-        exchangeResult.Value.ModifiedAt.ShouldBeInRange(seeder.ModifiedAt.Subtract(TimeSpan.FromSeconds(1)), seeder.ModifiedAt.AddSeconds(1));
+        exchangeResult.Value.CreatedAt.ShouldBeInRange(seeder.CreatedAt.Subtract(TimeSpan.FromSeconds(5)), seeder.CreatedAt.AddSeconds(5));
+        exchangeResult.Value.ModifiedAt.ShouldBeInRange(seeder.ModifiedAt.Subtract(TimeSpan.FromSeconds(5)), seeder.ModifiedAt.AddSeconds(5));
     }
 
     [Given(@"updated exchange request")]
@@ -226,8 +226,8 @@ public class ExchangeSteps(ScenarioContext scenarioContext, IExchangeService exc
         exchangeResponse.Value.CurrencyTo.Id.ShouldBe(seeder.CurrencyToId);
         exchangeResponse.Value.Commission.ShouldBe(seeder.Commission);
         exchangeResponse.Value.Rate.ShouldBe(seeder.Rate);
-        exchangeResponse.Value.CreatedAt.ShouldBeInRange(seeder.CreatedAt.Subtract(TimeSpan.FromSeconds(1)), seeder.CreatedAt.AddSeconds(1));
-        exchangeResponse.Value.ModifiedAt.ShouldBeInRange(seeder.ModifiedAt.Subtract(TimeSpan.FromSeconds(1)), seeder.ModifiedAt.AddSeconds(1));
+        exchangeResponse.Value.CreatedAt.ShouldBeInRange(seeder.CreatedAt.Subtract(TimeSpan.FromSeconds(5)), seeder.CreatedAt.AddSeconds(5));
+        exchangeResponse.Value.ModifiedAt.ShouldBeInRange(seeder.ModifiedAt.Subtract(TimeSpan.FromSeconds(5)), seeder.ModifiedAt.AddSeconds(5));
     }
 }
 

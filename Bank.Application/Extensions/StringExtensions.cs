@@ -46,7 +46,8 @@ public static class StringExtensions
     public static string UpDirectory(this string path, int count)
     {
         for (int index = 0; index < count; index++)
-            path = path[..^2].UpDirectory();
+            path = path[..^2]
+            .UpDirectory();
 
         return path;
     }

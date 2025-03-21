@@ -50,7 +50,6 @@ public class LoanController : ControllerBase
     }
 
     [HttpPost(Endpoints.Loan.Create)]
-
     [Authorize]
     public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanRequest loanRequest)
     {

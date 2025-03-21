@@ -63,7 +63,7 @@ public static partial class Example
 
             public static readonly Pageable Pageable = new()
                                                        {
-                                                           Page = 0,
+                                                           Page = 1,
                                                            Size = 10
                                                        };
         }
