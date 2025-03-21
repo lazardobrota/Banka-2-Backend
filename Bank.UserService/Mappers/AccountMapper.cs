@@ -11,7 +11,7 @@ public static class AccountMapper
         return new AccountResponse
                {
                    Id            = account.Id,
-                   AccountNumber = account.Number,
+                   AccountNumber = account.AccountNumber,
                    Name          = account.Name,
                    Client = account.Client?.ToClient()
                                    .ToSimpleResponse()!,
@@ -41,7 +41,7 @@ public static class AccountMapper
         return new AccountSimpleResponse
                {
                    Id            = account.Id,
-                   AccountNumber = account.Number
+                   AccountNumber = account.AccountNumber
                };
     }
 

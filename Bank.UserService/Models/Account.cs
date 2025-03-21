@@ -1,6 +1,9 @@
-﻿namespace Bank.UserService.Models;
+﻿
+using Bank.UserService.Functions;
 
-public class Account
+namespace Bank.UserService.Models;
+
+public class Account : IAccountBalance
 {
     public required Guid                  Id                { set;  get; }
     public          User?                 Client            { set;  get; }
@@ -10,7 +13,7 @@ public class Account
     public required decimal               Balance           { set;  get; }
     public required decimal               AvailableBalance  { set;  get; }
     public          User?                 Employee          { set;  get; }
-    public required Guid                  EmployeeId        { set;  get; }
+    public required Guid?                 EmployeeId        { set;  get; }
     public          Currency?             Currency          { set;  get; }
     public required Guid                  CurrencyId        { set;  get; }
     public          AccountType?          Type              { set;  get; }
@@ -23,4 +26,36 @@ public class Account
     public required bool                  Status            { set;  get; }
     public required DateTime              CreatedAt         { set;  get; }
     public required DateTime              ModifiedAt        { set;  get; }
+
+    public string AccountNumber => $"{Client?.Bank?.Code}0000{Number}{Type?.Code}";
+    
+    public bool IsForeign => Type != null && (Type.Code.StartsWith('3') || Type.Code.StartsWith('4'));
+    
+    public IAccountBalance? FindAccountBalance(Guid currencyId)
+    {
+
+        if (CurrencyId == currencyId)
+            return this;
+
+        return AccountCurrencies.Find(accountCurrency => accountCurrency.CurrencyId == currencyId);
+    }
+
+    public bool ChangeAvailableBalance(decimal amount)
+    {
+        AvailableBalance += amount;
+
+        return true;
+    }
+
+    public bool ChangeBalance(decimal amount)
+    {
+        Balance += amount;
+
+        return true;
+    }
+    
+    public decimal GetAvailableBalance()
+    {
+        return AvailableBalance;
+    }
 }

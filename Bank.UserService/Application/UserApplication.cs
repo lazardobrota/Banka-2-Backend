@@ -3,6 +3,7 @@ using System.Text;
 
 using Bank.Application;
 using Bank.Application.Domain;
+using Bank.UserService.BackgroundServices;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.HostedServices;
@@ -36,6 +37,7 @@ public class UserApplication
         builder.Services.AddServices();
         builder.Services.AddDatabase();
         builder.Services.AddHostedServices();
+        builder.Services.AddBackgroundServices();
         builder.Services.AddHttpServices();
 
         builder.Services.AddCors();
@@ -109,6 +111,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInstallmentService, InstallmentService>();
         services.AddScoped<ILoanTypeService, LoanTypeService>();
 
+        return services;
+    }
+    
+    public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
+    {
+        services.AddSingleton<TransactionBackgroundService>();
+        
         return services;
     }
 

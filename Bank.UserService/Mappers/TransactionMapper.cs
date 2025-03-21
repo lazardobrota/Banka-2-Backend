@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Mappers;
@@ -79,6 +80,98 @@ public static class TransactionMapper
                    CreatedAt       = oldTransaction.CreatedAt,
                    CodeId          = oldTransaction.CodeId,
                    ModifiedAt      = DateTime.UtcNow,
+               };
+    }
+    
+     public static Transaction ToTransaction(this PrepareWithdrawTransaction withdrawTransaction)
+    {
+        return new Transaction
+               {
+                   Id             = Guid.NewGuid(),
+                   FromAccountId  = withdrawTransaction.Account!.Id,
+                   FromCurrencyId = withdrawTransaction.Currency!.Id,
+                   FromAmount     = withdrawTransaction.Amount,
+                   CodeId         = Seeder.TransactionCode.TransactionCode266.Id,
+                   Status         = TransactionStatus.Pending,
+                   CreatedAt      = DateTime.UtcNow,
+                   ModifiedAt     = DateTime.UtcNow
+               };
+    }
+
+    public static Transaction ToTransaction(this PrepareDepositTransaction depositTransaction)
+    {
+        return new Transaction
+               {
+                   Id           = Guid.NewGuid(),
+                   ToAccountId  = depositTransaction.Account!.Id,
+                   ToCurrencyId = depositTransaction.Currency!.Id,
+                   ToAmount     = depositTransaction.Amount,
+                   CodeId       = Seeder.TransactionCode.TransactionCode289.Id,
+                   Status       = TransactionStatus.Pending,
+                   CreatedAt    = DateTime.UtcNow,
+                   ModifiedAt   = DateTime.UtcNow
+               };
+    }
+
+    public static Transaction ToTransaction(this PrepareInternalTransaction internalTransaction)
+    {
+        return new Transaction
+               {
+                   Id              = Guid.NewGuid(),
+                   FromAccountId   = internalTransaction.FromAccount!.Id,
+                   FromCurrencyId  = internalTransaction.FromCurrency!.Id,
+                   FromAmount      = internalTransaction.FromAmount,
+                   ToAccountId     = internalTransaction.ToAccount!.Id,
+                   ToCurrencyId    = internalTransaction.ToCurrency!.Id,
+                   ToAmount        = internalTransaction.ToAmount,
+                   CodeId          = internalTransaction.TransactionCode!.Id,
+                   Status          = TransactionStatus.Pending,
+                   Purpose         = internalTransaction.Purpose,
+                   ReferenceNumber = internalTransaction.ReferenceNumber,
+                   CreatedAt       = DateTime.UtcNow,
+                   ModifiedAt      = DateTime.UtcNow
+               };
+    }
+
+    public static ProcessTransaction ToProcessTransaction(this PrepareWithdrawTransaction withdrawTransaction, Guid transactionId)
+    {
+        return new ProcessTransaction
+               {
+                   TransactionId  = transactionId,
+                   FromAccountId  = withdrawTransaction.Account!.Id,
+                   FromCurrencyId = withdrawTransaction.Currency!.Id,
+                   FromAmount     = withdrawTransaction.Amount,
+                   ToAccountId    = Guid.Empty,
+                   ToCurrencyId   = Guid.Empty,
+                   ToAmount       = 0
+               };
+    }
+
+    public static ProcessTransaction ToProcessTransaction(this PrepareDepositTransaction depositTransaction, Guid transactionId)
+    {
+        return new ProcessTransaction
+               {
+                   TransactionId  = transactionId,
+                   FromAccountId  = Guid.Empty,
+                   FromCurrencyId = Guid.Empty,
+                   FromAmount     = 0,
+                   ToAccountId    = depositTransaction.Account!.Id,
+                   ToCurrencyId   = depositTransaction.Currency!.Id,
+                   ToAmount       = depositTransaction.Amount
+               };
+    }
+
+    public static ProcessTransaction ToProcessTransaction(this PrepareInternalTransaction internalTransaction, Guid transactionId)
+    {
+        return new ProcessTransaction
+               {
+                   TransactionId  = transactionId,
+                   FromAccountId  = internalTransaction.FromAccount!.Id,
+                   FromCurrencyId = internalTransaction.FromCurrency!.Id,
+                   FromAmount     = internalTransaction.FromAmount,
+                   ToAccountId    = internalTransaction.ToAccount!.Id,
+                   ToCurrencyId   = internalTransaction.ToCurrency!.Id,
+                   ToAmount       = internalTransaction.ToAmount,
                };
     }
 }
