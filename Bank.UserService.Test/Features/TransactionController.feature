@@ -5,7 +5,7 @@ Feature: Transaction controller testing
         And transaction get request with query pageable
         When transactions are fetched from the database
         Then transaction response should be 200
-        And response should contain the list of transactions matching the filter parameters 
+        And response should contain the list of transactions matching the filter parameters
 
     Scenario: Get transaction by Id
         Given transaction get request with Id

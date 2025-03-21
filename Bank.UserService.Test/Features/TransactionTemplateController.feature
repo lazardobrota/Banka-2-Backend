@@ -9,12 +9,14 @@
 
     Scenario: Get Transaction template by Id
         Given transaction template get request with Id
+        And authorization for transaction template
         When transaction template is fetched by Id from the database
         Then transaction template response should be 200
         And response should contain the transaction template with the given Id
 
     Scenario: Create Transaction template
         Given transaction template create request
+        And authorization for transaction template
         When transaction template is created in the database
         Then transaction template response should be 200
         And transaction template details should match the created transaction template

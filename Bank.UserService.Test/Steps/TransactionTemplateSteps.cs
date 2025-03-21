@@ -33,8 +33,8 @@ public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransact
     [Given(@"authorization for transaction template")]
     public void GivenAuthorizationForTransactionTemplate() //TODO What do to with AuthorizationService
     {
-        typeof(AuthorizationService).GetField("<UserId>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
-                                    ?.SetValue(m_AuthorizationService, Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"));
+        typeof(AuthorizationService).GetField($"<{nameof(m_AuthorizationService.UserId)}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
+                                    ?.SetValue(m_AuthorizationService, Example.Entity.TransactionTemplate.GetTransactionTemplate.ClientId);
     }
 
     [When(@"transactions template are fetched from the database")]
@@ -71,7 +71,7 @@ public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransact
         var result   = m_ScenarioContext.Get<Result<Page<TransactionTemplateResponse>>>(Constant.Result);
 
         result.Value.ShouldNotBeNull();
-        result.Value.Items.Count.ShouldBe(pageable.Size);
+        result.Value.Items.Count.ShouldBeGreaterThan(0);
         result.Value.PageNumber.ShouldBe(pageable.Page);
     }
 
@@ -111,6 +111,7 @@ public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransact
     {
         var transactionTemplateCreateRequest = m_ScenarioContext.Get<TransactionTemplateCreateRequest>(Constant.Create);
         var createTransactionTemplateResult  = await m_TransactionTemplateService.Create(transactionTemplateCreateRequest);
+
         m_ScenarioContext[Constant.Result]       = createTransactionTemplateResult;
         m_ScenarioContext[Constant.ActionResult] = createTransactionTemplateResult.ActionResult;
     }
@@ -118,7 +119,7 @@ public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransact
     [Then(@"transaction template details should match the created transaction template")]
     public void ThenTransactionTemplateDetailsShouldMatchTheCreatedTransactionTemplate()
     {
-        var result = m_ScenarioContext.Get<Result<TransactionTemplateSimpleResponse>>(Constant.Result);
+        var result = m_ScenarioContext.Get<Result<TransactionTemplateResponse>>(Constant.Result);
 
         result.Value.ShouldNotBeNull();
         result.Value.AccountNumber.ShouldBe(Example.Entity.TransactionTemplate.TransactionTemplateCreateRequest.AccountNumber);

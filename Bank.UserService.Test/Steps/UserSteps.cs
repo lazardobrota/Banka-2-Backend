@@ -3,7 +3,6 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.UserService.Security;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
 
@@ -185,8 +184,8 @@ public class UserSteps(IUserService userService, ScenarioContext scenarioContext
     public async Task WhenTheyRequestAPasswordReset()
     {
         var request = m_ScenarioContext.Get<UserRequestPasswordResetRequest>(Constant.PasswordReset);
-        var result = await m_UserService.RequestPasswordReset(request);
-        
+        var result  = await m_UserService.RequestPasswordReset(request);
+
         m_ScenarioContext[Constant.Result]       = result;
         m_ScenarioContext[Constant.ActionResult] = result.ActionResult;
     }

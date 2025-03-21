@@ -1,6 +1,4 @@
-﻿using Bank.Application.Domain;
-using Bank.Application.Requests;
-using Bank.UserService.Database.Seeders;
+﻿using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Test.Examples.Entities;

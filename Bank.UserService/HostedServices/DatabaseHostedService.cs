@@ -65,10 +65,10 @@ public class DatabaseHostedService(IServiceProvider serviceProvider, IHttpClient
 
         Context.SeedTransactionCode()
                .Wait();
-        
+
         Context.SeedTransaction()
                .Wait();
-        
+
         Context.SeedTransactionTemplate()
                .Wait();
 
