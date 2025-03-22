@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Requests;
+using Bank.UserService.Database.Sample;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
@@ -23,10 +24,7 @@ public static partial class Example
 
             public static readonly Guid UpdateId = Seeder.Exchange.RsdAndUsd.Id;
 
-            public static readonly ExchangeUpdateRequest ExchangeUpdateRequest = new()
-                                                                                 {
-                                                                                     Commission = 0.07m,
-                                                                                 };
+            public static readonly ExchangeUpdateRequest ExchangeUpdateRequest = Sample.Exchange.UpdateRequest;
 
             public static readonly Exchange UpdatedExchange = new()
                                                               {

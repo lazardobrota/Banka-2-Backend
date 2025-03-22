@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Requests;
+using Bank.UserService.Database.Sample;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
@@ -12,11 +13,7 @@ public static partial class Example
     {
         public static class User
         {
-            public static readonly UserLoginRequest LoginRequest = new()
-                                                                   {
-                                                                       Email    = "admin@gmail.com",
-                                                                       Password = "admin"
-                                                                   };
+            public static readonly UserLoginRequest LoginRequest = Sample.User.LoginRequest;
 
             public static readonly UserModel GetEmployee = new()
                                                            {
@@ -64,11 +61,7 @@ public static partial class Example
                                                                   Activated                  = Seeder.Employee.Employee02.Activated
                                                               };
 
-            public static readonly UserActivationRequest UserActivationRequest = new()
-                                                                                 {
-                                                                                     Password        = "em12345678",
-                                                                                     ConfirmPassword = "em12345678",
-                                                                                 };
+            public static readonly UserActivationRequest UserActivationRequest = Sample.User.ActivationRequest;
         }
     }
 }

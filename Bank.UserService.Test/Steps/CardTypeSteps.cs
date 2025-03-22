@@ -2,6 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,7 @@ public class CardTypeSteps(ScenarioContext scenarioContext, ICardTypeService car
     [Given(@"card type Id")]
     public void GivenCardTypeId()
     {
-        m_ScenarioContext[Constant.CardTypeId] = Guid.Parse("cd2ea450-14f3-4c46-a35a-7dccf783f48a");
+        m_ScenarioContext[Constant.CardTypeId] = Seeder.CardType.VisaDebitCard.Id;
     }
 
     [When(@"card type is fetched from the database")]

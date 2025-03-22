@@ -1,7 +1,7 @@
-﻿using Bank.Application.Domain;
-using Bank.Application.Extensions;
+﻿using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Sample;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -14,63 +14,35 @@ file static class Example
 {
     public static class Transaction
     {
-        public static readonly Guid              Id              = Guid.Parse("ddee4d61-3fef-44a9-b186-6e81a87c63a1");
-        public static readonly Guid              FromAccountId   = Guid.Parse("c61ff9cf-3632-470c-abdd-a45c2f264bee");
-        public static readonly Guid              FromCurrencyId  = Guid.Parse("e9b82215-f306-4df9-96f5-0331d0bccf6b");
-        public static readonly Guid              ToCurrencyId    = Guid.Parse("5ab96b3c-fce8-4951-9542-fbbd5c09ea58");
-        public const           string            ToAccountNumber = "222000100000123411";
-        public const           decimal           Amount          = 100.00M;
-        public const           decimal           FromAmount      = 1000.00m;
-        public const           decimal           ToAmount        = 950.00m;
-        public static readonly Guid              CodeId          = Guid.Parse("18c3d509-cac1-4a7c-b845-b25db0a8cc56");
-        public const           string            ReferenceNumber = "117.6926";
-        public const           string            Purpose         = "Plaćanje fakture";
-        public const           TransactionStatus Status          = TransactionStatus.Completed;
-        public static readonly DateTime          CreatedAt       = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime          ModifiedAt      = new(2025, 3, 5, 12, 45, 0);
-
-        public static readonly TransactionCreateRequest CreateRequest = new()
-                                                                        {
-                                                                            FromAccountId   = FromAccountId,
-                                                                            FromCurrencyId  = FromCurrencyId,
-                                                                            ToAccountNumber = ToAccountNumber,
-                                                                            ToCurrencyId    = ToCurrencyId,
-                                                                            Amount          = Amount,
-                                                                            CodeId          = CodeId,
-                                                                            ReferenceNumber = ReferenceNumber,
-                                                                            Purpose         = Purpose
-                                                                        };
-
-        public static readonly TransactionUpdateRequest UpdateRequest = new()
-                                                                        {
-                                                                            Status = Status
-                                                                        };
+        public static readonly Guid    Id         = Guid.Parse("ddee4d61-3fef-44a9-b186-6e81a87c63a1");
+        public const           decimal FromAmount = 1000.00m;
+        public const           decimal ToAmount   = 950.00m;
 
         public static readonly TransactionResponse Response = new()
                                                               {
-                                                                  Id              = Id,
+                                                                  Id              = Guid.Parse("ddee4d61-3fef-44a9-b186-6e81a87c63a1"),
                                                                   FromAccount     = null!,
                                                                   ToAccount       = null!,
                                                                   FromAmount      = FromAmount,
                                                                   ToAmount        = ToAmount,
                                                                   Code            = null!,
-                                                                  ReferenceNumber = ReferenceNumber,
-                                                                  Purpose         = Purpose,
-                                                                  Status          = Status,
-                                                                  CreatedAt       = CreatedAt,
-                                                                  ModifiedAt      = ModifiedAt
+                                                                  ReferenceNumber = Sample.Transaction.CreateRequest.ReferenceNumber!,
+                                                                  Purpose         = Sample.Transaction.CreateRequest.Purpose,
+                                                                  Status          = Sample.Transaction.UpdateRequest.Status,
+                                                                  CreatedAt       = DateTime.UtcNow,
+                                                                  ModifiedAt      = DateTime.UtcNow
                                                               };
 
         public static readonly TransactionCreateResponse CreateResponse = new()
                                                                           {
-                                                                              Id              = Id,
+                                                                              Id              = Guid.Parse("ddee4d61-3fef-44a9-b186-6e81a87c63a1"),
                                                                               FromAmount      = FromAmount,
                                                                               Code            = null!,
-                                                                              ReferenceNumber = ReferenceNumber,
-                                                                              Purpose         = Purpose,
-                                                                              Status          = Status,
-                                                                              CreatedAt       = CreatedAt,
-                                                                              ModifiedAt      = ModifiedAt
+                                                                              ReferenceNumber = Sample.Transaction.CreateRequest.ReferenceNumber!,
+                                                                              Purpose         = Sample.Transaction.CreateRequest.Purpose,
+                                                                              Status          = Sample.Transaction.UpdateRequest.Status,
+                                                                              CreatedAt       = DateTime.UtcNow,
+                                                                              ModifiedAt      = DateTime.UtcNow
                                                                           };
     }
 }
@@ -79,7 +51,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Transaction
     {
-        public class CreateRequest() : SwaggerSchemaFilter<TransactionCreateRequest>(SchemeFilters.Example.Transaction.CreateRequest)
+        public class CreateRequest() : SwaggerSchemaFilter<TransactionCreateRequest>(Sample.Transaction.CreateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -105,7 +77,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class UpdateRequest() : SwaggerSchemaFilter<TransactionUpdateRequest>(SchemeFilters.Example.Transaction.UpdateRequest)
+        public class UpdateRequest() : SwaggerSchemaFilter<TransactionUpdateRequest>(Sample.Transaction.UpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

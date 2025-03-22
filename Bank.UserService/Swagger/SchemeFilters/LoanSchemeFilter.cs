@@ -2,6 +2,7 @@
 using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Sample;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -14,50 +15,21 @@ file static class Example
 {
     public static class Loan
     {
-        public static readonly Guid         Id           = Guid.Parse("90a10f93-85cc-491a-8624-07c485a2b431");
-        public static readonly Guid         TypeId       = Guid.Parse("af94b480-4c67-4281-962d-0d73efe48e4a");
-        public static readonly Guid         AccountId    = Guid.Parse("69434456-99a3-4cef-a366-b98877b5d4fc");
-        public const           decimal      Amount       = 50000.00m;
-        public const           int          Period       = 60;
-        public static readonly DateOnly     CreationDate = new(2024, 3, 5);
-        public static readonly DateOnly     MaturityDate = new(2029, 3, 5);
-        public static readonly Guid         CurrencyId   = Guid.Parse("2ae3889c-609f-4988-a334-0a37f3992e96");
-        public const           LoanStatus   Status       = LoanStatus.Active;
-        public const           InterestType InterestType = Bank.Application.Domain.InterestType.Mixed;
-        public static readonly DateTime     CreatedAt    = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime     ModifiedAt   = new(2025, 3, 5, 12, 45, 0);
-
-        public static readonly LoanRequest Request = new()
-                                                     {
-                                                         TypeId       = TypeId,
-                                                         AccountId    = AccountId,
-                                                         Amount       = Amount,
-                                                         Period       = Period,
-                                                         CurrencyId   = CurrencyId,
-                                                         InterestType = InterestType
-                                                     };
-
         public static readonly LoanResponse Response = new()
                                                        {
-                                                           Id           = Id,
+                                                           Id           = Guid.Parse("90a10f93-85cc-491a-8624-07c485a2b431"),
                                                            Type         = null!,
                                                            Account      = null!,
-                                                           Amount       = Amount,
-                                                           Period       = Period,
-                                                           CreationDate = CreationDate,
-                                                           MaturityDate = MaturityDate,
+                                                           Amount       = Sample.Loan.Request.Amount,
+                                                           Period       = Sample.Loan.Request.Period,
+                                                           CreationDate = new(2024, 3, 5),
+                                                           MaturityDate = new(2029, 3, 5),
                                                            Currency     = null!,
-                                                           Status       = Status,
-                                                           InterestType = InterestType,
-                                                           CreatedAt    = CreatedAt,
-                                                           ModifiedAt   = ModifiedAt
+                                                           Status       = LoanStatus.Active,
+                                                           InterestType = Sample.Loan.Request.InterestType,
+                                                           CreatedAt    = DateTime.UtcNow,
+                                                           ModifiedAt   = DateTime.UtcNow
                                                        };
-
-        public static readonly LoanUpdateRequest UpdateRequest = new()
-                                                                 {
-                                                                     Status       = Status,
-                                                                     MaturityDate = MaturityDate.ToDateTime(TimeOnly.MinValue)
-                                                                 };
     }
 }
 
@@ -65,7 +37,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Loan
     {
-        public class Request() : SwaggerSchemaFilter<LoanRequest>(SchemeFilters.Example.Loan.Request)
+        public class Request() : SwaggerSchemaFilter<LoanRequest>(Sample.Loan.Request)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -87,14 +59,14 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class UpdateRequest() : SwaggerSchemaFilter<LoanUpdateRequest>(SchemeFilters.Example.Loan.UpdateRequest)
+        public class UpdateRequest() : SwaggerSchemaFilter<LoanUpdateRequest>(Sample.Loan.UpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
                 return new OpenApiObject()
                        {
                            [nameof(Example.Status)
-                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status),
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status!),
                            [nameof(Example.MaturityDate)
                             .ToCamelCase()] = new OpenApiDateTime(Example.MaturityDate ?? DateTime.MinValue)
                        };

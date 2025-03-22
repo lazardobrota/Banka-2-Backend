@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Requests;
+using Bank.UserService.Database.Sample;
 
 namespace Bank.UserService.Test.Examples.Entities;
 
@@ -8,17 +9,8 @@ public static partial class Example
     {
         public static class LoanType
         {
-            public static readonly LoanTypeRequest Request = new()
-                                                             {
-                                                                 Name   = "Lični kredit",
-                                                                 Margin = 3.5m,
-                                                             };
-
-            public static readonly LoanTypeUpdateRequest UpdateRequest = new()
-                                                                         {
-                                                                             Name   = "Lični kredit",
-                                                                             Margin = 4m,
-                                                                         };
+            public static readonly LoanTypeRequest       Request       = Sample.LoanType.Request;
+            public static readonly LoanTypeUpdateRequest UpdateRequest = Sample.LoanType.UpdateRequest;
         }
     }
 }

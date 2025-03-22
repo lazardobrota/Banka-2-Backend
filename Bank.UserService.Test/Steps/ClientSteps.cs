@@ -65,7 +65,7 @@ public class ClientSteps(ScenarioContext scenarioContext, IClientService clientS
     public void GivenClientUpdateRequestAndId()
     {
         m_ScenarioContext[Constant.UpdateRequest] = Example.Entity.Client.UpdateRequest;
-        m_ScenarioContext[Constant.Id]            = Guid.Parse("45ddacb5-eedf-4e18-b23e-850a1f1e2e8a");
+        m_ScenarioContext[Constant.Id]            = Example.Entity.Client.Id1;
     }
 
     [When(@"client is updated in the database")]
@@ -117,7 +117,7 @@ public class ClientSteps(ScenarioContext scenarioContext, IClientService clientS
     [Given(@"client Id")]
     public void GivenClientId()
     {
-        m_ScenarioContext[Constant.IdForAccount] = Guid.Parse("b5d36c22-3b6c-4de0-845b-a1a74e7b9856");
+        m_ScenarioContext[Constant.IdForAccount] = Example.Entity.Client.Id2;
     }
 
     [When(@"all accounts are fetched from the database")]
@@ -143,7 +143,7 @@ public class ClientSteps(ScenarioContext scenarioContext, IClientService clientS
     [Given(@"client Id which has cards")]
     public void GivenClientIdWhichHasCards()
     {
-        m_ScenarioContext[Constant.Id] = Guid.Parse("b5d36c22-3b6c-4de0-845b-a1a74e7b9856");
+        m_ScenarioContext[Constant.Id] = Example.Entity.Client.Id2;
     }
 
     [When(@"all cards are fetched from the database for the client")]
