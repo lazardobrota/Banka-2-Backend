@@ -54,7 +54,7 @@ public class LoanService(
             if (currencyForLoan == null)
                 return Result.NotFound<Page<LoanResponse>>($"No Currency for Loan found with Id: {loan.CurrencyId}");
 
-            var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, currencyForLoan);
+            var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, currencyForLoan);
             var nominalRate = m_LoanHostedService.GetBaseInterestRate(amountInRsd);
 
             if (loan.InterestType == InterestType.Variable)
@@ -92,7 +92,7 @@ public class LoanService(
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
         var response    = loan.ToLoanResponse();
-        var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+        var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, loan.Currency);
         var nominalRate = m_LoanHostedService.GetBaseInterestRate(amountInRsd);
 
         if (loan.InterestType == InterestType.Variable)
@@ -128,7 +128,7 @@ public class LoanService(
 
         var updatedLoan = loanRequest.ToLoan(oldLoan);
         var loan        = await m_LoanRepository.Update(oldLoan, updatedLoan);
-        var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+        var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, loan.Currency);
 
         if (loan.Status == LoanStatus.Active)
         {

@@ -45,7 +45,7 @@ public class InstallmentService : IInstallmentService
             return Result.NotFound<InstallmentResponse>($"Loan for Installment with ID {id} not found");
 
         var response = installment.ToResponse();
-        response.Amount = await m_LoanHostedService.CalculateInstallmentAmount(loan, installment, m_InstallmentRepository);
+        response.Amount = await m_LoanHostedService.CalculateInstallmentAmount(loan);
 
         return Result.Ok(response);
     }
@@ -64,7 +64,7 @@ public class InstallmentService : IInstallmentService
         foreach (var installment in page.Items)
         {
             var response = installment.ToResponse();
-            response.Amount = await m_LoanHostedService.CalculateInstallmentAmount(loan, installment, m_InstallmentRepository);
+            response.Amount = await m_LoanHostedService.CalculateInstallmentAmount(loan);
             installmentResponses.Add(response);
         }
 
