@@ -49,11 +49,11 @@ public static class LoanMapper
 
     public static LoanTypeResponse ToResponse(this LoanType loanType)
     {
-        return new LoanTypeResponse()
+        return new LoanTypeResponse
                {
                    Id     = loanType.Id,
                    Name   = loanType.Name,
-                   Margin = loanType.Margin,
+                   Margin = loanType.Margin
                };
     }
 
@@ -69,39 +69,21 @@ public static class LoanMapper
                };
     }
 
-    public static Loan ToLoan(this LoanUpdateRequest request, Loan oldLoan)
+    public static Loan Update(this Loan loan, LoanUpdateRequest updateRequest)
     {
-        return new Loan()
-               {
-                   Id           = oldLoan.Id,
-                   TypeId       = oldLoan.TypeId,
-                   Account      = oldLoan.Account,
-                   Amount       = oldLoan.Amount,
-                   Period       = oldLoan.Period,
-                   CreationDate = oldLoan.CreationDate,
-                   MaturityDate = oldLoan.MaturityDate,
-                   Currency     = oldLoan.Currency,
-                   Status       = request.Status ?? oldLoan.Status,
-                   InterestType = oldLoan.InterestType,
-                   CreatedAt    = oldLoan.CreatedAt,
-                   ModifiedAt   = DateTime.UtcNow,
-                   AccountId    = oldLoan.AccountId,
-                   CurrencyId   = oldLoan.CurrencyId,
-               };
+        loan.Status     = updateRequest.Status ?? loan.Status;
+        loan.ModifiedAt = DateTime.UtcNow;
+
+        return loan;
     }
 
-    public static LoanType ToEntity(this LoanTypeUpdateRequest request, LoanType oldLoanType)
+    public static LoanType Update(this LoanType loanType, LoanTypeUpdateRequest updateRequest)
     {
-        var updatedLoanType = new LoanType
-                              {
-                                  Id         = oldLoanType.Id,
-                                  Name       = request.Name   ?? oldLoanType.Name,
-                                  Margin     = request.Margin ?? oldLoanType.Margin,
-                                  CreatedAt  = oldLoanType.CreatedAt,
-                                  ModifiedAt = DateTime.UtcNow
-                              };
+        loanType.Name       = updateRequest.Name   ?? loanType.Name;
+        loanType.Margin     = updateRequest.Margin ?? loanType.Margin;
+        loanType.ModifiedAt = DateTime.UtcNow;
 
-        return updatedLoanType;
+        return loanType;
     }
 
     private static DateTime CalculateMaturityDate(DateTime creationDate, int periodInMonths)

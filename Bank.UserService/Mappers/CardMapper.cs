@@ -14,7 +14,7 @@ public static class CardMapper
                    Id         = cardType.Id,
                    Name       = cardType.Name,
                    CreatedAt  = cardType.CreatedAt,
-                   ModifiedAt = cardType.ModifiedAt,
+                   ModifiedAt = cardType.ModifiedAt
                };
     }
 
@@ -32,7 +32,7 @@ public static class CardMapper
                    ExpiresAt  = card.ExpiresAt,
                    Account    = card.Account.ToResponse(),
                    Limit      = card.Limit,
-                   Number     = card.Number,
+                   Number     = card.Number
                };
     }
 
@@ -54,47 +54,23 @@ public static class CardMapper
                    ExpiresAt  = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(1)),
                    Account    = account,
                    Type       = type,
-                   AccountId  = account.Id,
+                   AccountId  = account.Id
                };
     }
 
-    public static Card ToCard(this CardUpdateStatusRequest cardUpdate, Card oldCard)
+    public static Card Update(this Card card, CardUpdateStatusRequest updateRequest)
     {
-        return new Card
-               {
-                   Id         = oldCard.Id,
-                   Name       = oldCard.Name,
-                   CreatedAt  = oldCard.CreatedAt,
-                   ModifiedAt = oldCard.ModifiedAt,
-                   CVV        = oldCard.CVV,
-                   Status     = cardUpdate.Status,
-                   Type       = oldCard.Type,
-                   TypeId     = oldCard.Type.Id,
-                   ExpiresAt  = oldCard.ExpiresAt,
-                   Account    = oldCard.Account,
-                   AccountId  = oldCard.Account.Id,
-                   Limit      = oldCard.Limit,
-                   Number     = oldCard.Number
-               };
+        card.Status     = updateRequest.Status;
+        card.ModifiedAt = DateTime.UtcNow;
+
+        return card;
     }
 
-    public static Card ToCard(this CardUpdateLimitRequest cardUpdate, Card oldCard)
+    public static Card Update(this Card card, CardUpdateLimitRequest updateRequest)
     {
-        return new Card
-               {
-                   Id         = oldCard.Id,
-                   Name       = oldCard.Name,
-                   CreatedAt  = oldCard.CreatedAt,
-                   ModifiedAt = oldCard.ModifiedAt,
-                   CVV        = oldCard.CVV,
-                   Status     = oldCard.Status,
-                   Type       = oldCard.Type,
-                   TypeId     = oldCard.Type.Id,
-                   ExpiresAt  = oldCard.ExpiresAt,
-                   Account    = oldCard.Account,
-                   AccountId  = oldCard.Account.Id,
-                   Limit      = cardUpdate.Limit,
-                   Number     = oldCard.Number
-               };
+        card.Limit      = updateRequest.Limit;
+        card.ModifiedAt = DateTime.UtcNow;
+
+        return card;
     }
 }

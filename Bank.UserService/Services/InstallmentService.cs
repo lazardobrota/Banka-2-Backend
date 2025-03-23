@@ -22,8 +22,8 @@ public interface IInstallmentService
 public class InstallmentService : IInstallmentService
 {
     private readonly IInstallmentRepository m_InstallmentRepository;
-    private readonly ILoanRepository        m_LoanRepository;
     private readonly LoanHostedService      m_LoanHostedService;
+    private readonly ILoanRepository        m_LoanRepository;
 
     public InstallmentService(IInstallmentRepository installmentRepository, ILoanRepository loanRepository, LoanHostedService loanHostedService)
     {
@@ -87,15 +87,13 @@ public class InstallmentService : IInstallmentService
 
     public async Task<Result<InstallmentResponse>> Update(InstallmentUpdateRequest request, Guid id)
     {
-        var existingInstallment = await m_InstallmentRepository.FindById(id);
+        var dbInstallment = await m_InstallmentRepository.FindById(id);
 
-        if (existingInstallment == null)
+        if (dbInstallment == null)
             return Result.NotFound<InstallmentResponse>($"Installment with ID {id} not found");
 
-        var updatedInstallment = request.ToEntity(existingInstallment);
+        var installment = await m_InstallmentRepository.Update(dbInstallment, dbInstallment.Update(request));
 
-        var result = await m_InstallmentRepository.Update(existingInstallment, updatedInstallment);
-
-        return Result.Ok(result.ToResponse());
+        return Result.Ok(installment.ToResponse());
     }
 }

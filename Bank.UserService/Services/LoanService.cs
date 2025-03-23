@@ -121,13 +121,12 @@ public class LoanService(
 
     public async Task<Result<LoanResponse>> Update(LoanUpdateRequest loanRequest, Guid id)
     {
-        var oldLoan = await m_LoanRepository.FindById(id);
+        var dbLoan = await m_LoanRepository.FindById(id);
 
-        if (oldLoan is null)
+        if (dbLoan is null)
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
-        var updatedLoan = loanRequest.ToLoan(oldLoan);
-        var loan        = await m_LoanRepository.Update(updatedLoan);
+        var loan        = await m_LoanRepository.Update(dbLoan.Update(loanRequest));
         var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, loan.Currency);
 
         if (loan.Status == LoanStatus.Active)
