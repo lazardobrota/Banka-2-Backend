@@ -2,7 +2,7 @@
 
 namespace Bank.Application.Requests;
 
-public class InstallmentRequest
+public class InstallmentCreateRequest
 {
     public required Guid              InstallmentId;
     public required Guid              LoanId          { get; set; }

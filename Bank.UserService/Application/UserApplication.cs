@@ -113,11 +113,11 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<TransactionBackgroundService>();
-        
+
         return services;
     }
 

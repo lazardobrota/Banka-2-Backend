@@ -26,7 +26,7 @@ public class DatabaseHostedService(IServiceProvider serviceProvider, IHttpClient
 
         Context.SeedBank()
                .Wait();
-        
+
         Context.SeedClient()
                .Wait();
 

@@ -14,7 +14,7 @@ public interface IInstallmentService
 
     Task<Result<Page<InstallmentResponse>>> GetAllByLoanId(Guid loanId, Pageable pageable);
 
-    Task<Result<InstallmentResponse>> Create(InstallmentRequest request);
+    Task<Result<InstallmentResponse>> Create(InstallmentCreateRequest createRequest);
 
     Task<Result<InstallmentResponse>> Update(InstallmentUpdateRequest request, Guid id);
 }
@@ -71,14 +71,14 @@ public class InstallmentService : IInstallmentService
         return Result.Ok(new Page<InstallmentResponse>(installmentResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
-    public async Task<Result<InstallmentResponse>> Create(InstallmentRequest request)
+    public async Task<Result<InstallmentResponse>> Create(InstallmentCreateRequest createRequest)
     {
-        var loan = await m_LoanRepository.FindById(request.LoanId);
+        var loan = await m_LoanRepository.FindById(createRequest.LoanId);
 
         if (loan == null)
-            return Result.NotFound<InstallmentResponse>($"Loan with ID {request.LoanId} not found");
+            return Result.NotFound<InstallmentResponse>($"Loan with ID {createRequest.LoanId} not found");
 
-        var installment = request.ToInstallment();
+        var installment = createRequest.ToInstallment();
 
         var createdInstallment = await m_InstallmentRepository.Add(installment);
 

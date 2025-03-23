@@ -27,15 +27,15 @@ file static class Example
         public static readonly DateTime     CreatedAt    = new(2024, 3, 5, 10, 30, 0);
         public static readonly DateTime     ModifiedAt   = new(2025, 3, 5, 12, 45, 0);
 
-        public static readonly LoanRequest Request = new()
-                                                     {
-                                                         TypeId       = TypeId,
-                                                         AccountId    = AccountId,
-                                                         Amount       = Amount,
-                                                         Period       = Period,
-                                                         CurrencyId   = CurrencyId,
-                                                         InterestType = InterestType
-                                                     };
+        public static readonly LoanCreateRequest CreateRequest = new()
+                                                                 {
+                                                                     TypeId       = TypeId,
+                                                                     AccountId    = AccountId,
+                                                                     Amount       = Amount,
+                                                                     Period       = Period,
+                                                                     CurrencyId   = CurrencyId,
+                                                                     InterestType = InterestType
+                                                                 };
 
         public static readonly LoanResponse Response = new()
                                                        {
@@ -65,7 +65,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Loan
     {
-        public class Request() : SwaggerSchemaFilter<LoanRequest>(SchemeFilters.Example.Loan.Request)
+        public class Request() : SwaggerSchemaFilter<LoanCreateRequest>(SchemeFilters.Example.Loan.CreateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

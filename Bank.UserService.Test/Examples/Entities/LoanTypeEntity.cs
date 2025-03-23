@@ -8,11 +8,11 @@ public static partial class Example
     {
         public static class LoanType
         {
-            public static readonly LoanTypeRequest Request = new()
-                                                             {
-                                                                 Name   = "Lični kredit",
-                                                                 Margin = 3.5m,
-                                                             };
+            public static readonly LoanTypeCreateRequest CreateRequest = new()
+                                                                         {
+                                                                             Name   = "Lični kredit",
+                                                                             Margin = 3.5m,
+                                                                         };
 
             public static readonly LoanTypeUpdateRequest UpdateRequest = new()
                                                                          {

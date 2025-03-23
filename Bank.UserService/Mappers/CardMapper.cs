@@ -58,7 +58,7 @@ public static class CardMapper
                };
     }
 
-    public static Card ToCard(this CardStatusUpdateRequest card, Card oldCard)
+    public static Card ToCard(this CardUpdateStatusRequest cardUpdate, Card oldCard)
     {
         return new Card
                {
@@ -67,7 +67,7 @@ public static class CardMapper
                    CreatedAt  = oldCard.CreatedAt,
                    ModifiedAt = oldCard.ModifiedAt,
                    CVV        = oldCard.CVV,
-                   Status     = card.Status,
+                   Status     = cardUpdate.Status,
                    Type       = oldCard.Type,
                    TypeId     = oldCard.Type.Id,
                    ExpiresAt  = oldCard.ExpiresAt,
@@ -78,7 +78,7 @@ public static class CardMapper
                };
     }
 
-    public static Card ToCard(this CardLimitUpdateRequest card, Card oldCard)
+    public static Card ToCard(this CardUpdateLimitRequest cardUpdate, Card oldCard)
     {
         return new Card
                {
@@ -93,7 +93,7 @@ public static class CardMapper
                    ExpiresAt  = oldCard.ExpiresAt,
                    Account    = oldCard.Account,
                    AccountId  = oldCard.Account.Id,
-                   Limit      = card.Limit,
+                   Limit      = cardUpdate.Limit,
                    Number     = oldCard.Number
                };
     }

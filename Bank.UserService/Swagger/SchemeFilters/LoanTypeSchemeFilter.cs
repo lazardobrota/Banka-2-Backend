@@ -17,11 +17,11 @@ file static class Example
         public const           string  Name   = "Lični kredit";
         public const           decimal Margin = 3.5m;
 
-        public static readonly LoanTypeRequest Request = new()
-                                                         {
-                                                             Name   = Name,
-                                                             Margin = Margin,
-                                                         };
+        public static readonly LoanTypeCreateRequest CreateRequest = new()
+                                                                     {
+                                                                         Name   = Name,
+                                                                         Margin = Margin,
+                                                                     };
 
         public static readonly LoanTypeUpdateRequest UpdateRequest = new()
                                                                      {
@@ -42,7 +42,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class LoanType
     {
-        public class Request() : SwaggerSchemaFilter<LoanTypeRequest>(SchemeFilters.Example.LoanType.Request)
+        public class Request() : SwaggerSchemaFilter<LoanTypeCreateRequest>(SchemeFilters.Example.LoanType.CreateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

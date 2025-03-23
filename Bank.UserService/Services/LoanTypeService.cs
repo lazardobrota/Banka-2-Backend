@@ -13,7 +13,7 @@ public interface ILoanTypeService
 
     Task<Result<LoanTypeResponse>> GetOne(Guid id);
 
-    Task<Result<LoanTypeResponse>> Create(LoanTypeRequest request);
+    Task<Result<LoanTypeResponse>> Create(LoanTypeCreateRequest createRequest);
 
     Task<Result<LoanTypeResponse>> Update(LoanTypeUpdateRequest request, Guid id);
 }
@@ -42,9 +42,9 @@ public class LoanTypeService(ILoanTypeRepository loanTypeRepository) : ILoanType
         return Result.Ok(loanType.ToResponse());
     }
 
-    public async Task<Result<LoanTypeResponse>> Create(LoanTypeRequest request)
+    public async Task<Result<LoanTypeResponse>> Create(LoanTypeCreateRequest createRequest)
     {
-        var loanType = request.ToLoanType();
+        var loanType = createRequest.ToLoanType();
 
         var createdLoanType = await m_LoanTypeRepository.Add(loanType);
 
@@ -60,7 +60,7 @@ public class LoanTypeService(ILoanTypeRepository loanTypeRepository) : ILoanType
 
         var updatedLoanType = request.ToEntity(existingLoanType);
 
-        var result = await m_LoanTypeRepository.Update(existingLoanType, updatedLoanType);
+        var result = await m_LoanTypeRepository.Update(updatedLoanType);
 
         return Result.Ok(result.ToResponse());
     }

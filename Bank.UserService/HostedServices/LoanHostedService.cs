@@ -252,7 +252,7 @@ public class LoanHostedService(IServiceProvider serviceProvider)
                                   ModifiedAt   = DateTime.UtcNow
                               };
 
-            await loanRepository.Update(loan, updatedLoan);
+            await loanRepository.Update(updatedLoan);
         }
     }
 

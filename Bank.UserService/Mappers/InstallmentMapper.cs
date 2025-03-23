@@ -6,16 +6,16 @@ namespace Bank.UserService.Mappers;
 
 public static class InstallmentMapper
 {
-    public static Installment ToInstallment(this InstallmentRequest request)
+    public static Installment ToInstallment(this InstallmentCreateRequest createRequest)
     {
         return new Installment
                {
                    Id              = Guid.NewGuid(),
-                   LoanId          = request.LoanId,
-                   InterestRate    = request.InterestRate,
-                   ExpectedDueDate = DateTime.SpecifyKind(request.ExpectedDueDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc),
-                   ActualDueDate   = DateTime.SpecifyKind(request.ActualDueDate.ToDateTime(TimeOnly.MinValue),   DateTimeKind.Utc),
-                   Status          = request.Status,
+                   LoanId          = createRequest.LoanId,
+                   InterestRate    = createRequest.InterestRate,
+                   ExpectedDueDate = DateTime.SpecifyKind(createRequest.ExpectedDueDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc),
+                   ActualDueDate   = DateTime.SpecifyKind(createRequest.ActualDueDate.ToDateTime(TimeOnly.MinValue),   DateTimeKind.Utc),
+                   Status          = createRequest.Status,
                    CreatedAt       = DateTime.UtcNow,
                    ModifiedAt      = DateTime.UtcNow
                };

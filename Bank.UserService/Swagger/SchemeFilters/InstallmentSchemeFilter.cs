@@ -23,15 +23,15 @@ file static class Example
         public static readonly DateTime          CreatedAt       = new(2024, 3, 5, 10, 30, 0);
         public static readonly DateTime          ModifiedAt      = new(2025, 3, 5, 12, 45, 0);
 
-        public static readonly InstallmentRequest Request = new()
-                                                            {
-                                                                InstallmentId   = Id,
-                                                                LoanId          = LoanId,
-                                                                InterestRate    = InterestRate,
-                                                                ExpectedDueDate = ExpectedDueDate,
-                                                                ActualDueDate   = ActualDueDate,
-                                                                Status          = Status
-                                                            };
+        public static readonly InstallmentCreateRequest CreateRequest = new()
+                                                                        {
+                                                                            InstallmentId   = Id,
+                                                                            LoanId          = LoanId,
+                                                                            InterestRate    = InterestRate,
+                                                                            ExpectedDueDate = ExpectedDueDate,
+                                                                            ActualDueDate   = ActualDueDate,
+                                                                            Status          = Status
+                                                                        };
 
         public static readonly InstallmentUpdateRequest UpdateRequest = new()
                                                                         {
@@ -57,7 +57,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Installment
     {
-        public class Request() : SwaggerSchemaFilter<InstallmentRequest>(SchemeFilters.Example.Installment.Request)
+        public class Request() : SwaggerSchemaFilter<InstallmentCreateRequest>(SchemeFilters.Example.Installment.CreateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

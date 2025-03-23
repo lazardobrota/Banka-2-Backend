@@ -20,13 +20,13 @@ public class LoanTypeSteps(ScenarioContext scenarioContext, ILoanTypeService loa
     [Given(@"loan type create request")]
     public void GivenLoanTypeCreateRequest()
     {
-        m_ScenarioContext[Constant.LoanTypeCreateRequest] = Example.Entity.LoanType.Request;
+        m_ScenarioContext[Constant.LoanTypeCreateRequest] = Example.Entity.LoanType.CreateRequest;
     }
 
     [When(@"loan type is created in the database")]
     public async Task WhenLoanTypeIsCreatedInTheDatabase()
     {
-        var loanTypeCreateRequest = m_ScenarioContext.Get<LoanTypeRequest>(Constant.LoanTypeCreateRequest);
+        var loanTypeCreateRequest = m_ScenarioContext.Get<LoanTypeCreateRequest>(Constant.LoanTypeCreateRequest);
 
         var loanType = await m_LoanTypeService.Create(loanTypeCreateRequest);
 
@@ -50,8 +50,8 @@ public class LoanTypeSteps(ScenarioContext scenarioContext, ILoanTypeService loa
 
         loanTypeCreateResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         loanTypeCreateResult.ShouldNotBeNull();
-        loanTypeCreateResult.Value!.Name.ShouldBe(Example.Entity.LoanType.Request.Name);
-        loanTypeCreateResult.Value.Margin.ShouldBe(Example.Entity.LoanType.Request.Margin);
+        loanTypeCreateResult.Value!.Name.ShouldBe(Example.Entity.LoanType.CreateRequest.Name);
+        loanTypeCreateResult.Value.Margin.ShouldBe(Example.Entity.LoanType.CreateRequest.Margin);
     }
 
     [Given(@"loan type update request")]

@@ -15,7 +15,7 @@ public interface ILoanRepository
 
     Task<Loan> Add(Loan loan);
 
-    Task<Loan> Update(Loan oldLoan, Loan loan);
+    Task<Loan> Update(Loan loan);
 
     Task<List<Loan>> GetLoansWithDueInstallmentsAsync(DateTime dueDate);
 
@@ -75,16 +75,21 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
         return loan;
     }
 
-    public async Task<Loan> Update(Loan oldLoan, Loan loan)
+    public async Task<Loan> Update(Loan loan)
     {
-        m_Context.Entry(oldLoan)
-                 .State = EntityState.Detached;
+        await m_Context.Loans.Where(dbLoan => dbLoan.Id == loan.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbLoan => dbLoan.TypeId, loan.TypeId)
+                                                             .SetProperty(dbLoan => dbLoan.AccountId,    loan.AccountId)
+                                                             .SetProperty(dbLoan => dbLoan.Amount,       loan.Amount)
+                                                             .SetProperty(dbLoan => dbLoan.Period,       loan.Period)
+                                                             .SetProperty(dbLoan => dbLoan.CreationDate, loan.CreationDate)
+                                                             .SetProperty(dbLoan => dbLoan.MaturityDate, loan.MaturityDate)
+                                                             .SetProperty(dbLoan => dbLoan.CurrencyId,   loan.CurrencyId)
+                                                             .SetProperty(dbLoan => dbLoan.Status,       loan.Status)
+                                                             .SetProperty(dbLoan => dbLoan.InterestType, loan.InterestType)
+                                                             .SetProperty(dbLoan => dbLoan.ModifiedAt,   loan.ModifiedAt));
 
-        var updatedLoan = m_Context.Loans.Update(loan);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedLoan.Entity;
+        return loan;
     }
 
     public async Task<List<Loan>> GetLoansWithDueInstallmentsAsync(DateTime dueDate)

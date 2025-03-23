@@ -24,7 +24,7 @@ public class BankEntityConfiguration : IEntityTypeConfiguration<Models.Bank>
         builder.Property(bank => bank.BaseUrl)
                .HasMaxLength(64)
                .IsRequired();
-        
+
         builder.Property(bank => bank.CreatedAt)
                .IsRequired();
 

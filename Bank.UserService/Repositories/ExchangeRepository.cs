@@ -13,7 +13,7 @@ public interface IExchangeRepository
     public Task<Exchange?> FindById(Guid id);
 
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId);
-    
+
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency, ExchangeFilterQuery exchangeFilterQuery);
 
     public Task<Exchange?> FindByCurrencyFromIdAndCurrencyToId(Guid firstCurrencyId, Guid secondCurrencyId, ExchangeFilterQuery exchangeFilterQuery);
@@ -21,7 +21,6 @@ public interface IExchangeRepository
     public Task<Exchange?> FindByCurrencyFromCodeAndCurrencyToCode(string firstCurrencyCode, string secondCurrencyCode, ExchangeFilterQuery exchangeFilterQuery);
 
     public Task<Exchange> Add(Exchange exchange);
-    
 
     public Task<Exchange> Update(Exchange oldExchange, Exchange exchange);
 }
@@ -58,7 +57,7 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
                               .Include(exchange => exchange.CurrencyTo)
                               .FirstOrDefaultAsync(x => x.Id == id);
     }
-    
+
     public async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId)
     {
         return await m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)

@@ -37,9 +37,9 @@ public class InstallmentController(IInstallmentService installmentService) : Con
 
     [HttpPost(Endpoints.Installment.Create)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
-    public async Task<ActionResult<InstallmentResponse>> Create([FromBody] InstallmentRequest request)
+    public async Task<ActionResult<InstallmentResponse>> Create([FromBody] InstallmentCreateRequest createRequest)
     {
-        var result = await m_InstallmentService.Create(request);
+        var result = await m_InstallmentService.Create(createRequest);
 
         return result.ActionResult;
     }

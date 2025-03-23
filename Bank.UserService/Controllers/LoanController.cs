@@ -51,9 +51,9 @@ public class LoanController : ControllerBase
 
     [HttpPost(Endpoints.Loan.Create)]
     [Authorize]
-    public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanRequest loanRequest)
+    public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanCreateRequest loanCreateRequest)
     {
-        var result = await m_LoanService.Create(loanRequest);
+        var result = await m_LoanService.Create(loanCreateRequest);
 
         return result.ActionResult;
     }

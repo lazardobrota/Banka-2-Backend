@@ -49,12 +49,12 @@ file static class Example
                                                                      Status     = Status
                                                                  };
 
-        public static readonly CardStatusUpdateRequest StatusUpdateRequest = new()
+        public static readonly CardUpdateStatusRequest UpdateStatusRequest = new()
                                                                              {
                                                                                  Status = Status
                                                                              };
 
-        public static readonly CardLimitUpdateRequest LimitUpdateRequest = new()
+        public static readonly CardUpdateLimitRequest UpdateLimitRequest = new()
                                                                            {
                                                                                Limit = Limit
                                                                            };
@@ -85,7 +85,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class StatusUpdateRequest() : SwaggerSchemaFilter<CardStatusUpdateRequest>(SchemeFilters.Example.Card.StatusUpdateRequest)
+        public class StatusUpdateRequest() : SwaggerSchemaFilter<CardUpdateStatusRequest>(SchemeFilters.Example.Card.UpdateStatusRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -97,7 +97,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class LimitUpdateRequest() : SwaggerSchemaFilter<CardLimitUpdateRequest>(SchemeFilters.Example.Card.LimitUpdateRequest)
+        public class LimitUpdateRequest() : SwaggerSchemaFilter<CardUpdateLimitRequest>(SchemeFilters.Example.Card.UpdateLimitRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

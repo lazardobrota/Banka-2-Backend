@@ -17,7 +17,7 @@ public interface ILoanService
 
     Task<Result<LoanResponse>> GetOne(Guid id);
 
-    Task<Result<LoanResponse>> Create(LoanRequest loanRequest);
+    Task<Result<LoanResponse>> Create(LoanCreateRequest loanCreateRequest);
 
     Task<Result<LoanResponse>> Update(LoanUpdateRequest loanRequest, Guid id);
 
@@ -104,16 +104,16 @@ public class LoanService(
         return Result.Ok(response);
     }
 
-    public async Task<Result<LoanResponse>> Create(LoanRequest loanRequest)
+    public async Task<Result<LoanResponse>> Create(LoanCreateRequest loanCreateRequest)
     {
-        var loanType = await m_LoanTypeRepository.FindById(loanRequest.TypeId);
-        var account  = await m_AccountRepository.FindById(loanRequest.AccountId);
-        var currency = await m_CurrencyRepository.FindById(loanRequest.CurrencyId);
+        var loanType = await m_LoanTypeRepository.FindById(loanCreateRequest.TypeId);
+        var account  = await m_AccountRepository.FindById(loanCreateRequest.AccountId);
+        var currency = await m_CurrencyRepository.FindById(loanCreateRequest.CurrencyId);
 
         if (loanType == null || account == null || currency == null)
             return Result.BadRequest<LoanResponse>("Invalid data. Loan type, account, or currency not found.");
 
-        var loan = loanRequest.ToLoan();
+        var loan = loanCreateRequest.ToLoan();
         loan = await m_LoanRepository.Add(loan);
 
         return Result.Ok(loan.ToLoanResponse());
@@ -127,12 +127,12 @@ public class LoanService(
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
         var updatedLoan = loanRequest.ToLoan(oldLoan);
-        var loan        = await m_LoanRepository.Update(oldLoan, updatedLoan);
+        var loan        = await m_LoanRepository.Update(updatedLoan);
         var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, loan.Currency);
 
         if (loan.Status == LoanStatus.Active)
         {
-            var installment = new InstallmentRequest
+            var installment = new InstallmentCreateRequest
                               {
                                   InstallmentId   = Guid.NewGuid(),
                                   LoanId          = loan.Id,

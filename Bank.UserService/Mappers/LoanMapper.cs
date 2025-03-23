@@ -7,22 +7,22 @@ namespace Bank.UserService.Mappers;
 
 public static class LoanMapper
 {
-    public static Loan ToLoan(this LoanRequest request)
+    public static Loan ToLoan(this LoanCreateRequest createRequest)
     {
         var now = DateTime.UtcNow;
 
         return new Loan
                {
                    Id           = Guid.NewGuid(),
-                   TypeId       = request.TypeId,
-                   AccountId    = request.AccountId,
-                   Amount       = request.Amount,
-                   Period       = request.Period,
+                   TypeId       = createRequest.TypeId,
+                   AccountId    = createRequest.AccountId,
+                   Amount       = createRequest.Amount,
+                   Period       = createRequest.Period,
                    CreationDate = now,
-                   MaturityDate = CalculateMaturityDate(now, request.Period),
-                   CurrencyId   = request.CurrencyId,
+                   MaturityDate = CalculateMaturityDate(now, createRequest.Period),
+                   CurrencyId   = createRequest.CurrencyId,
                    Status       = LoanStatus.Pending,
-                   InterestType = request.InterestType,
+                   InterestType = createRequest.InterestType,
                    CreatedAt    = now,
                    ModifiedAt   = now
                };
@@ -57,13 +57,13 @@ public static class LoanMapper
                };
     }
 
-    public static LoanType ToLoanType(this LoanTypeRequest request)
+    public static LoanType ToLoanType(this LoanTypeCreateRequest createRequest)
     {
         return new LoanType
                {
                    Id         = Guid.NewGuid(),
-                   Name       = request.Name,
-                   Margin     = request.Margin,
+                   Name       = createRequest.Name,
+                   Margin     = createRequest.Margin,
                    CreatedAt  = DateTime.UtcNow,
                    ModifiedAt = DateTime.UtcNow
                };
