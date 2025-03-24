@@ -38,10 +38,9 @@ public class ExchangeController(IExchangeService exchangeService) : ControllerBa
     }
 
     [HttpPost(Endpoints.Exchange.MakeExchange)]
-    public async Task<ActionResult<ExchangeResponse>> MakeExchange([FromBody]  ExchangeMakeExchangeRequest exchangeMakeExchangeRequest,
-                                                                   [FromQuery] ExchangeFilterQuery         exchangeFilterQuery)
+    public async Task<ActionResult<ExchangeResponse>> MakeExchange([FromBody]  ExchangeMakeExchangeRequest exchangeMakeExchangeRequest)
     {
-        var result = await m_ExchangeService.MakeExchange(exchangeMakeExchangeRequest, exchangeFilterQuery);
+        var result = await m_ExchangeService.MakeExchange(exchangeMakeExchangeRequest);
 
         return result.ActionResult;
     }

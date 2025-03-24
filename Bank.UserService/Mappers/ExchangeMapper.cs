@@ -11,8 +11,8 @@ public static class ExchangeMapper
         return new ExchangeResponse
                {
                    Id           = exchange.Id,
-                   CurrencyFrom = exchange.CurrencyFrom.ToSimpleResponse(),
-                   CurrencyTo   = exchange.CurrencyTo.ToSimpleResponse(),
+                   CurrencyFrom = exchange.CurrencyFrom!.ToSimpleResponse(),
+                   CurrencyTo   = exchange.CurrencyTo!.ToSimpleResponse(),
                    Commission   = exchange.Commission,
                    Rate         = exchange.Rate,
                    InverseRate  = exchange.InverseRate,
@@ -36,23 +36,7 @@ public static class ExchangeMapper
                    ModifiedAt     = exchange.ModifiedAt
                };
     }
-
-    public static Exchange ToExchange(this ExchangeUpdateRequest exchangeUpdateRequest, Exchange oldExchange)
-    {
-        return new Exchange
-               {
-                   Id             = oldExchange.Id,
-                   CurrencyFromId = oldExchange.CurrencyFromId,
-                   CurrencyFrom   = oldExchange.CurrencyFrom,
-                   CurrencyToId   = oldExchange.CurrencyToId,
-                   CurrencyTo     = oldExchange.CurrencyTo,
-                   Commission     = exchangeUpdateRequest.Commission,
-                   Rate           = oldExchange.Rate,
-                   CreatedAt      = oldExchange.CreatedAt,
-                   ModifiedAt     = DateTime.UtcNow
-               };
-    }
-
+    
     public static Exchange ToExchange(this ExchangeFetchResponse exchangeFetchResponse, Currency currencyFrom, Currency currencyTo, decimal commission)
     {
         return new Exchange
@@ -67,5 +51,11 @@ public static class ExchangeMapper
                    CreatedAt      = DateTime.UtcNow,
                    ModifiedAt     = DateTime.UtcNow
                };
+    }
+
+    public static Exchange Update(this Exchange exchange, ExchangeUpdateRequest exchangeUpdateRequest)
+    {
+        exchange.Commission = exchangeUpdateRequest.Commission;
+        return exchange;
     }
 }

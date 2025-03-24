@@ -16,3 +16,13 @@ public class Exchange
     public decimal BidRate     => InverseRate * (1 + Commission);
     public decimal AskRate     => InverseRate * (1 - Commission);
 }
+
+public class ExchangeDetails
+{
+    public          Currency? CurrencyFrom        { set; get; }
+    public          Currency? CurrencyTo          { set; get; }
+    public required decimal   AverageRate         { set; get; }
+    public required decimal   ExchangeRate        { set; get; }
+    public required decimal   InverseAverageRate  { set; get; }
+    public required decimal   InverseExchangeRate { set; get; }
+}
