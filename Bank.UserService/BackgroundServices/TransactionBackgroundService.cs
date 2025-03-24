@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
+using Bank.Application.Domain;
 using Bank.Application.Extensions;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database.Seeders;
@@ -43,6 +44,9 @@ public class TransactionBackgroundService(IServiceProvider serviceProvider)
         BankAccount = accountRepository.FindById(Seeder.Account.BankAccount.Id)
                                        .Result ?? throw new Exception("Invalid bank account.");
 
+        if (Configuration.Application.Profile == Profile.Testing)
+            return;
+        
         m_InternalTimer = new Timer(service => ProcessInternalTransactions(service).Wait(), this, TimeSpan.Zero, TimeSpan.FromSeconds(15));
         m_ExternalTimer = new Timer(service => ProcessExternalTransactions(service).Wait(), this, TimeSpan.Zero, TimeSpan.FromMinutes(15));
     }
