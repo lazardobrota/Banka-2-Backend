@@ -1,6 +1,6 @@
 @echo off
 
-set SERVICE_NAME=bank.user
+set SERVICE_NAME=user_database
 
 echo Starting %SERVICE_NAME% service and its dependencies...
 docker-compose up %SERVICE_NAME% --build

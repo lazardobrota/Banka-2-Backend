@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICE_NAME="bank.user"
+SERVICE_NAME="user_database"
 
 echo "Starting $SERVICE_NAME service and its dependencies..."
 docker-compose up $SERVICE_NAME --build

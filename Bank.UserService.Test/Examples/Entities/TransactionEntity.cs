@@ -15,12 +15,12 @@ public static partial class Example
                                                                             {
                                                                                 FromAccountId   = Seeder.Account.DomesticAccount01.Id,
                                                                                 FromCurrencyId  = Seeder.Currency.SerbianDinar.Id,
-                                                                                ToAccountNumber = Seeder.Account.ForeignAccount01.Number,
+                                                                                ToAccountNumber = $"{Seeder.Bank.Bank02.Code}0000{Seeder.Account.ForeignAccount01.Number}{Seeder.AccountType.ForeignCurrencyAccount.Code}",
                                                                                 ToCurrencyId    = Seeder.Currency.Euro.Id,
                                                                                 Amount          = 10.05m,
                                                                                 CodeId          = Seeder.TransactionCode.TransactionCode224.Id,
                                                                                 ReferenceNumber = "2345454333",
-                                                                                Purpose         = "Za testiranje"
+                                                                                Purpose         = "Testing"
                                                                             };
 
             public static readonly TransactionUpdateRequest UpdateRequest = new()

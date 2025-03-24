@@ -1,5 +1,6 @@
 using Bank.Application.Extensions;
 using Bank.UserService.Application;
+using Bank.UserService.BackgroundServices;
 using Bank.UserService.HostedServices;
 
 using DotNetEnv;
@@ -29,6 +30,7 @@ public class Hooks
         var services = new ServiceCollection();
 
         services.AddServices();
+        services.AddBackgroundServices();
         services.AddHttpServices();
         services.AddDatabase();
         services.AddHostedServices();
@@ -37,6 +39,8 @@ public class Hooks
         var serviceProvider = services.BuildServiceProvider();
 
         serviceProvider.GetRequiredService<DatabaseHostedService>()
+                       .OnApplicationStarted();
+        serviceProvider.GetRequiredService<TransactionBackgroundService>()
                        .OnApplicationStarted();
 
         return services;
