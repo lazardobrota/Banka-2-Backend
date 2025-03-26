@@ -1,6 +1,7 @@
-﻿using Bank.Application.Domain;
+using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
+using Bank.UserService.Database.Sample;
 using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.Test.Examples.Entities;
@@ -11,22 +12,9 @@ public static partial class Example
     {
         public static class Transaction
         {
-            public static readonly TransactionCreateRequest CreateRequest = new()
-                                                                            {
-                                                                                FromAccountId   = Seeder.Account.DomesticAccount01.Id,
-                                                                                FromCurrencyId  = Seeder.Currency.SerbianDinar.Id,
-                                                                                ToAccountNumber = $"{Seeder.Bank.Bank02.Code}0000{Seeder.Account.ForeignAccount01.Number}{Seeder.AccountType.ForeignCurrencyAccount.Code}",
-                                                                                ToCurrencyId    = Seeder.Currency.Euro.Id,
-                                                                                Amount          = 10.05m,
-                                                                                CodeId          = Seeder.TransactionCode.TransactionCode224.Id,
-                                                                                ReferenceNumber = "2345454333",
-                                                                                Purpose         = "Testing"
-                                                                            };
+            public static readonly TransactionCreateRequest CreateRequest = Sample.Transaction.CreateRequest;
 
-            public static readonly TransactionUpdateRequest UpdateRequest = new()
-                                                                            {
-                                                                                Status = TransactionStatus.Failed
-                                                                            };
+            public static readonly TransactionUpdateRequest UpdateRequest = Sample.Transaction.UpdateRequest;
 
             public static readonly Guid TransactionId = Seeder.Transaction.Transaction01.Id;
 

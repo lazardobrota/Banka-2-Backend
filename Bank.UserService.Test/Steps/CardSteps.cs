@@ -61,7 +61,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     [Given(@"card update status request and Id")]
     public void GivenCardUpdateStatusRequestAndId()
     {
-        m_ScenarioContext[Constant.CardId]              = Guid.Parse("4d18a4c9-8f48-4044-9424-625b49106b36");
+        m_ScenarioContext[Constant.CardId]              = Example.Entity.Card.Id;
         m_ScenarioContext[Constant.StatusUpdateRequest] = Example.Entity.Card.StatusUpdateRequest;
     }
 
@@ -90,7 +90,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     [Given(@"card update limit request and Id")]
     public void GivenCardUpdateLimitRequestAndId()
     {
-        m_ScenarioContext[Constant.CardId]             = Guid.Parse("4d18a4c9-8f48-4044-9424-625b49106b36");
+        m_ScenarioContext[Constant.CardId]             = Example.Entity.Card.Id;
         m_ScenarioContext[Constant.LimitUpdateRequest] = Example.Entity.Card.LimitUpdateRequest;
     }
 

@@ -1,4 +1,6 @@
 ﻿using Bank.Application.Requests;
+using Bank.UserService.Database.Sample;
+using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.Test.Examples.Entities;
 
@@ -8,24 +10,13 @@ public static partial class Example
     {
         public static class Card
         {
-            public static readonly CardCreateRequest CreateRequest = new()
-                                                                     {
-                                                                         CardTypeId = Guid.Parse("cd2ea450-14f3-4c46-a35a-7dccf783f48a"),
-                                                                         AccountId  = Guid.Parse("5d5fa996-9533-421c-a319-cd43ff41d86f"),
-                                                                         Name       = "Credit Card",
-                                                                         Limit      = 5000.00m,
-                                                                         Status     = true
-                                                                     };
+            public static readonly CardCreateRequest CreateRequest = Sample.Card.CreateRequest;
 
-            public static readonly CardStatusUpdateRequest StatusUpdateRequest = new()
-                                                                                 {
-                                                                                     Status = false
-                                                                                 };
+            public static readonly CardStatusUpdateRequest StatusUpdateRequest = Sample.Card.StatusUpdateRequest;
 
-            public static readonly CardLimitUpdateRequest LimitUpdateRequest = new()
-                                                                               {
-                                                                                   Limit = 10000.00m
-                                                                               };
+            public static readonly CardLimitUpdateRequest LimitUpdateRequest = Sample.Card.LimitUpdateRequest;
+
+            public static readonly Guid Id = Seeder.Card.Card03.Id;
         }
     }
 }

@@ -12,19 +12,13 @@ file static class Example
 {
     public static class TransactionCode
     {
-        public static readonly Guid     Id         = Guid.Parse("9a25d56c-5244-4b5a-b39d-d07b0e1be150");
-        public const           string   Code       = "289";
-        public const           string   Name       = "Platna transakcija";
-        public static readonly DateTime CreatedAt  = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime ModifiedAt = new(2025, 3, 5, 12, 45, 0);
-
         public static readonly TransactionCodeResponse Response = new()
                                                                   {
-                                                                      Id         = Id,
-                                                                      Code       = Code,
-                                                                      Name       = Name,
-                                                                      CreatedAt  = CreatedAt,
-                                                                      ModifiedAt = ModifiedAt
+                                                                      Id         = Guid.Parse("9a25d56c-5244-4b5a-b39d-d07b0e1be150"),
+                                                                      Code       = "289",
+                                                                      Name       = "Platna transakcija",
+                                                                      CreatedAt  = DateTime.UtcNow,
+                                                                      ModifiedAt = DateTime.UtcNow,
                                                                   };
     }
 }
