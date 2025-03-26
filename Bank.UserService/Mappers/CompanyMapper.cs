@@ -20,19 +20,6 @@ public static class CompanyMapper
                };
     }
 
-    public static CompanySimpleResponse ToSimpleResponse(this Company company)
-    {
-        return new CompanySimpleResponse
-               {
-                   Id                      = company.Id,
-                   Name                    = company.Name,
-                   RegistrationNumber      = company.RegistrationNumber,
-                   TaxIdentificationNumber = company.TaxIdentificationNumber,
-                   ActivityCode            = company.ActivityCode,
-                   Address                 = company.Address
-               };
-    }
-
     public static Company ToCompany(this CompanyCreateRequest companyCreateRequest, User majorityOwner)
     {
         return new Company
@@ -48,18 +35,14 @@ public static class CompanyMapper
                };
     }
 
-    public static Company ToCompany(this CompanyUpdateRequest companyUpdateRequest, Company oldCompany, User majorityOwner)
+    public static Company Update(this Company company, CompanyUpdateRequest updateRequest, User majorityOwner)
     {
-        return new Company
-               {
-                   Id                      = oldCompany.Id,
-                   Name                    = companyUpdateRequest.Name,
-                   RegistrationNumber      = oldCompany.RegistrationNumber,
-                   TaxIdentificationNumber = oldCompany.TaxIdentificationNumber,
-                   ActivityCode            = companyUpdateRequest.ActivityCode,
-                   Address                 = companyUpdateRequest.Address,
-                   MajorityOwnerId         = companyUpdateRequest.MajorityOwnerId,
-                   MajorityOwner           = majorityOwner
-               };
+        company.Name            = updateRequest.Name;
+        company.ActivityCode    = updateRequest.ActivityCode;
+        company.Address         = updateRequest.Address;
+        company.MajorityOwnerId = updateRequest.MajorityOwnerId;
+        company.MajorityOwner   = majorityOwner;
+
+        return company;
     }
 }
