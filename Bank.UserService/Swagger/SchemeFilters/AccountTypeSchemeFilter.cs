@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Sample;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -13,31 +14,13 @@ file static class Example
 {
     public static class AccountType
     {
-        public static readonly Guid     Id         = Guid.Parse("c3f7a5d4-e6b8-4d2a-a678-123456789abc");
-        public const           string   Name       = "Štedni račun";
-        public const           string   Code       = "SSS";
-        public static readonly DateTime CreatedAt  = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime ModifiedAt = new(2025, 3, 5, 12, 45, 0);
-
-        public static readonly AccountTypeCreateRequest CreateRequest = new()
-                                                                        {
-                                                                            Name = Name,
-                                                                            Code = Code
-                                                                        };
-
-        public static readonly AccountTypeUpdateRequest UpdateRequest = new()
-                                                                        {
-                                                                            Name = Name,
-                                                                            Code = Code
-                                                                        };
-
         public static readonly AccountTypeResponse Response = new()
                                                               {
-                                                                  Id         = Id,
-                                                                  Name       = Name,
-                                                                  Code       = Code,
-                                                                  CreatedAt  = CreatedAt,
-                                                                  ModifiedAt = ModifiedAt
+                                                                  Id         = Guid.Parse("c3f7a5d4-e6b8-4d2a-a678-123456789abc"),
+                                                                  Name       = Sample.AccountType.CreateRequest.Name,
+                                                                  Code       = Sample.AccountType.CreateRequest.Code,
+                                                                  CreatedAt  = DateTime.UtcNow,
+                                                                  ModifiedAt = DateTime.UtcNow
                                                               };
     }
 }
@@ -46,7 +29,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class AccountType
     {
-        public class CreateRequest() : SwaggerSchemaFilter<AccountTypeCreateRequest>(SchemeFilters.Example.AccountType.CreateRequest)
+        public class CreateRequest() : SwaggerSchemaFilter<AccountTypeCreateRequest>(Sample.AccountType.CreateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -60,7 +43,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class UpdateRequest() : SwaggerSchemaFilter<AccountTypeUpdateRequest>(SchemeFilters.Example.AccountType.UpdateRequest)
+        public class UpdateRequest() : SwaggerSchemaFilter<AccountTypeUpdateRequest>(Sample.AccountType.UpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

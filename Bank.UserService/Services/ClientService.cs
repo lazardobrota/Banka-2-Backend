@@ -78,13 +78,12 @@ public class ClientService(IUserRepository repository, IEmailService emailServic
 
     public async Task<Result<ClientResponse>> Update(ClientUpdateRequest clientUpdateRequest, Guid id)
     {
-        var oldUser = await m_UserRepository.FindById(id);
+        var dbUser = await m_UserRepository.FindById(id);
 
-        if (oldUser is null || oldUser.Role != Role.Client)
+        if (dbUser is null || dbUser.Role != Role.Client)
             return Result.NotFound<ClientResponse>($"No Client found with Id: {id}");
 
-        var user = await m_UserRepository.Update(oldUser, clientUpdateRequest.ToClient(oldUser.ToClient())
-                                                                             .ToUser());
+        var user = await m_UserRepository.Update(dbUser.Update(clientUpdateRequest));
 
         return Result.Ok(user.ToClient()
                              .ToResponse());
@@ -92,16 +91,13 @@ public class ClientService(IUserRepository repository, IEmailService emailServic
 
     public async Task<Result<List<CardResponse>>> FindAllCards(Guid clientId)
     {
-        // First verify the client exists
         var client = await m_UserRepository.FindById(clientId);
 
         if (client is null || client.Role != Role.Client)
             return Result.NotFound<List<CardResponse>>($"No Client found with Id: {clientId}");
 
-        // Get all cards for the client
         var cards = await m_CardRepository.FindAllByClientId(clientId);
 
-        // Map cards to response objects
         var cardResponses = cards.Select(card => card.ToResponse())
                                  .ToList();
 

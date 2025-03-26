@@ -66,7 +66,7 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
     [Given(@"installment Id")]
     public void GivenInstallmentId()
     {
-        m_ScenarioContext[Constant.InstallmentId] = Guid.Parse("7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d");
+        m_ScenarioContext[Constant.InstallmentId] = Example.Entity.Installment.InstallmentId;
     }
 
     [When(@"installment is updated with request in the database")]
@@ -88,14 +88,14 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
 
         installmentUpdateResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         installmentUpdateResult.ShouldNotBeNull();
-        installmentUpdateResult.Value?.ActualDueDate.ShouldBe(DateOnly.FromDateTime((DateTime)Example.Entity.Installment.UpdateRequest.ActualDueDate));
-        installmentUpdateResult.Value?.Status.ShouldBe(Example.Entity.Installment.UpdateRequest.Status.Value);
+        installmentUpdateResult.Value?.ActualDueDate.ShouldBe(DateOnly.FromDateTime((DateTime)Example.Entity.Installment.UpdateRequest.ActualDueDate!));
+        installmentUpdateResult.Value?.Status.ShouldBe(Example.Entity.Installment.UpdateRequest.Status!.Value);
     }
 
     [Given(@"loan Id for installments")]
     public void GivenLoanIdForInstallments()
     {
-        m_ScenarioContext[Constant.LoanId] = Guid.Parse("f5a74113-8f10-42a3-b130-54c5c691ba8e");
+        m_ScenarioContext[Constant.LoanId] = Example.Entity.Installment.LoanId;
     }
 
     [When(@"all installments are fetched for the account")]

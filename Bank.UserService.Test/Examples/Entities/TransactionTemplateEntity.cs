@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Requests;
+using Bank.UserService.Database.Sample;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
@@ -12,18 +13,9 @@ public static partial class Example
     {
         public static class TransactionTemplate
         {
-            public static readonly TransactionTemplateCreateRequest TransactionTemplateCreateRequest = new()
-                                                                                                       {
-                                                                                                           AccountNumber = "11111",
-                                                                                                           Name          = "Slavko RSD"
-                                                                                                       };
+            public static readonly TransactionTemplateCreateRequest TransactionTemplateCreateRequest = Sample.TransactionTemplate.CreateRequest;
 
-            public static readonly TransactionTemplateUpdateRequest TransactionTemplateUpdateRequest = new()
-                                                                                                       {
-                                                                                                           AccountNumber = "22222",
-                                                                                                           Deleted       = false,
-                                                                                                           Name          = "Mirko EUR"
-                                                                                                       };
+            public static readonly TransactionTemplateUpdateRequest TransactionTemplateUpdateRequest = Sample.TransactionTemplate.UpdateRequest;
 
             public static readonly TransactionTemplateModel GetTransactionTemplate = new()
                                                                                      {

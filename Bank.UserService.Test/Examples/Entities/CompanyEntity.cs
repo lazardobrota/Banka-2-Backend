@@ -2,6 +2,7 @@
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Sample;
 using Bank.UserService.Mappers;
 
 using Seeder = Bank.UserService.Database.Seeders.Seeder;
@@ -14,15 +15,7 @@ public static partial class Example
     {
         public static class Company
         {
-            public static readonly CompanyCreateRequest CreateRequest = new()
-                                                                        {
-                                                                            Name                    = "Innovate Tech",
-                                                                            RegistrationNumber      = "11345678",
-                                                                            TaxIdentificationNumber = "88654321",
-                                                                            ActivityCode            = "1234",
-                                                                            Address                 = "123 Tech Street, Innovate City",
-                                                                            MajorityOwnerId         = Seeder.Client.Client01.Id
-                                                                        };
+            public static readonly CompanyCreateRequest CreateRequest = Sample.Company.CreateRequest;
 
             public static readonly CompanyResponse CompanyResponse = new()
                                                                      {
@@ -46,13 +39,7 @@ public static partial class Example
                                                                           MajorityOwner           = Seeder.Company.Company02.MajorityOwner?.ToSimpleResponse()
                                                                       };
 
-            public static readonly CompanyUpdateRequest UpdateRequest = new()
-                                                                        {
-                                                                            Name            = "Updated Company Name",
-                                                                            ActivityCode    = "4321",
-                                                                            Address         = "456 Updated Street, New City",
-                                                                            MajorityOwnerId = Seeder.Client.Client01.Id
-                                                                        };
+            public static readonly CompanyUpdateRequest UpdateRequest = Sample.Company.UpdateRequest;
 
             public static readonly CompanyFilterQuery CompanyFilterQuery = new()
                                                                            {

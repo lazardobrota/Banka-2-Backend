@@ -4,6 +4,7 @@ using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Configurations;
 using Bank.UserService.Mappers;
+using Bank.UserService.Models;
 using Bank.UserService.Repositories;
 
 namespace Bank.UserService.Services;
@@ -16,7 +17,7 @@ public interface IExchangeService
 
     Task<Result<ExchangeResponse>> GetByCurrencies(ExchangeBetweenQuery exchangeBetweenQuery);
 
-    Task<Result<ExchangeResponse>> MakeExchange(ExchangeMakeExchangeRequest exchangeMakeExchangeRequest, ExchangeFilterQuery exchangeFilterQuery);
+    Task<Result<ExchangeResponse>> MakeExchange(ExchangeMakeExchangeRequest exchangeMakeExchangeRequest);
 
     Task<Result<ExchangeResponse>> Update(ExchangeUpdateRequest exchangeUpdateRequest, Guid id);
 }
@@ -49,7 +50,7 @@ public class ExchangeService(
         }
         else if (!string.IsNullOrEmpty(exchangeFilterQuery.CurrencyCode))
         {
-            exchangeResponses = exchanges.Select(exchange => exchange.CurrencyFrom.Code == exchangeFilterQuery.CurrencyCode
+            exchangeResponses = exchanges.Select(exchange => exchange.CurrencyFrom!.Code == exchangeFilterQuery.CurrencyCode
                                                              ? exchange.ToResponse()
                                                              : exchange.Inverse()
                                                                        .ToResponse())
@@ -84,7 +85,7 @@ public class ExchangeService(
         if (secondCurrency is null)
             return Result.NotFound<ExchangeResponse>($"No Currency with code '{exchangeBetweenQuery.CurrencyToCode}'");
 
-        var exchange = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(firstCurrency, secondCurrency, new ExchangeFilterQuery());
+        var exchange = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(firstCurrency, secondCurrency);
 
         if (exchange is null)
             return Result.NotFound<ExchangeResponse>($"No Exchange with currencies '{firstCurrency.Code}' and '{secondCurrency.Code}'");
@@ -95,7 +96,7 @@ public class ExchangeService(
                                    .ToResponse());
     }
 
-    public async Task<Result<ExchangeResponse>> MakeExchange(ExchangeMakeExchangeRequest exchangeMakeExchangeRequest, ExchangeFilterQuery exchangeFilterQuery)
+    public async Task<Result<ExchangeResponse>> MakeExchange(ExchangeMakeExchangeRequest exchangeMakeExchangeRequest)
     {
         var account = await m_AccountRepository.FindById(exchangeMakeExchangeRequest.AccountId);
 
@@ -117,17 +118,10 @@ public class ExchangeService(
         if (defaultCurrency is null)
             throw new Exception("No Domestic Currency");
 
-        var exchangeFrom = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyFrom, exchangeFilterQuery);
-        var exchangeTo   = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyTo,   exchangeFilterQuery);
-
-        if (exchangeFrom is null && exchangeTo is null)
-            return Result.BadRequest<ExchangeResponse>($"No Exchange with currencies '{currencyFrom.Code}' and '{currencyTo.Code}'");
-
-        decimal rateFrom = exchangeFrom?.AskRate ?? 1;
-        decimal rateTo   = exchangeTo?.BidRate   ?? 1;
-
-        decimal resultRate  = rateFrom                           / rateTo;
-        decimal finalAmount = exchangeMakeExchangeRequest.Amount * resultRate;
+        var exchangeFrom = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyFrom);
+        var exchangeTo   = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyTo);
+        
+        var exchangeDetails = CalculateExchangeDetails(exchangeFrom, exchangeTo);
 
         // TODO: make transaction
 
@@ -141,8 +135,64 @@ public class ExchangeService(
         if (oldExchange == null)
             return Result.NotFound<ExchangeResponse>($"No Exchange found with Id '{id}'");
 
-        var updatedExchange = await m_ExchangeRepository.Update(oldExchange, exchangeUpdateRequest.ToExchange(oldExchange));
+        var updatedExchange = await m_ExchangeRepository.Update(oldExchange.Update(exchangeUpdateRequest));
 
         return Result.Ok(updatedExchange.ToResponse());
+    }
+
+    public async Task<ExchangeDetails?> CalculateExchangeDetails(Guid currencyFromId, Guid currencyToId)
+    {
+        var currencyFromTask = m_CurrencyRepository.FindById(currencyFromId);
+        var currencyToTask   = m_CurrencyRepository.FindById(currencyToId);
+        var defaultCurrencyTask  = m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode);
+
+        await Task.WhenAll(currencyFromTask, currencyToTask, defaultCurrencyTask);
+        
+        var currencyFrom        = await currencyFromTask;
+        var currencyTo          = await currencyToTask;
+        var defaultCurrency = await defaultCurrencyTask;
+        
+        if (currencyFrom is null || currencyTo is null)
+            return null;
+        
+        if (defaultCurrency is null)
+            throw new Exception("No Default Currency");
+        
+        var exchangeFromTask = m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyFrom);
+        var exchangeToTask   = m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyTo);
+        
+        await Task.WhenAll(exchangeFromTask, exchangeToTask);
+        
+        var exchangeFrom = await exchangeFromTask;
+        var exchangeTo   = await exchangeToTask;
+
+        return CalculateExchangeDetails(exchangeFrom, exchangeTo);
+    }
+
+    public ExchangeDetails CalculateExchangeDetails(Exchange? exchangeFrom, Exchange? exchangeTo)
+    {
+        decimal exchangeRateFrom = exchangeFrom?.AskRate ?? 1;
+        decimal exchangeRateTo   = exchangeTo?.BidRate   ?? 1;
+        decimal exchangeRate     = exchangeRateFrom / exchangeRateTo;
+
+        decimal inverseExchangeRate = exchangeRateTo / exchangeRateFrom;
+
+        decimal averageRateFrom = exchangeFrom?.Rate ?? 1;
+        decimal averageRateTo   = exchangeTo?.Rate   ?? 1;
+        decimal averageRate     = averageRateFrom / averageRateTo;
+
+        decimal inverseAverageRateFrom = exchangeFrom?.InverseRate ?? 1;
+        decimal inverseAverageRateTo   = exchangeTo?.InverseRate   ?? 1;
+        decimal inverseAverageRate     = inverseAverageRateFrom / inverseAverageRateTo;
+
+        return new ExchangeDetails()
+               {
+                   CurrencyFrom        = exchangeFrom?.CurrencyFrom ?? null,
+                   CurrencyTo          = exchangeTo?.CurrencyTo     ?? null,
+                   ExchangeRate        = exchangeRate,
+                   InverseExchangeRate = inverseExchangeRate,
+                   AverageRate         = averageRate,
+                   InverseAverageRate  = inverseAverageRate
+               };
     }
 }

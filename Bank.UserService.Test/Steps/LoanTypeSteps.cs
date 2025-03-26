@@ -2,6 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
 
@@ -63,7 +64,7 @@ public class LoanTypeSteps(ScenarioContext scenarioContext, ILoanTypeService loa
     [Given(@"loan type Id")]
     public void GivenLoanTypeId()
     {
-        m_ScenarioContext[Constant.LoanTypeId] = Guid.Parse("4632f907-4f31-47f2-8fab-5c8a717aef55");
+        m_ScenarioContext[Constant.LoanTypeId] = Seeder.LoanType.Personal.Id;
     }
 
     [When(@"loan type is updated in the database")]

@@ -13,10 +13,6 @@ public interface ICurrencyRepository
     Task<Currency?> FindById(Guid id);
 
     Task<Currency?> FindByCode(string currencyCode);
-
-    Task<Currency> Add(Currency currency);
-
-    Task<Currency> Update(Currency oldCurrency, Currency currency);
 }
 
 public class CurrencyRepository(ApplicationContext context) : ICurrencyRepository
@@ -39,34 +35,15 @@ public class CurrencyRepository(ApplicationContext context) : ICurrencyRepositor
 
     public async Task<Currency?> FindById(Guid id)
     {
-        return await m_Context.Currencies.Include(c => c.Countries)
-                              .FirstOrDefaultAsync(x => x.Id == id);
+        return await m_Context.Currencies.Include(currency => currency.Countries)
+                              .Where(currency => currency.Id == id)
+                              .FirstOrDefaultAsync();
     }
 
     public async Task<Currency?> FindByCode(string currencyCode)
     {
-        return await m_Context.Currencies.Include(c => c.Countries)
-                              .FirstOrDefaultAsync(x => x.Code.ToLower() == currencyCode.ToLower());
-    }
-
-    public async Task<Currency> Add(Currency currency)
-    {
-        var addedCurrency = await m_Context.Currencies.AddAsync(currency);
-
-        await m_Context.SaveChangesAsync();
-
-        return addedCurrency.Entity;
-    }
-
-    public async Task<Currency> Update(Currency oldCurrency, Currency currency)
-    {
-        m_Context.Currencies.Entry(oldCurrency)
-                 .State = EntityState.Detached;
-
-        var updatedCurrency = m_Context.Currencies.Update(currency);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedCurrency.Entity;
+        return await m_Context.Currencies.Include(currency => currency.Countries)
+                              .Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
+                              .FirstOrDefaultAsync();
     }
 }

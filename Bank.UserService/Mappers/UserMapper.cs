@@ -180,29 +180,20 @@ public static class UserMapper
                };
     }
 
-    public static Employee ToEmployee(this EmployeeUpdateRequest employeeUpdateRequest, Employee oldEmployee)
+    public static User Update(this User user, EmployeeUpdateRequest updateRequest)
     {
-        return new Employee
-               {
-                   FirstName                  = employeeUpdateRequest.FirstName,
-                   LastName                   = employeeUpdateRequest.LastName,
-                   Username                   = employeeUpdateRequest.Username,
-                   PhoneNumber                = employeeUpdateRequest.PhoneNumber,
-                   Address                    = employeeUpdateRequest.Address,
-                   Role                       = employeeUpdateRequest.Role,
-                   Department                 = employeeUpdateRequest.Department,
-                   Employed                   = employeeUpdateRequest.Employed,
-                   Activated                  = employeeUpdateRequest.Activated,
-                   Id                         = oldEmployee.Id,
-                   Password                   = oldEmployee.Password,
-                   Salt                       = oldEmployee.Salt,
-                   DateOfBirth                = oldEmployee.DateOfBirth,
-                   Gender                     = oldEmployee.Gender,
-                   UniqueIdentificationNumber = oldEmployee.UniqueIdentificationNumber,
-                   Email                      = oldEmployee.Email,
-                   CreatedAt                  = oldEmployee.CreatedAt,
-                   ModifiedAt                 = DateTime.UtcNow
-               };
+        user.FirstName   = updateRequest.FirstName;
+        user.LastName    = updateRequest.LastName;
+        user.Username    = updateRequest.Username;
+        user.PhoneNumber = updateRequest.PhoneNumber;
+        user.Address     = updateRequest.Address;
+        user.Role        = updateRequest.Role;
+        user.Department  = updateRequest.Department;
+        user.Employed    = updateRequest.Employed;
+        user.Activated   = updateRequest.Activated;
+        user.ModifiedAt  = DateTime.UtcNow;
+
+        return user;
     }
 
     public static ClientResponse ToResponse(this Client client)
@@ -268,27 +259,16 @@ public static class UserMapper
                };
     }
 
-    public static Client ToClient(this ClientUpdateRequest clientUpdateRequest, Client oldClient)
+    public static User Update(this User user, ClientUpdateRequest updateRequest)
     {
-        return new Client
-               {
-                   Id                         = oldClient.Id,
-                   FirstName                  = clientUpdateRequest.FirstName,
-                   LastName                   = clientUpdateRequest.LastName,
-                   PhoneNumber                = clientUpdateRequest.PhoneNumber,
-                   Address                    = clientUpdateRequest.Address,
-                   Activated                  = clientUpdateRequest.Activated,
-                   DateOfBirth                = oldClient.DateOfBirth,
-                   Gender                     = oldClient.Gender,
-                   UniqueIdentificationNumber = oldClient.UniqueIdentificationNumber,
-                   Email                      = oldClient.Email,
-                   Password                   = oldClient.Password,
-                   Salt                       = oldClient.Salt,
-                   Role                       = oldClient.Role,
-                   BankId                     = Seeder.Bank.Bank02.Id,
-                   CreatedAt                  = oldClient.CreatedAt,
-                   ModifiedAt                 = DateTime.UtcNow
-               };
+        user.FirstName   = updateRequest.FirstName;
+        user.LastName    = updateRequest.LastName;
+        user.PhoneNumber = updateRequest.PhoneNumber;
+        user.Address     = updateRequest.Address;
+        user.Activated   = updateRequest.Activated;
+        user.ModifiedAt  = DateTime.UtcNow;
+
+        return user;
     }
 
     public static User ToUser(this Client client)

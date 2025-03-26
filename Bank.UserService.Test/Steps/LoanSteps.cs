@@ -68,7 +68,7 @@ public class LoanSteps(ScenarioContext scenarioContext, ILoanService loanService
     [Given(@"loan Id")]
     public void GivenLoanId()
     {
-        m_ScenarioContext[Constant.LoanId] = Guid.Parse("f5a74113-8f10-42a3-b130-54c5c691ba8e");
+        m_ScenarioContext[Constant.LoanId] = Example.Entity.Loan.Id;
     }
 
     [When(@"loan is updated in the database")]
@@ -97,7 +97,7 @@ public class LoanSteps(ScenarioContext scenarioContext, ILoanService loanService
     [Given(@"loan Id which has installemtns")]
     public void GivenLoanIdWhichHasInstallemtns()
     {
-        m_ScenarioContext[Constant.LoanId] = Guid.Parse("f5a74113-8f10-42a3-b130-54c5c691ba8e");
+        m_ScenarioContext[Constant.LoanId] = Example.Entity.Loan.Id;
     }
 
     [When(@"all installemtns are fetched for the loan")]

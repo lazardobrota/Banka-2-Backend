@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Sample;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -13,43 +14,25 @@ file static class Example
 {
     public static class TransactionTemplate
     {
-        public static readonly Guid     Id            = Guid.Parse("44ca0bef-1783-40b9-9b41-51e196d4f6b3");
-        public const           string   Name          = "Mesečni zakup";
-        public const           string   AccountNumber = "222002200000123211";
-        public const           bool     Deleted       = false;
-        public static readonly DateTime CreatedAt     = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime ModifiedAt    = new(2025, 3, 5, 12, 45, 0);
-
-        public static readonly TransactionTemplateCreateRequest CreateRequest = new()
-                                                                                {
-                                                                                    Name          = Name,
-                                                                                    AccountNumber = AccountNumber
-                                                                                };
-
-        public static readonly TransactionTemplateUpdateRequest UpdateRequest = new()
-                                                                                {
-                                                                                    Name          = Name,
-                                                                                    AccountNumber = AccountNumber,
-                                                                                    Deleted       = Deleted
-                                                                                };
+        public static readonly Guid Id = Guid.Parse("44ca0bef-1783-40b9-9b41-51e196d4f6b3");
 
         public static readonly TransactionTemplateResponse Response = new()
                                                                       {
                                                                           Id            = Id,
                                                                           Client        = null!,
-                                                                          Name          = Name,
-                                                                          AccountNumber = AccountNumber,
-                                                                          Deleted       = Deleted,
-                                                                          CreatedAt     = CreatedAt,
-                                                                          ModifiedAt    = ModifiedAt
+                                                                          Name          = Sample.TransactionTemplate.CreateRequest.Name,
+                                                                          AccountNumber = Sample.TransactionTemplate.CreateRequest.AccountNumber,
+                                                                          Deleted       = Sample.TransactionTemplate.UpdateRequest.Deleted,
+                                                                          CreatedAt     = DateTime.UtcNow,
+                                                                          ModifiedAt    = DateTime.UtcNow
                                                                       };
 
         public static readonly TransactionTemplateSimpleResponse SimpleResponse = new()
                                                                                   {
                                                                                       Id            = Id,
-                                                                                      Name          = Name,
-                                                                                      AccountNumber = AccountNumber,
-                                                                                      Deleted       = Deleted
+                                                                                      Name          = Sample.TransactionTemplate.CreateRequest.Name,
+                                                                                      AccountNumber = Sample.TransactionTemplate.CreateRequest.AccountNumber,
+                                                                                      Deleted       = Sample.TransactionTemplate.UpdateRequest.Deleted,
                                                                                   };
     }
 }
@@ -58,7 +41,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class TransactionTemplate
     {
-        public class CreateRequest() : SwaggerSchemaFilter<TransactionTemplateCreateRequest>(SchemeFilters.Example.TransactionTemplate.CreateRequest)
+        public class CreateRequest() : SwaggerSchemaFilter<TransactionTemplateCreateRequest>(Sample.TransactionTemplate.CreateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -72,7 +55,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class UpdateRequest() : SwaggerSchemaFilter<TransactionTemplateUpdateRequest>(SchemeFilters.Example.TransactionTemplate.UpdateRequest)
+        public class UpdateRequest() : SwaggerSchemaFilter<TransactionTemplateUpdateRequest>(Sample.TransactionTemplate.UpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

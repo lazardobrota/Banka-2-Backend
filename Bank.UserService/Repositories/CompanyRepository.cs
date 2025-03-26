@@ -15,7 +15,7 @@ public interface ICompanyRepository
 
     Task<Company> Add(Company company);
 
-    Task<Company> Update(Company oldCompany, Company company);
+    Task<Company> Update(Company company);
 
     Task<bool> ExistsByUniqueConstrains(string registrationNumber, string taxIdentificationNumber);
 }
@@ -62,16 +62,15 @@ public class CompanyRepository(ApplicationContext context) : ICompanyRepository
         return addedCompany.Entity;
     }
 
-    public async Task<Company> Update(Company oldCompany, Company company)
+    public async Task<Company> Update(Company company)
     {
-        m_Context.Companies.Entry(oldCompany)
-                 .State = EntityState.Detached;
+        await m_Context.Companies.Where(dbCompany => dbCompany.Id == company.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbCompany => dbCompany.Address, company.Address)
+                                                             .SetProperty(dbCompany => dbCompany.Name,            company.Name)
+                                                             .SetProperty(dbCompany => dbCompany.ActivityCode,    company.ActivityCode)
+                                                             .SetProperty(dbCompany => dbCompany.MajorityOwnerId, company.MajorityOwnerId));
 
-        var updatedCompany = m_Context.Companies.Update(company);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedCompany.Entity;
+        return company;
     }
 
     public async Task<bool> ExistsByUniqueConstrains(string registrationNumber, string taxIdentificationNumber)

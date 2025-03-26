@@ -61,8 +61,8 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     [Given(@"card update status request and Id")]
     public void GivenCardUpdateStatusRequestAndId()
     {
-        m_ScenarioContext[Constant.CardId]              = Guid.Parse("4d18a4c9-8f48-4044-9424-625b49106b36");
-        m_ScenarioContext[Constant.StatusUpdateRequest] = Example.Entity.Card.UpdateStatusRequest;
+        m_ScenarioContext[Constant.CardId]              = Example.Entity.Card.Id;
+        m_ScenarioContext[Constant.StatusUpdateRequest] = Example.Entity.Card.StatusUpdateRequest;
     }
 
     [When(@"card status is updated in the database")]
@@ -70,7 +70,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     {
         var cardId = m_ScenarioContext.Get<Guid>(Constant.CardId);
 
-        var statusUpdateRequest = m_ScenarioContext.Get<CardUpdateStatusRequest>(Constant.StatusUpdateRequest);
+        var statusUpdateRequest = m_ScenarioContext.Get<CardStatusUpdateRequest>(Constant.StatusUpdateRequest);
 
         var updateCardResult = await m_CardService.Update(statusUpdateRequest, cardId);
 
@@ -84,14 +84,14 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
 
         updateCardResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         updateCardResult.Value.ShouldNotBeNull();
-        updateCardResult.Value.Status.ShouldBe(Example.Entity.Card.UpdateStatusRequest.Status);
+        updateCardResult.Value.Status.ShouldBe(Example.Entity.Card.StatusUpdateRequest.Status);
     }
 
     [Given(@"card update limit request and Id")]
     public void GivenCardUpdateLimitRequestAndId()
     {
-        m_ScenarioContext[Constant.CardId]             = Guid.Parse("4d18a4c9-8f48-4044-9424-625b49106b36");
-        m_ScenarioContext[Constant.LimitUpdateRequest] = Example.Entity.Card.UpdateLimitRequest;
+        m_ScenarioContext[Constant.CardId]             = Example.Entity.Card.Id;
+        m_ScenarioContext[Constant.LimitUpdateRequest] = Example.Entity.Card.LimitUpdateRequest;
     }
 
     [When(@"card limit is updated in the database")]
@@ -99,7 +99,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     {
         var cardId = m_ScenarioContext.Get<Guid>(Constant.CardId);
 
-        var limitUpdateRequest = m_ScenarioContext.Get<CardUpdateLimitRequest>(Constant.LimitUpdateRequest);
+        var limitUpdateRequest = m_ScenarioContext.Get<CardLimitUpdateRequest>(Constant.LimitUpdateRequest);
 
         var updateCardResult = await m_CardService.Update(limitUpdateRequest, cardId);
 
@@ -113,7 +113,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
 
         updateCardResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         updateCardResult.Value.ShouldNotBeNull();
-        updateCardResult.Value.Limit.ShouldBe(Example.Entity.Card.UpdateLimitRequest.Limit);
+        updateCardResult.Value.Limit.ShouldBe(Example.Entity.Card.LimitUpdateRequest.Limit);
         updateCardResult.Value.Id.ShouldBe(m_ScenarioContext.Get<Guid>(Constant.CardId));
     }
 

@@ -2,6 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Mvc;
@@ -37,7 +38,7 @@ public class AccountTypeSteps(ScenarioContext scenarioContext, IAccountTypeServi
     [Given(@"I have an account type")]
     public void GivenIHaveAnAccountType()
     {
-        m_ScenarioContext[Constant.AccountTypeId] = Guid.Parse("f606cd71-f42f-4ca4-a532-5254bfe34920");
+        m_ScenarioContext[Constant.AccountTypeId] = Seeder.AccountType.CheckingAccount.Id;
     }
 
     [When(@"I get one account type")]

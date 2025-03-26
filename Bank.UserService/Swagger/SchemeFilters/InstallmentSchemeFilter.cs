@@ -1,7 +1,7 @@
-﻿using Bank.Application.Domain;
-using Bank.Application.Extensions;
+﻿using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Sample;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -14,41 +14,16 @@ file static class Example
 {
     public static class Installment
     {
-        public static readonly Guid              Id              = Guid.Parse("a52cbe51-d29e-486a-b7dd-079aa315883f");
-        public static readonly Guid              LoanId          = Guid.Parse("c6dcae29-91cd-40d5-a75c-8df6f24cc257");
-        public const           decimal           InterestRate    = 5.0m;
-        public static readonly DateOnly          ExpectedDueDate = new(2025, 6, 15);
-        public static readonly DateOnly          ActualDueDate   = new(2025, 6, 20);
-        public const           InstallmentStatus Status          = InstallmentStatus.Paid;
-        public static readonly DateTime          CreatedAt       = new(2024, 3, 5, 10, 30, 0);
-        public static readonly DateTime          ModifiedAt      = new(2025, 3, 5, 12, 45, 0);
-
-        public static readonly InstallmentCreateRequest CreateRequest = new()
-                                                                        {
-                                                                            InstallmentId   = Id,
-                                                                            LoanId          = LoanId,
-                                                                            InterestRate    = InterestRate,
-                                                                            ExpectedDueDate = ExpectedDueDate,
-                                                                            ActualDueDate   = ActualDueDate,
-                                                                            Status          = Status
-                                                                        };
-
-        public static readonly InstallmentUpdateRequest UpdateRequest = new()
-                                                                        {
-                                                                            ActualDueDate = ActualDueDate.ToDateTime(TimeOnly.MinValue),
-                                                                            Status        = Status
-                                                                        };
-
         public static readonly InstallmentResponse Response = new()
                                                               {
-                                                                  Id              = Id,
+                                                                  Id              = Sample.Installment.Request.InstallmentId,
                                                                   Loan            = null!,
-                                                                  InterestRate    = InterestRate,
-                                                                  ExpectedDueDate = ExpectedDueDate,
-                                                                  ActualDueDate   = ActualDueDate,
-                                                                  Status          = Status,
-                                                                  CreatedAt       = CreatedAt,
-                                                                  ModifiedAt      = ModifiedAt
+                                                                  InterestRate    = Sample.Installment.Request.InterestRate,
+                                                                  ExpectedDueDate = Sample.Installment.Request.ExpectedDueDate,
+                                                                  ActualDueDate   = Sample.Installment.Request.ActualDueDate,
+                                                                  Status          = Sample.Installment.Request.Status,
+                                                                  CreatedAt       = DateTime.UtcNow,
+                                                                  ModifiedAt      = DateTime.UtcNow,
                                                               };
     }
 }
@@ -57,7 +32,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Installment
     {
-        public class Request() : SwaggerSchemaFilter<InstallmentCreateRequest>(SchemeFilters.Example.Installment.CreateRequest)
+        public class Request() : SwaggerSchemaFilter<InstallmentRequest>(Sample.Installment.Request)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -79,7 +54,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class UpdateRequest() : SwaggerSchemaFilter<InstallmentUpdateRequest>(SchemeFilters.Example.Installment.UpdateRequest)
+        public class UpdateRequest() : SwaggerSchemaFilter<InstallmentUpdateRequest>(Sample.Installment.UpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -88,7 +63,7 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.ActualDueDate)
                             .ToCamelCase()] = new OpenApiDate(Example.ActualDueDate ?? DateTime.MinValue),
                            [nameof(Example.Status)
-                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status),
+                            .ToCamelCase()] = new OpenApiInteger((int)Example.Status!),
                        };
             }
         }

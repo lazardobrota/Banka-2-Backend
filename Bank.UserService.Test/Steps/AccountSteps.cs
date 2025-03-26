@@ -83,7 +83,7 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     [Given(@"account Id")]
     public void GivenAccountId()
     {
-        m_ScenarioContext[Constant.AccountId] = Guid.Parse("1befdb51-989a-4e1f-b7bd-333cf29421b3");
+        m_ScenarioContext[Constant.AccountId] = Example.Entity.Account.AccountId;
     }
 
     [When(@"account is updated with client request in the database")]

@@ -1,5 +1,4 @@
 ﻿using Bank.Application.Domain;
-using Bank.LoanService.Database.Seeders;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.Database.Seeders;

@@ -1,7 +1,6 @@
-﻿using Bank.UserService.Database;
-using Bank.UserService.Models;
+﻿using Bank.UserService.Models;
 
-namespace Bank.LoanService.Database.Seeders;
+namespace Bank.UserService.Database.Seeders;
 
 using LoanTypeModel = LoanType;
 

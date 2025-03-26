@@ -14,15 +14,12 @@ public interface IExchangeRepository
 
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId);
 
-    public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency, ExchangeFilterQuery exchangeFilterQuery);
+    public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency);
 
-    public Task<Exchange?> FindByCurrencyFromIdAndCurrencyToId(Guid firstCurrencyId, Guid secondCurrencyId, ExchangeFilterQuery exchangeFilterQuery);
-
-    public Task<Exchange?> FindByCurrencyFromCodeAndCurrencyToCode(string firstCurrencyCode, string secondCurrencyCode, ExchangeFilterQuery exchangeFilterQuery);
 
     public Task<Exchange> Add(Exchange exchange);
 
-    public Task<Exchange> Update(Exchange oldExchange, Exchange exchange);
+    public Task<Exchange> Update(Exchange exchange);
 }
 
 public class ExchangeRepository(ApplicationContext context) : IExchangeRepository
@@ -66,38 +63,10 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
                               .FirstOrDefaultAsync(exchange => (exchange.CurrencyFromId == firstCurrencyId  && exchange.CurrencyToId == secondCurrencyId) ||
                                                                (exchange.CurrencyFromId == secondCurrencyId && exchange.CurrencyToId == firstCurrencyId));
     }
-
-    public async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency, ExchangeFilterQuery exchangeFilterQuery)
+    
+    public async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency)
     {
-        return await FindByCurrencyFromIdAndCurrencyToId(firstCurrency.Id, secondCurrency.Id, exchangeFilterQuery);
-    }
-
-    public async Task<Exchange?> FindByCurrencyFromIdAndCurrencyToId(Guid firstCurrencyId, Guid secondCurrencyId, ExchangeFilterQuery exchangeFilterQuery)
-    {
-        if (exchangeFilterQuery.Date == DateOnly.MinValue)
-            exchangeFilterQuery.Date = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        return await m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
-                              .Include(exchange => exchange.CurrencyTo)
-                              .FirstOrDefaultAsync(exchange => ((exchange.CurrencyFromId == firstCurrencyId  && exchange.CurrencyToId == secondCurrencyId) ||
-                                                                (exchange.CurrencyFromId == secondCurrencyId && exchange.CurrencyToId == firstCurrencyId)) &&
-                                                               exchangeFilterQuery.Date                  <= DateOnly.FromDateTime(exchange.CreatedAt)      &&
-                                                               DateOnly.FromDateTime(exchange.CreatedAt) < exchangeFilterQuery.Date.AddDays(1));
-    }
-
-    public async Task<Exchange?> FindByCurrencyFromCodeAndCurrencyToCode(string firstCurrencyCode, string secondCurrencyCode, ExchangeFilterQuery exchangeFilterQuery)
-    {
-        if (exchangeFilterQuery.Date == DateOnly.MinValue)
-            exchangeFilterQuery.Date = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        return await m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
-                              .Include(exchange => exchange.CurrencyTo)
-                              .FirstOrDefaultAsync(exchange =>
-                                                   ((EF.Functions.ILike(exchange.CurrencyFrom!.Code, $"%{firstCurrencyCode}%") &&
-                                                     EF.Functions.ILike(exchange.CurrencyTo!.Code,   $"secondCurrencyCode")) ||
-                                                    (EF.Functions.ILike(exchange.CurrencyFrom!.Code, $"%{secondCurrencyCode}%") &&
-                                                     exchange.CurrencyTo!.Code == firstCurrencyCode)) && exchangeFilterQuery.Date <= DateOnly.FromDateTime(exchange.CreatedAt) &&
-                                                   DateOnly.FromDateTime(exchange.CreatedAt)                                      < exchangeFilterQuery.Date.AddDays(1));
+        return await FindByCurrencyFromAndCurrencyTo(firstCurrency.Id, secondCurrency.Id);
     }
 
     public async Task<Exchange> Add(Exchange exchange)
@@ -109,15 +78,11 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
         return addExchange.Entity;
     }
 
-    public async Task<Exchange> Update(Exchange oldExchange, Exchange exchange)
+    public async Task<Exchange> Update(Exchange exchange)
     {
-        m_Context.Exchanges.Entry(oldExchange)
-                 .State = EntityState.Detached;
+        await m_Context.Exchanges.Where(dbExchange => dbExchange.Id == exchange.Id)
+                       .ExecuteUpdateAsync(setter => setter.SetProperty(dbExchange => dbExchange.Commission, exchange.Commission));
 
-        var newExchange = m_Context.Exchanges.Update(exchange);
-
-        await m_Context.SaveChangesAsync();
-
-        return newExchange.Entity;
+        return exchange;
     }
 }

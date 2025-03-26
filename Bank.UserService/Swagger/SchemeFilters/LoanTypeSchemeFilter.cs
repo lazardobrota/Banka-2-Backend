@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.UserService.Database.Sample;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -13,27 +14,11 @@ file static class Example
 {
     public static class LoanType
     {
-        public static readonly Guid    Id     = Guid.Parse("74358a7f-2b43-4839-a1f8-f48b7fc952e5");
-        public const           string  Name   = "Lični kredit";
-        public const           decimal Margin = 3.5m;
-
-        public static readonly LoanTypeCreateRequest CreateRequest = new()
-                                                                     {
-                                                                         Name   = Name,
-                                                                         Margin = Margin,
-                                                                     };
-
-        public static readonly LoanTypeUpdateRequest UpdateRequest = new()
-                                                                     {
-                                                                         Name   = Name,
-                                                                         Margin = Margin,
-                                                                     };
-
         public static readonly LoanTypeResponse Response = new()
                                                            {
-                                                               Id     = Id,
-                                                               Name   = Name,
-                                                               Margin = Margin
+                                                               Id     = Guid.Parse("74358a7f-2b43-4839-a1f8-f48b7fc952e5"),
+                                                               Name   = Sample.LoanType.Request.Name,
+                                                               Margin = Sample.LoanType.Request.Margin
                                                            };
     }
 }
@@ -42,7 +27,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class LoanType
     {
-        public class Request() : SwaggerSchemaFilter<LoanTypeCreateRequest>(SchemeFilters.Example.LoanType.CreateRequest)
+        public class Request() : SwaggerSchemaFilter<LoanTypeRequest>(Sample.LoanType.Request)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -56,7 +41,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class UpdateRequest() : SwaggerSchemaFilter<LoanTypeUpdateRequest>(SchemeFilters.Example.LoanType.UpdateRequest)
+        public class UpdateRequest() : SwaggerSchemaFilter<LoanTypeUpdateRequest>(Sample.LoanType.UpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -65,7 +50,7 @@ public static partial class SwaggerSchemaFilter
                            [nameof(Example.Name)
                             .ToCamelCase()] = new OpenApiString(Example.Name),
                            [nameof(Example.Margin)
-                            .ToCamelCase()] = new OpenApiDouble((double)Example.Margin)
+                            .ToCamelCase()] = new OpenApiDouble((double)Example.Margin!)
                        };
             }
         }
