@@ -7,6 +7,7 @@ using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.HostedServices;
+using Bank.ExchangeService.Services;
 
 using DotNetEnv;
 
@@ -68,6 +69,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        
         return services;
     }
 
