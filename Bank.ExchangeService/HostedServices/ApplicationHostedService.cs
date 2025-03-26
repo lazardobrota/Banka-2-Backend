@@ -9,15 +9,9 @@ public class ApplicationHostedService(IHostApplicationLifetime applicationLifeti
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        m_ApplicationLifetime.ApplicationStarted.Register(() =>
-                                                          {
-                                                              m_DatabaseBackgroundService.OnApplicationStarted();
-                                                          });
+        m_ApplicationLifetime.ApplicationStarted.Register(() => { m_DatabaseBackgroundService.OnApplicationStarted(); });
 
-        m_ApplicationLifetime.ApplicationStopped.Register(() =>
-                                                          {
-                                                              m_DatabaseBackgroundService.OnApplicationStopped();
-                                                          });
+        m_ApplicationLifetime.ApplicationStopped.Register(() => { m_DatabaseBackgroundService.OnApplicationStopped(); });
 
         return Task.CompletedTask;
     }
