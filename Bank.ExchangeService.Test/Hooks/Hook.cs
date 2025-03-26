@@ -1,7 +1,5 @@
 using Bank.Application.Extensions;
-using Bank.UserService.Application;
-using Bank.UserService.BackgroundServices;
-using Bank.UserService.HostedServices;
+using Bank.ExchangeService.Application;
 
 using DotNetEnv;
 
@@ -10,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Reqnroll.BoDi;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;
 
-namespace Bank.UserService.Test.Hooks;
+namespace Bank.ExchangeService.Test.Hooks;
 
 [Binding]
 public class Hooks
@@ -35,13 +33,6 @@ public class Hooks
         services.AddDatabase();
         services.AddHostedServices();
         services.AddSwagger();
-
-        var serviceProvider = services.BuildServiceProvider();
-
-        serviceProvider.GetRequiredService<DatabaseHostedService>()
-                       .OnApplicationStarted();
-        serviceProvider.GetRequiredService<TransactionBackgroundService>()
-                       .OnApplicationStarted();
 
         return services;
     }

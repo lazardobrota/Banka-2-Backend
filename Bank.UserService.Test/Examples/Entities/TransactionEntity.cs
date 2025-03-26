@@ -1,4 +1,4 @@
-﻿using Bank.Application.Domain;
+using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.UserService.Database.Sample;
