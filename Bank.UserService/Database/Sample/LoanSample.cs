@@ -9,7 +9,7 @@ public static partial class Sample
 {
     public static class Loan
     {
-        public static readonly LoanRequest Request = new()
+        public static readonly LoanCreateRequest Request = new()
                                                      {
                                                          TypeId       = Seeder.LoanType.Personal.Id,
                                                          AccountId    = Seeder.Account.DomesticAccount02.Id,

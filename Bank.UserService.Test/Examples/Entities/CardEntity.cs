@@ -12,9 +12,9 @@ public static partial class Example
         {
             public static readonly CardCreateRequest CreateRequest = Sample.Card.CreateRequest;
 
-            public static readonly CardStatusUpdateRequest StatusUpdateRequest = Sample.Card.StatusUpdateRequest;
+            public static readonly CardUpdateStatusRequest StatusUpdateRequest = Sample.Card.StatusUpdateRequest;
 
-            public static readonly CardLimitUpdateRequest LimitUpdateRequest = Sample.Card.LimitUpdateRequest;
+            public static readonly CardUpdateLimitRequest LimitUpdateRequest = Sample.Card.LimitUpdateRequest;
 
             public static readonly Guid Id = Seeder.Card.Card03.Id;
         }

@@ -21,7 +21,7 @@ public class LoanTypeSteps(ScenarioContext scenarioContext, ILoanTypeService loa
     [Given(@"loan type create request")]
     public void GivenLoanTypeCreateRequest()
     {
-        m_ScenarioContext[Constant.LoanTypeCreateRequest] = Example.Entity.LoanType.CreateRequest;
+        m_ScenarioContext[Constant.LoanTypeCreateRequest] = Example.Entity.LoanType.Request;
     }
 
     [When(@"loan type is created in the database")]
@@ -51,8 +51,8 @@ public class LoanTypeSteps(ScenarioContext scenarioContext, ILoanTypeService loa
 
         loanTypeCreateResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         loanTypeCreateResult.ShouldNotBeNull();
-        loanTypeCreateResult.Value!.Name.ShouldBe(Example.Entity.LoanType.CreateRequest.Name);
-        loanTypeCreateResult.Value.Margin.ShouldBe(Example.Entity.LoanType.CreateRequest.Margin);
+        loanTypeCreateResult.Value!.Name.ShouldBe(Example.Entity.LoanType.Request.Name);
+        loanTypeCreateResult.Value.Margin.ShouldBe(Example.Entity.LoanType.Request.Margin);
     }
 
     [Given(@"loan type update request")]

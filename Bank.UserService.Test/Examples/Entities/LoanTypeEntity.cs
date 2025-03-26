@@ -9,7 +9,7 @@ public static partial class Example
     {
         public static class LoanType
         {
-            public static readonly LoanTypeRequest       Request       = Sample.LoanType.Request;
+            public static readonly LoanTypeCreateRequest       Request       = Sample.LoanType.Request;
             public static readonly LoanTypeUpdateRequest UpdateRequest = Sample.LoanType.UpdateRequest;
         }
     }

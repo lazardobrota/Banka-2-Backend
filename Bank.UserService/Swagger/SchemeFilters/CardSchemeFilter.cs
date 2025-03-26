@@ -55,7 +55,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class StatusUpdateRequest() : SwaggerSchemaFilter<CardStatusUpdateRequest>(Sample.Card.StatusUpdateRequest)
+        public class StatusUpdateRequest() : SwaggerSchemaFilter<CardUpdateStatusRequest>(Sample.Card.StatusUpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {
@@ -67,7 +67,7 @@ public static partial class SwaggerSchemaFilter
             }
         }
 
-        public class LimitUpdateRequest() : SwaggerSchemaFilter<CardLimitUpdateRequest>(Sample.Card.LimitUpdateRequest)
+        public class LimitUpdateRequest() : SwaggerSchemaFilter<CardUpdateLimitRequest>(Sample.Card.LimitUpdateRequest)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

@@ -27,7 +27,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class LoanType
     {
-        public class Request() : SwaggerSchemaFilter<LoanTypeRequest>(Sample.LoanType.Request)
+        public class Request() : SwaggerSchemaFilter<LoanTypeCreateRequest>(Sample.LoanType.Request)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

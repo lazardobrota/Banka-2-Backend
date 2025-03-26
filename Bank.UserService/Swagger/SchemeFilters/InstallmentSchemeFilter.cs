@@ -32,7 +32,7 @@ public static partial class SwaggerSchemaFilter
 {
     public static class Installment
     {
-        public class Request() : SwaggerSchemaFilter<InstallmentRequest>(Sample.Installment.Request)
+        public class Request() : SwaggerSchemaFilter<InstallmentCreateRequest>(Sample.Installment.Request)
         {
             protected override IOpenApiAny CreateExample(OpenApiSchema schema, SchemaFilterContext context)
             {

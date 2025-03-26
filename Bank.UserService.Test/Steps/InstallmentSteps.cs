@@ -20,7 +20,7 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
     [Given(@"installment create request")]
     public void GivenInstallmentCreateRequest()
     {
-        m_ScenarioContext[Constant.InstallmentCreateRequest] = Example.Entity.Installment.CreateRequest;
+        m_ScenarioContext[Constant.InstallmentCreateRequest] = Example.Entity.Installment.Request;
     }
 
     [When(@"installment is created in the database")]
@@ -50,11 +50,11 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
 
         installmentCreateResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         installmentCreateResult.ShouldNotBeNull();
-        installmentCreateResult.Value!.Loan.Id.ShouldBe(Example.Entity.Installment.CreateRequest.LoanId);
-        installmentCreateResult.Value.InterestRate.ShouldBe(Example.Entity.Installment.CreateRequest.InterestRate);
-        installmentCreateResult.Value.ExpectedDueDate.ShouldBe(Example.Entity.Installment.CreateRequest.ExpectedDueDate);
-        installmentCreateResult.Value.ActualDueDate.ShouldBe(Example.Entity.Installment.CreateRequest.ActualDueDate);
-        installmentCreateResult.Value.Status.ShouldBe(Example.Entity.Installment.CreateRequest.Status);
+        installmentCreateResult.Value!.Loan.Id.ShouldBe(Example.Entity.Installment.Request.LoanId);
+        installmentCreateResult.Value.InterestRate.ShouldBe(Example.Entity.Installment.Request.InterestRate);
+        installmentCreateResult.Value.ExpectedDueDate.ShouldBe(Example.Entity.Installment.Request.ExpectedDueDate);
+        installmentCreateResult.Value.ActualDueDate.ShouldBe(Example.Entity.Installment.Request.ActualDueDate);
+        installmentCreateResult.Value.Status.ShouldBe(Example.Entity.Installment.Request.Status);
     }
 
     [Given(@"installment update request")]
