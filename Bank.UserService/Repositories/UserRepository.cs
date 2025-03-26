@@ -19,7 +19,7 @@ public interface IUserRepository
 
     Task<User> Add(User user);
 
-    Task<User> Update(User oldUser, User user);
+    Task<User> Update(User user);
 
     Task<User> SetPassword(Guid id, string password);
 }
@@ -80,16 +80,21 @@ public class UserRepository(ApplicationContext context) : IUserRepository
         return addedUser.Entity;
     }
 
-    public async Task<User> Update(User oldUser, User user)
+    public async Task<User> Update(User user)
     {
-        m_Context.Users.Entry(oldUser)
-                 .State = EntityState.Detached;
+        await m_Context.Users.Where(dbUser => dbUser.Id == user.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbUser => dbUser.FirstName, user.FirstName)
+                                                             .SetProperty(dbUser => dbUser.LastName,    user.LastName)
+                                                             .SetProperty(dbUser => dbUser.Username,    user.Username)
+                                                             .SetProperty(dbUser => dbUser.PhoneNumber, user.PhoneNumber)
+                                                             .SetProperty(dbUser => dbUser.Address,     user.Address)
+                                                             .SetProperty(dbUser => dbUser.Role,        user.Role)
+                                                             .SetProperty(dbUser => dbUser.Department,  user.Department)
+                                                             .SetProperty(dbUser => dbUser.Employed,    user.Employed)
+                                                             .SetProperty(dbUser => dbUser.Activated,   user.Activated)
+                                                             .SetProperty(dbUser => dbUser.ModifiedAt,  user.ModifiedAt));
 
-        var updatedUser = m_Context.Users.Update(user);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedUser.Entity;
+        return user;
     }
 
     public async Task<User> SetPassword(Guid id, string password)

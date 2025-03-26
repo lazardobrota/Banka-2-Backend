@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Application", "Bank.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.UserService.Test", "Bank.UserService.Test\Bank.UserService.Test.csproj", "{FE650BCC-6638-4D6C-8742-786345A37BA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.ExchangeService", "Bank.ExchangeService\Bank.ExchangeService.csproj", "{537A9809-E52F-4EDD-966C-16412649BC85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.ExchangeService.Test", "Bank.ExchangeService.Test\Bank.ExchangeService.Test.csproj", "{5E48CD2B-3AFD-4986-A388-4F706B5C078A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +29,14 @@ Global
 		{FE650BCC-6638-4D6C-8742-786345A37BA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE650BCC-6638-4D6C-8742-786345A37BA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE650BCC-6638-4D6C-8742-786345A37BA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{537A9809-E52F-4EDD-966C-16412649BC85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{537A9809-E52F-4EDD-966C-16412649BC85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{537A9809-E52F-4EDD-966C-16412649BC85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{537A9809-E52F-4EDD-966C-16412649BC85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E48CD2B-3AFD-4986-A388-4F706B5C078A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E48CD2B-3AFD-4986-A388-4F706B5C078A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E48CD2B-3AFD-4986-A388-4F706B5C078A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E48CD2B-3AFD-4986-A388-4F706B5C078A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C328B3D2-9265-42A4-81F5-CF9D941F8234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

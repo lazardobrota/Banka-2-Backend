@@ -12,10 +12,6 @@ public interface ICountryRepository
     Task<Page<Country>> FindAll(CountryFilterQuery countryFilterQuery, Pageable pageable);
 
     Task<Country?> FindById(Guid id);
-
-    Task<Country> Add(Country country);
-
-    Task<Country> Update(Country oldCountry, Country country);
 }
 
 public class CountryRepository(ApplicationContext context) : ICountryRepository
@@ -51,26 +47,5 @@ public class CountryRepository(ApplicationContext context) : ICountryRepository
     {
         return await m_Context.Countries.Include(c => c.Currency)
                               .FirstOrDefaultAsync(x => x.Id == id);
-    }
-
-    public async Task<Country> Add(Country country)
-    {
-        var addedCountry = await m_Context.Countries.AddAsync(country);
-
-        await m_Context.SaveChangesAsync();
-
-        return addedCountry.Entity;
-    }
-
-    public async Task<Country> Update(Country oldCountry, Country country)
-    {
-        m_Context.Countries.Entry(oldCountry)
-                 .State = EntityState.Detached;
-
-        var updatedCountry = m_Context.Countries.Update(country);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedCountry.Entity;
     }
 }

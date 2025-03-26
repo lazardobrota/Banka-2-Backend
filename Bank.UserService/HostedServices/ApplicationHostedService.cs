@@ -18,15 +18,21 @@ public class ApplicationHostedService(
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        m_ApplicationLifetime.ApplicationStarted.Register(m_DatabaseHostedService.OnApplicationStarted);
-        m_ApplicationLifetime.ApplicationStarted.Register(m_ExchangeHostedService.OnApplicationStarted);
-        m_ApplicationLifetime.ApplicationStarted.Register(m_LoanHostedService.OnApplicationStarted);
-        m_ApplicationLifetime.ApplicationStarted.Register(m_TransactionBackgroundService.OnApplicationStarted);
+        m_ApplicationLifetime.ApplicationStarted.Register(() =>
+                                                          {
+                                                              m_DatabaseHostedService.OnApplicationStarted();
+                                                              m_ExchangeHostedService.OnApplicationStarted();
+                                                              m_LoanHostedService.OnApplicationStarted();
+                                                              m_TransactionBackgroundService.OnApplicationStarted();
+                                                          });
 
-        m_ApplicationLifetime.ApplicationStarted.Register(m_ExchangeHostedService.OnApplicationStopped);
-        m_ApplicationLifetime.ApplicationStopped.Register(m_DatabaseHostedService.OnApplicationStopped);
-        m_ApplicationLifetime.ApplicationStopped.Register(m_LoanHostedService.OnApplicationStopped);
-        m_ApplicationLifetime.ApplicationStopped.Register(m_TransactionBackgroundService.OnApplicationStopped);
+        m_ApplicationLifetime.ApplicationStopped.Register(() =>
+                                                          {
+                                                              m_ExchangeHostedService.OnApplicationStopped();
+                                                              m_DatabaseHostedService.OnApplicationStopped();
+                                                              m_LoanHostedService.OnApplicationStopped();
+                                                              m_TransactionBackgroundService.OnApplicationStopped();
+                                                          });
 
         return Task.CompletedTask;
     }
