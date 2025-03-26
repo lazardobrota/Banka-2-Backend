@@ -90,6 +90,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
+        services.AddSingleton<DatabaseHostedService>();
         services.AddHostedService<ApplicationHostedService>();
 
         return services;
@@ -129,8 +130,9 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
-                                                                                                                                                    .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
+                                                                                                                                       .Jwt
+                                                                                                                                       .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,
@@ -155,7 +157,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSwaggerGen(config =>
                                {
-                                   config.SwaggerDoc("v1", new OpenApiInfo() { Title = "ExchangeService", Version = "v1" });
+                                   config.SwaggerDoc("v1", new OpenApiInfo { Title = "ExchangeService", Version = "v1" });
 
                                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                                                                           {
