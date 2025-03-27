@@ -1,5 +1,7 @@
 ﻿using Bank.ExchangeService.Model;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Bank.ExchangeService.Database.Seeders;
 
 using ListingModel = Listing;
@@ -66,6 +68,19 @@ public static class ListingSeederExtension
     {
         if (context.Listings.Any())
             return;
+
+        var exchanges = await context.StockExchanges.ToListAsync();
+
+        var exchangeMap = exchanges.GroupBy(e => e.Acronym)
+                                   .ToDictionary(g => g.Key, g => g.First()
+                                                                   .Id);
+
+        // Dodeli tačne StockExchangeId vrednosti iz baze
+        Seeder.Listing.MicrosoftStock.StockExchangeId = exchangeMap["NASDAQ"];
+        Seeder.Listing.AppleStock.StockExchangeId     = exchangeMap["NASDAQ"];
+        Seeder.Listing.GoogleStock.StockExchangeId    = exchangeMap["NASDAQ"];
+        Seeder.Listing.AmazonStock.StockExchangeId    = exchangeMap["NASDAQ"];
+        Seeder.Listing.JPMorganStock.StockExchangeId  = exchangeMap["NASDAQ"];
 
         await context.Listings.AddRangeAsync(Seeder.Listing.MicrosoftStock, Seeder.Listing.AppleStock, Seeder.Listing.GoogleStock, Seeder.Listing.AmazonStock,
                                              Seeder.Listing.JPMorganStock);
