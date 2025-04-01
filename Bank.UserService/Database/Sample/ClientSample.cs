@@ -17,6 +17,7 @@ public static partial class Sample
                                                                        Email                      = "aleksandar.ivanovic@gmail.com",
                                                                        PhoneNumber                = "+381698812321",
                                                                        Address                    = "Kralja Petra 12",
+                                                                       Permissions                  = Permission.Client,
                                                                    };
 
         public static readonly ClientUpdateRequest UpdateRequest = new()

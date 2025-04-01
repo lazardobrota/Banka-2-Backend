@@ -21,7 +21,8 @@ public class TokenProvider
         var claims = new List<Claim>
                      {
                          new("id", user.Id.ToString()),
-                         new("role", user.Role.ToString())
+                         new("role", user.Role.ToString()),
+                         new("permission", user.Permissions.ToString())
                      };
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -46,7 +47,8 @@ public class TokenProvider
         var claims = new List<Claim>
                      {
                          new("id", user.Id.ToString()),
-                         new("role", user.Role.ToString())
+                         new("role", user.Role.ToString()),
+                         new("permission", user.Permissions.ToString())
                      };
 
         var tokenDescriptor = new SecurityTokenDescriptor
