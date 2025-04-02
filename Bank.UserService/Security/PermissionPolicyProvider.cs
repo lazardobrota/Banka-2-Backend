@@ -2,49 +2,48 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Bank.UserService.Authorization;
-
-public class PermissionPolicyProvider : DefaultAuthorizationPolicyProvider
+namespace Bank.UserService.Security
 {
-    private const string POLICY_PREFIX = "Permission_";
-    
-    public PermissionPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
+    public class PermissionPolicyProvider : DefaultAuthorizationPolicyProvider
     {
-    }
-
-    public override async Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
-    {
-        if (!policyName.StartsWith(POLICY_PREFIX))
+        public PermissionPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
         {
-            return await base.GetPolicyAsync(policyName);
         }
 
-        var permissionsValue = policyName.Substring(POLICY_PREFIX.Length);
-        
-        var permissionValues = permissionsValue.Split(',')
-                                               .Select(p => p.Trim())
-                                               .Where(p => !string.IsNullOrEmpty(p));
-        
-        var permissions = new List<Permission>();
-        
-        foreach (var permValue in permissionValues)
+        public override async Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
-            if (Enum.TryParse<Permission>(permValue, out var permission))
+            if (!policyName.StartsWith("Permission."))
             {
-                permissions.Add(permission);
+                return await base.GetPolicyAsync(policyName);
             }
-            else if (long.TryParse(permValue, out var longValue))
-            {
-                permissions.Add((Permission)longValue);
-            }
-        }
-        
-        var policy = new AuthorizationPolicyBuilder()
-                     .RequireAuthenticatedUser()
-                     .AddRequirements(new PermissionRequirement(permissions.ToArray()))
-                     .Build();
+
+            var permissionsString = policyName.Substring("Permission.".Length);
             
-        return policy;
+            var permissionValues = permissionsString.Split('_')
+                                                    .Select(p => p.Trim())
+                                                    .Where(p => !string.IsNullOrEmpty(p));
+            
+            var permissions = new List<Permission>();
+            
+            foreach (var permValue in permissionValues)
+            {
+                if (Enum.TryParse<Permission>(permValue, out var permission))
+                {
+                    permissions.Add(permission);
+                }
+            }
+            
+            var policy = new AuthorizationPolicyBuilder()
+                         .RequireAuthenticatedUser()
+                         .AddRequirements(new PermissionRequirement(permissions.ToArray()))
+                         .Build();
+                
+            return policy;
+        }
     }
 }

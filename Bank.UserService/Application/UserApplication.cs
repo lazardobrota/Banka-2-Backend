@@ -3,7 +3,6 @@ using System.Text;
 
 using Bank.Application;
 using Bank.Application.Domain;
-using Bank.UserService.Authorization;
 using Bank.UserService.BackgroundServices;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;
@@ -194,22 +193,15 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAuthorizationServices(this IServiceCollection services)
     {
         services.AddAuthorizationBuilder()
-                .AddPermissionPolicies()
                 .AddPolicy(Configuration.Policy.Role.Admin,    policy => policy.RequireRole(nameof(Role.Admin)))
                 .AddPolicy(Configuration.Policy.Role.Employee, policy => policy.RequireRole(nameof(Role.Employee)))
                 .AddPolicy(Configuration.Policy.Role.Client,   policy => policy.RequireRole(nameof(Role.Client)));
 
-        //services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+        
 
         return services;
-    }
-
-    public static AuthorizationBuilder AddPermissionPolicies(this AuthorizationBuilder builder)
-    {
-        builder.Services.Configure<AuthorizationOptions>(options => { PermissionPolicies.AddPermissionPolicies(options); });
-
-        return builder;
     }
 
     public static IServiceCollection AddSwagger(this IServiceCollection services)

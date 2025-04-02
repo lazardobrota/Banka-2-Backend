@@ -13,7 +13,6 @@ public class ClientCreateRequest
     public required string     PhoneNumber                { set; get; }
     public required string     Address                    { set; get; }
     public required Permission Permissions                { set; get; } = Permission.Client;
-
 }
 
 public class ClientUpdateRequest

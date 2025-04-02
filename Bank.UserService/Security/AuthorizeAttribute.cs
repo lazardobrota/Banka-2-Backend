@@ -1,28 +1,39 @@
-﻿namespace Bank.UserService.Security;
+﻿using Bank.Application.Domain;
+using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Linq;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
-public class AuthorizeAttribute : Microsoft.AspNetCore.Authorization.AuthorizeAttribute
+namespace Bank.UserService.Security
 {
-    private const string c_PolicyPrefix = "Permission_";
-
-    public AuthorizeAttribute() { }
-
-    public new string Roles
+    public class AuthorizeAttribute : Microsoft.AspNetCore.Authorization.AuthorizeAttribute
     {
-        get => base.Roles;
-        set => base.Roles = value;
-    }
-
-    // Add a new Permissions property
-    private string _permissions = string.Empty;
-
-    public string Permissions
-    {
-        get => _permissions;
-        set
+        public AuthorizeAttribute()
         {
-            _permissions = value;
-            Policy       = $"{c_PolicyPrefix}{value}";
+        }
+
+        // Handle both single and multiple permissions with a single constructor
+        public AuthorizeAttribute(Permission firstPermission, params Permission[] additionalPermissions)
+        {
+            var allPermissions = new[] { firstPermission }.Concat(additionalPermissions ?? Array.Empty<Permission>());
+            Policy = $"Permission.{string.Join("_", allPermissions)}";
+        }
+
+        private Permission[] _permissions;
+        public Permission[] Permissions
+        {
+            get => _permissions;
+            set
+            {
+                _permissions = value;
+                if (_permissions != null && _permissions.Length > 0)
+                {
+                    Policy = $"Permission.{string.Join("_", _permissions)}";
+                }
+                else
+                {
+                    throw new ArgumentException("At least one permission must be specified", nameof(Permissions));
+                }
+            }
         }
     }
 }

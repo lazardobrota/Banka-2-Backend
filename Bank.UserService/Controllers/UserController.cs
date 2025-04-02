@@ -16,19 +16,15 @@ public class UserController(IUserService userService) : ControllerBase
     private readonly IUserService m_UserService = userService;
 
     [HttpGet(Endpoints.User.GetAll)]
-    //[Authorize(Policy = "Permission_Admin")]
-    //[RequirePermission(Permission.Admin)]
-    [Authorize(Policy = PermissionPolicies.AdminOrEmployee)]
+    [Authorize(Permission.Admin)]
     public async Task<ActionResult<Page<UserResponse>>> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
         var result = await m_UserService.GetAll(userFilterQuery, pageable);
 
         return result.ActionResult;
     }
-
-    //[Authorize(Policy = "Permission_Admin")]
-    //[RequirePermission(Permission.Admin)]
-    [Authorize(Policy = PermissionPolicies.AdminOrEmployee)]
+    
+    [Authorize]
     [HttpGet(Endpoints.User.GetOne)]
     public async Task<ActionResult<UserResponse>> GetOne(Guid id)
     {
@@ -70,7 +66,6 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPut("{userId}/permissions")]
-    [Authorize(Permissions = $"Admin, Client")]
     public async Task<ActionResult> UpdatePermissions([FromRoute] Guid userId, [FromBody] UpdatePermissionsRequest request)
     {
         var result = await m_UserService.UpdatePermissions(userId, request);
