@@ -7,14 +7,15 @@ public class AuthorizeAttribute : Microsoft.AspNetCore.Authorization.AuthorizeAt
 
     public AuthorizeAttribute() { }
 
-    public new string Roles 
-    { 
-        get => base.Roles; 
-        set => base.Roles = value; 
+    public new string Roles
+    {
+        get => base.Roles;
+        set => base.Roles = value;
     }
 
     // Add a new Permissions property
     private string _permissions = string.Empty;
+
     public string Permissions
     {
         get => _permissions;

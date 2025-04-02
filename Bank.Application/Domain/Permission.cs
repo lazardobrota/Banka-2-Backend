@@ -30,6 +30,8 @@ public struct AuthPermission
     }
 
     public static implicit operator Permission(AuthPermission permissions) => permissions.Value;
-    public static implicit operator AuthPermission(long value)       => new AuthPermission(value);
-    public static implicit operator AuthPermission(Permission permission)  => new AuthPermission(permission);
+
+    public static implicit operator AuthPermission(long value) => new AuthPermission(value);
+
+    public static implicit operator AuthPermission(Permission permission) => new AuthPermission(permission);
 }

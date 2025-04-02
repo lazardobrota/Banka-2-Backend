@@ -81,8 +81,7 @@ public static class UserMapper
                    ModifiedAt                 = user.ModifiedAt,
                    Employed                   = user.Employed ?? true,
                    Activated                  = user.Activated,
-                   Permissions = user.Permissions
-                   
+                   Permissions                = user.Permissions
                };
     }
 
@@ -109,7 +108,7 @@ public static class UserMapper
                    ModifiedAt                 = employee.ModifiedAt,
                    Employed                   = employee.Employed,
                    Activated                  = employee.Activated,
-                   Permissions = employee.Permissions
+                   Permissions                = employee.Permissions
                };
     }
 
@@ -180,8 +179,7 @@ public static class UserMapper
                    CreatedAt                  = DateTime.UtcNow,
                    ModifiedAt                 = DateTime.UtcNow,
                    Activated                  = false,
-                   Permissions = employeeCreateRequest.Permissions
-                   
+                   Permissions                = employeeCreateRequest.Permissions
                };
     }
 
@@ -261,8 +259,7 @@ public static class UserMapper
                    CreatedAt                  = DateTime.UtcNow,
                    ModifiedAt                 = DateTime.UtcNow,
                    Activated                  = false,
-                   Permissions = clientCreateRequest.Permissions
-                   
+                   Permissions                = clientCreateRequest.Permissions
                };
     }
 
@@ -301,7 +298,7 @@ public static class UserMapper
                    ModifiedAt                 = client.ModifiedAt,
                    Employed                   = null,
                    Activated                  = client.Activated,
-                   Permissions = client.Permissions
+                   Permissions                = client.Permissions
                };
     }
 
@@ -325,7 +322,7 @@ public static class UserMapper
                    CreatedAt                  = user.CreatedAt,
                    ModifiedAt                 = user.ModifiedAt,
                    Activated                  = user.Activated,
-                   Permissions = user.Permissions
+                   Permissions                = user.Permissions
                };
     }
 }

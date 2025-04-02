@@ -9,6 +9,7 @@ using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.HostedServices;
 using Bank.UserService.Repositories;
+using Bank.UserService.Security;
 using Bank.UserService.Services;
 using Bank.UserService.Swagger.SchemeFilters;
 
@@ -111,17 +112,17 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITransactionTemplateService, TransactionTemplateService>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ITransactionService, TransactionService>();
-        services.AddScoped<ILoanService, Services.LoanService>();
+        services.AddScoped<ILoanService, LoanService>();
         services.AddScoped<IInstallmentService, InstallmentService>();
         services.AddScoped<ILoanTypeService, LoanTypeService>();
 
         return services;
     }
-    
+
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<TransactionBackgroundService>();
-        
+
         return services;
     }
 
@@ -193,14 +194,22 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAuthorizationServices(this IServiceCollection services)
     {
         services.AddAuthorizationBuilder()
+                .AddPermissionPolicies()
                 .AddPolicy(Configuration.Policy.Role.Admin,    policy => policy.RequireRole(nameof(Role.Admin)))
                 .AddPolicy(Configuration.Policy.Role.Employee, policy => policy.RequireRole(nameof(Role.Employee)))
                 .AddPolicy(Configuration.Policy.Role.Client,   policy => policy.RequireRole(nameof(Role.Client)));
 
-        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        //services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         services.AddScoped<IAuthorizationHandler, PermissionHandler>();
 
         return services;
+    }
+
+    public static AuthorizationBuilder AddPermissionPolicies(this AuthorizationBuilder builder)
+    {
+        builder.Services.Configure<AuthorizationOptions>(options => { PermissionPolicies.AddPermissionPolicies(options); });
+
+        return builder;
     }
 
     public static IServiceCollection AddSwagger(this IServiceCollection services)

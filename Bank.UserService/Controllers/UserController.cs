@@ -8,8 +8,6 @@ using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
-
 namespace Bank.UserService.Controllers;
 
 [ApiController]
@@ -18,7 +16,9 @@ public class UserController(IUserService userService) : ControllerBase
     private readonly IUserService m_UserService = userService;
 
     [HttpGet(Endpoints.User.GetAll)]
-    [Authorize(Policy = "Permission_Admin")]
+    //[Authorize(Policy = "Permission_Admin")]
+    //[RequirePermission(Permission.Admin)]
+    [Authorize(Policy = PermissionPolicies.AdminOrEmployee)]
     public async Task<ActionResult<Page<UserResponse>>> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
         var result = await m_UserService.GetAll(userFilterQuery, pageable);
@@ -26,7 +26,9 @@ public class UserController(IUserService userService) : ControllerBase
         return result.ActionResult;
     }
 
-    [Authorize(Policy = "Permission_Admin")]
+    //[Authorize(Policy = "Permission_Admin")]
+    //[RequirePermission(Permission.Admin)]
+    [Authorize(Policy = PermissionPolicies.AdminOrEmployee)]
     [HttpGet(Endpoints.User.GetOne)]
     public async Task<ActionResult<UserResponse>> GetOne(Guid id)
     {
@@ -66,7 +68,7 @@ public class UserController(IUserService userService) : ControllerBase
 
         return result.ActionResult;
     }
-    
+
     [HttpPut("{userId}/permissions")]
     [Authorize(Permissions = $"Admin, Client")]
     public async Task<ActionResult> UpdatePermissions([FromRoute] Guid userId, [FromBody] UpdatePermissionsRequest request)

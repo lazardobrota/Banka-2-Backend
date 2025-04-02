@@ -60,7 +60,7 @@ public enum Profile
 
 public enum Permission : long
 {
-    Invalid = 1 << 0,
+    Invalid  = 1 << 0,
     Admin    = 1 << 1,
     Employee = 1 << 2,
     Client   = 1 << 3,
