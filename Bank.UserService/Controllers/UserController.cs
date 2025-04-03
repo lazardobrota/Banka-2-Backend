@@ -16,6 +16,7 @@ public class UserController(IUserService userService) : ControllerBase
     private readonly IUserService m_UserService = userService;
 
     [HttpGet(Endpoints.User.GetAll)]
+    //[Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     [Authorize(Permission.Admin, Permission.Employee)]
     public async Task<ActionResult<Page<UserResponse>>> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
