@@ -11,7 +11,6 @@ namespace Bank.UserService.Security
         {
         }
 
-        // Handle both single and multiple permissions with a single constructor
         public AuthorizeAttribute(Permission firstPermission, params Permission[] additionalPermissions)
         {
             var allPermissions = new[] { firstPermission }.Concat(additionalPermissions ?? Array.Empty<Permission>());
