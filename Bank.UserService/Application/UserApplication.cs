@@ -3,6 +3,7 @@ using System.Text;
 
 using Bank.Application;
 using Bank.Application.Domain;
+using Bank.UserService.Authorization;
 using Bank.UserService.BackgroundServices;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;

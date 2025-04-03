@@ -34,7 +34,6 @@ public class AuthorizationService : IAuthorizationService
 
         UserId = userId != null ? Guid.Parse(userId.Value) : Guid.Empty;
         Role   = role   != null ? Enum.TryParse(role.Value, out Role myRole) ? myRole : Role.Invalid : Role.Invalid;
-        //Permissions = permission != null ? Enum.TryParse(permission.Value, out Permission myPermissions) ? myPermissions : Permission.Invalid : Permission.Invalid;
         Permissions = permission != null ? (Permission)long.Parse(permission.Value) : Permission.Invalid;
     }
 
