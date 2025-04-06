@@ -20,8 +20,7 @@ public static partial class Sample
                                                                          Address                    = "Kneza Miloša 88",
                                                                          Role                       = Role.Employee,
                                                                          Department                 = "HR",
-                                                                         Employed                   = true,
-                                                                         Permissions = Permission.Employee
+                                                                         Employed                   = true
                                                                      };
 
         public static readonly EmployeeUpdateRequest UpdateRequest = new()
