@@ -110,6 +110,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILoanService, Services.LoanService>();
         services.AddScoped<IInstallmentService, InstallmentService>();
         services.AddScoped<ILoanTypeService, LoanTypeService>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderService, OrderService>();
 
         return services;
     }
