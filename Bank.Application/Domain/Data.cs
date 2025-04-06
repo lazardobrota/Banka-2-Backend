@@ -57,3 +57,18 @@ public enum Profile
     Staging,
     Production
 }
+
+public enum Permission : long
+{
+    Invalid  = 1 << 0,
+    Admin    = 1 << 1,
+    Employee = 1 << 2,
+    Client   = 1 << 3,
+}
+
+public enum PermissionOperation
+{
+    Set,
+    Add,
+    Remove
+}
