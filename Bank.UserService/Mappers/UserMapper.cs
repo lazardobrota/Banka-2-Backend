@@ -80,8 +80,7 @@ public static class UserMapper
                    CreatedAt                  = user.CreatedAt,
                    ModifiedAt                 = user.ModifiedAt,
                    Employed                   = user.Employed ?? true,
-                   Activated                  = user.Activated,
-                   Permissions                = user.Permissions
+                   Activated                  = user.Activated
                };
     }
 
@@ -107,8 +106,7 @@ public static class UserMapper
                    CreatedAt                  = employee.CreatedAt,
                    ModifiedAt                 = employee.ModifiedAt,
                    Employed                   = employee.Employed,
-                   Activated                  = employee.Activated,
-                   Permissions                = employee.Permissions
+                   Activated                  = employee.Activated
                };
     }
 
@@ -179,7 +177,6 @@ public static class UserMapper
                    CreatedAt                  = DateTime.UtcNow,
                    ModifiedAt                 = DateTime.UtcNow,
                    Activated                  = false,
-                   Permissions                = employeeCreateRequest.Permissions
                };
     }
 
@@ -258,8 +255,7 @@ public static class UserMapper
                    BankId                     = Seeder.Bank.Bank02.Id,
                    CreatedAt                  = DateTime.UtcNow,
                    ModifiedAt                 = DateTime.UtcNow,
-                   Activated                  = false,
-                   Permissions                = clientCreateRequest.Permissions
+                   Activated                  = false
                };
     }
 
@@ -297,8 +293,7 @@ public static class UserMapper
                    CreatedAt                  = client.CreatedAt,
                    ModifiedAt                 = client.ModifiedAt,
                    Employed                   = null,
-                   Activated                  = client.Activated,
-                   Permissions                = client.Permissions
+                   Activated                  = client.Activated
                };
     }
 
@@ -321,8 +316,7 @@ public static class UserMapper
                    BankId                     = Seeder.Bank.Bank02.Id,
                    CreatedAt                  = user.CreatedAt,
                    ModifiedAt                 = user.ModifiedAt,
-                   Activated                  = user.Activated,
-                   Permissions                = user.Permissions
+                   Activated                  = user.Activated
                };
     }
 }

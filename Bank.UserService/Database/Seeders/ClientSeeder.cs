@@ -28,8 +28,7 @@ public static partial class Seeder
                                                       Salt                       = Guid.NewGuid(),
                                                       CreatedAt                  = DateTime.UtcNow,
                                                       ModifiedAt                 = DateTime.UtcNow,
-                                                      Activated                  = true,
-                                                      Permissions = Permission.Client
+                                                      Activated                  = true
                                                   };
 
         public static readonly ClientModel Client01 = new()
@@ -49,8 +48,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client02 = new()
@@ -70,8 +68,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client03 = new()
@@ -91,8 +88,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client04 = new()
@@ -112,8 +108,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client05 = new()
@@ -133,8 +128,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client06 = new()
@@ -154,8 +148,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client07 = new()
@@ -175,10 +168,8 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
-        
 
         public static readonly ClientModel Client08 = new()
                                                       {
@@ -197,8 +188,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client09 = new()
@@ -218,8 +208,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
 
         public static readonly ClientModel Client10 = new()
@@ -239,8 +228,7 @@ public static partial class Seeder
                                                           Salt                       = Guid.NewGuid(),
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
-                                                          Activated                  = true,
-                                                          Permissions                = Permission.Client
+                                                          Activated                  = true
                                                       };
     }
 }

@@ -23,10 +23,7 @@ public interface IUserService
 
     Task<Result> RequestPasswordReset(UserRequestPasswordResetRequest passwordResetRequest);
 
-    Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string                   token);
-
-    Task<Result> UpdatePermissions(Guid userId, UpdatePermissionsRequest request);
-
+    Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token);
 }
 
 public class UserService(IUserRepository userRepository, IEmailService emailService, IAuthorizationService authorizationService) : IUserService
@@ -105,41 +102,6 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
 
         return Result.Accepted();
     }
-    
-    public async Task<Result> UpdatePermissions(Guid userId, UpdatePermissionsRequest request)
-    {
-        var user = await m_UserRepository.FindById(userId);
-    
-        if (user == null)
-        {
-            return Result.BadRequest("User not found");
-        }
-    
-        var authPermission = new AuthPermission(user.Permissions);
-    
-        switch (request.Operation)
-        {
-            case PermissionOperation.Set:
-                user.Permissions = request.Permissions;
-                break;
-        
-            case PermissionOperation.Add:
-                authPermission.AddPermission(request.Permissions);
-                user.Permissions = authPermission;
-                break;
-        
-            case PermissionOperation.Remove:
-                authPermission.RemovePermission(request.Permissions);
-                user.Permissions = authPermission;
-                break;
-        }
-    
-        user.ModifiedAt = DateTime.UtcNow;
-        await m_UserRepository.Update(user);
-
-        return Result.Ok();
-    }
-
 
     public async Task<Result> PasswordReset(UserPasswordResetRequest userPasswordResetRequest, string token)
     {

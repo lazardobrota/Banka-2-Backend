@@ -74,9 +74,6 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(user => user.Activated)
                .IsRequired();
-        
-        builder.Property(user => user.Permissions)
-               .IsRequired();
 
         builder.HasMany(user => user.Accounts)
                .WithOne(account => account.Client)
