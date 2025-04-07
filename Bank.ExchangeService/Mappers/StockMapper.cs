@@ -9,7 +9,7 @@ public static class StockMapper
     {
         return new StockResponse
                {
-                   Id = stock.Id,
+                   Id            = stock.Id,
                    Name          = stock.Name,
                    Ticker        = stock.Ticker,
                    StockExchange = stock.StockExchange!.ToResponse(currencyResponse),
@@ -30,7 +30,7 @@ public static class StockMapper
     {
         return new StockSimpleResponse
                {
-                   Id = stock.Id,
+                   Id                           = stock.Id,
                    Name                         = stock.Name,
                    Ticker                       = stock.Ticker,
                    HighPrice                    = stock.HighPrice,

@@ -9,13 +9,13 @@ public static class QuoteMapper
     {
         return new QuoteSimpleResponse
                {
-                   Id                           = quote.Id,
-                   Price                        = quote.Price,
-                   HighPrice                    = quote.HighPrice,
-                   LowPrice                     = quote.LowPrice,
-                   Volume                       = quote.Volume,
-                   CreatedAt                    = quote.CreatedAt,
-                   ModifiedAt                   = quote.ModifiedAt,
+                   Id         = quote.Id,
+                   Price      = quote.Price,
+                   HighPrice  = quote.HighPrice,
+                   LowPrice   = quote.LowPrice,
+                   Volume     = quote.Volume,
+                   CreatedAt  = quote.CreatedAt,
+                   ModifiedAt = quote.ModifiedAt,
                };
     }
 
@@ -23,14 +23,14 @@ public static class QuoteMapper
     {
         return new Quote
                {
-                   Id          = Guid.NewGuid(),
-                   Price       = barResponse.LatestPrice,
-                   StockId     = stockId,
-                   HighPrice   = barResponse.HighPrice,
-                   LowPrice    = barResponse.LowPrice,
-                   Volume      = barResponse.NumberOfTradesInInterval,
-                   CreatedAt   = barResponse.Date,
-                   ModifiedAt  = barResponse.Date
+                   Id         = Guid.NewGuid(),
+                   Price      = barResponse.LatestPrice,
+                   StockId    = stockId,
+                   HighPrice  = barResponse.HighPrice,
+                   LowPrice   = barResponse.LowPrice,
+                   Volume     = barResponse.NumberOfTradesInInterval,
+                   CreatedAt  = barResponse.Date,
+                   ModifiedAt = barResponse.Date
                };
     }
 }

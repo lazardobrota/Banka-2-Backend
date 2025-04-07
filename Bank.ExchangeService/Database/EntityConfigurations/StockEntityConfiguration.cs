@@ -15,7 +15,7 @@ public class StockEntityConfiguration : IEntityTypeConfiguration<Stock>
 
         builder.Property(stock => stock.Id)
                .IsRequired();
-        
+
         builder.Property(stock => stock.Name)
                .IsRequired()
                .HasMaxLength(255);

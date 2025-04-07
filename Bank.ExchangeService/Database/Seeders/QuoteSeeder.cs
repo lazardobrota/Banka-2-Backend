@@ -17,98 +17,98 @@ public static partial class Seeder
     {
         public static readonly QuoteModel StockAppleQuote = new()
                                                             {
-                                                                Id          = Guid.Parse("a17ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                StockId     = Stock.Apple.Id,
-                                                                Price       = 175.43m,
-                                                                HighPrice   = 176.98m,
-                                                                LowPrice    = 174.21m,
-                                                                Volume      = 52436789,
-                                                                CreatedAt   = DateTime.UtcNow,
-                                                                ModifiedAt  = DateTime.UtcNow,
+                                                                Id         = Guid.Parse("a17ac10b-58cc-4372-a567-0e02b2c3d479"),
+                                                                StockId    = Stock.Apple.Id,
+                                                                Price      = 175.43m,
+                                                                HighPrice  = 176.98m,
+                                                                LowPrice   = 174.21m,
+                                                                Volume     = 52436789,
+                                                                CreatedAt  = DateTime.UtcNow,
+                                                                ModifiedAt = DateTime.UtcNow,
                                                             };
 
         public static readonly QuoteModel StockMicrosoftQuote = new()
                                                                 {
-                                                                    Id          = Guid.Parse("b17ac10b-58cc-4372-a567-0e02b2c3d480"),
-                                                                    StockId     = Stock.Microsoft.Id,
-                                                                    Price       = 338.11m,
-                                                                    HighPrice   = 339.54m,
-                                                                    LowPrice    = 336.77m,
-                                                                    Volume      = 23567890,
-                                                                    CreatedAt   = DateTime.UtcNow,
-                                                                    ModifiedAt  = DateTime.UtcNow,
+                                                                    Id         = Guid.Parse("b17ac10b-58cc-4372-a567-0e02b2c3d480"),
+                                                                    StockId    = Stock.Microsoft.Id,
+                                                                    Price      = 338.11m,
+                                                                    HighPrice  = 339.54m,
+                                                                    LowPrice   = 336.77m,
+                                                                    Volume     = 23567890,
+                                                                    CreatedAt  = DateTime.UtcNow,
+                                                                    ModifiedAt = DateTime.UtcNow,
                                                                 };
 
         public static readonly QuoteModel StockTeslaQuote = new()
                                                             {
-                                                                Id          = Guid.Parse("c17ac10b-58cc-4372-a567-0e02b2c3d481"),
-                                                                StockId     = Stock.Tesla.Id,
-                                                                Price       = 242.68m,
-                                                                HighPrice   = 245.33m,
-                                                                LowPrice    = 240.12m,
-                                                                Volume      = 128907654,
-                                                                CreatedAt   = DateTime.UtcNow,
-                                                                ModifiedAt  = DateTime.UtcNow,
+                                                                Id         = Guid.Parse("c17ac10b-58cc-4372-a567-0e02b2c3d481"),
+                                                                StockId    = Stock.Tesla.Id,
+                                                                Price      = 242.68m,
+                                                                HighPrice  = 245.33m,
+                                                                LowPrice   = 240.12m,
+                                                                Volume     = 128907654,
+                                                                CreatedAt  = DateTime.UtcNow,
+                                                                ModifiedAt = DateTime.UtcNow,
                                                             };
 
         public static readonly QuoteModel StockAmazonQuote = new()
                                                              {
-                                                                 Id          = Guid.Parse("d17ac10b-58cc-4372-a567-0e02b2c3d482"),
-                                                                 StockId     = Stock.Amazon.Id,
-                                                                 Price       = 129.96m,
-                                                                 HighPrice   = 131.25m,
-                                                                 LowPrice    = 128.88m,
-                                                                 Volume      = 45678901,
-                                                                 CreatedAt   = DateTime.UtcNow,
-                                                                 ModifiedAt  = DateTime.UtcNow,
+                                                                 Id         = Guid.Parse("d17ac10b-58cc-4372-a567-0e02b2c3d482"),
+                                                                 StockId    = Stock.Amazon.Id,
+                                                                 Price      = 129.96m,
+                                                                 HighPrice  = 131.25m,
+                                                                 LowPrice   = 128.88m,
+                                                                 Volume     = 45678901,
+                                                                 CreatedAt  = DateTime.UtcNow,
+                                                                 ModifiedAt = DateTime.UtcNow,
                                                              };
 
         public static readonly QuoteModel StockAppleQuoteYesterday = new()
                                                                      {
-                                                                         Id          = Guid.Parse("a27ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                         StockId     = Stock.Apple.Id,
-                                                                         Price       = 174.21m,
-                                                                         HighPrice   = 175.10m,
-                                                                         LowPrice    = 173.45m,
-                                                                         Volume      = 48923451,
-                                                                         CreatedAt   = DateTime.UtcNow.AddDays(-1),
-                                                                         ModifiedAt  = DateTime.UtcNow.AddDays(-1),
+                                                                         Id         = Guid.Parse("a27ac10b-58cc-4372-a567-0e02b2c3d479"),
+                                                                         StockId    = Stock.Apple.Id,
+                                                                         Price      = 174.21m,
+                                                                         HighPrice  = 175.10m,
+                                                                         LowPrice   = 173.45m,
+                                                                         Volume     = 48923451,
+                                                                         CreatedAt  = DateTime.UtcNow.AddDays(-1),
+                                                                         ModifiedAt = DateTime.UtcNow.AddDays(-1),
                                                                      };
 
         public static readonly QuoteModel StockAppleQuote2DaysAgo = new()
                                                                     {
-                                                                        Id          = Guid.Parse("a37ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                        StockId     = Stock.Apple.Id,
-                                                                        Price       = 172.88m,
-                                                                        HighPrice   = 173.95m,
-                                                                        LowPrice    = 171.96m,
-                                                                        Volume      = 51234567,
-                                                                        CreatedAt   = DateTime.UtcNow.AddDays(-2),
-                                                                        ModifiedAt  = DateTime.UtcNow.AddDays(-2),
+                                                                        Id         = Guid.Parse("a37ac10b-58cc-4372-a567-0e02b2c3d479"),
+                                                                        StockId    = Stock.Apple.Id,
+                                                                        Price      = 172.88m,
+                                                                        HighPrice  = 173.95m,
+                                                                        LowPrice   = 171.96m,
+                                                                        Volume     = 51234567,
+                                                                        CreatedAt  = DateTime.UtcNow.AddDays(-2),
+                                                                        ModifiedAt = DateTime.UtcNow.AddDays(-2),
                                                                     };
 
         public static readonly QuoteModel StockAppleQuote3DaysAgo = new()
                                                                     {
-                                                                        Id          = Guid.Parse("a47ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                        StockId     = Stock.Apple.Id,
-                                                                        Price       = 168.45m,
-                                                                        HighPrice   = 169.87m,
-                                                                        LowPrice    = 167.23m,
-                                                                        Volume      = 47891234,
-                                                                        CreatedAt   = DateTime.UtcNow.AddDays(-3),
-                                                                        ModifiedAt  = DateTime.UtcNow.AddDays(-3),
+                                                                        Id         = Guid.Parse("a47ac10b-58cc-4372-a567-0e02b2c3d479"),
+                                                                        StockId    = Stock.Apple.Id,
+                                                                        Price      = 168.45m,
+                                                                        HighPrice  = 169.87m,
+                                                                        LowPrice   = 167.23m,
+                                                                        Volume     = 47891234,
+                                                                        CreatedAt  = DateTime.UtcNow.AddDays(-3),
+                                                                        ModifiedAt = DateTime.UtcNow.AddDays(-3),
                                                                     };
 
         public static readonly QuoteModel StockAppleQuote4DaysAgo = new()
                                                                     {
-                                                                        Id          = Guid.Parse("a57ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                        StockId     = Stock.Apple.Id,
-                                                                        Price       = 162.33m,
-                                                                        HighPrice   = 164.12m,
-                                                                        LowPrice    = 161.78m,
-                                                                        Volume      = 45678901,
-                                                                        CreatedAt   = DateTime.UtcNow.AddDays(-4),
-                                                                        ModifiedAt  = DateTime.UtcNow.AddDays(-4),
+                                                                        Id         = Guid.Parse("a57ac10b-58cc-4372-a567-0e02b2c3d479"),
+                                                                        StockId    = Stock.Apple.Id,
+                                                                        Price      = 162.33m,
+                                                                        HighPrice  = 164.12m,
+                                                                        LowPrice   = 161.78m,
+                                                                        Volume     = 45678901,
+                                                                        CreatedAt  = DateTime.UtcNow.AddDays(-4),
+                                                                        ModifiedAt = DateTime.UtcNow.AddDays(-4),
                                                                     };
 
         public static readonly QuoteModel ForexPairUsdEurLatest = new()
@@ -185,38 +185,38 @@ public static partial class Seeder
 
         public static readonly QuoteModel OptionAppleCallOptionLatest = new()
                                                                         {
-                                                                            Id          = Guid.Parse("ed3ab504-2cb1-431c-84ee-19ac4cdd0885"),
-                                                                            OptionId    = Option.AppleCallOption.Id,
-                                                                            Price       = 5.45m,
-                                                                            HighPrice   = 5.65m,
-                                                                            LowPrice    = 5.25m,
-                                                                            Volume      = 12345,
-                                                                            CreatedAt   = DateTime.UtcNow,
-                                                                            ModifiedAt  = DateTime.UtcNow,
+                                                                            Id         = Guid.Parse("ed3ab504-2cb1-431c-84ee-19ac4cdd0885"),
+                                                                            OptionId   = Option.AppleCallOption.Id,
+                                                                            Price      = 5.45m,
+                                                                            HighPrice  = 5.65m,
+                                                                            LowPrice   = 5.25m,
+                                                                            Volume     = 12345,
+                                                                            CreatedAt  = DateTime.UtcNow,
+                                                                            ModifiedAt = DateTime.UtcNow,
                                                                         };
 
         public static readonly QuoteModel OptionAppleCallOptionYesterday = new()
                                                                            {
-                                                                               Id          = Guid.Parse("7e3df1a2-0d2e-4f4a-9d1c-c06c5816752b"),
-                                                                               OptionId    = Option.AppleCallOption.Id,
-                                                                               Price       = 5.25m,
-                                                                               HighPrice   = 5.40m,
-                                                                               LowPrice    = 5.10m,
-                                                                               Volume      = 11234,
-                                                                               CreatedAt   = DateTime.UtcNow.AddDays(-1),
-                                                                               ModifiedAt  = DateTime.UtcNow.AddDays(-1),
+                                                                               Id         = Guid.Parse("7e3df1a2-0d2e-4f4a-9d1c-c06c5816752b"),
+                                                                               OptionId   = Option.AppleCallOption.Id,
+                                                                               Price      = 5.25m,
+                                                                               HighPrice  = 5.40m,
+                                                                               LowPrice   = 5.10m,
+                                                                               Volume     = 11234,
+                                                                               CreatedAt  = DateTime.UtcNow.AddDays(-1),
+                                                                               ModifiedAt = DateTime.UtcNow.AddDays(-1),
                                                                            };
 
         public static readonly QuoteModel OptionAppleCallOptionLastWeek = new()
                                                                           {
-                                                                              Id          = Guid.Parse("7e252962-d766-42b8-af47-af09a57d6e93"),
-                                                                              OptionId    = Option.AppleCallOption.Id,
-                                                                              Price       = 4.85m,
-                                                                              HighPrice   = 5.00m,
-                                                                              LowPrice    = 4.70m,
-                                                                              Volume      = 10123,
-                                                                              CreatedAt   = DateTime.UtcNow.AddDays(-7),
-                                                                              ModifiedAt  = DateTime.UtcNow.AddDays(-7),
+                                                                              Id         = Guid.Parse("7e252962-d766-42b8-af47-af09a57d6e93"),
+                                                                              OptionId   = Option.AppleCallOption.Id,
+                                                                              Price      = 4.85m,
+                                                                              HighPrice  = 5.00m,
+                                                                              LowPrice   = 4.70m,
+                                                                              Volume     = 10123,
+                                                                              CreatedAt  = DateTime.UtcNow.AddDays(-7),
+                                                                              ModifiedAt = DateTime.UtcNow.AddDays(-7),
                                                                           };
     }
 }
@@ -298,21 +298,21 @@ public static class QuoteSeederExtension
 
         string? nextPage = null;
         var     query    = HttpUtility.ParseQueryString(string.Empty);
-        query["symbols"]   = symbols;
-        query["start"]     = Configuration.Security.Stock.StartTime;
+        query["symbols"] = symbols;
+        query["start"]   = Configuration.Security.Stock.StartTime;
         // query["end"]       = Configuration.Security.Stock.EndTime;
         query["limit"]     = "10000";
         query["timeframe"] = "15Min";
 
         var quotes = new List<QuoteModel>();
-        
+
         do
         {
             if (!string.IsNullOrEmpty(nextPage))
                 query["page_token"] = nextPage;
             else
                 query.Remove("page_token");
-        
+
             var request = new HttpRequestMessage
                           {
                               Method     = HttpMethod.Get,
@@ -324,38 +324,38 @@ public static class QuoteSeederExtension
                                   { "APCA-API-SECRET-KEY", Configuration.Security.AlpacaSecretKey },
                               }
                           };
-        
+
             var response = await httpClient.SendAsync(request);
-        
+
             if (!response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
                 break;
             }
-        
+
             var body = await response.Content.ReadFromJsonAsync<FetchStockBarResponse>();
-        
+
             if (body is null)
             {
                 Console.WriteLine($"RESULT IS NULL");
                 break;
             }
-        
+
             quotes.AddRange(body.Bars.SelectMany(pair =>
                                                  {
                                                      var stockId = stocks[pair.Key].Id;
                                                      return pair.Value.Select(bar => bar.ToQuote(stockId));
                                                  }));
-        
+
             nextPage = body.NextPage;
         } while (!string.IsNullOrEmpty(nextPage));
-        
+
         Console.WriteLine("Please wait for database to seed...");
-        
+
         await quoteRepository.CreateQuotes(quotes);
-        
+
         stopwatchFull.Stop();
-        
+
         Console.WriteLine($"SeedQuoteStocks | All | Time Elapsed: {stopwatchFull.ElapsedMilliseconds}ms");
     }
 }

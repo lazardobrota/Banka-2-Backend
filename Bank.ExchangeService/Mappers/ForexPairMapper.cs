@@ -21,14 +21,14 @@ public static class ForexPairMapper
                    StockExchange      = forexPair.StockExchange!.ToResponse(currencyResponse),
                    Quotes = forexPair.SortedQuotes.Select(quote => quote.ToSimpleResponse())
                                      .ToList(),
-                   HighPrice   = forexPair.HighPrice,
-                   LowPrice    = forexPair.LowPrice,
-                   Volume      = forexPair.Volume,
-                   PriceChangeInInterval = forexPair.PriceChange,
+                   HighPrice                    = forexPair.HighPrice,
+                   LowPrice                     = forexPair.LowPrice,
+                   Volume                       = forexPair.Volume,
+                   PriceChangeInInterval        = forexPair.PriceChange,
                    PriceChangePercentInInterval = forexPair.PriceChangePercent,
-                   Price       = forexPair.Price,
-                   CreatedAt   = forexPair.CreatedAt,
-                   ModifiedAt  = forexPair.ModifiedAt
+                   Price                        = forexPair.Price,
+                   CreatedAt                    = forexPair.CreatedAt,
+                   ModifiedAt                   = forexPair.ModifiedAt
                };
     }
 

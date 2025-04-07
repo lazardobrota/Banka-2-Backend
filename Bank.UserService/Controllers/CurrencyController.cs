@@ -3,7 +3,6 @@ using Bank.Application.Queries;
 using Bank.Application.Responses;
 using Bank.UserService.Services;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.UserService.Controllers;

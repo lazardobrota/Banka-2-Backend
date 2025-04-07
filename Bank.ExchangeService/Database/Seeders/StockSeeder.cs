@@ -17,7 +17,7 @@ public static partial class Seeder
     {
         public static readonly StockModel Apple = new()
                                                   {
-                                                      Id = Guid.Parse("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
+                                                      Id              = Guid.Parse("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
                                                       Name            = "Apple Inc.",
                                                       Ticker          = "AAPL",
                                                       StockExchangeId = StockExchange.Nasdaq.Id
@@ -25,7 +25,7 @@ public static partial class Seeder
 
         public static readonly StockModel Microsoft = new()
                                                       {
-                                                          Id = Guid.Parse("b47ac10b-58cc-4372-a567-0e02b2c3d480"),
+                                                          Id              = Guid.Parse("b47ac10b-58cc-4372-a567-0e02b2c3d480"),
                                                           Name            = "Microsoft Corporation",
                                                           Ticker          = "MSFT",
                                                           StockExchangeId = StockExchange.Nasdaq.Id,
@@ -33,7 +33,7 @@ public static partial class Seeder
 
         public static readonly StockModel Tesla = new()
                                                   {
-                                                      Id = Guid.Parse("c47ac10b-58cc-4372-a567-0e02b2c3d481"),
+                                                      Id              = Guid.Parse("c47ac10b-58cc-4372-a567-0e02b2c3d481"),
                                                       Name            = "Tesla, Inc.",
                                                       Ticker          = "TSLA",
                                                       StockExchangeId = StockExchange.ClearStreet.Id
@@ -41,7 +41,7 @@ public static partial class Seeder
 
         public static readonly StockModel Amazon = new()
                                                    {
-                                                       Id = Guid.Parse("d47ac10b-58cc-4372-a567-0e02b2c3d482"),
+                                                       Id              = Guid.Parse("d47ac10b-58cc-4372-a567-0e02b2c3d482"),
                                                        Name            = "Amazon.com, Inc.",
                                                        Ticker          = "AMZN",
                                                        StockExchangeId = StockExchange.ClearStreet.Id,

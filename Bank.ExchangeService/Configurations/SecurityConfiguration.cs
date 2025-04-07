@@ -24,8 +24,10 @@ public static partial class Configuration
             public static           string   ApiKey    => s_ApiKeys[s_ApiKeyIndex = (s_ApiKeyIndex          + 1) % s_ApiKeys.Length];
             public static           string   ApiSecret => s_ApiSecrets[s_ApiSecretIndex = (s_ApiSecretIndex + 1) % s_ApiSecrets.Length];
 
-            public static readonly string StartTime = DateTime.UtcNow.AddDays(-4).ToString("yyyy-MM-ddTHH:mm:ssZ");
-            public static readonly string EndTime   = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            public static readonly string StartTime = DateTime.UtcNow.AddDays(-4)
+                                                              .ToString("yyyy-MM-ddTHH:mm:ssZ");
+
+            public static readonly string EndTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
             // public const string StartTime = "2025-04-04T12:30:00Z";
             // public const string EndTime   = "2025-04-07T12:30:00Z";
         }

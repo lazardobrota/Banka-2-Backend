@@ -40,7 +40,7 @@ public class OptionSimpleResponse
     public          decimal    PriceChange                  { get; set; }
     public required decimal    PriceChangeInInterval        { get; set; }
     public required decimal    PriceChangePercentInInterval { get; set; }
-    public          decimal    Price             { get; set; }
-    public          DateTime   CreatedAt         { get; set; }
-    public          DateTime   ModifiedAt        { get; set; }
+    public          decimal    Price                        { get; set; }
+    public          DateTime   CreatedAt                    { get; set; }
+    public          DateTime   ModifiedAt                   { get; set; }
 }

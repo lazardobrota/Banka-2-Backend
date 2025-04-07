@@ -35,7 +35,7 @@ public class FutureContractSimpleResponse
     public required int          Volume                       { get; set; }
     public required decimal      PriceChangeInInterval        { get; set; }
     public required decimal      PriceChangePercentInInterval { get; set; }
-    public required decimal      Price          { get; set; }
-    public required DateTime     CreatedAt      { get; set; }
-    public required DateTime     ModifiedAt     { get; set; }
+    public required decimal      Price                        { get; set; }
+    public required DateTime     CreatedAt                    { get; set; }
+    public required DateTime     ModifiedAt                   { get; set; }
 }

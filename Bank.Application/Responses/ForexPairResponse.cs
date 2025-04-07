@@ -39,7 +39,7 @@ public class ForexPairSimpleResponse
     public required decimal                Count                        { get; set; }
     public required decimal                PriceChangeInInterval        { get; set; }
     public required decimal                PriceChangePercentInInterval { get; set; }
-    public required decimal                Price              { get; set; }
-    public required DateTime               CreatedAt          { get; set; }
-    public required DateTime               ModifiedAt         { get; set; }
+    public required decimal                Price                        { get; set; }
+    public required DateTime               CreatedAt                    { get; set; }
+    public required DateTime               ModifiedAt                   { get; set; }
 }

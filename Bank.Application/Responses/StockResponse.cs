@@ -2,7 +2,7 @@
 
 namespace Bank.Application.Responses;
 
-public class StockResponse 
+public class StockResponse
 {
     public required Guid Id { get; set; }
 
