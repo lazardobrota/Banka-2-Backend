@@ -57,8 +57,8 @@ public static partial class SwaggerSchemaFilter
             {
                 return new OpenApiObject()
                        {
-                           [nameof(Example.FromAccountId)
-                            .ToCamelCase()] = new OpenApiString(Example.FromAccountId.ToString()),
+                           [nameof(Example.FromAccountNumber)
+                            .ToCamelCase()] = new OpenApiString(Example.FromAccountNumber),
                            [nameof(Example.FromCurrencyId)
                             .ToCamelCase()] = new OpenApiString(Example.FromCurrencyId.ToString()),
                            [nameof(Example.ToAccountNumber)

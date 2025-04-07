@@ -84,27 +84,27 @@ public class AccountService(
         return Result.Ok(account.ToResponse());
     }
 
-    public async Task<Result<AccountResponse>> Update(AccountUpdateClientRequest accountUpdateRequest, Guid id)
+    public async Task<Result<AccountResponse>> Update(AccountUpdateClientRequest request, Guid id)
     {
-        var oldAccount = await m_AccountRepository.FindById(id);
-
-        if (oldAccount is null)
+        var dbAccount = await m_AccountRepository.FindById(id);
+    
+        if (dbAccount is null)
             return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
-
-        var account = await m_AccountRepository.Update(oldAccount, accountUpdateRequest.ToAccount(oldAccount));
-
+    
+        var account = await m_AccountRepository.Update(dbAccount.ToAccount(request));
+    
         return Result.Ok(account.ToResponse());
     }
 
-    public async Task<Result<AccountResponse>> Update(AccountUpdateEmployeeRequest accountUpdateRequest, Guid id)
+    public async Task<Result<AccountResponse>> Update(AccountUpdateEmployeeRequest request, Guid id)
     {
-        var oldAccount = await m_AccountRepository.FindById(id);
-
-        if (oldAccount is null)
+        var dbAccount = await m_AccountRepository.FindById(id);
+    
+        if (dbAccount is null)
             return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
-
-        var account = await m_AccountRepository.Update(oldAccount, accountUpdateRequest.ToAccount(oldAccount));
-
+    
+        var account = await m_AccountRepository.Update(dbAccount.ToAccount(request));
+    
         return Result.Ok(account.ToResponse());
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Requests;
+using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.Database.Sample;
 
@@ -8,8 +9,8 @@ public static partial class Sample
     {
         public static readonly UserLoginRequest LoginRequest = new()
                                                                {
-                                                                   Email    = "marko.petrovic@example.com",
-                                                                   Password = "M4rk0Petrovic@2024"
+                                                                   Email    = Seeder.Client.Client01.Email,
+                                                                   Password = "client1"
                                                                };
 
         public static readonly UserActivationRequest ActivationRequest = new()
