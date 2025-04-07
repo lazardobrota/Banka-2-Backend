@@ -58,6 +58,33 @@ public enum Profile
     Production
 }
 
+public enum OrderType
+{
+    Invalid,
+    Market,
+    Limit,
+    Stop,
+    StopLimit
+}
+
+public enum Direction
+{
+    Invalid,
+    Buy,
+    Sell
+}
+
+public enum OrderStatus
+{
+    Invalid,
+    Pending,
+    Approved,
+    Declined,
+    Completed,
+    Failed
+}
+
+
 public enum Liquidity
 {
     High,
