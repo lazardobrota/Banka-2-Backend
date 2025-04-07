@@ -8,24 +8,29 @@ namespace Bank.UserService.Repositories;
 
 public interface IAccountCurrencyRepository
 {
-    Task<Page<AccountCurrency>> FindAll(Pageable pageable); //todo: filter
+    Task<Page<AccountCurrency>> FindAll(Pageable pageable);
 
     Task<AccountCurrency?> FindById(Guid id);
 
+    Task<bool> Exists(Guid id);
+
     Task<AccountCurrency> Add(AccountCurrency accountCurrency);
 
-    Task<AccountCurrency> Update(AccountCurrency oldAccountTypeCurrency, AccountCurrency accountCurrency);
+    Task<AccountCurrency> Update(AccountCurrency accountCurrency);
 }
 
-public class AccountCurrencyRepository(ApplicationContext context) : IAccountCurrencyRepository
+public class AccountCurrencyRepository(ApplicationContext context, IDbContextFactory<ApplicationContext> contextFactory) : IAccountCurrencyRepository
 {
-    private readonly ApplicationContext m_Context = context;
+    private readonly ApplicationContext                    m_Context        = context;
+    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
+    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
+    
     public async Task<Page<AccountCurrency>> FindAll(Pageable pageable)
     {
-        var accountTypeQuery = m_Context.AccountCurrencies.Include(account => account.Employee)
-                                        .Include(account => account.Currency)
-                                        .Include(account => account.Account)
+        var accountTypeQuery = m_Context.AccountCurrencies.Include(accountCurrency => accountCurrency.Employee)
+                                        .Include(accountCurrency => accountCurrency.Currency)
+                                        .Include(accountCurrency => accountCurrency.Account)
                                         .AsQueryable();
 
         var accountTypes = await accountTypeQuery.Skip((pageable.Page - 1) * pageable.Size)
@@ -39,10 +44,15 @@ public class AccountCurrencyRepository(ApplicationContext context) : IAccountCur
 
     public async Task<AccountCurrency?> FindById(Guid id)
     {
-        return await m_Context.AccountCurrencies.Include(account => account.Employee)
-                              .Include(account => account.Currency)
-                              .Include(account => account.Account)
-                              .FirstOrDefaultAsync(a => a.Id == id);
+        return await m_Context.AccountCurrencies.Include(accountCurrency => accountCurrency.Employee)
+                              .Include(accountCurrency => accountCurrency.Currency)
+                              .Include(accountCurrency => accountCurrency.Account)
+                              .FirstOrDefaultAsync(accountCurrency => accountCurrency.Id == id);
+    }
+
+    public async Task<bool> Exists(Guid id)
+    {
+        return await m_Context.AccountCurrencies.AnyAsync(accountCurrency => accountCurrency.Id == id);
     }
 
     public async Task<AccountCurrency> Add(AccountCurrency accountCurrency)
@@ -54,15 +64,13 @@ public class AccountCurrencyRepository(ApplicationContext context) : IAccountCur
         return addedAccountCurrency.Entity;
     }
 
-    public async Task<AccountCurrency> Update(AccountCurrency oldAccountCurrency, AccountCurrency accountCurrency)
+    public async Task<AccountCurrency> Update(AccountCurrency accountCurrency)
     {
-        m_Context.AccountCurrencies.Entry(oldAccountCurrency)
-                 .State = EntityState.Detached;
+        await m_Context.AccountCurrencies.Where(dbAccountCurrency => dbAccountCurrency.Id == accountCurrency.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbAccountCurrency => dbAccountCurrency.DailyLimit, accountCurrency.DailyLimit)
+                                                             .SetProperty(dbAccountCurrency => dbAccountCurrency.MonthlyLimit, accountCurrency.MonthlyLimit)
+                                                             .SetProperty(dbAccountCurrency => dbAccountCurrency.ModifiedAt,   accountCurrency.ModifiedAt));
 
-        var updatedAccountCurrency = m_Context.AccountCurrencies.Update(accountCurrency);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedAccountCurrency.Entity;
+        return accountCurrency;
     }
 }

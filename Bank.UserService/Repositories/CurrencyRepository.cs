@@ -13,12 +13,17 @@ public interface ICurrencyRepository
     Task<Currency?> FindById(Guid id);
 
     Task<Currency?> FindByCode(string currencyCode);
+
+    Task<bool> Exists(Guid currencyId);
 }
 
-public class CurrencyRepository(ApplicationContext context) : ICurrencyRepository
+public class CurrencyRepository(ApplicationContext context, IDbContextFactory<ApplicationContext> contextFactory) : ICurrencyRepository
 {
-    private readonly ApplicationContext m_Context = context;
+    private readonly ApplicationContext                    m_Context        = context;
+    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
+    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
+    
     public async Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery)
     {
         var currencyQuery = m_Context.Currencies.Include(c => c.Countries)
@@ -35,15 +40,45 @@ public class CurrencyRepository(ApplicationContext context) : ICurrencyRepositor
 
     public async Task<Currency?> FindById(Guid id)
     {
-        return await m_Context.Currencies.Include(currency => currency.Countries)
-                              .Where(currency => currency.Id == id)
-                              .FirstOrDefaultAsync();
+        await using var context = await CreateContext;
+
+        return await FindById(id, context);
     }
 
     public async Task<Currency?> FindByCode(string currencyCode)
     {
-        return await m_Context.Currencies.Include(currency => currency.Countries)
-                              .Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
-                              .FirstOrDefaultAsync();
+        await using var context = await CreateContext;
+
+        return await FindByCode(currencyCode, context);
     }
+
+    public async Task<bool> Exists(Guid currencyId)
+    {
+        await using var context = await CreateContext;
+
+        return await Exists(currencyId, context);
+    }
+
+    #region Static Repository Calls
+    
+    private static async Task<Currency?> FindById(Guid id, ApplicationContext context)
+    {
+        return await context.Currencies.Include(currency => currency.Countries)
+                            .Where(currency => currency.Id == id)
+                            .FirstOrDefaultAsync();
+    }
+
+    private static async Task<Currency?> FindByCode(string currencyCode, ApplicationContext context)
+    {
+        return await context.Currencies.Include(currency => currency.Countries)
+                            .Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
+                            .FirstOrDefaultAsync();
+    }
+
+    private static Task<bool> Exists(Guid currencyId, ApplicationContext context)
+    {
+        return context.Currencies.AnyAsync(currency => currency.Id == currencyId);
+    }
+    
+    #endregion
 }

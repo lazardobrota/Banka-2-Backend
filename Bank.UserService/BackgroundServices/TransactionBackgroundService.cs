@@ -46,37 +46,32 @@ public class TransactionBackgroundService(IServiceProvider serviceProvider)
 
         if (Configuration.Application.Profile == Profile.Testing)
             return;
-        
-        m_InternalTimer = new Timer(service => ProcessInternalTransactions(service).Wait(), this, TimeSpan.Zero, TimeSpan.FromSeconds(15));
-        m_ExternalTimer = new Timer(service => ProcessExternalTransactions(service).Wait(), this, TimeSpan.Zero, TimeSpan.FromMinutes(15));
+
+        m_InternalTimer = new Timer(service => ProcessInternalTransactions(service)
+                                    .Wait(), this, TimeSpan.Zero, TimeSpan.FromSeconds(15));
+
+        m_ExternalTimer = new Timer(service => ProcessExternalTransactions(service)
+                                    .Wait(), this, TimeSpan.Zero, TimeSpan.FromMinutes(15));
     }
 
     private bool m_ProcessingInternalTransaction = false;
 
-    private async Task ProcessInternalTransactions(object? @object)
+    private async Task ProcessInternalTransactions(object? _)
     {
         if (m_ProcessingInternalTransaction || InternalTransactions.IsEmpty)
             return;
 
         m_ProcessingInternalTransaction = true;
 
-        var transactionBackgroundService = @object as TransactionBackgroundService;
+        var processTransactions = new List<ProcessTransaction>();
 
-        var transactionsPerAccount = new ConcurrentDictionary<Guid, List<ProcessTransaction>>();
+        while (InternalTransactions.TryDequeue(out var processTransaction))
+            processTransactions.Add(processTransaction);
 
-        while (InternalTransactions.TryDequeue(out var transaction))
-        {
-            transactionsPerAccount.GetOrAdd(transaction.FromAccountId, [])
-                                  .Add(transaction);
-            
-            transactionsPerAccount.GetOrAdd(transaction.ToAccountId, [])
-                                  .Add(transaction);
-        }
+        var transactionService = TransactionService;
 
-        var transactionService = transactionBackgroundService!.TransactionService;
-
-        foreach (var accountTransactions in transactionsPerAccount)
-            await transactionService.ProcessInternalTransactionsForAccount(accountTransactions.Key, accountTransactions.Value);
+        await Task.WhenAll(processTransactions.Select(transactionService.ProcessInternalTransaction)
+                                              .ToList());
 
         m_ProcessingInternalTransaction = false;
     }

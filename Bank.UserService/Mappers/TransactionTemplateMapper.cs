@@ -46,23 +46,13 @@ public static class TransactionTemplateMapper
                };
     }
 
-    public static TransactionTemplate ToTransactionTemplate(this TransactionTemplateUpdateRequest transactionTemplateUpdateRequest, TransactionTemplate oldTransactionTemplate)
+    public static TransactionTemplate ToTransactionTemplate(this TransactionTemplate transactionTemplate, TransactionTemplateUpdateRequest transactionTemplateUpdateRequest)
     {
-        return new TransactionTemplate
-               {
-                   Id            = oldTransactionTemplate.Id,
-                   ClientId      = oldTransactionTemplate.ClientId,
-                   Client        = oldTransactionTemplate.Client,
-                   Name          = transactionTemplateUpdateRequest.Name,
-                   AccountNumber = transactionTemplateUpdateRequest.AccountNumber,
-                   Deleted       = transactionTemplateUpdateRequest.Deleted,
-                   CreatedAt     = oldTransactionTemplate.CreatedAt,
-                   ModifiedAt    = DateTime.UtcNow
-               };
+        transactionTemplate.AccountNumber = transactionTemplateUpdateRequest.AccountNumber;
+        transactionTemplate.Name          = transactionTemplateUpdateRequest.Name;
+        transactionTemplate.Deleted       = transactionTemplateUpdateRequest.Deleted;
+        transactionTemplate.ModifiedAt    = DateTime.UtcNow;
 
-        // oldTransactionTemplate.AccountNumber = transactionTemplateUpdateRequest.AccountNumber;
-        // oldTransactionTemplate.Name = transactionTemplateUpdateRequest.Name;
-        // oldTransactionTemplate.Deleted = transactionTemplateUpdateRequest.Deleted;
-        // oldTransactionTemplate.ModifiedAt = DateTime.UtcNow;
+        return transactionTemplate;
     }
 }
