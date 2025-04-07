@@ -12,9 +12,13 @@ public static class TransactionValidator
     {
         public Create()
         {
-            RuleFor(request => request.FromAccountId)
+            RuleFor(request => request.FromAccountNumber)
             .NotEmpty()
-            .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("FromAccountId"));
+            .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("FromAccountNumber"))
+            .Length(18)
+            .WithMessage(ValidationErrorMessage.Global.TextFixedLength("FromAccountNumber", 18))
+            .Must(ValidatorUtilities.Global.ContainsOnlyNumbers)
+            .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("FromToAccountNumber"));
 
             RuleFor(request => request.FromCurrencyId)
             .NotEmpty()

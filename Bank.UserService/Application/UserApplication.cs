@@ -110,7 +110,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILoanService, Services.LoanService>();
         services.AddScoped<IInstallmentService, InstallmentService>();
         services.AddScoped<ILoanTypeService, LoanTypeService>();
-
+        services.AddScoped<Lazy<ITransactionService>>(provider => new Lazy<ITransactionService>(provider.GetRequiredService<ITransactionService>));
+        
         return services;
     }
     
@@ -124,6 +125,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDatabase(this IServiceCollection services)
     {
         services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
+        services.AddDbContextFactory<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()));
 
         return services;
     }

@@ -15,7 +15,7 @@ public interface IAccountTypeRepository
 
     Task<AccountType> Add(AccountType accountType);
 
-    Task<AccountType> Update(AccountType oldAccountType, AccountType accountType);
+    Task<AccountType> Update(AccountType accountType);
 }
 
 public class AccountTypeRepository(ApplicationContext context) : IAccountTypeRepository
@@ -55,15 +55,13 @@ public class AccountTypeRepository(ApplicationContext context) : IAccountTypeRep
         return addedAccountType.Entity;
     }
 
-    public async Task<AccountType> Update(AccountType oldAccountType, AccountType accountType)
+    public async Task<AccountType> Update(AccountType accountType)
     {
-        m_Context.AccountTypes.Entry(oldAccountType)
-                 .State = EntityState.Detached;
+        await m_Context.AccountTypes.Where(dbAccountType => dbAccountType.Id == accountType.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbAccountType => dbAccountType.Name, accountType.Name)
+                                                             .SetProperty(dbAccountType => dbAccountType.Code,       accountType.Code)
+                                                             .SetProperty(dbAccountType => dbAccountType.ModifiedAt, accountType.ModifiedAt));
 
-        var updatedAccountType = m_Context.AccountTypes.Update(accountType);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedAccountType.Entity;
+        return accountType;
     }
 }

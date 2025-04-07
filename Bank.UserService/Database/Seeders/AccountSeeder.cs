@@ -1,4 +1,5 @@
-﻿using Bank.UserService.Models;
+﻿using Bank.UserService.Mappers;
+using Bank.UserService.Models;
 
 namespace Bank.UserService.Database.Seeders;
 
@@ -19,8 +20,8 @@ public static partial class Seeder
                                                               EmployeeId       = Employee.Admin.Id,
                                                               CurrencyId       = Currency.SerbianDinar.Id,
                                                               AccountTypeId    = AccountType.BusinessForeignCurrencyAccount.Id,
-                                                              DailyLimit       = decimal.MaxValue,
-                                                              MonthlyLimit     = decimal.MaxValue,
+                                                              DailyLimit       = 9999999999999999.999999999999m,
+                                                              MonthlyLimit     = 9999999999999999.999999999999m,
                                                               CreationDate     = DateOnly.FromDateTime(DateTime.UtcNow),
                                                               ExpirationDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(999)),
                                                               CreatedAt        = DateTime.UtcNow,

@@ -15,7 +15,7 @@ public interface ITransactionTemplateRepository
 
     Task<TransactionTemplate> Add(TransactionTemplate transactionTemplate);
 
-    Task<TransactionTemplate> Update(TransactionTemplate oldTransactionTemplate, TransactionTemplate transactionTemplate);
+    Task<TransactionTemplate> Update(TransactionTemplate transactionTemplate);
 }
 
 public class TransactionTemplateRepository(ApplicationContext context, IAuthorizationService authorizationService) : ITransactionTemplateRepository
@@ -64,5 +64,16 @@ public class TransactionTemplateRepository(ApplicationContext context, IAuthoriz
         await m_Context.SaveChangesAsync();
 
         return updatedTransactionTemplate.Entity;
+    }
+
+    public async Task<TransactionTemplate> Update(TransactionTemplate transactionTemplate)
+    {
+        await m_Context.TransactionTemplates.Where(dbTransactionTemplate => dbTransactionTemplate.Id == transactionTemplate.Id)
+                       .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(dbTransactionTemplate => dbTransactionTemplate.AccountNumber, transactionTemplate.AccountNumber)
+                                                                     .SetProperty(dbTransactionTemplate => dbTransactionTemplate.Name,       transactionTemplate.Name)
+                                                                     .SetProperty(dbTransactionTemplate => dbTransactionTemplate.Deleted,    transactionTemplate.Deleted)
+                                                                     .SetProperty(dbTransactionTemplate => dbTransactionTemplate.ModifiedAt, transactionTemplate.ModifiedAt));
+
+        return transactionTemplate;
     }
 }

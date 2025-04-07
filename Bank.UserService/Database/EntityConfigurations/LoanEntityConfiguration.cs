@@ -21,8 +21,8 @@ public class LoanEntityConfiguration : IEntityTypeConfiguration<Loan>
                .IsRequired();
 
         builder.Property(loan => loan.Amount)
-               .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12)
+               .IsRequired();
 
         builder.Property(loan => loan.Period)
                .IsRequired();
