@@ -57,3 +57,23 @@ public enum Profile
     Staging,
     Production
 }
+
+public enum Liquidity
+{
+    High,
+    Medium,
+    Low
+}
+
+public enum OptionType
+{
+    Call,
+    Put
+}
+
+public enum ContractUnit
+{
+    Kilogram,
+    Liter,
+    Barrel
+}

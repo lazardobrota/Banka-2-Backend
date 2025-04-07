@@ -7,6 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Alpaca.Markets" Version="7.2.0" />
+        <PackageReference Include="Alpaca.Markets.Extensions" Version="7.2.0" />
         <PackageReference Include="DotNetEnv" Version="3.1.1" />
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />

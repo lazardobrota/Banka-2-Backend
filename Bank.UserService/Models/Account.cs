@@ -1,5 +1,4 @@
-﻿
-using Bank.UserService.Functions;
+﻿using Bank.UserService.Functions;
 
 namespace Bank.UserService.Models;
 
@@ -28,12 +27,11 @@ public class Account : IAccountBalance
     public required DateTime              ModifiedAt        { set;  get; }
 
     public string AccountNumber => $"{Client?.Bank?.Code}0000{Number}{Type?.Code}";
-    
+
     public bool IsForeign => Type != null && (Type.Code.StartsWith('3') || Type.Code.StartsWith('4'));
-    
+
     public IAccountBalance? FindAccountBalance(Guid currencyId)
     {
-
         if (CurrencyId == currencyId)
             return this;
 
@@ -53,7 +51,7 @@ public class Account : IAccountBalance
 
         return true;
     }
-    
+
     public decimal GetAvailableBalance()
     {
         return AvailableBalance;

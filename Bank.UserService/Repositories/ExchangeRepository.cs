@@ -16,7 +16,6 @@ public interface IExchangeRepository
 
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency);
 
-
     public Task<Exchange> Add(Exchange exchange);
 
     public Task<Exchange> Update(Exchange exchange);
@@ -63,7 +62,7 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
                               .FirstOrDefaultAsync(exchange => (exchange.CurrencyFromId == firstCurrencyId  && exchange.CurrencyToId == secondCurrencyId) ||
                                                                (exchange.CurrencyFromId == secondCurrencyId && exchange.CurrencyToId == firstCurrencyId));
     }
-    
+
     public async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency)
     {
         return await FindByCurrencyFromAndCurrencyTo(firstCurrency.Id, secondCurrency.Id);

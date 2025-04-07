@@ -17,18 +17,18 @@ public class AccountCurrency : IAccountBalance
     public required decimal   MonthlyLimit     { set; get; }
     public required DateTime  CreatedAt        { set; get; }
     public required DateTime  ModifiedAt       { set; get; }
-    
+
     public bool ChangeAvailableBalance(decimal amount)
     {
         AvailableBalance += amount;
-        
+
         return true;
     }
-    
+
     public bool ChangeBalance(decimal amount)
     {
         Balance += amount;
-        
+
         return true;
     }
 

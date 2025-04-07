@@ -40,6 +40,7 @@ public class Hooks
 
         serviceProvider.GetRequiredService<DatabaseHostedService>()
                        .OnApplicationStarted();
+
         serviceProvider.GetRequiredService<TransactionBackgroundService>()
                        .OnApplicationStarted();
 

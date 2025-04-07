@@ -1,0 +1,29 @@
+﻿using Bank.Application.Domain;
+using Bank.Application.Endpoints;
+using Bank.Application.Queries;
+using Bank.Application.Responses;
+using Bank.ExchangeService.Services;
+
+using Microsoft.AspNetCore.Mvc;
+
+namespace Bank.ExchangeService.Controllers;
+
+[ApiController]
+public class ForexPairController(IForexPairService forexPairService) : ControllerBase
+{
+    private readonly IForexPairService m_ForexPairService = forexPairService;
+
+    [HttpGet(Endpoints.ForexPair.GetAll)]
+    public async Task<ActionResult<Page<ForexPairSimpleResponse>>> GetAll([FromQuery] QuoteFilterQuery filter, [FromQuery] Pageable pageable)
+    {
+        var result = await m_ForexPairService.GetAll(filter, pageable);
+        return result.ActionResult;
+    }
+
+    [HttpGet(Endpoints.ForexPair.GetOne)]
+    public async Task<ActionResult<ForexPairResponse>> GetOne([FromRoute] Guid id)
+    {
+        var result = await m_ForexPairService.GetOne(id);
+        return result.ActionResult;
+    }
+}

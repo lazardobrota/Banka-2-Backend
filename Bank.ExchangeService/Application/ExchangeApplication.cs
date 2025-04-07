@@ -8,7 +8,7 @@ using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.HttpClients;
-using Bank.ExchangeService.Repositorties;
+using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 
 using DotNetEnv;
@@ -74,11 +74,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IStockExchangeRepository, StockExchangeRepository>();
         services.AddScoped<IStockExchangeService, StockExchangeService>();
-        services.AddScoped<IListingRepository, ListingRepository>();
-        services.AddScoped<IListingService, ListingService>();
-        services.AddScoped<IListingHistoricalRepository, ListingHistoricalRepository>();
-        services.AddScoped<IListingHistoricalService, ListingHistoricalService>();
         services.AddScoped<ICurrencyClient, CurrencyClient>();
+        services.AddScoped<IStockRepository, StockRepository>();
+        services.AddScoped<IStockService, StockService>();
+        services.AddScoped<IOptionRepository, OptionRepository>();
+        services.AddScoped<IOptionService, OptionService>();
+        services.AddScoped<IForexPairRepository, ForexPairRepository>();
+        services.AddScoped<IForexPairService, ForexPairService>();
+        services.AddScoped<IFutureContractRepository, FutureContractRepository>();
+        services.AddScoped<IFutureContractService, FutureContractService>();
+        services.AddScoped<IQuoteRepository, QuoteRepository>();
 
         return services;
     }
@@ -93,13 +98,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDatabase(this IServiceCollection services)
     {
         services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
+        services.AddDbContextFactory<DatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()));
 
         return services;
     }
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
-        services.AddSingleton<DatabaseHostedService>();
         services.AddHostedService<ApplicationHostedService>();
 
         return services;

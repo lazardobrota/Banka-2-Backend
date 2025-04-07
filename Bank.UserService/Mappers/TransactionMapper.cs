@@ -82,8 +82,8 @@ public static class TransactionMapper
                    ModifiedAt      = DateTime.UtcNow,
                };
     }
-    
-     public static Transaction ToTransaction(this PrepareWithdrawTransaction withdrawTransaction)
+
+    public static Transaction ToTransaction(this PrepareWithdrawTransaction withdrawTransaction)
     {
         return new Transaction
                {

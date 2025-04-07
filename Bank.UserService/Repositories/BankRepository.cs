@@ -41,6 +41,5 @@ public class BankRepository(ApplicationContext context) : IBankRepository
     public async Task<BankModel?> FindById(Guid id)
     {
         return await m_Context.Banks.FirstOrDefaultAsync(bank => bank.Id == id);
-
     }
 }

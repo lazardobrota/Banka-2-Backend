@@ -120,7 +120,7 @@ public class ExchangeService(
 
         var exchangeFrom = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyFrom);
         var exchangeTo   = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyTo);
-        
+
         var exchangeDetails = CalculateExchangeDetails(exchangeFrom, exchangeTo);
 
         // TODO: make transaction
@@ -142,27 +142,27 @@ public class ExchangeService(
 
     public async Task<ExchangeDetails?> CalculateExchangeDetails(Guid currencyFromId, Guid currencyToId)
     {
-        var currencyFromTask = m_CurrencyRepository.FindById(currencyFromId);
-        var currencyToTask   = m_CurrencyRepository.FindById(currencyToId);
-        var defaultCurrencyTask  = m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode);
+        var currencyFromTask    = m_CurrencyRepository.FindById(currencyFromId);
+        var currencyToTask      = m_CurrencyRepository.FindById(currencyToId);
+        var defaultCurrencyTask = m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode);
 
         await Task.WhenAll(currencyFromTask, currencyToTask, defaultCurrencyTask);
-        
-        var currencyFrom        = await currencyFromTask;
-        var currencyTo          = await currencyToTask;
+
+        var currencyFrom    = await currencyFromTask;
+        var currencyTo      = await currencyToTask;
         var defaultCurrency = await defaultCurrencyTask;
-        
+
         if (currencyFrom is null || currencyTo is null)
             return null;
-        
+
         if (defaultCurrency is null)
             throw new Exception("No Default Currency");
-        
+
         var exchangeFromTask = m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyFrom);
         var exchangeToTask   = m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyTo);
-        
+
         await Task.WhenAll(exchangeFromTask, exchangeToTask);
-        
+
         var exchangeFrom = await exchangeFromTask;
         var exchangeTo   = await exchangeToTask;
 

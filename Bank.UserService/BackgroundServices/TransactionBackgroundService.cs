@@ -46,9 +46,12 @@ public class TransactionBackgroundService(IServiceProvider serviceProvider)
 
         if (Configuration.Application.Profile == Profile.Testing)
             return;
-        
-        m_InternalTimer = new Timer(service => ProcessInternalTransactions(service).Wait(), this, TimeSpan.Zero, TimeSpan.FromSeconds(15));
-        m_ExternalTimer = new Timer(service => ProcessExternalTransactions(service).Wait(), this, TimeSpan.Zero, TimeSpan.FromMinutes(15));
+
+        m_InternalTimer = new Timer(service => ProcessInternalTransactions(service)
+                                    .Wait(), this, TimeSpan.Zero, TimeSpan.FromSeconds(15));
+
+        m_ExternalTimer = new Timer(service => ProcessExternalTransactions(service)
+                                    .Wait(), this, TimeSpan.Zero, TimeSpan.FromMinutes(15));
     }
 
     private bool m_ProcessingInternalTransaction = false;
@@ -68,7 +71,7 @@ public class TransactionBackgroundService(IServiceProvider serviceProvider)
         {
             transactionsPerAccount.GetOrAdd(transaction.FromAccountId, [])
                                   .Add(transaction);
-            
+
             transactionsPerAccount.GetOrAdd(transaction.ToAccountId, [])
                                   .Add(transaction);
         }
