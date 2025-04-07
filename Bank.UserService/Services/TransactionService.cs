@@ -110,7 +110,7 @@ public class TransactionService(
         return Result.Ok(transaction.Value.ToCreateResponse());
     }
 
-    public async Task<Result<TransactionResponse>> Update(TransactionUpdateRequest request, Guid id) 
+    public async Task<Result<TransactionResponse>> Update(TransactionUpdateRequest request, Guid id)
     {
         var dbTransaction = await m_TransactionRepository.FindById(id);
 

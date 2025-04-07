@@ -26,7 +26,7 @@ public static class OptionMapper
                    Price                        = option.Price,
                    CreatedAt                    = option.CreatedAt,
                    ModifiedAt                   = option.ModifiedAt,
-                   SortedQuotes = option.SortedQuotes.Select(quote => quote.ToSimpleResponse())
+                   SortedQuotes = option.Quotes.Select(quote => quote.ToSimpleResponse())
                                         .ToList(),
                };
     }

@@ -12,36 +12,38 @@ public interface IOptionService
 {
     Task<Result<Page<OptionSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable);
 
-    Task<Result<OptionResponse>> GetOne(Guid id);
+    Task<Result<OptionResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class OptionService(IOptionRepository optionRepository, ICurrencyClient currencyClient) : IOptionService
+public class OptionService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IOptionService
 {
-    private readonly IOptionRepository m_OptionRepository = optionRepository;
-    private readonly ICurrencyClient   m_Client           = currencyClient;
+    private readonly ISecurityRepository m_SecurityRepository = securityRepository;
+    private readonly ICurrencyClient     m_Client             = currencyClient;
 
     public async Task<Result<Page<OptionSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
-        var page = await m_OptionRepository.FindAll(quoteFilterQuery, pageable);
+        var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.Option, pageable);
 
-        var responses = page.Items.Select(option => option.ToSimpleResponse())
+        var responses = page.Items.Select(security => security.ToOption()
+                                                              .ToSimpleResponse())
                             .ToList();
 
         return Result.Ok(new Page<OptionSimpleResponse>(responses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
-    public async Task<Result<OptionResponse>> GetOne(Guid id)
+    public async Task<Result<OptionResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter)
     {
-        var option = await m_OptionRepository.FindById(id);
+        var security = await m_SecurityRepository.FindById(id, filter);
 
-        if (option is null)
+        if (security is null)
             return Result.NotFound<OptionResponse>($"No Option found with Id: {id}");
 
-        var currencyResponse = await m_Client.GetCurrencyByIdSimple(option.StockExchange!.CurrencyId);
+        var currencyResponse = await m_Client.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
-            throw new Exception($"No Currency with Id: {option.StockExchange!.CurrencyId}");
+            throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
 
-        return Result.Ok(option.ToResponse(currencyResponse));
+        return Result.Ok(security.ToOption()
+                                 .ToResponse(currencyResponse));
     }
 }

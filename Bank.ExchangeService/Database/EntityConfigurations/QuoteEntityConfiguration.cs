@@ -9,57 +9,38 @@ public class QuoteEntityConfiguration : IEntityTypeConfiguration<Quote>
 {
     public void Configure(EntityTypeBuilder<Quote> builder)
     {
-        builder.HasKey(history => history.Id);
+        builder.HasKey(quote => quote.Id);
 
-        builder.Property(history => history.Id)
+        builder.Property(quote => quote.Id)
                .IsRequired();
 
-        builder.Property(history => history.Price)
+        builder.Property(quote => quote.Price)
                .IsRequired()
                .HasPrecision(18, 6);
 
-        builder.Property(history => history.HighPrice)
+        builder.Property(quote => quote.HighPrice)
                .IsRequired()
                .HasPrecision(18, 6);
 
-        builder.Property(history => history.LowPrice)
+        builder.Property(quote => quote.LowPrice)
                .IsRequired()
                .HasPrecision(18, 6);
 
-        builder.Property(history => history.Volume)
+        builder.Property(quote => quote.Volume)
                .IsRequired();
 
-        builder.Property(history => history.CreatedAt)
+        builder.Property(quote => quote.CreatedAt)
                .IsRequired();
 
-        builder.Property(history => history.ModifiedAt)
+        builder.Property(quote => quote.ModifiedAt)
                .IsRequired();
 
-        builder.Property(history => history.StockId);
-        builder.Property(history => history.ForexPairId);
-        builder.Property(history => history.FuturesContractId);
-        builder.Property(history => history.OptionId);
+        builder.Property(quote => quote.SecurityId)
+               .IsRequired();
 
-        builder.HasOne(history => history.Stock)
+        builder.HasOne(quote => quote.Security)
                .WithMany()
-               .HasForeignKey(history => history.StockId)
+               .HasForeignKey(quote => quote.SecurityId)
                .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(history => history.ForexPair)
-               .WithMany()
-               .HasForeignKey(history => history.ForexPairId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(history => history.FuturesContract)
-               .WithMany()
-               .HasForeignKey(history => history.FuturesContractId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(history => history.Option)
-               .WithMany()
-               .HasForeignKey(history => history.OptionId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasIndex(history => history.StockId);
     }
 }

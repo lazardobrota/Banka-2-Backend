@@ -8,7 +8,7 @@ public class OptionResponse
     public required decimal                   StrikePrice                  { get; set; }
     public required decimal                   ImpliedVolatility            { get; set; }
     public required int                       OpenInterest                 { get; set; }
-    public required DateTime                  SettlementDate               { get; set; }
+    public required DateOnly                  SettlementDate               { get; set; }
     public required string                    Name                         { get; set; }
     public required string                    Ticker                       { get; set; }
     public required OptionType                OptionType                   { get; set; }
@@ -30,7 +30,7 @@ public class OptionSimpleResponse
     public required decimal    StrikePrice                  { get; set; }
     public required decimal    ImpliedVolatility            { get; set; }
     public required int        OpenInterest                 { get; set; }
-    public required DateTime   SettlementDate               { get; set; }
+    public required DateOnly   SettlementDate               { get; set; }
     public required string     Name                         { get; set; }
     public required string     Ticker                       { get; set; }
     public required OptionType OptionType                   { get; set; }

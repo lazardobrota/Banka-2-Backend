@@ -5,6 +5,7 @@ namespace Bank.Application.Requests;
 public class OrderCreateRequest
 {
     public required Guid ActuaryId { set; get; }
+
     //TODO asset
     public required OrderType OrderType         { set; get; }
     public required int       Quantity          { set; get; }

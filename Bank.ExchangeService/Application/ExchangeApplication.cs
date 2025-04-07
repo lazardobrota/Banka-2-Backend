@@ -75,16 +75,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IStockExchangeRepository, StockExchangeRepository>();
         services.AddScoped<IStockExchangeService, StockExchangeService>();
         services.AddScoped<ICurrencyClient, CurrencyClient>();
-        services.AddScoped<IStockRepository, StockRepository>();
         services.AddScoped<IStockService, StockService>();
-        services.AddScoped<IOptionRepository, OptionRepository>();
         services.AddScoped<IOptionService, OptionService>();
-        services.AddScoped<IForexPairRepository, ForexPairRepository>();
         services.AddScoped<IForexPairService, ForexPairService>();
-        services.AddScoped<IFutureContractRepository, FutureContractRepository>();
         services.AddScoped<IFutureContractService, FutureContractService>();
         services.AddScoped<IQuoteRepository, QuoteRepository>();
-
+        services.AddScoped<ISecurityRepository, SecurityRepository>();
         return services;
     }
 

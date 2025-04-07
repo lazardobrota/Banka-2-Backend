@@ -69,12 +69,12 @@ public class AccountCurrencyService(
     public async Task<Result<AccountCurrencyResponse>> Update(AccountCurrencyClientUpdateRequest request, Guid id)
     {
         var dbAccountCurrency = await m_AccountCurrencyRepository.FindById(id);
-    
+
         if (dbAccountCurrency is null)
             return Result.NotFound<AccountCurrencyResponse>($"No Account Currency found with Id: {id}");
-    
+
         var accountCurrency = await m_AccountCurrencyRepository.Update(dbAccountCurrency.ToAccountCurrency(request));
-    
+
         return Result.Ok(accountCurrency.ToResponse());
     }
 }

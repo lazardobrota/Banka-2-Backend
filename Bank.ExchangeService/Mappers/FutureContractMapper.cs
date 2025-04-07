@@ -16,7 +16,7 @@ public static class FutureContractMapper
                    Name           = futureContract.Name,
                    Ticker         = futureContract.Ticker,
                    StockExchange  = futureContract.StockExchange!.ToResponse(currencyResponse),
-                   Quotes = futureContract.SortedQuotes.Select(quote => quote.ToSimpleResponse())
+                   Quotes = futureContract.Quotes.Select(quote => quote.ToSimpleResponse())
                                           .ToList(),
                    HighPrice                    = futureContract.HighPrice,
                    LowPrice                     = futureContract.LowPrice,

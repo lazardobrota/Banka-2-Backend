@@ -21,9 +21,9 @@ public class FutureContractController(IFutureContractService futureContractServi
     }
 
     [HttpGet(Endpoints.FutureContract.GetOne)]
-    public async Task<ActionResult<FutureContractResponse>> GetOne([FromRoute] Guid id)
+    public async Task<ActionResult<FutureContractResponse>> GetOne([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
     {
-        var result = await m_FutureContractService.GetOne(id);
+        var result = await m_FutureContractService.GetOne(id, filter);
         return result.ActionResult;
     }
 }

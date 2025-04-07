@@ -19,7 +19,7 @@ public static class ForexPairMapper
                    Name               = forexPair.Name,
                    Ticker             = forexPair.Ticker,
                    StockExchange      = forexPair.StockExchange!.ToResponse(currencyResponse),
-                   Quotes = forexPair.SortedQuotes.Select(quote => quote.ToSimpleResponse())
+                   Quotes = forexPair.Quotes.Select(quote => quote.ToSimpleResponse())
                                      .ToList(),
                    HighPrice                    = forexPair.HighPrice,
                    LowPrice                     = forexPair.LowPrice,

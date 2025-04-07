@@ -21,9 +21,9 @@ public class OptionController(IOptionService optionService) : ControllerBase
     }
 
     [HttpGet(Endpoints.Option.GetOne)]
-    public async Task<ActionResult<OptionResponse>> GetOne([FromRoute] Guid id)
+    public async Task<ActionResult<OptionResponse>> GetOne([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
     {
-        var result = await m_OptionService.GetOne(id);
+        var result = await m_OptionService.GetOne(id, filter);
         return result.ActionResult;
     }
 }

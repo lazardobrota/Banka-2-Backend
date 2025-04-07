@@ -7,11 +7,11 @@ namespace Bank.ExchangeService.BackgroundServices;
 
 public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory)
 {
-    private readonly IServiceProvider   m_ServiceProvider   = serviceProvider;
-    private readonly IHttpClientFactory m_HttpClientFactory = httpClientFactory;
-    private          IStockRepository   m_StockRepository   = null!;
-    private          IQuoteRepository   m_QuoteRepository   = null!;
-    private          Timer?             m_StockTimer        = null;
+    private readonly IServiceProvider    m_ServiceProvider    = serviceProvider;
+    private readonly IHttpClientFactory  m_HttpClientFactory  = httpClientFactory;
+    private          ISecurityRepository m_SecurityRepository = null!;
+    private          IQuoteRepository    m_QuoteRepository    = null!;
+    private          Timer?              m_StockTimer;
 
     private DatabaseContext Context =>
     m_ServiceProvider.CreateScope()
@@ -19,8 +19,8 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
 
     public void OnApplicationStarted()
     {
-        m_StockRepository = m_ServiceProvider.CreateScope()
-                                             .ServiceProvider.GetRequiredService<IStockRepository>();
+        m_SecurityRepository = m_ServiceProvider.CreateScope()
+                                                .ServiceProvider.GetRequiredService<ISecurityRepository>();
 
         m_QuoteRepository = m_ServiceProvider.CreateScope()
                                              .ServiceProvider.GetRequiredService<IQuoteRepository>();
@@ -51,7 +51,7 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
 
         if (!Context.Quotes.Any())
         {
-            Context.SeedQuoteStocks(m_HttpClientFactory.CreateClient(), m_StockRepository, m_QuoteRepository)
+            Context.SeedQuoteStocks(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
                    .Wait();
         }
 
@@ -70,6 +70,6 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         using var scope   = m_ServiceProvider.CreateScope();
         var       context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-        await context.SeedQuoteStocksLatest(m_HttpClientFactory.CreateClient(), m_StockRepository, m_QuoteRepository);
+        await context.SeedQuoteStocksLatest(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository);
     }
 }

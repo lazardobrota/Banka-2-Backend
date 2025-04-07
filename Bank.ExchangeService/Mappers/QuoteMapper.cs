@@ -25,7 +25,7 @@ public static class QuoteMapper
                {
                    Id         = Guid.NewGuid(),
                    Price      = barResponse.LatestPrice,
-                   StockId    = stockId,
+                   SecurityId = stockId,
                    HighPrice  = barResponse.HighPrice,
                    LowPrice   = barResponse.LowPrice,
                    Volume     = barResponse.NumberOfTradesInInterval,

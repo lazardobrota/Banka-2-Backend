@@ -61,8 +61,8 @@ public class OrderRepository(ApplicationContext context, IAuthorizationService a
     public async Task<Order> Update(Order order)
     {
         await m_Context.Orders.Where(dbOrder => dbOrder.Id == order.Id)
-                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbOrder => dbOrder.Status, order.Status) 
-                                                      .SetProperty(dbOrder => dbOrder.ModifiedAt, order.ModifiedAt));
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbOrder => dbOrder.Status, order.Status)
+                                                             .SetProperty(dbOrder => dbOrder.ModifiedAt, order.ModifiedAt));
 
         return order;
     }

@@ -21,9 +21,9 @@ public class ForexPairController(IForexPairService forexPairService) : Controlle
     }
 
     [HttpGet(Endpoints.ForexPair.GetOne)]
-    public async Task<ActionResult<ForexPairResponse>> GetOne([FromRoute] Guid id)
+    public async Task<ActionResult<ForexPairResponse>> GetOne([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
     {
-        var result = await m_ForexPairService.GetOne(id);
+        var result = await m_ForexPairService.GetOne(id, filter);
         return result.ActionResult;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Mappers;
@@ -9,43 +10,47 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
-using StockModel = Stock;
+using SecurityModel = Security;
 
 public static partial class Seeder
 {
     public static class Stock
     {
-        public static readonly StockModel Apple = new()
-                                                  {
-                                                      Id              = Guid.Parse("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                      Name            = "Apple Inc.",
-                                                      Ticker          = "AAPL",
-                                                      StockExchangeId = StockExchange.Nasdaq.Id
-                                                  };
+        public static readonly SecurityModel Apple = new()
+                                                     {
+                                                         Id              = Guid.Parse("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
+                                                         Name            = "Apple Inc.",
+                                                         Ticker          = "AAPL",
+                                                         StockExchangeId = StockExchange.Nasdaq.Id,
+                                                         SecurityType    = SecurityType.Stock
+                                                     };
 
-        public static readonly StockModel Microsoft = new()
+        public static readonly SecurityModel Microsoft = new()
+                                                         {
+                                                             Id              = Guid.Parse("b47ac10b-58cc-4372-a567-0e02b2c3d480"),
+                                                             Name            = "Microsoft Corporation",
+                                                             Ticker          = "MSFT",
+                                                             StockExchangeId = StockExchange.Nasdaq.Id,
+                                                             SecurityType    = SecurityType.Stock,
+                                                         };
+
+        public static readonly SecurityModel Tesla = new()
+                                                     {
+                                                         Id              = Guid.Parse("c47ac10b-58cc-4372-a567-0e02b2c3d481"),
+                                                         Name            = "Tesla, Inc.",
+                                                         Ticker          = "TSLA",
+                                                         StockExchangeId = StockExchange.ClearStreet.Id,
+                                                         SecurityType    = SecurityType.Stock
+                                                     };
+
+        public static readonly SecurityModel Amazon = new()
                                                       {
-                                                          Id              = Guid.Parse("b47ac10b-58cc-4372-a567-0e02b2c3d480"),
-                                                          Name            = "Microsoft Corporation",
-                                                          Ticker          = "MSFT",
-                                                          StockExchangeId = StockExchange.Nasdaq.Id,
+                                                          Id              = Guid.Parse("d47ac10b-58cc-4372-a567-0e02b2c3d482"),
+                                                          Name            = "Amazon.com, Inc.",
+                                                          Ticker          = "AMZN",
+                                                          StockExchangeId = StockExchange.ClearStreet.Id,
+                                                          SecurityType    = SecurityType.Stock,
                                                       };
-
-        public static readonly StockModel Tesla = new()
-                                                  {
-                                                      Id              = Guid.Parse("c47ac10b-58cc-4372-a567-0e02b2c3d481"),
-                                                      Name            = "Tesla, Inc.",
-                                                      Ticker          = "TSLA",
-                                                      StockExchangeId = StockExchange.ClearStreet.Id
-                                                  };
-
-        public static readonly StockModel Amazon = new()
-                                                   {
-                                                       Id              = Guid.Parse("d47ac10b-58cc-4372-a567-0e02b2c3d482"),
-                                                       Name            = "Amazon.com, Inc.",
-                                                       Ticker          = "AMZN",
-                                                       StockExchangeId = StockExchange.ClearStreet.Id,
-                                                   };
     }
 }
 
@@ -57,7 +62,7 @@ public static class StockSeederExtension
 
         stopwatch.Start();
 
-        if (context.Stocks.Any())
+        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
             return;
 
         var request = new HttpRequestMessage
@@ -95,13 +100,17 @@ public static class StockSeederExtension
         var stocks = body.Select(stockResponse =>
                                  {
                                      var exchange = stockExchanges.Find(exchange => exchange.Acronym == stockResponse.StockExchangeAcronym);
-                                     return exchange != null && stockResponse.Tradable ? stockResponse.ToStock(exchange.Id) : null;
+
+                                     return exchange != null && stockResponse.Tradable
+                                            ? stockResponse.ToStock(exchange.Id)
+                                                           .ToSecurity()
+                                            : null;
                                  })
-                         .Where(stock => stock != null)
-                         .Select(stock => stock!)
+                         .Where(security => security != null)
+                         .Select(security => security!)
                          .ToList();
 
-        await context.AddRangeAsync(stocks);
+        await context.Securities.AddRangeAsync(stocks);
 
         await context.SaveChangesAsync();
 
@@ -112,10 +121,10 @@ public static class StockSeederExtension
 
     public static async Task SeedStockHardcoded(this DatabaseContext context)
     {
-        if (context.Stocks.Any())
+        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
             return;
 
-        await context.Stocks.AddRangeAsync(Seeder.Stock.Apple, Seeder.Stock.Amazon, Seeder.Stock.Microsoft, Seeder.Stock.Tesla);
+        await context.Securities.AddRangeAsync(Seeder.Stock.Apple, Seeder.Stock.Amazon, Seeder.Stock.Microsoft, Seeder.Stock.Tesla);
 
         await context.SaveChangesAsync();
     }

@@ -14,34 +14,34 @@ public interface IForexPairService
 {
     Task<Result<Page<ForexPairSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable);
 
-    Task<Result<ForexPairResponse>> GetOne(Guid id);
+    Task<Result<ForexPairResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class ForexPairService(IForexPairRepository forexPairRepository, ICurrencyClient currencyClient) : IForexPairService
+public class ForexPairService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IForexPairService
 {
-    private readonly IForexPairRepository m_ForexPairRepository = forexPairRepository;
-    private readonly ICurrencyClient      m_CurrencyClient      = currencyClient;
+    private readonly ISecurityRepository m_SecurityRepository = securityRepository;
+    private readonly ICurrencyClient     m_CurrencyClient     = currencyClient;
 
     public async Task<Result<Page<ForexPairSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
-        var page = await m_ForexPairRepository.FindAll(quoteFilterQuery, pageable);
+        var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.ForexPair, pageable);
 
         var list = m_CurrencyClient.GetAllCurrenciesSimple();
 
         if (list.Result is null)
             throw new Exception("There are no currencies in a database");
 
-        var response = page
-                       .Items.Select(pair => pair.ToSimpleResponse(list.Result.Find(curr => curr.Id == pair.BaseCurrencyId)!,
-                                                                   list.Result.Find(curr => curr.Id == pair.QuoteCurrencyId)!))
-                       .ToList();
+        var response = page.Items.Select(security => security.ToForexPair()
+                                                             .ToSimpleResponse(list.Result.Find(curr => curr.Id == security.BaseCurrencyId)!,
+                                                                               list.Result.Find(curr => curr.Id == security.QuoteCurrencyId)!))
+                           .ToList();
 
         return Result.Ok(new Page<ForexPairSimpleResponse>(response, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
-    public async Task<Result<ForexPairResponse>> GetOne(Guid id)
+    public async Task<Result<ForexPairResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter)
     {
-        var forexPair = await m_ForexPairRepository.FindById(id);
+        var forexPair = await m_SecurityRepository.FindById(id, filter);
 
         if (forexPair is null)
             return Result.NotFound<ForexPairResponse>($"No Forex pair found wih Id: {id}");
@@ -65,6 +65,7 @@ public class ForexPairService(IForexPairRepository forexPairRepository, ICurrenc
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {forexPair.StockExchange!.CurrencyId}");
 
-        return Result.Ok(forexPair.ToResponse(currencyResponse, currencyBaseResponse, currencyQuoteResponse));
+        return Result.Ok(forexPair.ToForexPair()
+                                  .ToResponse(currencyResponse, currencyBaseResponse, currencyQuoteResponse));
     }
 }

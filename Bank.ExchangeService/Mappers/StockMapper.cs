@@ -13,7 +13,7 @@ public static class StockMapper
                    Name          = stock.Name,
                    Ticker        = stock.Ticker,
                    StockExchange = stock.StockExchange!.ToResponse(currencyResponse),
-                   Quotes = stock.SortedQuotes.Select(quote => quote.ToSimpleResponse())
+                   Quotes = stock.Quotes.Select(quote => quote.ToSimpleResponse())
                                  .ToList(),
                    HighPrice                    = stock.HighPrice,
                    LowPrice                     = stock.LowPrice,

@@ -15,7 +15,7 @@ public interface IExchangeRepository
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId);
 
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency);
-    
+
     public Task<Exchange> Add(Exchange exchange);
 
     public Task<Exchange> Update(Exchange exchange);
@@ -28,7 +28,7 @@ public class ExchangeRepository(ApplicationContext context, IDbContextFactory<Ap
     private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
     private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
-    
+
     public async Task<List<Exchange>> FindAll(ExchangeFilterQuery exchangeFilterQuery)
     {
         var exchangeQueue = m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
@@ -88,9 +88,9 @@ public class ExchangeRepository(ApplicationContext context, IDbContextFactory<Ap
 
         return exchange;
     }
-    
+
     #region Static Repository Calls
-    
+
     private static async Task<Exchange?> FindById(Guid id, ApplicationContext context)
     {
         return await context.Exchanges.Include(exchange => exchange.CurrencyFrom)
@@ -106,6 +106,6 @@ public class ExchangeRepository(ApplicationContext context, IDbContextFactory<Ap
                             .FirstOrDefaultAsync(exchange => (exchange.CurrencyFromId == firstCurrencyId  && exchange.CurrencyToId == secondCurrencyId) ||
                                                              (exchange.CurrencyFromId == secondCurrencyId && exchange.CurrencyToId == firstCurrencyId));
     }
-    
+
     #endregion
 }

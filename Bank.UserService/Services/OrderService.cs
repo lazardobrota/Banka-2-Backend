@@ -1,10 +1,10 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
-using Bank.Application.Responses;
-using Bank.UserService.Repositories;
 using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Mappers;
+using Bank.UserService.Repositories;
 
 namespace Bank.UserService.Services;
 
@@ -22,7 +22,7 @@ public interface IOrderService
 public class OrderService(IOrderRepository orderRepository) : IOrderService
 {
     private readonly IOrderRepository m_OrderRepository = orderRepository;
-    
+
     public async Task<Result<Page<OrderResponse>>> GetAll(OrderFilterQuery orderFilterQuery, Pageable pageable)
     {
         var orders = await m_OrderRepository.FindAll(orderFilterQuery, pageable);
@@ -45,21 +45,20 @@ public class OrderService(IOrderRepository orderRepository) : IOrderService
 
     public async Task<Result<OrderResponse>> Create(OrderCreateRequest request)
     {
-        var order = await m_OrderRepository.Add(request.ToOrder()); 
-        
+        var order = await m_OrderRepository.Add(request.ToOrder());
+
         return Result.Ok(order.ToResponse());
     }
 
     public async Task<Result<OrderResponse>> Update(OrderUpdateRequest request, Guid id)
     {
         var dbOrder = await m_OrderRepository.FindById(id);
-    
+
         if (dbOrder is null)
             return Result.NotFound<OrderResponse>($"No Order found with Id: {id}");
-    
+
         var order = await m_OrderRepository.Update(dbOrder.ToOrder(request));
-    
+
         return Result.Ok(order.ToResponse());
-     
     }
 }

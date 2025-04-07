@@ -26,7 +26,7 @@ public class ApplicationContext(DbContextOptions options) : DbContext(options)
     public DbSet<Loan>                Loans                { init; get; }
     public DbSet<Installment>         Installments         { init; get; }
     public DbSet<LoanType>            LoanTypes            { init; get; }
-    public DbSet<Order>     Orders               { init; get; }
+    public DbSet<Order>               Orders               { init; get; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Web;
 
+using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Mappers;
@@ -18,7 +19,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockAppleQuote = new()
                                                             {
                                                                 Id         = Guid.Parse("a17ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                StockId    = Stock.Apple.Id,
+                                                                SecurityId = Stock.Apple.Id,
                                                                 Price      = 175.43m,
                                                                 HighPrice  = 176.98m,
                                                                 LowPrice   = 174.21m,
@@ -30,7 +31,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockMicrosoftQuote = new()
                                                                 {
                                                                     Id         = Guid.Parse("b17ac10b-58cc-4372-a567-0e02b2c3d480"),
-                                                                    StockId    = Stock.Microsoft.Id,
+                                                                    SecurityId = Stock.Microsoft.Id,
                                                                     Price      = 338.11m,
                                                                     HighPrice  = 339.54m,
                                                                     LowPrice   = 336.77m,
@@ -42,7 +43,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockTeslaQuote = new()
                                                             {
                                                                 Id         = Guid.Parse("c17ac10b-58cc-4372-a567-0e02b2c3d481"),
-                                                                StockId    = Stock.Tesla.Id,
+                                                                SecurityId = Stock.Tesla.Id,
                                                                 Price      = 242.68m,
                                                                 HighPrice  = 245.33m,
                                                                 LowPrice   = 240.12m,
@@ -54,7 +55,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockAmazonQuote = new()
                                                              {
                                                                  Id         = Guid.Parse("d17ac10b-58cc-4372-a567-0e02b2c3d482"),
-                                                                 StockId    = Stock.Amazon.Id,
+                                                                 SecurityId = Stock.Amazon.Id,
                                                                  Price      = 129.96m,
                                                                  HighPrice  = 131.25m,
                                                                  LowPrice   = 128.88m,
@@ -66,7 +67,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockAppleQuoteYesterday = new()
                                                                      {
                                                                          Id         = Guid.Parse("a27ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                         StockId    = Stock.Apple.Id,
+                                                                         SecurityId = Stock.Apple.Id,
                                                                          Price      = 174.21m,
                                                                          HighPrice  = 175.10m,
                                                                          LowPrice   = 173.45m,
@@ -78,7 +79,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockAppleQuote2DaysAgo = new()
                                                                     {
                                                                         Id         = Guid.Parse("a37ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                        StockId    = Stock.Apple.Id,
+                                                                        SecurityId = Stock.Apple.Id,
                                                                         Price      = 172.88m,
                                                                         HighPrice  = 173.95m,
                                                                         LowPrice   = 171.96m,
@@ -90,7 +91,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockAppleQuote3DaysAgo = new()
                                                                     {
                                                                         Id         = Guid.Parse("a47ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                        StockId    = Stock.Apple.Id,
+                                                                        SecurityId = Stock.Apple.Id,
                                                                         Price      = 168.45m,
                                                                         HighPrice  = 169.87m,
                                                                         LowPrice   = 167.23m,
@@ -102,7 +103,7 @@ public static partial class Seeder
         public static readonly QuoteModel StockAppleQuote4DaysAgo = new()
                                                                     {
                                                                         Id         = Guid.Parse("a57ac10b-58cc-4372-a567-0e02b2c3d479"),
-                                                                        StockId    = Stock.Apple.Id,
+                                                                        SecurityId = Stock.Apple.Id,
                                                                         Price      = 162.33m,
                                                                         HighPrice  = 164.12m,
                                                                         LowPrice   = 161.78m,
@@ -113,80 +114,80 @@ public static partial class Seeder
 
         public static readonly QuoteModel ForexPairUsdEurLatest = new()
                                                                   {
-                                                                      Id          = Guid.Parse("40f83733-e150-41a7-9bfb-21a18f9cb857"),
-                                                                      ForexPairId = ForexPair.UsdEur.Id,
-                                                                      Price       = 1.0921m,
-                                                                      HighPrice   = 1.0945m,
-                                                                      LowPrice    = 1.0898m,
-                                                                      CreatedAt   = DateTime.UtcNow,
-                                                                      ModifiedAt  = DateTime.UtcNow,
-                                                                      Volume      = 123121
+                                                                      Id         = Guid.Parse("40f83733-e150-41a7-9bfb-21a18f9cb857"),
+                                                                      SecurityId = ForexPair.UsdEur.Id,
+                                                                      Price      = 1.0921m,
+                                                                      HighPrice  = 1.0945m,
+                                                                      LowPrice   = 1.0898m,
+                                                                      CreatedAt  = DateTime.UtcNow,
+                                                                      ModifiedAt = DateTime.UtcNow,
+                                                                      Volume     = 123121
                                                                   };
 
         public static readonly QuoteModel ForexPairUsdEurYesterday = new()
                                                                      {
-                                                                         Id          = Guid.Parse("79a03d9d-c990-4dfd-8997-494e5cc0905a"),
-                                                                         ForexPairId = ForexPair.UsdEur.Id,
-                                                                         Price       = 1.0898m,
-                                                                         HighPrice   = 1.0925m,
-                                                                         LowPrice    = 1.0876m,
-                                                                         CreatedAt   = DateTime.UtcNow.AddDays(-1),
-                                                                         ModifiedAt  = DateTime.UtcNow.AddDays(-1),
-                                                                         Volume      = 42919
+                                                                         Id         = Guid.Parse("79a03d9d-c990-4dfd-8997-494e5cc0905a"),
+                                                                         SecurityId = ForexPair.UsdEur.Id,
+                                                                         Price      = 1.0898m,
+                                                                         HighPrice  = 1.0925m,
+                                                                         LowPrice   = 1.0876m,
+                                                                         CreatedAt  = DateTime.UtcNow.AddDays(-1),
+                                                                         ModifiedAt = DateTime.UtcNow.AddDays(-1),
+                                                                         Volume     = 42919
                                                                      };
 
         public static readonly QuoteModel ForexPairEurJpyQuote = new()
                                                                  {
-                                                                     Id          = Guid.Parse("29301e3c-9181-4a0c-8b56-6c1a3d3ed271"),
-                                                                     ForexPairId = ForexPair.EurJpy.Id,
-                                                                     Price       = 1.0876m,
-                                                                     HighPrice   = 1.0901m,
-                                                                     LowPrice    = 1.0845m,
-                                                                     CreatedAt   = DateTime.UtcNow,
-                                                                     ModifiedAt  = DateTime.UtcNow,
-                                                                     Volume      = 231321
+                                                                     Id         = Guid.Parse("29301e3c-9181-4a0c-8b56-6c1a3d3ed271"),
+                                                                     SecurityId = ForexPair.EurJpy.Id,
+                                                                     Price      = 1.0876m,
+                                                                     HighPrice  = 1.0901m,
+                                                                     LowPrice   = 1.0845m,
+                                                                     CreatedAt  = DateTime.UtcNow,
+                                                                     ModifiedAt = DateTime.UtcNow,
+                                                                     Volume     = 231321
                                                                  };
 
         public static readonly QuoteModel FutureContractCrudeOilLatest = new()
                                                                          {
-                                                                             Id                = Guid.Parse("8b52b6fc-530b-4063-b2ec-e7bd808db906"),
-                                                                             FuturesContractId = FutureContract.CrudeOilFuture.Id,
-                                                                             Price             = 72.45m,
-                                                                             HighPrice         = 73.21m,
-                                                                             LowPrice          = 71.98m,
-                                                                             CreatedAt         = DateTime.UtcNow,
-                                                                             ModifiedAt        = DateTime.UtcNow,
-                                                                             Volume            = 223321
+                                                                             Id         = Guid.Parse("8b52b6fc-530b-4063-b2ec-e7bd808db906"),
+                                                                             SecurityId = FutureContract.CrudeOilFuture.Id,
+                                                                             Price      = 72.45m,
+                                                                             HighPrice  = 73.21m,
+                                                                             LowPrice   = 71.98m,
+                                                                             CreatedAt  = DateTime.UtcNow,
+                                                                             ModifiedAt = DateTime.UtcNow,
+                                                                             Volume     = 223321
                                                                          };
 
         public static readonly QuoteModel FutureContractCrudeOilYesterday = new()
                                                                             {
-                                                                                Id                = Guid.Parse("41ea6c56-afaf-4cfc-9f46-6824f5757fe9"),
-                                                                                FuturesContractId = FutureContract.CrudeOilFuture.Id,
-                                                                                Price             = 71.98m,
-                                                                                HighPrice         = 72.54m,
-                                                                                LowPrice          = 71.45m,
-                                                                                CreatedAt         = DateTime.UtcNow.AddDays(-1),
-                                                                                ModifiedAt        = DateTime.UtcNow.AddDays(-1),
-                                                                                Volume            = 132215
+                                                                                Id         = Guid.Parse("41ea6c56-afaf-4cfc-9f46-6824f5757fe9"),
+                                                                                SecurityId = FutureContract.CrudeOilFuture.Id,
+                                                                                Price      = 71.98m,
+                                                                                HighPrice  = 72.54m,
+                                                                                LowPrice   = 71.45m,
+                                                                                CreatedAt  = DateTime.UtcNow.AddDays(-1),
+                                                                                ModifiedAt = DateTime.UtcNow.AddDays(-1),
+                                                                                Volume     = 132215
                                                                             };
 
         public static readonly QuoteModel FutureContractCrudeOilLastWeek = new()
                                                                            {
-                                                                               Id                = Guid.Parse("b41e80b5-cd29-4922-b5c5-bec0bbe1064a"),
-                                                                               FuturesContractId = FutureContract.CrudeOilFuture.Id,
-                                                                               Price             = 70.89m,
-                                                                               HighPrice         = 71.34m,
-                                                                               LowPrice          = 70.21m,
-                                                                               Volume            = 187654,
-                                                                               CreatedAt         = DateTime.UtcNow.AddDays(-7),
-                                                                               ModifiedAt        = DateTime.UtcNow.AddDays(-7),
+                                                                               Id         = Guid.Parse("b41e80b5-cd29-4922-b5c5-bec0bbe1064a"),
+                                                                               SecurityId = FutureContract.CrudeOilFuture.Id,
+                                                                               Price      = 70.89m,
+                                                                               HighPrice  = 71.34m,
+                                                                               LowPrice   = 70.21m,
+                                                                               Volume     = 187654,
+                                                                               CreatedAt  = DateTime.UtcNow.AddDays(-7),
+                                                                               ModifiedAt = DateTime.UtcNow.AddDays(-7),
                                                                            };
 
         public static readonly QuoteModel OptionAppleCallOptionLatest = new()
                                                                         {
                                                                             Id         = Guid.Parse("ed3ab504-2cb1-431c-84ee-19ac4cdd0885"),
-                                                                            OptionId   = Option.AppleCallOption.Id,
+                                                                            SecurityId = Option.AppleCallOption.Id,
                                                                             Price      = 5.45m,
                                                                             HighPrice  = 5.65m,
                                                                             LowPrice   = 5.25m,
@@ -198,7 +199,7 @@ public static partial class Seeder
         public static readonly QuoteModel OptionAppleCallOptionYesterday = new()
                                                                            {
                                                                                Id         = Guid.Parse("7e3df1a2-0d2e-4f4a-9d1c-c06c5816752b"),
-                                                                               OptionId   = Option.AppleCallOption.Id,
+                                                                               SecurityId = Option.AppleCallOption.Id,
                                                                                Price      = 5.25m,
                                                                                HighPrice  = 5.40m,
                                                                                LowPrice   = 5.10m,
@@ -210,7 +211,7 @@ public static partial class Seeder
         public static readonly QuoteModel OptionAppleCallOptionLastWeek = new()
                                                                           {
                                                                               Id         = Guid.Parse("7e252962-d766-42b8-af47-af09a57d6e93"),
-                                                                              OptionId   = Option.AppleCallOption.Id,
+                                                                              SecurityId = Option.AppleCallOption.Id,
                                                                               Price      = 4.85m,
                                                                               HighPrice  = 5.00m,
                                                                               LowPrice   = 4.70m,
@@ -241,9 +242,9 @@ public static class QuoteSeederExtension
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedQuoteStocksLatest(this DatabaseContext context, HttpClient httpClient, IStockRepository stockRepository, IQuoteRepository quoteRepository)
+    public static async Task SeedQuoteStocksLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
-        var stocks = (await stockRepository.FindAll()).ToDictionary(stock => stock.Ticker, stock => stock);
+        var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
 
         var symbols = string.Join(",", stocks.Values.Select(stock => stock.Ticker)
                                              .ToList());
@@ -286,12 +287,12 @@ public static class QuoteSeederExtension
         await quoteRepository.CreateQuotes(quotes);
     }
 
-    public static async Task SeedQuoteStocks(this DatabaseContext context, HttpClient httpClient, IStockRepository stockRepository, IQuoteRepository quoteRepository)
+    public static async Task SeedQuoteStocks(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
         var stopwatchFull = new Stopwatch();
         stopwatchFull.Start();
 
-        var stocks = (await stockRepository.FindAll()).ToDictionary(stock => stock.Ticker, stock => stock);
+        var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
 
         var symbols = string.Join(",", stocks.Values.Select(stock => stock.Ticker)
                                              .ToList());

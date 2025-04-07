@@ -37,7 +37,7 @@ public static class OrderMapper
         order.ModifiedAt = DateTime.UtcNow;
         return order;
     }
-    
+
     public static Order ToOrder(this OrderCreateRequest createRequest)
     {
         return new Order
@@ -56,6 +56,5 @@ public static class OrderMapper
                    CreatedAt         = DateTime.UtcNow,
                    ModifiedAt        = DateTime.UtcNow
                };
-
     }
 }

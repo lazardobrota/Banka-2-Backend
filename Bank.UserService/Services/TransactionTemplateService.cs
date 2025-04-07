@@ -56,12 +56,12 @@ public class TransactionTemplateService(ITransactionTemplateRepository transacti
     public async Task<Result<TransactionTemplateResponse>> Update(TransactionTemplateUpdateRequest request, Guid id)
     {
         var dbTransactionTemplate = await m_TransactionTemplateRepository.FindById(id);
-    
+
         if (dbTransactionTemplate is null)
             return Result.NotFound<TransactionTemplateResponse>($"No Transaction Template found with Id: {id}");
-    
+
         var order = await m_TransactionTemplateRepository.Update(dbTransactionTemplate.ToTransactionTemplate(request));
-    
+
         return Result.Ok(order.ToResponse());
     }
 }

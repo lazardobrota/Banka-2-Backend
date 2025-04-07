@@ -81,7 +81,7 @@ public static class AccountMapper
         account.Name         = accountUpdate.Name;
         account.DailyLimit   = accountUpdate.DailyLimit;
         account.MonthlyLimit = accountUpdate.MonthlyLimit;
-        
+
         return account;
     }
 

@@ -25,7 +25,7 @@ public class AccountCurrencyRepository(ApplicationContext context, IDbContextFac
     private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
     private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
-    
+
     public async Task<Page<AccountCurrency>> FindAll(Pageable pageable)
     {
         var accountTypeQuery = m_Context.AccountCurrencies.Include(accountCurrency => accountCurrency.Employee)

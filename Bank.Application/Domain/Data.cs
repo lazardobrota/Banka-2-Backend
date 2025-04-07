@@ -84,7 +84,6 @@ public enum OrderStatus
     Failed
 }
 
-
 public enum Liquidity
 {
     High,
@@ -103,4 +102,12 @@ public enum ContractUnit
     Kilogram,
     Liter,
     Barrel
+}
+
+public enum SecurityType
+{
+    Stock,
+    Option,
+    FutureContract,
+    ForexPair
 }

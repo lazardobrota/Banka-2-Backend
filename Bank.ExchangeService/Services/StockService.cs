@@ -17,16 +17,17 @@ public interface IStockService
     Task<Result<StockResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class StockService(IStockRepository stockRepository, ICurrencyClient currencyClient) : IStockService
+public class StockService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IStockService
 {
-    private readonly IStockRepository m_StockRepository = stockRepository;
-    private readonly ICurrencyClient  m_Client          = currencyClient;
+    private readonly ISecurityRepository m_SecurityRepository = securityRepository;
+    private readonly ICurrencyClient     m_Client             = currencyClient;
 
     public async Task<Result<Page<StockSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
-        var page = await m_StockRepository.FindAll(quoteFilterQuery, pageable);
+        var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.Stock, pageable);
 
-        var responses = page.Items.Select(stock => stock.ToSimpleResponse())
+        var responses = page.Items.Select(security => security.ToStock()
+                                                              .ToSimpleResponse())
                             .ToList();
 
         return Result.Ok(new Page<StockSimpleResponse>(responses, page.PageNumber, page.PageSize, page.TotalElements));
@@ -34,16 +35,17 @@ public class StockService(IStockRepository stockRepository, ICurrencyClient curr
 
     public async Task<Result<StockResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter)
     {
-        var stock = await m_StockRepository.FindById(id, filter);
+        var security = await m_SecurityRepository.FindById(id, filter);
 
-        if (stock is null)
+        if (security is null)
             return Result.NotFound<StockResponse>($"No Stock found wih Id: {id}");
 
-        var currencyResponse = await m_Client.GetCurrencyByIdSimple(stock.StockExchange!.CurrencyId);
+        var currencyResponse = await m_Client.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
-            throw new Exception($"No Currency with Id: {stock.StockExchange!.CurrencyId}");
+            throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
 
-        return Result.Ok(stock.ToResponse(currencyResponse));
+        return Result.Ok(security.ToStock()
+                                 .ToResponse(currencyResponse));
     }
 }
