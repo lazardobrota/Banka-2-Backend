@@ -45,8 +45,6 @@ public class AccountValidator
             .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("AccountTypeId"));
 
             RuleFor(accountRequest => accountRequest.Balance)
-            .NotEmpty()
-            .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Balance"))
             .GreaterThanOrEqualTo(0)
             .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Balance"));
         }

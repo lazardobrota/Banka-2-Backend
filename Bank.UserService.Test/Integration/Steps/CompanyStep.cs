@@ -152,7 +152,7 @@ public class CompanyStep(ScenarioContext scenarioContext, ICompanyService compan
         updateResult.Value.Name.ShouldBe(Example.Entity.Company.UpdateRequest.Name);
         updateResult.Value.ActivityCode.ShouldBe(Example.Entity.Company.UpdateRequest.ActivityCode);
         updateResult.Value.Address.ShouldBe(Example.Entity.Company.UpdateRequest.Address);
-        updateResult.Value.MajorityOwner.Id.ShouldBe(Example.Entity.Company.CreateRequest.MajorityOwnerId);
+        updateResult.Value.MajorityOwner!.Id.ShouldBe(Example.Entity.Company.UpdateRequest.MajorityOwnerId);
     }
 
     [Given(@"a valid company Id for fetching")]

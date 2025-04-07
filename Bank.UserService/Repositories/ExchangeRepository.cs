@@ -15,16 +15,20 @@ public interface IExchangeRepository
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId);
 
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency);
-
+    
     public Task<Exchange> Add(Exchange exchange);
 
     public Task<Exchange> Update(Exchange exchange);
 }
 
-public class ExchangeRepository(ApplicationContext context) : IExchangeRepository
+public class ExchangeRepository(ApplicationContext context, IDbContextFactory<ApplicationContext> contextFactory) : IExchangeRepository
 {
     private readonly ApplicationContext m_Context = context;
 
+    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
+
+    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
+    
     public async Task<List<Exchange>> FindAll(ExchangeFilterQuery exchangeFilterQuery)
     {
         var exchangeQueue = m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
@@ -49,23 +53,23 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
 
     public async Task<Exchange?> FindById(Guid id)
     {
-        return await m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
-                              .Include(exchange => exchange.CurrencyTo)
-                              .FirstOrDefaultAsync(x => x.Id == id);
+        await using var context = await CreateContext;
+
+        return await FindById(id, context);
     }
 
     public async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId)
     {
-        return await m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
-                              .Include(exchange => exchange.CurrencyTo)
-                              .OrderByDescending(exchange => exchange.CreatedAt)
-                              .FirstOrDefaultAsync(exchange => (exchange.CurrencyFromId == firstCurrencyId  && exchange.CurrencyToId == secondCurrencyId) ||
-                                                               (exchange.CurrencyFromId == secondCurrencyId && exchange.CurrencyToId == firstCurrencyId));
+        await using var context = await CreateContext;
+
+        return await FindByCurrencyFromAndCurrencyTo(firstCurrencyId, secondCurrencyId, context);
     }
 
     public async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency)
     {
-        return await FindByCurrencyFromAndCurrencyTo(firstCurrency.Id, secondCurrency.Id);
+        await using var context = await CreateContext;
+
+        return await FindByCurrencyFromAndCurrencyTo(firstCurrency.Id, secondCurrency.Id, context);
     }
 
     public async Task<Exchange> Add(Exchange exchange)
@@ -84,4 +88,24 @@ public class ExchangeRepository(ApplicationContext context) : IExchangeRepositor
 
         return exchange;
     }
+    
+    #region Static Repository Calls
+    
+    private static async Task<Exchange?> FindById(Guid id, ApplicationContext context)
+    {
+        return await context.Exchanges.Include(exchange => exchange.CurrencyFrom)
+                            .Include(exchange => exchange.CurrencyTo)
+                            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    private static async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId, ApplicationContext context)
+    {
+        return await context.Exchanges.Include(exchange => exchange.CurrencyFrom)
+                            .Include(exchange => exchange.CurrencyTo)
+                            .OrderByDescending(exchange => exchange.CreatedAt)
+                            .FirstOrDefaultAsync(exchange => (exchange.CurrencyFromId == firstCurrencyId  && exchange.CurrencyToId == secondCurrencyId) ||
+                                                             (exchange.CurrencyFromId == secondCurrencyId && exchange.CurrencyToId == firstCurrencyId));
+    }
+    
+    #endregion
 }

@@ -211,7 +211,7 @@ public class LoanHostedService
                                          ModifiedAt        = DateTime.UtcNow
                                      };
 
-                await accountRepository.Update(account, updatedAccount);
+                await accountRepository.Update(updatedAccount);
 
                 await transactionRepo.Add(transaction);
 

@@ -18,15 +18,19 @@ public interface ITransactionRepository
 
     Task<Transaction> Add(Transaction transaction);
 
-    Task<Transaction> Update(Transaction oldTransaction, Transaction transaction);
+    Task<Transaction> Update(Transaction transaction);
 
-    Task<Transaction> UpdateStatus(Guid id, TransactionStatus status);
+    Task<bool> UpdateStatus(Guid id, TransactionStatus status);
 }
 
-public class TransactionRepository(ApplicationContext context, IAuthorizationService authorizationService) : ITransactionRepository
+public class TransactionRepository(ApplicationContext context, IAuthorizationService authorizationService, IDbContextFactory<ApplicationContext> contextFactory)
+: ITransactionRepository
 {
-    private readonly ApplicationContext    m_Context              = context;
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly ApplicationContext                    m_Context              = context;
+    private readonly IAuthorizationService                 m_AuthorizationService = authorizationService;
+    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory       = contextFactory;
+
+    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
 
     public async Task<Page<Transaction>> FindAll(TransactionFilterQuery filter, Pageable pageable)
     {
@@ -62,7 +66,11 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
     public async Task<Page<Transaction>> FindAllByAccountId(Guid accountId, TransactionFilterQuery filter, Pageable pageable)
     {
         var transactionQuery = m_Context.Transactions.Include(transaction => transaction.FromAccount)
+                                        .Include(transaction => transaction.FromAccount!.Type)
+                                        .Include(transaction => transaction.FromAccount!.Client!.Bank)
                                         .Include(transaction => transaction.ToAccount)
+                                        .Include(transaction => transaction.ToAccount!.Type)
+                                        .Include(transaction => transaction.ToAccount!.Client!.Bank)
                                         .Include(transaction => transaction.Code)
                                         .AsQueryable();
 
@@ -88,41 +96,52 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
 
     public async Task<Transaction?> FindById(Guid id)
     {
-        return await m_Context.Transactions.Include(transaction => transaction.FromAccount)
-                              .Include(transaction => transaction.ToAccount)
-                              .Include(transaction => transaction.Code)
-                              .FirstOrDefaultAsync(transaction => transaction.Id == id);
+        await using var context = await CreateContext;
+
+        return await FindById(id, context);
     }
 
     public async Task<Transaction> Add(Transaction transaction)
     {
-        var addedTransaction = await m_Context.Transactions.AddAsync(transaction);
+        await using var context = await CreateContext;
 
-        await m_Context.SaveChangesAsync();
+        var addedTransaction = await context.Transactions.AddAsync(transaction);
+
+        await context.SaveChangesAsync();
 
         return addedTransaction.Entity;
     }
 
-    public async Task<Transaction> Update(Transaction oldTransaction, Transaction transaction)
+    public async Task<Transaction> Update(Transaction transaction)
     {
-        m_Context.Transactions.Entry(oldTransaction)
-                 .State = EntityState.Detached;
+        await m_Context.Transactions.Where(dbTransaction => dbTransaction.Id == transaction.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbTransaction => dbTransaction.Status, transaction.Status)
+                                                             .SetProperty(dbTransaction => dbTransaction.ModifiedAt, transaction.ModifiedAt));
 
-        var updatedTransaction = m_Context.Transactions.Update(transaction);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedTransaction.Entity;
+        return transaction;
     }
 
-    public async Task<Transaction> UpdateStatus(Guid id, TransactionStatus status)
+    public async Task<bool> UpdateStatus(Guid id, TransactionStatus status)
     {
-        await m_Context.Transactions.Where(transaction => transaction.Id == id)
-                       .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(transaction => transaction.Status, status));
+        await using var context = await CreateContext;
 
-        var transaction = await m_Context.Transactions.AsNoTracking()
-                                         .FirstOrDefaultAsync(transaction => transaction.Id == id);
+        return await UpdateStatus(id, status, context);
+    }
 
-        return transaction!;
+    public static async Task<bool> UpdateStatus(Guid id, TransactionStatus status, ApplicationContext context)
+    {
+        var updatedRows = await context.Transactions.Where(transaction => transaction.Id == id)
+                                       .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(transaction => transaction.Status, status)
+                                                                                     .SetProperty(transaction => transaction.ModifiedAt, DateTime.UtcNow));
+
+        return updatedRows == 1;
+    }
+
+    public static async Task<Transaction?> FindById(Guid id, ApplicationContext context)
+    {
+        return await context.Transactions.Include(transaction => transaction.FromAccount)
+                            .Include(transaction => transaction.ToAccount)
+                            .Include(transaction => transaction.Code)
+                            .FirstOrDefaultAsync(transaction => transaction.Id == id);
     }
 }

@@ -13,11 +13,16 @@ public interface ICurrencyRepository
     Task<Currency?> FindById(Guid id, bool includeForeignEntity = true);
 
     Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity = true);
+
+    Task<bool> Exists(Guid currencyId);
 }
 
-public class CurrencyRepository(ApplicationContext context) : ICurrencyRepository
+public class CurrencyRepository(ApplicationContext context, IDbContextFactory<ApplicationContext> contextFactory) : ICurrencyRepository
 {
-    private readonly ApplicationContext m_Context = context;
+    private readonly ApplicationContext                    m_Context        = context;
+    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
+
+    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
 
     public async Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery, bool includeForeignEntity)
     {
@@ -37,7 +42,30 @@ public class CurrencyRepository(ApplicationContext context) : ICurrencyRepositor
 
     public async Task<Currency?> FindById(Guid id, bool includeForeignEntity)
     {
-        var currencyQuery = m_Context.Currencies.AsQueryable();
+        await using var context = await CreateContext;
+
+        return await FindById(id, includeForeignEntity, context);
+    }
+
+    public async Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity)
+    {
+        await using var context = await CreateContext;
+
+        return await FindByCode(currencyCode, includeForeignEntity, context);
+    }
+
+    public async Task<bool> Exists(Guid currencyId)
+    {
+        await using var context = await CreateContext;
+
+        return await Exists(currencyId, context);
+    }
+
+    #region Static Repository Calls
+
+    private static async Task<Currency?> FindById(Guid id, bool includeForeignEntity, ApplicationContext context)
+    {
+        var currencyQuery = context.Currencies.AsQueryable();
 
         if (includeForeignEntity)
             currencyQuery = currencyQuery.Include(c => c.Countries);
@@ -46,9 +74,9 @@ public class CurrencyRepository(ApplicationContext context) : ICurrencyRepositor
                                   .FirstOrDefaultAsync();
     }
 
-    public async Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity)
+    private static async Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity, ApplicationContext context)
     {
-        var currencyQuery = m_Context.Currencies.AsQueryable();
+        var currencyQuery = context.Currencies.AsQueryable();
 
         if (includeForeignEntity)
             currencyQuery = currencyQuery.Include(c => c.Countries);
@@ -56,4 +84,11 @@ public class CurrencyRepository(ApplicationContext context) : ICurrencyRepositor
         return await currencyQuery.Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
                                   .FirstOrDefaultAsync();
     }
+
+    private static Task<bool> Exists(Guid currencyId, ApplicationContext context)
+    {
+        return context.Currencies.AnyAsync(currency => currency.Id == currencyId);
+    }
+
+    #endregion
 }

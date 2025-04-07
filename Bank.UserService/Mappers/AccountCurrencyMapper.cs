@@ -44,23 +44,13 @@ public static class AccountCurrencyMapper
                };
     }
 
-    public static AccountCurrency ToAccountCurrency(this AccountCurrencyClientUpdateRequest accountCurrencyUpdate, AccountCurrency oldAccountCurrency)
+    public static AccountCurrency ToAccountCurrency(this AccountCurrency accountCurrency, AccountCurrencyClientUpdateRequest accountCurrencyUpdate)
     {
-        return new AccountCurrency
-               {
-                   Id               = oldAccountCurrency.Id,
-                   DailyLimit       = accountCurrencyUpdate.DailyLimit,
-                   MonthlyLimit     = accountCurrencyUpdate.MonthlyLimit,
-                   CreatedAt        = oldAccountCurrency.CreatedAt,
-                   ModifiedAt       = DateTime.UtcNow,
-                   Account          = oldAccountCurrency.Account,
-                   AccountId        = oldAccountCurrency.AccountId,
-                   Employee         = oldAccountCurrency.Employee,
-                   EmployeeId       = oldAccountCurrency.EmployeeId,
-                   Currency         = oldAccountCurrency.Currency,
-                   CurrencyId       = oldAccountCurrency.CurrencyId,
-                   Balance          = oldAccountCurrency.Balance,
-                   AvailableBalance = oldAccountCurrency.AvailableBalance
-               };
+        accountCurrency.DailyLimit   = accountCurrencyUpdate.DailyLimit;
+        accountCurrency.MonthlyLimit = accountCurrencyUpdate.MonthlyLimit;
+        accountCurrency.ModifiedAt   = DateTime.UtcNow;
+
+        return accountCurrency;
+        
     }
 }

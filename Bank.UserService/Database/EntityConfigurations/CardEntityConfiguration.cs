@@ -45,6 +45,7 @@ public class CardEntityConfiguration : IEntityTypeConfiguration<Card>
                .IsRequired();
 
         builder.Property(card => card.Limit)
+               .HasPrecision(28, 12)
                .IsRequired();
 
         builder.Property(card => card.Status)

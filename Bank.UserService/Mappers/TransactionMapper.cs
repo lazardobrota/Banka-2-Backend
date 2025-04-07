@@ -16,7 +16,7 @@ public static class TransactionMapper
                    FromAmount      = transaction.FromAmount,
                    Code            = transaction.Code?.ToResponse()!,
                    ReferenceNumber = transaction.ReferenceNumber!,
-                   Purpose         = transaction.Purpose,
+                   Purpose         = transaction.Purpose ?? "",
                    Status          = transaction.Status,
                    CreatedAt       = transaction.CreatedAt,
                    ModifiedAt      = transaction.ModifiedAt,
@@ -34,7 +34,7 @@ public static class TransactionMapper
                    ToAmount        = transaction.ToAmount,
                    Code            = transaction.Code?.ToResponse()!,
                    ReferenceNumber = transaction.ReferenceNumber!,
-                   Purpose         = transaction.Purpose,
+                   Purpose         = transaction.Purpose ?? "",
                    Status          = transaction.Status,
                    CreatedAt       = transaction.CreatedAt,
                    ModifiedAt      = transaction.ModifiedAt,
@@ -46,12 +46,12 @@ public static class TransactionMapper
         return new Transaction
                {
                    Id              = Guid.NewGuid(),
-                   FromAccountId   = transactionCreateRequest.FromAccountId,
+                   FromAccountId   = null,
                    FromCurrencyId  = transactionCreateRequest.FromCurrencyId,
-                   ToAccountId     = null, // TODO: vrv null 
+                   ToAccountId     = null,
                    ToCurrencyId    = transactionCreateRequest.ToCurrencyId,
-                   FromAmount      = transactionCreateRequest.Amount, // TODO: currency
-                   ToAmount        = 0,                               // TODO: currency optional
+                   FromAmount      = transactionCreateRequest.Amount,
+                   ToAmount        = 0,
                    CodeId          = transactionCreateRequest.CodeId,
                    Code            = code,
                    ReferenceNumber = transactionCreateRequest.ReferenceNumber,
@@ -62,25 +62,11 @@ public static class TransactionMapper
                };
     }
 
-    public static Transaction ToTransaction(this TransactionUpdateRequest transactionUpdateRequest, Transaction oldTransaction)
+    public static Transaction ToTransaction(this Transaction transaction, TransactionUpdateRequest transactionUpdateRequest)
     {
-        return new Transaction
-               {
-                   Id              = oldTransaction.Id,
-                   FromAccountId   = oldTransaction.FromAccountId,
-                   FromCurrencyId  = oldTransaction.FromCurrencyId,
-                   ToAccountId     = oldTransaction.ToAccountId,
-                   ToCurrencyId    = oldTransaction.ToCurrencyId,
-                   FromAmount      = oldTransaction.FromAmount,
-                   ToAmount        = oldTransaction.ToAmount,
-                   Code            = oldTransaction.Code,
-                   ReferenceNumber = oldTransaction.ReferenceNumber,
-                   Purpose         = oldTransaction.Purpose,
-                   Status          = transactionUpdateRequest.Status,
-                   CreatedAt       = oldTransaction.CreatedAt,
-                   CodeId          = oldTransaction.CodeId,
-                   ModifiedAt      = DateTime.UtcNow,
-               };
+        transaction.Status     = transactionUpdateRequest.Status;
+        transaction.ModifiedAt = DateTime.UtcNow;
+        return transaction;
     }
 
     public static Transaction ToTransaction(this PrepareWithdrawTransaction withdrawTransaction)
@@ -88,8 +74,8 @@ public static class TransactionMapper
         return new Transaction
                {
                    Id             = Guid.NewGuid(),
-                   FromAccountId  = withdrawTransaction.Account!.Id,
-                   FromCurrencyId = withdrawTransaction.Currency!.Id,
+                   FromAccountId  = withdrawTransaction.Account.Id,
+                   FromCurrencyId = withdrawTransaction.CurrencyId,
                    FromAmount     = withdrawTransaction.Amount,
                    CodeId         = Seeder.TransactionCode.TransactionCode266.Id,
                    Status         = TransactionStatus.Pending,
@@ -104,7 +90,7 @@ public static class TransactionMapper
                {
                    Id           = Guid.NewGuid(),
                    ToAccountId  = depositTransaction.Account!.Id,
-                   ToCurrencyId = depositTransaction.Currency!.Id,
+                   ToCurrencyId = depositTransaction.CurrencyId,
                    ToAmount     = depositTransaction.Amount,
                    CodeId       = Seeder.TransactionCode.TransactionCode289.Id,
                    Status       = TransactionStatus.Pending,
@@ -119,12 +105,12 @@ public static class TransactionMapper
                {
                    Id              = Guid.NewGuid(),
                    FromAccountId   = internalTransaction.FromAccount!.Id,
-                   FromCurrencyId  = internalTransaction.FromCurrency!.Id,
-                   FromAmount      = internalTransaction.FromAmount,
+                   FromCurrencyId  = internalTransaction.FromCurrencyId,
+                   FromAmount      = internalTransaction.Amount,
                    ToAccountId     = internalTransaction.ToAccount!.Id,
-                   ToCurrencyId    = internalTransaction.ToCurrency!.Id,
-                   ToAmount        = internalTransaction.ToAmount,
-                   CodeId          = internalTransaction.TransactionCode!.Id,
+                   ToCurrencyId    = internalTransaction.ToCurrencyId,
+                   ToAmount        = internalTransaction.Amount,
+                   CodeId          = internalTransaction.TransactionCodeId,
                    Status          = TransactionStatus.Pending,
                    Purpose         = internalTransaction.Purpose,
                    ReferenceNumber = internalTransaction.ReferenceNumber,
@@ -138,12 +124,13 @@ public static class TransactionMapper
         return new ProcessTransaction
                {
                    TransactionId  = transactionId,
-                   FromAccountId  = withdrawTransaction.Account!.Id,
-                   FromCurrencyId = withdrawTransaction.Currency!.Id,
+                   FromAccountId  = withdrawTransaction.Account.Id,
+                   FromCurrencyId = withdrawTransaction.CurrencyId,
                    FromAmount     = withdrawTransaction.Amount,
                    ToAccountId    = Guid.Empty,
                    ToCurrencyId   = Guid.Empty,
-                   ToAmount       = 0
+                   ToAmount       = 0,
+                   FromBankAmount = withdrawTransaction.Amount
                };
     }
 
@@ -155,9 +142,10 @@ public static class TransactionMapper
                    FromAccountId  = Guid.Empty,
                    FromCurrencyId = Guid.Empty,
                    FromAmount     = 0,
-                   ToAccountId    = depositTransaction.Account!.Id,
-                   ToCurrencyId   = depositTransaction.Currency!.Id,
-                   ToAmount       = depositTransaction.Amount
+                   ToAccountId    = depositTransaction.Account.Id,
+                   ToCurrencyId   = depositTransaction.CurrencyId,
+                   ToAmount       = depositTransaction.Amount,
+                   FromBankAmount = 0
                };
     }
 
@@ -167,11 +155,13 @@ public static class TransactionMapper
                {
                    TransactionId  = transactionId,
                    FromAccountId  = internalTransaction.FromAccount!.Id,
-                   FromCurrencyId = internalTransaction.FromCurrency!.Id,
-                   FromAmount     = internalTransaction.FromAmount,
+                   FromCurrencyId = internalTransaction.FromCurrencyId,
+                   FromAmount     = internalTransaction.Amount,
                    ToAccountId    = internalTransaction.ToAccount!.Id,
-                   ToCurrencyId   = internalTransaction.ToCurrency!.Id,
-                   ToAmount       = internalTransaction.ToAmount,
+                   ToCurrencyId   = internalTransaction.ToCurrencyId,
+                   ToAmount       = internalTransaction.ExchangeDetails.ExchangeRate * internalTransaction.Amount,
+                   FromBankAmount = internalTransaction.ExchangeDetails.ExchangeRate * internalTransaction.ExchangeDetails.AverageRate *
+                                    internalTransaction.Amount,
                };
     }
 }
