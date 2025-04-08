@@ -92,7 +92,8 @@ public class UserRepository(ApplicationContext context) : IUserRepository
                                                              .SetProperty(dbUser => dbUser.Department,  user.Department)
                                                              .SetProperty(dbUser => dbUser.Employed,    user.Employed)
                                                              .SetProperty(dbUser => dbUser.Activated,   user.Activated)
-                                                             .SetProperty(dbUser => dbUser.ModifiedAt,  user.ModifiedAt));
+                                                             .SetProperty(dbUser => dbUser.ModifiedAt,  user.ModifiedAt)
+                                                             .SetProperty(dbUser => dbUser.Permissions,  user.Permissions));
 
         return user;
     }

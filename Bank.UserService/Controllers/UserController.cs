@@ -66,9 +66,9 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpPut(Endpoints.User.UpdatePermissions)]
-    public async Task<ActionResult> UpdatePermissions([FromRoute] Guid userId, [FromBody] UpdatePermissionsRequest request)
+    public async Task<ActionResult> UpdatePermissions(Guid id, [FromBody] UpdatePermissionsRequest request)
     {
-        var result = await m_UserService.UpdatePermissions(userId, request);
+        var result = await m_UserService.UpdatePermissions(id, request);
 
         return result.ActionResult;
     }
