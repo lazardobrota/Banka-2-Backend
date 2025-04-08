@@ -27,9 +27,11 @@ public class ExchangeEntityConfiguration : IEntityTypeConfiguration<Exchange>
                .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(exchange => exchange.Commission)
+               .HasPrecision(28, 12)
                .IsRequired();
 
         builder.Property(exchange => exchange.Rate)
+               .HasPrecision(28, 12)
                .IsRequired();
 
         builder.Property(exchange => exchange.CreatedAt)

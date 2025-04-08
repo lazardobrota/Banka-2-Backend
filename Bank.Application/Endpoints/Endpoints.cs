@@ -234,4 +234,44 @@ public static partial class Endpoints
     }
 }
 
+public static partial class Endpoints
+{
+    public static class StockExchange
+    {
+        public const string Base   = $"{ApiBase}/exchanges";
+        public const string GetAll = $"{Base}";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Create = $"{Base}";
+    }
+
+    public static class Listing
+    {
+        public const string Base   = $"{ApiBase}/listings";
+        public const string GetAll = $"{Base}";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Create = $"{Base}";
+    }
+
+    public static class ListingHistorical
+    {
+        public const string Base   = $"{ApiBase}/listings/historical";
+        public const string GetAll = $"{Base}";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Create = $"{Base}";
+    }
+}
+
+public static partial class Endpoints
+{
+    public static class Order
+    {
+        public const string Base = $"{ApiBase}/orders";
+
+        public const string GetAll = $"{Base}";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Create = $"{Base}";
+        public const string Update = $"{Base}/{{id:guid}}";
+    }
+}
+
 #endregion

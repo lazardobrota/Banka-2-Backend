@@ -21,6 +21,7 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
                .IsRequired(false);
 
         builder.Property(transaction => transaction.FromAmount)
+               .HasPrecision(28, 12)
                .IsRequired();
 
         builder.Property(transaction => transaction.ToAccountId)
@@ -30,6 +31,7 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
                .IsRequired(false);
 
         builder.Property(transaction => transaction.ToAmount)
+               .HasPrecision(28, 12)
                .IsRequired();
 
         builder.Property(transaction => transaction.ReferenceNumber)

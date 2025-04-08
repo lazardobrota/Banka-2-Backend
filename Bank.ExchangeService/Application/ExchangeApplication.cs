@@ -7,6 +7,8 @@ using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.HostedServices;
+using Bank.ExchangeService.HttpClients;
+using Bank.ExchangeService.Repositorties;
 using Bank.ExchangeService.Services;
 
 using DotNetEnv;
@@ -70,6 +72,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IStockExchangeRepository, StockExchangeRepository>();
+        services.AddScoped<IStockExchangeService, StockExchangeService>();
+        services.AddScoped<IListingRepository, ListingRepository>();
+        services.AddScoped<IListingService, ListingService>();
+        services.AddScoped<IListingHistoricalRepository, ListingHistoricalRepository>();
+        services.AddScoped<IListingHistoricalService, ListingHistoricalService>();
+        services.AddScoped<ICurrencyClient, CurrencyClient>();
 
         return services;
     }
@@ -90,6 +99,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
+        services.AddSingleton<DatabaseHostedService>();
         services.AddHostedService<ApplicationHostedService>();
 
         return services;
@@ -98,6 +108,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddHttpServices(this IServiceCollection services)
     {
         services.AddHttpClient();
+        services.AddHttpClient<ICurrencyClient, CurrencyClient>(client => { client.BaseAddress = new Uri("http://localhost:5075"); });
         services.AddHttpContextAccessor();
 
         return services;
@@ -155,7 +166,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSwaggerGen(config =>
                                {
-                                   config.SwaggerDoc("v1", new OpenApiInfo() { Title = "ExchangeService", Version = "v1" });
+                                   config.SwaggerDoc("v1", new OpenApiInfo { Title = "ExchangeService", Version = "v1" });
 
                                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                                                                           {

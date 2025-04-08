@@ -1,8 +1,6 @@
-﻿using Bank.UserService.Functions;
+﻿namespace Bank.UserService.Models;
 
-namespace Bank.UserService.Models;
-
-public class Account : IAccountBalance
+public class Account
 {
     public required Guid                  Id                { set;  get; }
     public          User?                 Client            { set;  get; }
@@ -30,30 +28,23 @@ public class Account : IAccountBalance
 
     public bool IsForeign => Type != null && (Type.Code.StartsWith('3') || Type.Code.StartsWith('4'));
 
-    public IAccountBalance? FindAccountBalance(Guid currencyId)
+    public bool TryFindAccount(Guid currencyId, out Guid accountId)
     {
+        accountId = Id;
+
         if (CurrencyId == currencyId)
-            return this;
+            return true;
 
-        return AccountCurrencies.Find(accountCurrency => accountCurrency.CurrencyId == currencyId);
+        accountId = AccountCurrencies.Find(accountCurrency => accountCurrency.CurrencyId == currencyId)
+                                     ?.Id ?? Guid.Empty;
+
+        return false;
     }
+};
 
-    public bool ChangeAvailableBalance(decimal amount)
-    {
-        AvailableBalance += amount;
-
-        return true;
-    }
-
-    public bool ChangeBalance(decimal amount)
-    {
-        Balance += amount;
-
-        return true;
-    }
-
-    public decimal GetAvailableBalance()
-    {
-        return AvailableBalance;
-    }
+public class Spending<T>
+{
+    public required T       Entity  { init; get; }
+    public required decimal Daily   { init; get; }
+    public required decimal Monthly { init; get; }
 }

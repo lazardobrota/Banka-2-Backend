@@ -4,9 +4,12 @@ using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.BackgroundServices;
+using Bank.UserService.Database;
 using Bank.UserService.Mappers;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.UserService.Services;
 
@@ -22,28 +25,32 @@ public interface ITransactionService
 
     Task<Result<TransactionResponse>> Update(TransactionUpdateRequest transactionUpdateRequest, Guid id);
 
-    Task ProcessInternalTransactionsForAccount(Guid accountId, List<ProcessTransaction> transactions);
-
     Task<Result<Transaction>> PrepareInternalTransaction(PrepareInternalTransaction internalTransaction);
+
+    Task ProcessInternalTransaction(ProcessTransaction processTransaction);
 }
 
 public class TransactionService(
-    ITransactionRepository       transactionRepository,
-    ITransactionCodeRepository   transactionCodeRepository,
-    IAuthorizationService        authorizationService,
-    IAccountRepository           accountRepository,
-    ICurrencyRepository          currencyRepository,
-    IExchangeRepository          exchangeRepository,
-    TransactionBackgroundService transactionBackgroundService
+    ITransactionRepository                transactionRepository,
+    IAuthorizationService                 authorizationService,
+    IAccountRepository                    accountRepository,
+    ICurrencyRepository                   currencyRepository,
+    TransactionBackgroundService          transactionBackgroundService,
+    IAccountCurrencyRepository            accountCurrencyRepository,
+    IExchangeService                      exchangeService,
+    IDbContextFactory<ApplicationContext> contextFactory
 ) : ITransactionService
 {
-    private readonly ITransactionRepository       m_TransactionRepository        = transactionRepository;
-    private readonly ITransactionCodeRepository   m_TransactionCodeRepository    = transactionCodeRepository;
-    private readonly IAccountRepository           m_AccountRepository            = accountRepository;
-    private readonly ICurrencyRepository          m_CurrencyRepository           = currencyRepository;
-    private readonly IExchangeRepository          m_ExchangeRepository           = exchangeRepository;
-    private readonly IAuthorizationService        m_AuthorizationService         = authorizationService;
-    private readonly TransactionBackgroundService m_TransactionBackgroundService = transactionBackgroundService;
+    private readonly ITransactionRepository                m_TransactionRepository        = transactionRepository;
+    private readonly IAccountRepository                    m_AccountRepository            = accountRepository;
+    private readonly IAccountCurrencyRepository            m_AccountCurrencyRepository    = accountCurrencyRepository;
+    private readonly ICurrencyRepository                   m_CurrencyRepository           = currencyRepository;
+    private readonly IAuthorizationService                 m_AuthorizationService         = authorizationService;
+    private readonly IExchangeService                      m_ExchangeService              = exchangeService;
+    private readonly TransactionBackgroundService          m_TransactionBackgroundService = transactionBackgroundService;
+    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory               = contextFactory;
+
+    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
 
     public async Task<Result<Page<TransactionResponse>>> GetAll(TransactionFilterQuery transactionFilterQuery, Pageable pageable)
     {
@@ -85,17 +92,11 @@ public class TransactionService(
 
     public async Task<Result<TransactionCreateResponse>> Create(TransactionCreateRequest transactionCreateRequest)
     {
-        var code        = await m_TransactionCodeRepository.FindById(transactionCreateRequest.CodeId);
-        var fromAccount = await m_AccountRepository.FindById(transactionCreateRequest.FromAccountId);
-
-        if (code == null || fromAccount == null)
-            return Result.BadRequest<TransactionCreateResponse>("Invalid data.");
-
         var transaction = await CreateTransaction(new TempyTransaction
                                                   {
-                                                      FromAccountNumber = fromAccount.AccountNumber,
+                                                      FromAccountNumber = transactionCreateRequest.FromAccountNumber,
                                                       FromCurrencyId    = transactionCreateRequest.FromCurrencyId,
-                                                      FromAmount        = transactionCreateRequest.Amount,
+                                                      Amount            = transactionCreateRequest.Amount,
                                                       ToAccountNumber   = transactionCreateRequest.ToAccountNumber,
                                                       ToCurrencyId      = transactionCreateRequest.ToCurrencyId,
                                                       Purpose           = transactionCreateRequest.Purpose,
@@ -109,51 +110,16 @@ public class TransactionService(
         return Result.Ok(transaction.Value.ToCreateResponse());
     }
 
-    public async Task<Result<TransactionResponse>> Update(TransactionUpdateRequest transactionUpdateRequest, Guid id)
+    public async Task<Result<TransactionResponse>> Update(TransactionUpdateRequest request, Guid id) 
     {
-        var oldTransaction = await m_TransactionRepository.FindById(id);
+        var dbTransaction = await m_TransactionRepository.FindById(id);
 
-        if (oldTransaction is null)
+        if (dbTransaction is null)
             return Result.NotFound<TransactionResponse>($"No Transaction found with Id: {id}");
 
-        var account = await m_TransactionRepository.Update(oldTransaction, transactionUpdateRequest.ToTransaction(oldTransaction));
+        var transaction = await m_TransactionRepository.Update(dbTransaction.ToTransaction(request));
 
-        return Result.Ok(account.ToResponse());
-    }
-
-    public async Task ProcessInternalTransactionsForAccount(Guid accountId, List<ProcessTransaction> transactions)
-    {
-        var account = await m_AccountRepository.FindById(accountId);
-
-        if (account == null)
-            return;
-
-        foreach (var processTransaction in transactions)
-        {
-            var transaction = await m_TransactionRepository.FindById(processTransaction.TransactionId);
-
-            if (transaction == null || transaction.Status == TransactionStatus.Canceled)
-                return;
-
-            var multiplier = processTransaction.FromAccountId == processTransaction.ToAccountId ? 0.5m : 1; // TODO: do it differently
-
-            if (processTransaction.FromAccountId == account.Id)
-                account.FindAccountBalance(processTransaction.FromCurrencyId)!.ChangeBalance(-processTransaction.FromAmount * multiplier);
-
-            if (processTransaction.ToAccountId == account.Id)
-                account.FindAccountBalance(processTransaction.ToCurrencyId)!.ChangeBalance(processTransaction.ToAmount * multiplier);
-
-            await m_AccountRepository.Update(account, account);
-
-            transaction.Status = transaction.Status switch
-                                 {
-                                     TransactionStatus.Pending => TransactionStatus.Affirm,
-                                     TransactionStatus.Affirm  => TransactionStatus.Completed,
-                                     _                         => transaction.Status
-                                 };
-
-            await m_TransactionRepository.Update(transaction, transaction);
-        }
+        return Result.Ok(transaction.ToResponse());
     }
 
     public async Task<Result<Transaction>> CreateTransaction(TempyTransaction tempyTransaction)
@@ -161,52 +127,44 @@ public class TransactionService(
         if (tempyTransaction.FromAccountNumber == null && tempyTransaction.ToAccountNumber == null)
             return Result.BadRequest<Transaction>("No valid account provided.");
 
-        var bankCodeFrom = tempyTransaction.FromAccountNumber?.Substring(0, 3);
-        var bankCodeTo   = tempyTransaction.ToAccountNumber?.Substring(0, 3);
+        var fromAccount     = await m_AccountRepository.FindByNumber(tempyTransaction.FromAccountNumber?.Substring(7, 9) ?? "");
+        var toAccount       = await m_AccountRepository.FindByNumber(tempyTransaction.ToAccountNumber?.Substring(7, 9)   ?? "");
+        var exchangeDetails = await m_ExchangeService.CalculateExchangeDetails(tempyTransaction.FromCurrencyId, tempyTransaction.ToCurrencyId);
 
-        var fromAccount = await m_AccountRepository.FindByNumber(tempyTransaction.FromAccountNumber?.Substring(7, 9) ?? "");
-        var toAccount   = await m_AccountRepository.FindByNumber(tempyTransaction.ToAccountNumber?.Substring(7, 9)   ?? "");
+        var bankCodeFrom = tempyTransaction.FromAccountNumber?[..3];
+        var bankCodeTo   = tempyTransaction.ToAccountNumber?[..3];
 
-        var fromCurrency = await m_CurrencyRepository.FindById(tempyTransaction.FromCurrencyId);
-        var toCurrency   = await m_CurrencyRepository.FindById(tempyTransaction.ToCurrencyId);
-
-        if (bankCodeTo == null && bankCodeFrom == m_TransactionBackgroundService.Bank.Code)
+        if (bankCodeTo == null && bankCodeFrom == m_TransactionBackgroundService.Bank.Code && fromAccount != null)
             return await PrepareWithdrawTransaction(new PrepareWithdrawTransaction
                                                     {
-                                                        Account  = fromAccount,
-                                                        Currency = fromCurrency,
-                                                        Amount   = tempyTransaction.FromAmount
+                                                        Account    = fromAccount,
+                                                        CurrencyId = tempyTransaction.FromCurrencyId,
+                                                        Amount     = tempyTransaction.Amount
                                                     });
 
-        if (bankCodeFrom == null && bankCodeTo == m_TransactionBackgroundService.Bank.Code)
+        if (bankCodeFrom == null && bankCodeTo == m_TransactionBackgroundService.Bank.Code && toAccount != null)
             return await PrepareDepositTransaction(new PrepareDepositTransaction
                                                    {
-                                                       Account  = toAccount,
-                                                       Currency = toCurrency,
-                                                       Amount   = tempyTransaction.ToAmount
+                                                       Account    = toAccount,
+                                                       CurrencyId = tempyTransaction.ToCurrencyId,
+                                                       Amount     = tempyTransaction.Amount
                                                    });
 
-        if (bankCodeFrom == null || bankCodeTo == null)
+        if (bankCodeFrom == null || bankCodeTo == null || exchangeDetails == null)
             return Result.BadRequest<Transaction>("Some error");
 
-        var transactionCode = await m_TransactionCodeRepository.FindById(tempyTransaction.CodeId);
-        var fromExchange    = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(m_TransactionBackgroundService.DefaultCurrency.Id, tempyTransaction.FromCurrencyId);
-        var toExchange      = await m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(m_TransactionBackgroundService.DefaultCurrency.Id, tempyTransaction.ToCurrencyId);
-
-        if (bankCodeFrom == m_TransactionBackgroundService.Bank.Code && bankCodeTo == m_TransactionBackgroundService.Bank.Code)
+        if (bankCodeFrom == m_TransactionBackgroundService.Bank.Code && bankCodeTo == m_TransactionBackgroundService.Bank.Code && fromAccount != null && toAccount != null)
             return await PrepareInternalTransaction(new PrepareInternalTransaction
                                                     {
-                                                        FromAccount     = fromAccount,
-                                                        FromCurrency    = fromCurrency,
-                                                        FromAmount      = tempyTransaction.FromAmount,
-                                                        FromExchange    = fromExchange,
-                                                        ToAccount       = toAccount,
-                                                        ToCurrency      = toCurrency,
-                                                        ToAmount        = tempyTransaction.ToAmount,
-                                                        ToExchange      = toExchange,
-                                                        TransactionCode = transactionCode,
-                                                        ReferenceNumber = tempyTransaction.ReferenceNumber,
-                                                        Purpose         = tempyTransaction.Purpose
+                                                        FromAccount       = fromAccount,
+                                                        FromCurrencyId    = tempyTransaction.FromCurrencyId,
+                                                        ToAccount         = toAccount,
+                                                        ToCurrencyId      = tempyTransaction.ToCurrencyId,
+                                                        Amount            = tempyTransaction.Amount,
+                                                        TransactionCodeId = tempyTransaction.CodeId,
+                                                        ReferenceNumber   = tempyTransaction.ReferenceNumber,
+                                                        Purpose           = tempyTransaction.Purpose,
+                                                        ExchangeDetails   = exchangeDetails
                                                     });
 
         return await AddExternalTransaction(tempyTransaction);
@@ -214,25 +172,16 @@ public class TransactionService(
 
     private async Task<Result<Transaction>> PrepareDepositTransaction(PrepareDepositTransaction depositTransaction)
     {
-        if (depositTransaction.Account == null || depositTransaction.Currency == null || depositTransaction.Amount <= 0)
+        var currencyExists = await m_CurrencyRepository.Exists(depositTransaction.CurrencyId);
+
+        if (!currencyExists || depositTransaction.Amount <= 0)
             return Result.BadRequest<Transaction>("Some error");
-
-        var accountToBalance = depositTransaction.Account.FindAccountBalance(depositTransaction.Currency.Id);
-
-        if (accountToBalance == null)
-            return Result.BadRequest<Transaction>("Some error");
-
-        accountToBalance.ChangeAvailableBalance(depositTransaction.Amount);
-
-        m_TransactionBackgroundService.BankAccount!.FindAccountBalance(depositTransaction.Currency.Id)!.ChangeAvailableBalance(depositTransaction.Amount);
-
-        await m_AccountRepository.Update(depositTransaction.Account, depositTransaction.Account);
 
         var transaction = depositTransaction.ToTransaction();
 
-        var processTransaction = depositTransaction.ToProcessTransaction(transaction.Id);
-
         await m_TransactionRepository.Add(transaction);
+
+        var processTransaction = depositTransaction.ToProcessTransaction(transaction.Id);
 
         m_TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
 
@@ -241,28 +190,27 @@ public class TransactionService(
 
     private async Task<Result<Transaction>> PrepareWithdrawTransaction(PrepareWithdrawTransaction withdrawTransaction)
     {
-        if (withdrawTransaction.Account == null || withdrawTransaction.Currency == null || withdrawTransaction.Amount <= 0)
+        var currencyExists = await m_CurrencyRepository.Exists(withdrawTransaction.CurrencyId);
+
+        if (!currencyExists || withdrawTransaction.Amount <= 0)
             return Result.BadRequest<Transaction>("Some error");
-
-        var accountFromBalance = withdrawTransaction.Account.FindAccountBalance(withdrawTransaction.Currency.Id);
-
-        if (accountFromBalance == null)
-            return Result.BadRequest<Transaction>("Some error");
-
-        if (accountFromBalance.GetAvailableBalance() < withdrawTransaction.Amount)
-            return Result.BadRequest<Transaction>("Not enough resources.");
-
-        accountFromBalance.ChangeAvailableBalance(-withdrawTransaction.Amount);
-
-        m_TransactionBackgroundService.BankAccount.FindAccountBalance(withdrawTransaction.Currency.Id)!.ChangeAvailableBalance(-withdrawTransaction.Amount);
-
-        await m_AccountRepository.Update(withdrawTransaction.Account, withdrawTransaction.Account);
 
         var transaction = withdrawTransaction.ToTransaction();
 
-        var processTransaction = withdrawTransaction.ToProcessTransaction(transaction.Id);
-
         await m_TransactionRepository.Add(transaction);
+
+        withdrawTransaction.Account.TryFindAccount(withdrawTransaction.CurrencyId, out var accountId);
+
+        var result = await m_AccountRepository.DecreaseAvailableBalance(accountId, withdrawTransaction.CurrencyId, withdrawTransaction.Amount, withdrawTransaction.Amount);
+
+        if (result is not true)
+        {
+            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
+
+            return Result.BadRequest<Transaction>("Some error");
+        }
+
+        var processTransaction = withdrawTransaction.ToProcessTransaction(transaction.Id);
 
         m_TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
 
@@ -271,51 +219,207 @@ public class TransactionService(
 
     public async Task<Result<Transaction>> PrepareInternalTransaction(PrepareInternalTransaction internalTransaction)
     {
-        if (internalTransaction.ToAccount    == null || internalTransaction.ToCurrency == null || internalTransaction.FromAccount     == null ||
-            internalTransaction.FromCurrency == null || internalTransaction.FromAmount <= 0    || internalTransaction.TransactionCode == null)
+        var currencyExistResults = await Task.WhenAll(m_CurrencyRepository.Exists(internalTransaction.FromCurrencyId),
+                                                      m_CurrencyRepository.Exists(internalTransaction.ToCurrencyId));
+
+        if (currencyExistResults.Any(result => !result) || internalTransaction.Amount <= 0)
             return Result.BadRequest<Transaction>("Some error");
-
-        var accountFromBalance = internalTransaction.FromAccount.FindAccountBalance(internalTransaction.FromCurrency.Id);
-        var accountToBalance   = internalTransaction.ToAccount.FindAccountBalance(internalTransaction.ToCurrency.Id);
-
-        if (accountFromBalance == null || accountToBalance == null)
-            return Result.BadRequest<Transaction>("Some error");
-
-        if (accountFromBalance.GetAvailableBalance() < internalTransaction.FromAmount)
-            return Result.BadRequest<Transaction>("Not enough resources.");
-
-        var exchangeRateFrom = internalTransaction.FromExchange?.AskRate ?? 1;
-        var exchangeRateTo   = internalTransaction.ToExchange?.BidRate   ?? 1;
-        var exchangeRate     = exchangeRateFrom / exchangeRateTo;
-
-        internalTransaction.ToAmount = exchangeRate * internalTransaction.FromAmount;
-
-        var averageRateFrom = internalTransaction.FromExchange?.InverseRate ?? 1;
-        var averageRateTo   = internalTransaction.ToExchange?.InverseRate   ?? 1;
-        var averageRate     = averageRateFrom / averageRateTo;
-
-        accountFromBalance.ChangeAvailableBalance(-internalTransaction.FromAmount);
-        accountToBalance.ChangeAvailableBalance(internalTransaction.ToAmount);
-
-        m_TransactionBackgroundService.BankAccount.FindAccountBalance(internalTransaction.FromCurrency.Id)!.ChangeAvailableBalance(-averageRate * internalTransaction.FromAmount);
-        m_TransactionBackgroundService.BankAccount.FindAccountBalance(internalTransaction.ToCurrency.Id)!.ChangeAvailableBalance(internalTransaction.ToAmount);
-
-        await m_AccountRepository.Update(internalTransaction.FromAccount, internalTransaction.FromAccount);
-        await m_AccountRepository.Update(internalTransaction.ToAccount,   internalTransaction.ToAccount);
 
         var transaction = internalTransaction.ToTransaction();
 
-        var processTransaction = internalTransaction.ToProcessTransaction(transaction.Id);
-
         await m_TransactionRepository.Add(transaction);
+
+        internalTransaction.FromAccount.TryFindAccount(internalTransaction.FromCurrencyId, out var accountId);
+
+        var result = await m_AccountRepository.DecreaseAvailableBalance(accountId, internalTransaction.FromCurrencyId, internalTransaction.Amount,
+                                                                        internalTransaction.ExchangeDetails.ExchangeRate * internalTransaction.ExchangeDetails.AverageRate *
+                                                                        internalTransaction.Amount);
+
+        if (result is not true)
+        {
+            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
+
+            return Result.BadRequest<Transaction>("Some error");
+        }
+
+        var processTransaction = internalTransaction.ToProcessTransaction(transaction.Id);
 
         m_TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
 
         return Result.Ok(transaction);
     }
 
-    private async Task<Result<Transaction>> AddExternalTransaction(TempyTransaction tempyTransaction)
+    private async Task<Result<Transaction>> AddExternalTransaction(TempyTransaction tempyTransaction) // TODO: external transaction 
     {
         return Result.Forbidden<Transaction>();
     }
+
+    #region Process Transactions
+
+    public async Task ProcessInternalTransaction(ProcessTransaction processTransaction)
+    {
+        var isDeposit  = processTransaction.FromAccountId == Guid.Empty;
+        var isWithdraw = processTransaction.ToAccountId   == Guid.Empty;
+
+        if (isDeposit && isWithdraw)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+            return;
+        }
+
+        var task = (isDeposit, isWithdraw) switch
+                   {
+                       (true, true)   => m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed),
+                       (true, false)  => ProcessDepositTransaction(processTransaction),
+                       (false, true)  => ProcessWithdrawTransaction(processTransaction),
+                       (false, false) => ProcessTransaction(processTransaction),
+                   };
+
+        await task;
+    }
+
+    private async Task<bool> ProcessDepositTransaction(ProcessTransaction processTransaction)
+    {
+        await using var databaseContext     = await CreateContext;
+        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
+
+        var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
+        var toAccountTask   = m_AccountRepository.FindById(processTransaction.ToAccountId);
+
+        await Task.WhenAll(transactionTask, toAccountTask);
+
+        var transaction = await transactionTask;
+        var toAccount   = await toAccountTask;
+
+        if (transaction?.Status == TransactionStatus.Canceled)
+            return true;
+
+        if (toAccount == null)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+
+            return false;
+        }
+
+        toAccount.TryFindAccount(processTransaction.ToCurrencyId, out var accountId);
+
+        var transferSucceeded = await m_AccountRepository.IncreaseBalances(accountId, processTransaction.ToCurrencyId, processTransaction.ToAmount, databaseContext);
+
+        if (!transferSucceeded)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+            await databaseTransaction.RollbackAsync();
+
+            return false;
+        }
+
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
+        await databaseTransaction.CommitAsync();
+
+        return true;
+    }
+
+    private async Task<bool> ProcessWithdrawTransaction(ProcessTransaction processTransaction)
+    {
+        await using var databaseContext     = await CreateContext;
+        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
+
+        var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
+        var fromAccountTask = m_AccountRepository.FindById(processTransaction.FromAccountId);
+
+        await Task.WhenAll(transactionTask, fromAccountTask);
+
+        var transaction = await transactionTask;
+        var fromAccount = await fromAccountTask;
+
+        if (transaction?.Status == TransactionStatus.Canceled)
+            return true;
+
+        if (fromAccount == null)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+
+            return false;
+        }
+
+        fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var accountId);
+
+        var transferSucceeded = await m_AccountRepository.DecreaseAvailableBalance(accountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
+                                                                                   processTransaction.FromAmount, databaseContext);
+
+        if (!transferSucceeded)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+            await databaseTransaction.RollbackAsync();
+
+            return false;
+        }
+
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
+        await databaseTransaction.CommitAsync();
+
+        return true;
+    }
+
+    private async Task<bool> ProcessTransaction(ProcessTransaction processTransaction)
+    {
+        await using var databaseContext     = await CreateContext;
+        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
+
+        var transferSucceeded = true;
+
+        var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
+        var fromAccountTask = m_AccountRepository.FindById(processTransaction.FromAccountId);
+        var toAccountTask   = m_AccountRepository.FindById(processTransaction.ToAccountId);
+
+        await Task.WhenAll(transactionTask, fromAccountTask);
+
+        var transaction = await transactionTask;
+        var fromAccount = await fromAccountTask;
+        var toAccount   = await toAccountTask;
+
+        if (transaction?.Status == TransactionStatus.Canceled)
+            return true;
+
+        if (fromAccount == null || toAccount == null)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+
+            return false;
+        }
+
+        fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var fromAccountId);
+
+        transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
+                                                                      processTransaction.FromBankAmount, databaseContext);
+
+        if (!transferSucceeded)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+            await databaseTransaction.RollbackAsync();
+
+            return false;
+        }
+
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Affirm);
+
+        toAccount.TryFindAccount(processTransaction.ToCurrencyId, out var toAccountId);
+
+        transferSucceeded = await m_AccountRepository.IncreaseBalances(toAccountId, processTransaction.ToCurrencyId, processTransaction.ToAmount, databaseContext);
+
+        if (!transferSucceeded)
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+            await databaseTransaction.RollbackAsync();
+
+            return false;
+        }
+
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
+        await databaseTransaction.CommitAsync();
+
+        return true;
+    }
+
+    #endregion
 }

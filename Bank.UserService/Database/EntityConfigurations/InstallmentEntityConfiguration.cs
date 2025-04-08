@@ -18,8 +18,8 @@ public class InstallmentEntityConfiguration : IEntityTypeConfiguration<Installme
                .IsRequired();
 
         builder.Property(installment => installment.InterestRate)
-               .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12)
+               .IsRequired();
 
         builder.Property(installment => installment.ExpectedDueDate)
                .IsRequired();

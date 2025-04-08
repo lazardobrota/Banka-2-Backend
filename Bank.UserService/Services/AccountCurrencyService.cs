@@ -66,15 +66,15 @@ public class AccountCurrencyService(
         return Result.Ok(accountCurrency.ToResponse());
     }
 
-    public async Task<Result<AccountCurrencyResponse>> Update(AccountCurrencyClientUpdateRequest accountClientUpdateRequest, Guid id)
+    public async Task<Result<AccountCurrencyResponse>> Update(AccountCurrencyClientUpdateRequest request, Guid id)
     {
-        var oldAccountCurrency = await m_AccountCurrencyRepository.FindById(id);
-
-        if (oldAccountCurrency is null)
-            return Result.NotFound<AccountCurrencyResponse>($"No AccountCurrency found with Id: {id}");
-
-        var accountCurrency = await m_AccountCurrencyRepository.Update(oldAccountCurrency, accountClientUpdateRequest.ToAccountCurrency(oldAccountCurrency));
-
+        var dbAccountCurrency = await m_AccountCurrencyRepository.FindById(id);
+    
+        if (dbAccountCurrency is null)
+            return Result.NotFound<AccountCurrencyResponse>($"No Account Currency found with Id: {id}");
+    
+        var accountCurrency = await m_AccountCurrencyRepository.Update(dbAccountCurrency.ToAccountCurrency(request));
+    
         return Result.Ok(accountCurrency.ToResponse());
     }
 }

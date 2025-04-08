@@ -19,8 +19,8 @@ public class LoanTypeEntityConfiguration : IEntityTypeConfiguration<LoanType>
                .IsRequired();
 
         builder.Property(loanType => loanType.Margin)
-               .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12)
+               .IsRequired();
 
         builder.Property(loanType => loanType.CreatedAt)
                .IsRequired();
