@@ -5,7 +5,7 @@ public enum Role
     Invalid,
     Admin,
     Employee,
-    Client,
+    Client
 }
 
 public enum Gender
@@ -84,3 +84,10 @@ public enum OrderStatus
     Failed
 }
 
+public enum Permission : long
+{
+    Invalid  = 1 << 0,
+    Admin    = 1 << 1,
+    Employee = 1 << 2,
+    Client   = 1 << 3
+}

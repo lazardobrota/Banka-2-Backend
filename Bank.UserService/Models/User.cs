@@ -26,6 +26,8 @@ public class User
     public required DateTime                  ModifiedAt                 { set;  get; }
     public required bool?                     Employed                   { set;  get; }
     public required bool                      Activated                  { set;  get; }
+
+    public required long Permissions { set; get; }
 }
 
 public class Employee
@@ -48,6 +50,7 @@ public class Employee
     public required DateTime ModifiedAt                 { set; get; }
     public required bool     Employed                   { set; get; }
     public required bool     Activated                  { set; get; }
+    public required long     Permissions                { set; get; }
 }
 
 public class Client
@@ -68,6 +71,7 @@ public class Client
     public required Guid                      BankId                     { set;  get; }
     public          List<Account>             Accounts                   { init; get; } = [];
     public          List<TransactionTemplate> TransactionTemplates       { init; get; } = [];
+    public required long                      Permissions                { set;  get; }
 
     public required DateTime CreatedAt  { set; get; }
     public required DateTime ModifiedAt { set; get; }

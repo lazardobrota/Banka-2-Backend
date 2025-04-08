@@ -8,6 +8,7 @@ using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.HostedServices;
 using Bank.UserService.Repositories;
+using Bank.UserService.Security;
 using Bank.UserService.Services;
 using Bank.UserService.Swagger.SchemeFilters;
 
@@ -17,9 +18,12 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+
+using IAuthorizationService = Bank.UserService.Services.IAuthorizationService;
 
 namespace Bank.UserService.Application;
 
@@ -107,7 +111,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITransactionTemplateService, TransactionTemplateService>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ITransactionService, TransactionService>();
-        services.AddScoped<ILoanService, Services.LoanService>();
+        services.AddScoped<ILoanService, LoanService>();
         services.AddScoped<IInstallmentService, InstallmentService>();
         services.AddScoped<ILoanTypeService, LoanTypeService>();
         services.AddScoped<IOrderRepository, OrderRepository>();
@@ -197,6 +201,9 @@ public static class ServiceCollectionExtensions
                 .AddPolicy(Configuration.Policy.Role.Employee, policy => policy.RequireRole(nameof(Role.Employee)))
                 .AddPolicy(Configuration.Policy.Role.Client,   policy => policy.RequireRole(nameof(Role.Client)));
 
+        services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        services.AddScoped<IAuthorizationHandler, PermissionHandler>();
+
         return services;
     }
 
@@ -204,7 +211,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSwaggerGen(config =>
                                {
-                                   config.SwaggerDoc("v1", new OpenApiInfo() { Title = "UserService", Version = "v1" });
+                                   config.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService", Version = "v1" });
 
                                    config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.CreateRequest>();
                                    config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.UpdateRequest>();
