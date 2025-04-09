@@ -1,10 +1,13 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 using Bank.UserService.Services;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -34,9 +37,7 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
 
     public async Task<Page<Transaction>> FindAll(TransactionFilterQuery filter, Pageable pageable)
     {
-        var transactionQuery = m_Context.Transactions.Include(transaction => transaction.FromAccount)
-                                        .Include(transaction => transaction.ToAccount)
-                                        .Include(transaction => transaction.Code)
+        var transactionQuery = m_Context.Transactions.IncludeAll()
                                         .AsQueryable();
 
         if (m_AuthorizationService.Role == Role.Client)
@@ -65,13 +66,7 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
 
     public async Task<Page<Transaction>> FindAllByAccountId(Guid accountId, TransactionFilterQuery filter, Pageable pageable)
     {
-        var transactionQuery = m_Context.Transactions.Include(transaction => transaction.FromAccount)
-                                        .Include(transaction => transaction.FromAccount!.Type)
-                                        .Include(transaction => transaction.FromAccount!.Client!.Bank)
-                                        .Include(transaction => transaction.ToAccount)
-                                        .Include(transaction => transaction.ToAccount!.Type)
-                                        .Include(transaction => transaction.ToAccount!.Client!.Bank)
-                                        .Include(transaction => transaction.Code)
+        var transactionQuery = m_Context.Transactions.IncludeAll()
                                         .AsQueryable();
 
         if (filter.Status != TransactionStatus.Invalid)
@@ -139,9 +134,88 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
 
     public static async Task<Transaction?> FindById(Guid id, ApplicationContext context)
     {
-        return await context.Transactions.Include(transaction => transaction.FromAccount)
-                            .Include(transaction => transaction.ToAccount)
-                            .Include(transaction => transaction.Code)
+        return await context.Transactions.IncludeAll()
                             .FirstOrDefaultAsync(transaction => transaction.Id == id);
+    }
+}
+
+public static partial class RepositoryExtensions
+{
+    public static IIncludableQueryable<Transaction, object?> IncludeAll(this DbSet<Transaction> set)
+    {
+        return set.Include(transaction => transaction.FromAccount)
+                  .ThenIncludeAll(transaction => transaction.FromAccount)
+                  .Include(transaction => transaction.FromAccount)
+                  .ThenInclude(account => account!.Client)
+                  .ThenInclude(client => client!.Bank)
+                  .Include(transaction => transaction.FromCurrency)
+                  .ThenIncludeAll(transaction => transaction.FromCurrency)
+                  .Include(transaction => transaction.ToAccount)
+                  .ThenIncludeAll(transaction => transaction.ToAccount)
+                  .Include(transaction => transaction.ToAccount)
+                  .ThenInclude(account => account!.Client)
+                  .ThenInclude(client => client!.Bank)
+                  .Include(transaction => transaction.ToCurrency)
+                  .ThenIncludeAll(transaction => transaction.ToCurrency)
+                  .Include(transaction => transaction.Code)
+                  .ThenIncludeAll(transaction => transaction.Code);
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Transaction?> value,
+                                                                                 Expression<Func<TEntity, Transaction?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Transaction.FromAccount)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction!.FromAccount);
+
+        if (!excludeProperties.Contains(nameof(Transaction.FromCurrency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction!.FromCurrency);
+
+        if (!excludeProperties.Contains(nameof(Transaction.ToAccount)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction!.ToAccount);
+
+        if (!excludeProperties.Contains(nameof(Transaction.ToCurrency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction!.ToCurrency);
+
+        if (!excludeProperties.Contains(nameof(Transaction.Code)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction!.Code);
+
+        return query;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Transaction>> value,
+                                                                                 Expression<Func<TEntity, List<Transaction>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Transaction.FromAccount)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction.FromAccount);
+
+        if (!excludeProperties.Contains(nameof(Transaction.FromCurrency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction.FromCurrency);
+
+        if (!excludeProperties.Contains(nameof(Transaction.ToAccount)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction.ToAccount);
+
+        if (!excludeProperties.Contains(nameof(Transaction.ToCurrency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction.ToCurrency);
+
+        if (!excludeProperties.Contains(nameof(Transaction.Code)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transaction => transaction.Code);
+
+        return query;
     }
 }

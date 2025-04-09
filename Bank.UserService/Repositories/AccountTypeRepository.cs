@@ -1,9 +1,12 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -63,5 +66,28 @@ public class AccountTypeRepository(ApplicationContext context) : IAccountTypeRep
                                                              .SetProperty(dbAccountType => dbAccountType.ModifiedAt, accountType.ModifiedAt));
 
         return accountType;
+    }
+}
+
+public static partial class RepositoryExtensions
+{
+    [Obsolete("This method does not have implementation.", true)]
+    public static IIncludableQueryable<AccountType, object?> IncludeAll(this DbSet<AccountType> set)
+    {
+        return set.Include(accountType => accountType);
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, AccountType?> value,
+                                                                                 Expression<Func<TEntity, AccountType?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<AccountType>> value,
+                                                                                 Expression<Func<TEntity, List<AccountType>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
     }
 }

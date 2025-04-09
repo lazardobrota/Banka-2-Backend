@@ -1,8 +1,11 @@
-﻿using Bank.Application.Queries;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Queries;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -23,10 +26,10 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
     private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
     private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
-    
+
     public async Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery)
     {
-        var currencyQuery = m_Context.Currencies.Include(c => c.Countries)
+        var currencyQuery = m_Context.Currencies.IncludeAll()
                                      .AsQueryable();
 
         if (!string.IsNullOrEmpty(currencyFilterQuery.Name))
@@ -60,17 +63,17 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
     }
 
     #region Static Repository Calls
-    
+
     private static async Task<Currency?> FindById(Guid id, ApplicationContext context)
     {
-        return await context.Currencies.Include(currency => currency.Countries)
+        return await context.Currencies.IncludeAll()
                             .Where(currency => currency.Id == id)
                             .FirstOrDefaultAsync();
     }
 
     private static async Task<Currency?> FindByCode(string currencyCode, ApplicationContext context)
     {
-        return await context.Currencies.Include(currency => currency.Countries)
+        return await context.Currencies.IncludeAll()
                             .Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
                             .FirstOrDefaultAsync();
     }
@@ -79,6 +82,41 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
     {
         return context.Currencies.AnyAsync(currency => currency.Id == currencyId);
     }
-    
+
     #endregion
+}
+
+public static partial class RepositoryExtensions
+{
+    public static IIncludableQueryable<Currency, object?> IncludeAll(this DbSet<Currency> set)
+    {
+        return set.Include(currency => currency.Countries)
+                  .ThenIncludeAll(currency => currency.Countries, nameof(Country.Currency));
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Currency?> value,
+                                                                                 Expression<Func<TEntity, Currency?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Currency.Countries)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(currency => currency!.Countries);
+
+        return query;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Currency>> value,
+                                                                                 Expression<Func<TEntity, List<Currency>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Currency.Countries)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(currency => currency.Countries);
+
+        return query;
+    }
 }

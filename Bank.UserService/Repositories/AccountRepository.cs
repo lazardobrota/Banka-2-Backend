@@ -1,10 +1,13 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.UserService.BackgroundServices;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -62,12 +65,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<Page<Account>> FindAll(AccountFilterQuery accountFilterQuery, Pageable pageable)
     {
-        var accountQuery = m_Context.Accounts.Include(account => account.Client)
-                                    .Include(account => account.Client!.Bank)
-                                    .Include(account => account.Employee)
-                                    .Include(account => account.Currency)
-                                    .Include(account => account.AccountCurrencies)
-                                    .Include(account => account.Type)
+        var accountQuery = m_Context.Accounts.IncludeAll()
                                     .AsQueryable();
 
         if (!string.IsNullOrEmpty(accountFilterQuery.ClientEmail))
@@ -105,12 +103,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<Page<Account>> FindAllByClientId(Guid clientId, Pageable pageable)
     {
-        var accounts = await m_Context.Accounts.Include(account => account.Client)
-                                      .Include(account => account.Client!.Bank)
-                                      .Include(account => account.Employee)
-                                      .Include(account => account.Currency)
-                                      .Include(account => account.AccountCurrencies)
-                                      .Include(account => account.Type)
+        var accounts = await m_Context.Accounts.IncludeAll()
                                       .Where(account => account.ClientId == clientId)
                                       .Skip((pageable.Page - 1) * pageable.Size)
                                       .Take(pageable.Size)
@@ -128,12 +121,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
         Console.WriteLine($"FindById | {DateTime.Now:hh:mm:ss.fff}");
         await Task.Delay(100);
 
-        return await context.Accounts.Include(account => account.Client)
-                            .Include(account => account.Client!.Bank)
-                            .Include(account => account.Employee)
-                            .Include(account => account.Currency)
-                            .Include(account => account.AccountCurrencies)
-                            .Include(account => account.Type)
+        return await context.Accounts.IncludeAll()
                             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
@@ -146,12 +134,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
     {
         await using var context = await CreateContext;
 
-        return await context.Accounts.Include(account => account.Client)
-                            .Include(account => account.Client!.Bank)
-                            .Include(account => account.Employee)
-                            .Include(account => account.Currency)
-                            .Include(account => account.AccountCurrencies)
-                            .Include(account => account.Type)
+        return await context.Accounts.IncludeAll()
                             .FirstOrDefaultAsync(a => a.Number == number);
     }
 
@@ -345,5 +328,80 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
                                                                                                        account => account.AvailableBalance + amount));
 
         return updatedAccounts + updatedAccountCurrencies == 2;
+    }
+}
+
+public static partial class RepositoryExtensions
+{
+    public static IIncludableQueryable<Account, object?> IncludeAll(this DbSet<Account> set)
+    {
+        return set.Include(account => account.Client)
+                  .ThenIncludeAll(account => account.Client, nameof(User.Accounts))
+                  .Include(account => account.Employee)
+                  .ThenIncludeAll(account => account.Employee, nameof(User.Accounts))
+                  .Include(account => account.Currency)
+                  .ThenIncludeAll(account => account.Currency)
+                  .Include(account => account.AccountCurrencies)
+                  .ThenIncludeAll(account => account.AccountCurrencies, nameof(AccountCurrency.Account))
+                  .Include(account => account.Type)
+                  .ThenIncludeAll(account => account.Type);
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Account?> value,
+                                                                                 Expression<Func<TEntity, Account?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Account.Client)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account!.Client);
+
+        if (!excludeProperties.Contains(nameof(Account.Employee)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account!.Employee);
+
+        if (!excludeProperties.Contains(nameof(Account.Currency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account!.Currency);
+
+        if (!excludeProperties.Contains(nameof(Account.Type)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account!.Type);
+
+        if (!excludeProperties.Contains(nameof(Account.AccountCurrencies)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account!.AccountCurrencies);
+
+        return query;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Account>> value,
+                                                                                 Expression<Func<TEntity, List<Account>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Account.Client)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account.Client);
+
+        if (!excludeProperties.Contains(nameof(Account.Employee)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account.Employee);
+
+        if (!excludeProperties.Contains(nameof(Account.Currency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account.Currency);
+
+        if (!excludeProperties.Contains(nameof(Account.Type)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account.Type);
+
+        if (!excludeProperties.Contains(nameof(Account.AccountCurrencies)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(account => account.AccountCurrencies);
+
+        return query;
     }
 }
