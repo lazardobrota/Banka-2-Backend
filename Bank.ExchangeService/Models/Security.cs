@@ -115,7 +115,7 @@ public class ForexPair
     public required Guid           BaseCurrencyId  { get; set; }
     public required Guid           QuoteCurrencyId { get; set; }
     public required decimal        ExchangeRate    { get; set; }
-    public          Liquidity      Liquidity       { get; set; }
+    public required Liquidity      Liquidity       { get; set; }
     public required int            ContractSize    { get; set; } = 1000;
     public required string         Name            { get; set; }
     public required string         Ticker          { get; set; }

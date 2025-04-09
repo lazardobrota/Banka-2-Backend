@@ -16,6 +16,8 @@ public interface ISecurityRepository
     Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter);
 
     Task<Security?> Create(Security security);
+
+    Task<bool> CreateSecurities(List<Security> securities);
 }
 
 public class SecurityRepository(DatabaseContext context, IDbContextFactory<DatabaseContext> contextFactory) : ISecurityRepository
@@ -95,5 +97,14 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
         var added = await m_Context.Securities.AddAsync(security);
         await m_Context.SaveChangesAsync();
         return added.Entity;
+    }
+
+    public async Task<bool> CreateSecurities(List<Security> securities)
+    {
+        await using var context = await CreateContext;
+
+        await context.Securities.AddRangeAsync(securities);
+
+        return await context.SaveChangesAsync() == securities.Count;
     }
 }

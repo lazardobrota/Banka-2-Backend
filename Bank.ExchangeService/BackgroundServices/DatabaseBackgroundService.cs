@@ -1,17 +1,20 @@
 ﻿using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Seeders;
+using Bank.ExchangeService.HttpClients;
 using Bank.ExchangeService.Repositories;
 
 namespace Bank.ExchangeService.BackgroundServices;
 
-public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory)
+public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, ICurrencyClient currencyClient)
 {
     private readonly IServiceProvider    m_ServiceProvider    = serviceProvider;
     private readonly IHttpClientFactory  m_HttpClientFactory  = httpClientFactory;
+    private readonly ICurrencyClient     m_CurrencyClient     = currencyClient;
     private          ISecurityRepository m_SecurityRepository = null!;
     private          IQuoteRepository    m_QuoteRepository    = null!;
     private          Timer?              m_StockTimer;
+    private          Timer?              m_ForexPairTimer;
 
     private DatabaseContext Context =>
     m_ServiceProvider.CreateScope()
@@ -37,13 +40,16 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         Context.SeedStockExchanges()
                .Wait();
 
-        Context.SeedOption()
-               .Wait();
+        // Context.SeedOption()
+        //        .Wait();
 
-        Context.SeedForexPair()
-               .Wait();
+        // Context.SeedForexPairHardcoded()
+        //        .Wait();
 
         Context.SeedFutureContract()
+               .Wait();
+
+        Context.SeedForexPair(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository)
                .Wait();
 
         Context.SeedStock(client)
@@ -53,23 +59,39 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         {
             Context.SeedQuoteStocks(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
                    .Wait();
+
+            Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository, m_QuoteRepository)
+                   .Wait();
         }
 
-        InitializeStockTimer();
+        InitializeTimers();
     }
 
     public void OnApplicationStopped() { }
 
-    public void InitializeStockTimer()
+    public void InitializeTimers()
     {
-        m_StockTimer = new Timer(async _ => await FetchLatestStocks(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        m_StockTimer     = new Timer(async _ => await FetchStocksLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        m_ForexPairTimer = new Timer(async _ => await FetchForexPairLatest(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
     }
 
-    private async Task FetchLatestStocks()
+    private async Task FetchStocksLatest()
+    {
+        using var scope              = m_ServiceProvider.CreateScope();
+        var       context            = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+        var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
+        var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
+
+        await context.SeedQuoteStocksLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository);
+    }
+
+    private async Task FetchForexPairLatest()
     {
         using var scope   = m_ServiceProvider.CreateScope();
         var       context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+        var securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
+        var quoteRepository = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
 
-        await context.SeedQuoteStocksLatest(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository);
+        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), m_CurrencyClient, securityRepository, quoteRepository);
     }
 }

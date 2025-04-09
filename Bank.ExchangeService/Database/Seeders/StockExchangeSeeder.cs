@@ -85,6 +85,19 @@ public static partial class Seeder
                                                                       CreatedAt  = DateTime.UtcNow,
                                                                       ModifiedAt = DateTime.UtcNow
                                                                   };
+
+        public static readonly StockExchangeModel ForexMarket = new()
+                                                                {
+                                                                    Id         = Guid.Parse("a1b2c3d4-e5f6-4718-9a0b-cd1e2f3a4b5c"),
+                                                                    Name       = "Global Forex Market",
+                                                                    Acronym    = "FOREX",
+                                                                    MIC        = "XXXX",
+                                                                    Polity     = "International",
+                                                                    CurrencyId = Guid.Parse("81bf331a-0a35-4716-ad12-d1d1bcf66627"), // USD
+                                                                    TimeZone   = TimeSpan.Zero,
+                                                                    CreatedAt  = DateTime.UtcNow,
+                                                                    ModifiedAt = DateTime.UtcNow
+                                                                };
     }
 }
 
@@ -96,7 +109,7 @@ public static class StockExchangeSeederExtension
             return;
 
         await context.StockExchanges.AddRangeAsync(Seeder.StockExchange.Nasdaq, Seeder.StockExchange.ASX, Seeder.StockExchange.EDGADark, Seeder.StockExchange.ClearStreet,
-                                                   Seeder.StockExchange.MarexIreland, Seeder.StockExchange.BorsaItaliana);
+                                                   Seeder.StockExchange.MarexIreland, Seeder.StockExchange.BorsaItaliana, Seeder.StockExchange.ForexMarket);
 
         await context.SaveChangesAsync();
     }

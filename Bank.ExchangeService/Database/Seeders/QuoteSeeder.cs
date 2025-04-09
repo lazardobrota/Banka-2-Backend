@@ -254,6 +254,7 @@ public static class QuoteSeederExtension
 
         var quotes = new List<QuoteModel>();
 
+        var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
         var request = new HttpRequestMessage
                       {
                           Method     = HttpMethod.Get,
@@ -261,8 +262,8 @@ public static class QuoteSeederExtension
                           Headers =
                           {
                               { "accept", "application/json" },
-                              { "APCA-API-KEY-ID", Configuration.Security.AlpacaApiKey },
-                              { "APCA-API-SECRET-KEY", Configuration.Security.AlpacaSecretKey },
+                              { "APCA-API-KEY-ID", apiKey },
+                              { "APCA-API-SECRET-KEY", apiSecret },
                           }
                       };
 
@@ -314,6 +315,7 @@ public static class QuoteSeederExtension
             else
                 query.Remove("page_token");
 
+            var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
             var request = new HttpRequestMessage
                           {
                               Method     = HttpMethod.Get,
@@ -321,8 +323,8 @@ public static class QuoteSeederExtension
                               Headers =
                               {
                                   { "accept", "application/json" },
-                                  { "APCA-API-KEY-ID", Configuration.Security.AlpacaApiKey },
-                                  { "APCA-API-SECRET-KEY", Configuration.Security.AlpacaSecretKey },
+                                  { "APCA-API-KEY-ID", apiKey },
+                                  { "APCA-API-SECRET-KEY", apiSecret },
                               }
                           };
 

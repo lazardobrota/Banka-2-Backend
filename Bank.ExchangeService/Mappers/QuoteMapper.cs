@@ -33,4 +33,34 @@ public static class QuoteMapper
                    ModifiedAt = barResponse.Date
                };
     }
+
+    public static Quote ToQuote(this FetchForexPairQuoteResponse fetchForexPairQuote, Guid forexPairId, DateTime date)
+    {
+        return new Quote
+               {
+                   Id         = Guid.NewGuid(),
+                   SecurityId = forexPairId,
+                   Price      = fetchForexPairQuote.Close,
+                   HighPrice  = fetchForexPairQuote.High,
+                   LowPrice   = fetchForexPairQuote.Low,
+                   Volume     = 0,
+                   CreatedAt  = date.ToUniversalTime(),
+                   ModifiedAt = date.ToUniversalTime()
+               };
+    }
+    
+    public static Quote ToQuote(this FetchForexPairLatestResponse fetchForexPairLatest, Guid forexPairId)
+    {
+        return new Quote
+               {
+                   Id         = Guid.NewGuid(),
+                   SecurityId = forexPairId,
+                   Price      = 0, 
+                   HighPrice  = fetchForexPairLatest.AskPrice,
+                   LowPrice   = fetchForexPairLatest.BidPrice,
+                   Volume     = 0,
+                   CreatedAt  = fetchForexPairLatest.Date.ToUniversalTime(),
+                   ModifiedAt = fetchForexPairLatest.Date.ToUniversalTime()
+               };
+    }
 }

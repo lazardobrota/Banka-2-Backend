@@ -65,6 +65,7 @@ public static class StockSeederExtension
         if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
             return;
 
+        var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
         var request = new HttpRequestMessage
                       {
                           Method     = HttpMethod.Get,
@@ -72,8 +73,8 @@ public static class StockSeederExtension
                           Headers =
                           {
                               { "accept", "application/json" },
-                              { "APCA-API-KEY-ID", Configuration.Security.AlpacaApiKey },
-                              { "APCA-API-SECRET-KEY", Configuration.Security.AlpacaSecretKey },
+                              { "APCA-API-KEY-ID", apiKey },
+                              { "APCA-API-SECRET-KEY", apiSecret },
                           },
                       };
 

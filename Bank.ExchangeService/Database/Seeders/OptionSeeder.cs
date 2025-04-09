@@ -1,5 +1,12 @@
-﻿using Bank.Application.Domain;
+﻿using System.Diagnostics;
+
+using Bank.Application.Domain;
+using Bank.Application.Responses;
+using Bank.ExchangeService.Configurations;
+using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
@@ -69,12 +76,73 @@ public static partial class Seeder
 
 public static class OptionSeederExtension
 {
-    public static async Task SeedOption(this DatabaseContext context)
+    // public static async Task SeedOption(this DatabaseContext context)
+    // {
+    //     if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
+    //         return;
+    //
+    //     await context.Securities.AddRangeAsync(Seeder.Option.AmazonPutOption, Seeder.Option.AppleCallOption, Seeder.Option.MicrosoftCallOption, Seeder.Option.TeslaPutOption);
+    //
+    //     await context.SaveChangesAsync();
+    // }
+
+    public static async Task SeedOptions(this DatabaseContext context, HttpClient httpClient)
     {
-        if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
+        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
             return;
 
-        await context.Securities.AddRangeAsync(Seeder.Option.AmazonPutOption, Seeder.Option.AppleCallOption, Seeder.Option.MicrosoftCallOption, Seeder.Option.TeslaPutOption);
+        var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
+
+        var request = new HttpRequestMessage
+                      {
+                          Method     = HttpMethod.Get,
+                          RequestUri = new Uri($"{Configuration.Security.Stock.GetAllApi}?status=active&asset_class=us_equity&attributes="),
+                          Headers =
+                          {
+                              { "accept", "application/json" },
+                              { "APCA-API-KEY-ID", apiKey },
+                              { "APCA-API-SECRET-KEY", apiSecret },
+                          },
+                      };
+
+        using var response = await httpClient.SendAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+            return;
+
+        var body = await response.Content.ReadFromJsonAsync<List<FetchStockResponse>>();
+
+        if (body is null)
+            throw new Exception("List of stocks can't be null");
+
+        Console.WriteLine(body);
+
+        var stockExchanges = await context.StockExchanges.ToListAsync();
+
+        var stocks = body.Select(stockResponse =>
+                                 {
+                                     var exchange = stockExchanges.Find(exchange => exchange.Acronym == stockResponse.StockExchangeAcronym);
+
+                                     return exchange != null && stockResponse.Tradable
+                                            ? stockResponse.ToStock(exchange.Id)
+                                                           .ToSecurity()
+                                            : null;
+                                 })
+                         .Where(security => security != null)
+                         .Select(security => security!)
+                         .ToList();
+
+        await context.Securities.AddRangeAsync(stocks);
+
+        await context.SaveChangesAsync();
+    }
+
+    public static async Task SeedStockHardcoded(this DatabaseContext context)
+    {
+        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
+            return;
+
+        await context.Securities.AddRangeAsync(Seeder.Stock.Apple, Seeder.Stock.Amazon, Seeder.Stock.Microsoft, Seeder.Stock.Tesla);
 
         await context.SaveChangesAsync();
     }
