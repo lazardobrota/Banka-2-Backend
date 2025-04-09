@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bank.UserService.Repositories;
 
+//TODO: Move to Exchange Service Project
+
 public interface IOrderRepository
 {
     Task<Page<Order>> FindAll(OrderFilterQuery orderFilterQuery, Pageable pageable); // filter
@@ -61,8 +63,8 @@ public class OrderRepository(ApplicationContext context, IAuthorizationService a
     public async Task<Order> Update(Order order)
     {
         await m_Context.Orders.Where(dbOrder => dbOrder.Id == order.Id)
-                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbOrder => dbOrder.Status, order.Status) 
-                                                      .SetProperty(dbOrder => dbOrder.ModifiedAt, order.ModifiedAt));
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbOrder => dbOrder.Status, order.Status)
+                                                             .SetProperty(dbOrder => dbOrder.ModifiedAt, order.ModifiedAt));
 
         return order;
     }

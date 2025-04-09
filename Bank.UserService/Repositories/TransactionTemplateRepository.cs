@@ -1,9 +1,12 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 using Bank.UserService.Services;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -25,7 +28,7 @@ public class TransactionTemplateRepository(ApplicationContext context, IAuthoriz
 
     public async Task<Page<TransactionTemplate>> FindAll(Pageable pageable)
     {
-        var transactionTemplateQuery = m_Context.TransactionTemplates.Include(template => template.Client)
+        var transactionTemplateQuery = m_Context.TransactionTemplates.IncludeAll()
                                                 .AsQueryable();
 
         transactionTemplateQuery = transactionTemplateQuery.Where(template => template.ClientId == m_AuthorizationService.UserId);
@@ -41,7 +44,7 @@ public class TransactionTemplateRepository(ApplicationContext context, IAuthoriz
 
     public async Task<TransactionTemplate?> FindById(Guid id)
     {
-        return await m_Context.TransactionTemplates.Include(template => template.Client)
+        return await m_Context.TransactionTemplates.IncludeAll()
                               .FirstOrDefaultAsync(transactionTemplate => transactionTemplate.Id == id);
     }
 
@@ -75,5 +78,40 @@ public class TransactionTemplateRepository(ApplicationContext context, IAuthoriz
                                                                      .SetProperty(dbTransactionTemplate => dbTransactionTemplate.ModifiedAt, transactionTemplate.ModifiedAt));
 
         return transactionTemplate;
+    }
+}
+
+public static partial class RepositoryExtensions
+{
+    public static IIncludableQueryable<TransactionTemplate, object?> IncludeAll(this DbSet<TransactionTemplate> set)
+    {
+        return set.Include(transactionTemplate => transactionTemplate.Client)
+                  .ThenIncludeAll(transactionTemplate => transactionTemplate.Client, nameof(User.TransactionTemplates));
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, TransactionTemplate?> value,
+                                                                                 Expression<Func<TEntity, TransactionTemplate?>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(TransactionTemplate.Client)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transactionTemplate => transactionTemplate!.Client);
+
+        return query;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<TransactionTemplate>> value,
+                                                                                 Expression<Func<TEntity, List<TransactionTemplate>>> navigationExpression,
+                                                                                 params string[] excludeProperties) where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(TransactionTemplate.Client)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(transactionTemplate => transactionTemplate.Client);
+
+        return query;
     }
 }

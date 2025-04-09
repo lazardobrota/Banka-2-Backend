@@ -1,8 +1,11 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.UserService.Database;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 using BankModel = Bank.UserService.Models.Bank;
 
@@ -41,6 +44,28 @@ public class BankRepository(ApplicationContext context) : IBankRepository
     public async Task<BankModel?> FindById(Guid id)
     {
         return await m_Context.Banks.FirstOrDefaultAsync(bank => bank.Id == id);
+    }
+}
 
+public static partial class RepositoryExtensions
+{
+    [Obsolete("This method does not have implementation.", true)]
+    public static IIncludableQueryable<BankModel, object?> IncludeAll(this DbSet<BankModel> set)
+    {
+        return set.Include(bank => bank);
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, BankModel?> query,
+                                                                                 Expression<Func<TEntity, BankModel?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return query;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<BankModel>> query,
+                                                                                 Expression<Func<TEntity, List<BankModel>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return query;
     }
 }

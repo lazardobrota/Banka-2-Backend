@@ -1,8 +1,11 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -33,5 +36,28 @@ public class TransactionCodeRepository(ApplicationContext context) : ITransactio
     public async Task<TransactionCode?> FindById(Guid id)
     {
         return await m_Context.TransactionCodes.FirstOrDefaultAsync(transactionCode => transactionCode.Id == id);
+    }
+}
+
+public static partial class RepositoryExtensions
+{
+    [Obsolete("This method does not have implementation.", true)]
+    public static IIncludableQueryable<TransactionCode, object?> IncludeAll(this DbSet<TransactionCode> set)
+    {
+        return set.Include(transactionCode => transactionCode);
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, TransactionCode?> value,
+                                                                                 Expression<Func<TEntity, TransactionCode?>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<TransactionCode>> value,
+                                                                                 Expression<Func<TEntity, List<TransactionCode>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
     }
 }
