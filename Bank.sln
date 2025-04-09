@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.ExchangeService.Test",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Database", "Bank.Database\Bank.Database.csproj", "{32BB9DC7-8BCF-4737-9F37-E5AF97236E54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.OpenApi", "Bank.OpenApi\Bank.OpenApi.csproj", "{2F6ECF99-3E2B-4EC2-8E0A-9DC7FB768768}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{32BB9DC7-8BCF-4737-9F37-E5AF97236E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32BB9DC7-8BCF-4737-9F37-E5AF97236E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32BB9DC7-8BCF-4737-9F37-E5AF97236E54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F6ECF99-3E2B-4EC2-8E0A-9DC7FB768768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F6ECF99-3E2B-4EC2-8E0A-9DC7FB768768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F6ECF99-3E2B-4EC2-8E0A-9DC7FB768768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F6ECF99-3E2B-4EC2-8E0A-9DC7FB768768}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C328B3D2-9265-42A4-81F5-CF9D941F8234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
