@@ -6,16 +6,16 @@ namespace Bank.UserService.Mappers;
 
 public static class InstallmentMapper
 {
-    public static Installment ToInstallment(this InstallmentRequest request)
+    public static Installment ToInstallment(this InstallmentCreateRequest createRequest)
     {
         return new Installment
                {
                    Id              = Guid.NewGuid(),
-                   LoanId          = request.LoanId,
-                   InterestRate    = request.InterestRate,
-                   ExpectedDueDate = DateTime.SpecifyKind(request.ExpectedDueDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc),
-                   ActualDueDate   = DateTime.SpecifyKind(request.ActualDueDate.ToDateTime(TimeOnly.MinValue),   DateTimeKind.Utc),
-                   Status          = request.Status,
+                   LoanId          = createRequest.LoanId,
+                   InterestRate    = createRequest.InterestRate,
+                   ExpectedDueDate = DateTime.SpecifyKind(createRequest.ExpectedDueDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc),
+                   ActualDueDate   = DateTime.SpecifyKind(createRequest.ActualDueDate.ToDateTime(TimeOnly.MinValue),   DateTimeKind.Utc),
+                   Status          = createRequest.Status,
                    CreatedAt       = DateTime.UtcNow,
                    ModifiedAt      = DateTime.UtcNow
                };
@@ -36,20 +36,12 @@ public static class InstallmentMapper
                };
     }
 
-    public static Installment ToEntity(this InstallmentUpdateRequest request, Installment oldInstallment)
+    public static Installment Update(this Installment installment, InstallmentUpdateRequest updateRequest)
     {
-        var updatedInstallment = new Installment
-                                 {
-                                     Id            = oldInstallment.Id,
-                                     LoanId        = oldInstallment.LoanId,
-                                     Loan          = oldInstallment.Loan,
-                                     ActualDueDate = request.ActualDueDate ?? oldInstallment.ActualDueDate,
-                                     InterestRate  = oldInstallment.InterestRate,
-                                     Status        = request.Status ?? oldInstallment.Status,
-                                     CreatedAt     = oldInstallment.CreatedAt,
-                                     ModifiedAt    = DateTime.UtcNow
-                                 };
+        installment.ActualDueDate = updateRequest.ActualDueDate ?? installment.ActualDueDate;
+        installment.Status        = updateRequest.Status        ?? installment.Status;
+        installment.ModifiedAt    = DateTime.UtcNow;
 
-        return updatedInstallment;
+        return installment;
     }
 }

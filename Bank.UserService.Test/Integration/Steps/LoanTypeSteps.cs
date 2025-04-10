@@ -27,7 +27,7 @@ public class LoanTypeSteps(ScenarioContext scenarioContext, ILoanTypeService loa
     [When(@"loan type is created in the database")]
     public async Task WhenLoanTypeIsCreatedInTheDatabase()
     {
-        var loanTypeCreateRequest = m_ScenarioContext.Get<LoanTypeRequest>(Constant.LoanTypeCreateRequest);
+        var loanTypeCreateRequest = m_ScenarioContext.Get<LoanTypeCreateRequest>(Constant.LoanTypeCreateRequest);
 
         var loanType = await m_LoanTypeService.Create(loanTypeCreateRequest);
 

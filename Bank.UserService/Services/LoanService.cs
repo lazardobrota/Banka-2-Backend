@@ -17,7 +17,7 @@ public interface ILoanService
 
     Task<Result<LoanResponse>> GetOne(Guid id);
 
-    Task<Result<LoanResponse>> Create(LoanRequest loanRequest);
+    Task<Result<LoanResponse>> Create(LoanCreateRequest loanCreateRequest);
 
     Task<Result<LoanResponse>> Update(LoanUpdateRequest loanRequest, Guid id);
 
@@ -54,7 +54,7 @@ public class LoanService(
             if (currencyForLoan == null)
                 return Result.NotFound<Page<LoanResponse>>($"No Currency for Loan found with Id: {loan.CurrencyId}");
 
-            var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, currencyForLoan);
+            var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, currencyForLoan);
             var nominalRate = m_LoanHostedService.GetBaseInterestRate(amountInRsd);
 
             if (loan.InterestType == InterestType.Variable)
@@ -92,7 +92,7 @@ public class LoanService(
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
         var response    = loan.ToLoanResponse();
-        var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+        var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, loan.Currency);
         var nominalRate = m_LoanHostedService.GetBaseInterestRate(amountInRsd);
 
         if (loan.InterestType == InterestType.Variable)
@@ -104,16 +104,16 @@ public class LoanService(
         return Result.Ok(response);
     }
 
-    public async Task<Result<LoanResponse>> Create(LoanRequest loanRequest)
+    public async Task<Result<LoanResponse>> Create(LoanCreateRequest loanCreateRequest)
     {
-        var loanType = await m_LoanTypeRepository.FindById(loanRequest.TypeId);
-        var account  = await m_AccountRepository.FindById(loanRequest.AccountId);
-        var currency = await m_CurrencyRepository.FindById(loanRequest.CurrencyId);
+        var loanType = await m_LoanTypeRepository.FindById(loanCreateRequest.TypeId);
+        var account  = await m_AccountRepository.FindById(loanCreateRequest.AccountId);
+        var currency = await m_CurrencyRepository.FindById(loanCreateRequest.CurrencyId);
 
         if (loanType == null || account == null || currency == null)
             return Result.BadRequest<LoanResponse>("Invalid data. Loan type, account, or currency not found.");
 
-        var loan = loanRequest.ToLoan();
+        var loan = loanCreateRequest.ToLoan();
         loan = await m_LoanRepository.Add(loan);
 
         return Result.Ok(loan.ToLoanResponse());
@@ -121,18 +121,17 @@ public class LoanService(
 
     public async Task<Result<LoanResponse>> Update(LoanUpdateRequest loanRequest, Guid id)
     {
-        var oldLoan = await m_LoanRepository.FindById(id);
+        var dbLoan = await m_LoanRepository.FindById(id);
 
-        if (oldLoan is null)
+        if (dbLoan is null)
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
-        var updatedLoan = loanRequest.ToLoan(oldLoan);
-        var loan        = await m_LoanRepository.Update(oldLoan, updatedLoan);
-        var amountInRsd = await m_LoanHostedService.ConvertToRSD(loan.Amount, loan.Currency);
+        var loan        = await m_LoanRepository.Update(dbLoan.Update(loanRequest));
+        var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, loan.Currency);
 
         if (loan.Status == LoanStatus.Active)
         {
-            var installment = new InstallmentRequest
+            var installment = new InstallmentCreateRequest
                               {
                                   InstallmentId   = Guid.NewGuid(),
                                   LoanId          = loan.Id,

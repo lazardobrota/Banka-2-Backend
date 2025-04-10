@@ -70,7 +70,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     {
         var cardId = m_ScenarioContext.Get<Guid>(Constant.CardId);
 
-        var statusUpdateRequest = m_ScenarioContext.Get<CardStatusUpdateRequest>(Constant.StatusUpdateRequest);
+        var statusUpdateRequest = m_ScenarioContext.Get<CardUpdateStatusRequest>(Constant.StatusUpdateRequest);
 
         var updateCardResult = await m_CardService.Update(statusUpdateRequest, cardId);
 
@@ -99,7 +99,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     {
         var cardId = m_ScenarioContext.Get<Guid>(Constant.CardId);
 
-        var limitUpdateRequest = m_ScenarioContext.Get<CardLimitUpdateRequest>(Constant.LimitUpdateRequest);
+        var limitUpdateRequest = m_ScenarioContext.Get<CardUpdateLimitRequest>(Constant.LimitUpdateRequest);
 
         var updateCardResult = await m_CardService.Update(limitUpdateRequest, cardId);
 

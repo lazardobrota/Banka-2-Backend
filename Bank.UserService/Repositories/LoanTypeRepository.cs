@@ -17,7 +17,7 @@ public interface ILoanTypeRepository
 
     Task<LoanType> Add(LoanType loanType);
 
-    Task<LoanType> Update(LoanType oldLoanType, LoanType loanType);
+    Task<LoanType> Update(LoanType loanType);
 }
 
 public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepository
@@ -49,16 +49,14 @@ public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepositor
         return loanType;
     }
 
-    public async Task<LoanType> Update(LoanType oldLoanType, LoanType loanType)
+    public async Task<LoanType> Update(LoanType loanType)
     {
-        m_Context.Entry(oldLoanType)
-                 .State = EntityState.Detached;
+        await m_Context.LoanTypes.Where(dbLoanType => dbLoanType.Id == loanType.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbLoanType => dbLoanType.Name, loanType.Name)
+                                                             .SetProperty(dbLoanType => dbLoanType.Margin,     loanType.Margin)
+                                                             .SetProperty(dbLoanType => dbLoanType.ModifiedAt, loanType.ModifiedAt));
 
-        var updatedLoanType = m_Context.LoanTypes.Update(loanType);
-
-        await m_Context.SaveChangesAsync();
-
-        return updatedLoanType.Entity;
+        return loanType;
     }
 }
 

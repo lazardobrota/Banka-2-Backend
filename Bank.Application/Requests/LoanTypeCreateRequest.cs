@@ -1,6 +1,6 @@
 ﻿namespace Bank.Application.Requests;
 
-public class LoanTypeRequest
+public class LoanTypeCreateRequest
 {
     public required string  Name   { get; set; }
     public required decimal Margin { get; set; }

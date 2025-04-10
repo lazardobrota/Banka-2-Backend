@@ -44,7 +44,7 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
 
         builder.Property(transaction => transaction.CodeId)
                .IsRequired();
-        
+
         builder.Property(transaction => transaction.Status)
                .IsRequired();
 

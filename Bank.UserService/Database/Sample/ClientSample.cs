@@ -11,12 +11,13 @@ public static partial class Sample
                                                                    {
                                                                        FirstName                  = "Aleksandar",
                                                                        LastName                   = "Ivanović",
-                                                                       DateOfBirth                = new(1995, 7, 12),
+                                                                       DateOfBirth                = new DateOnly(1995, 7, 12),
                                                                        Gender                     = Gender.Male,
                                                                        UniqueIdentificationNumber = "1207995710029",
                                                                        Email                      = "aleksandar.ivanovic@gmail.com",
                                                                        PhoneNumber                = "+381698812321",
                                                                        Address                    = "Kralja Petra 12",
+                                                                       Permissions                = 1 << 3
                                                                    };
 
         public static readonly ClientUpdateRequest UpdateRequest = new()
