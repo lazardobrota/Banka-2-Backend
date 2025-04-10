@@ -52,8 +52,6 @@ public static class CardMapper
                    Number     = cardNumber,
                    CVV        = cvv,
                    ExpiresAt  = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(1)),
-                   Account    = account,
-                   Type       = type,
                    AccountId  = account.Id
                };
     }
