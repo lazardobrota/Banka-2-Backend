@@ -58,14 +58,14 @@ public static class StockSeederExtension
 {
     public static async Task SeedStock(this DatabaseContext context, HttpClient httpClient)
     {
+        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
+            return;
+        
         var stopwatch = new Stopwatch();
 
         stopwatch.Start();
 
-        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
-            return;
-
-        var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
+        var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
         var request = new HttpRequestMessage
                       {
                           Method     = HttpMethod.Get,

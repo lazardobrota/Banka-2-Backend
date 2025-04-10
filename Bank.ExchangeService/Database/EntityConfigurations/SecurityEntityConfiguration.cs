@@ -22,7 +22,7 @@ public class SecurityEntityConfiguration : IEntityTypeConfiguration<Security>
 
         builder.Property(security => security.Ticker)
                .IsRequired()
-               .HasMaxLength(19);
+               .HasMaxLength(32);
 
         builder.Property(security => security.ContractSize)
                .IsRequired();

@@ -61,7 +61,7 @@ public static partial class Seeder
 
 public static class FutureContractSeederExtension
 {
-    public static async Task SeedFutureContract(this DatabaseContext context)
+    public static async Task SeedFutureContractHardcoded(this DatabaseContext context)
     {
         if (context.Securities.Any(security => security.SecurityType == SecurityType.FutureContract))
             return;

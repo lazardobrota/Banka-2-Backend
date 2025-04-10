@@ -1,10 +1,13 @@
 ﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Web;
 
 using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
+using Bank.ExchangeService.Repositories;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -76,74 +79,198 @@ public static partial class Seeder
 
 public static class OptionSeederExtension
 {
-    // public static async Task SeedOption(this DatabaseContext context)
-    // {
-    //     if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
-    //         return;
-    //
-    //     await context.Securities.AddRangeAsync(Seeder.Option.AmazonPutOption, Seeder.Option.AppleCallOption, Seeder.Option.MicrosoftCallOption, Seeder.Option.TeslaPutOption);
-    //
-    //     await context.SaveChangesAsync();
-    // }
+    private static readonly HashSet<string> s_StockOptions =
+    [
+        "AAPL", "MSFT", "AMZN", "GOOGL", "META", "TSLA", "BRK.B", "NVDA", "JPM", "JNJ",
+        "V", "PG", "UNH", "HD", "DIS", "PYPL", "MA", "INTC", "VZ", "NFLX",
+        "ADBE", "CMCSA", "PFE", "KO", "MRK", "PEP", "T", "XOM", "CSCO", "ABT",
+        "ABBV", "CRM", "NKE", "WMT", "MCD", "IBM", "QCOM", "ORCL", "CVX", "MDT",
+        "BA", "HON", "COST", "AMGN", "TMO", "DHR", "LIN", "AVGO", "ACN", "PM",
+        "TXN", "UNP", "LOW", "NEE", "UPS", "MS", "CAT", "LMT", "ISRG", "SPGI",
+        "NOW", "BLK", "AMD", "DE", "SYK", "GS", "PLD", "BKNG", "ADP", "CCI",
+        "ZTS", "SCHW", "CB", "TGT", "CME", "USB", "AMT", "FIS", "MO", "MDLZ",
+        "GILD", "VRTX", "REGN", "TFC", "CI", "EQIX", "SO", "HUM", "ITW", "WM",
+        "D", "APD", "SBUX", "EL", "CL", "NSC", "MMC", "EMR", "ADI", "ETN"
+    ];
 
-    public static async Task SeedOptions(this DatabaseContext context, HttpClient httpClient)
+    public static async Task SeedOptionHardcoded(this DatabaseContext context)
     {
-        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
+        if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
             return;
 
-        var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
-
-        var request = new HttpRequestMessage
-                      {
-                          Method     = HttpMethod.Get,
-                          RequestUri = new Uri($"{Configuration.Security.Stock.GetAllApi}?status=active&asset_class=us_equity&attributes="),
-                          Headers =
-                          {
-                              { "accept", "application/json" },
-                              { "APCA-API-KEY-ID", apiKey },
-                              { "APCA-API-SECRET-KEY", apiSecret },
-                          },
-                      };
-
-        using var response = await httpClient.SendAsync(request);
-
-        if (!response.IsSuccessStatusCode)
-            return;
-
-        var body = await response.Content.ReadFromJsonAsync<List<FetchStockResponse>>();
-
-        if (body is null)
-            throw new Exception("List of stocks can't be null");
-
-        Console.WriteLine(body);
-
-        var stockExchanges = await context.StockExchanges.ToListAsync();
-
-        var stocks = body.Select(stockResponse =>
-                                 {
-                                     var exchange = stockExchanges.Find(exchange => exchange.Acronym == stockResponse.StockExchangeAcronym);
-
-                                     return exchange != null && stockResponse.Tradable
-                                            ? stockResponse.ToStock(exchange.Id)
-                                                           .ToSecurity()
-                                            : null;
-                                 })
-                         .Where(security => security != null)
-                         .Select(security => security!)
-                         .ToList();
-
-        await context.Securities.AddRangeAsync(stocks);
+        await context.Securities.AddRangeAsync(Seeder.Option.AmazonPutOption, Seeder.Option.AppleCallOption, Seeder.Option.MicrosoftCallOption, Seeder.Option.TeslaPutOption);
 
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedStockHardcoded(this DatabaseContext context)
+    public static async Task SeedOptionsLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
-        if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
+        var options = (await securityRepository.FindAll(SecurityType.Option)).Select(security => security.ToOption())
+                                                                             .ToList();
+
+        const int readAmount = 100;
+        string?   nextPage   = null;
+        var       quotes     = new List<Quote>();
+        var       query      = HttpUtility.ParseQueryString(string.Empty);
+        query["feed"]  = "indicative";
+        query["limit"] = "1000";
+
+        for (int i = 1; i * readAmount < options.Count + readAmount; i++)
+        {
+            var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
+
+            var currOptionsDictionary = options.Skip((i - 1) * readAmount)
+                                               .Take(readAmount)
+                                               .ToDictionary(option => option.Ticker, option => option);
+
+            var symbols = string.Join(",", currOptionsDictionary.Values.Select(option => option.Ticker)
+                                                                .ToList());
+
+            query["symbols"] = symbols;
+
+            do
+            {
+                if (!string.IsNullOrEmpty(nextPage))
+                    query["page_token"] = nextPage;
+                else
+                    query.Remove("page_token");
+
+                var request = new HttpRequestMessage
+                              {
+                                  Method     = HttpMethod.Get,
+                                  RequestUri = new Uri($"{Configuration.Security.Option.OptionChainApi}?{query}"),
+                                  Headers =
+                                  {
+                                      { "accept", "application/json" },
+                                      { "APCA-API-KEY-ID", apiKey },
+                                      { "APCA-API-SECRET-KEY", apiSecret },
+                                  },
+                              };
+
+                using var response = await httpClient.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Failed to fetch options chain: {response.StatusCode}");
+                    continue;
+                }
+
+                var body = await response.Content.ReadFromJsonAsync<FetchOptionsResponse>();
+
+                if (body == null)
+                {
+                    Console.WriteLine("No options data received or invalid format");
+                    continue;
+                }
+
+                quotes.AddRange(body.Snapshots.Where(pair => pair.Value is { DailyBar: not null, LatestQuote: not null })
+                                    .Select(pair => pair.Value.ToQuote(currOptionsDictionary[pair.Key].Id))
+                                    .ToList());
+
+                nextPage = body.NextPage;
+            } while (!string.IsNullOrEmpty(nextPage));
+        }
+
+        Console.WriteLine("Please wait for latest options to seed...");
+        await quoteRepository.CreateQuotes(quotes);
+
+        Console.WriteLine("Completed");
+    }
+
+    public static async Task SeedOptions(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
+    {
+        if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
             return;
 
-        await context.Securities.AddRangeAsync(Seeder.Stock.Apple, Seeder.Stock.Amazon, Seeder.Stock.Microsoft, Seeder.Stock.Tesla);
+        var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
 
-        await context.SaveChangesAsync();
+        var stocks = (await securityRepository.FindAll(SecurityType.Stock)).Where(stock => s_StockOptions.Contains(stock.Ticker))
+                                                                           .Select(security => security.ToStock())
+                                                                           .ToList();
+
+        string? nextPage   = null;
+        var     securities = new List<SecurityModel>();
+        var     quotes     = new List<Quote>();
+        var     query      = HttpUtility.ParseQueryString(string.Empty);
+        query["feed"]  = "indicative";
+        query["limit"] = "1000";
+
+        foreach (var stock in stocks)
+        {
+            do
+            {
+                if (!string.IsNullOrEmpty(nextPage))
+                    query["page_token"] = nextPage;
+                else
+                    query.Remove("page_token");
+
+                var request = new HttpRequestMessage
+                              {
+                                  Method     = HttpMethod.Get,
+                                  RequestUri = new Uri($"{Configuration.Security.Option.OptionChainApi}/{stock.Ticker}?{query}"),
+                                  Headers =
+                                  {
+                                      { "accept", "application/json" },
+                                      { "APCA-API-KEY-ID", apiKey },
+                                      { "APCA-API-SECRET-KEY", apiSecret },
+                                  },
+                              };
+
+                using var response = await httpClient.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"Failed to fetch options chain: {response.StatusCode}");
+                    return;
+                }
+
+                var body = await response.Content.ReadFromJsonAsync<FetchOptionsResponse>();
+
+                if (body == null)
+                {
+                    Console.WriteLine("No options data received or invalid format");
+                    return;
+                }
+
+                foreach (var pair in body.Snapshots)
+                {
+                    if (pair.Value.DailyBar == null || pair.Value.LatestQuote == null)
+                        continue;
+
+                    var (expirationDate, strikePrice, optionType) = ParseOptionTracker(pair.Key);
+
+                    var security = pair.Value.ToOption(stock, pair.Key, expirationDate, strikePrice, optionType)
+                                       .ToSecurity();
+
+                    securities.Add(security);
+                    quotes.Add(pair.Value.ToQuote(security.Id));
+                }
+
+                nextPage = body.NextPage;
+            } while (!string.IsNullOrEmpty(nextPage));
+        }
+
+        Console.WriteLine("Please wait for options to seed...");
+        await securityRepository.CreateSecurities(securities);
+        await quoteRepository.CreateQuotes(quotes);
+
+        Console.WriteLine("Completed");
+    }
+
+    private static (DateOnly ExpirationDate, decimal StrikePrice, OptionType OptionType) ParseOptionTracker(string optionTracker)
+    {
+        var withoutStockTracker = optionTracker[optionTracker.IndexOfAny("0123456789".ToCharArray())..];
+
+        var year           = int.Parse(withoutStockTracker[..2]) + 2000;
+        var month          = int.Parse(withoutStockTracker.Substring(2, 2));
+        var day            = int.Parse(withoutStockTracker.Substring(4, 2));
+        var expirationDate = new DateOnly(year, month, day);
+
+        var optionType = withoutStockTracker[6] == 'C' ? OptionType.Call : OptionType.Put;
+
+        var strikePriceStr = withoutStockTracker[7..];
+        var strikePrice    = decimal.Parse(strikePriceStr) / 1000m; // Convert 00143000 to 143.000
+
+        return (expirationDate, strikePrice, optionType);
     }
 }

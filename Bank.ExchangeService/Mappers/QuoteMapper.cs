@@ -63,4 +63,19 @@ public static class QuoteMapper
                    ModifiedAt = fetchForexPairLatest.Date.ToUniversalTime()
                };
     }
+
+    public static Quote ToQuote(this FetchOptionOneResponse optionResponse, Guid optionId)
+    {
+        return new Quote
+               {
+                   Id         = Guid.NewGuid(),
+                   SecurityId = optionId,
+                   Price      = optionResponse.LatestQuote!.AskPrice,
+                   HighPrice  = optionResponse.DailyBar!.HighPrice,
+                   LowPrice   = optionResponse.DailyBar!.LowPrice,
+                   Volume     = optionResponse.DailyBar!.Volume,
+                   CreatedAt  = optionResponse.DailyBar!.TimeStamp,
+                   ModifiedAt = optionResponse.DailyBar!.TimeStamp
+               };
+    }
 }

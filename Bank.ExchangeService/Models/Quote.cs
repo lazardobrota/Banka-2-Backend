@@ -2,6 +2,7 @@
 
 public class Quote
 {
+    //TODO add impliedVolatility
     public required Guid      Id         { get; set; }
     public required Guid      SecurityId { get; set; }
     public          Security? Security   { get; set; }

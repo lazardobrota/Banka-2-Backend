@@ -1,4 +1,5 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Domain;
+using Bank.Application.Responses;
 using Bank.ExchangeService.Models;
 
 namespace Bank.ExchangeService.Mappers;
@@ -52,6 +53,22 @@ public static class OptionMapper
                    ModifiedAt                   = option.ModifiedAt,
                    PriceChangeInInterval        = option.PriceChange,
                    PriceChangePercentInInterval = option.PriceChangePercent,
+               };
+    }
+
+    public static Option ToOption(this FetchOptionOneResponse optionResponse, Stock stock, string optionTicker, DateOnly settlementDate, decimal strikePrice, OptionType optionType)
+    {
+        return new Option
+               {
+                   Id                = Guid.NewGuid(),
+                   OptionType        = optionType,
+                   StrikePrice       = strikePrice,
+                   ImpliedVolatility = optionResponse.ImpliedVolatility,
+                   OpenInterest      = 0, //TODO Remove
+                   SettlementDate    = settlementDate,
+                   Name              = stock.Name,
+                   Ticker            = optionTicker,
+                   StockExchangeId   = stock.StockExchangeId
                };
     }
 }

@@ -108,7 +108,7 @@ public static class ForexPairSeederExtension
             return;
         }
 
-        var apiKey     = Configuration.Security.ForexPair.ApiKeyForex;
+        var apiKey     = Configuration.Security.Keys.ApiKeyForex;
         var securities = new List<SecurityModel>();
 
         foreach (var currencyFrom in currencies)
@@ -187,7 +187,7 @@ public static class ForexPairSeederExtension
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
 
-        var apiKey = Configuration.Security.ForexPair.ApiKeyForex;
+        var apiKey = Configuration.Security.Keys.ApiKeyForex;
         var quotes = new List<Quote>();
 
         foreach (var currencyFrom in currencies)
@@ -222,8 +222,6 @@ public static class ForexPairSeederExtension
 
                 if (!parsed.RootElement.TryGetProperty("Realtime Currency Exchange Rate", out var forexPairElement))
                     continue;
-                
-                // Console.WriteLine("PASSED");
 
                 var body = JsonSerializer.Deserialize<FetchForexPairLatestResponse>(forexPairElement.GetRawText());
 
@@ -259,7 +257,7 @@ public static class ForexPairSeederExtension
             return;
         }
 
-        var apiKey = Configuration.Security.ForexPair.ApiKeyForex;
+        var apiKey = Configuration.Security.Keys.ApiKeyForex;
         var quotes = new List<Quote>();
 
         foreach (var currencyFrom in currencies)

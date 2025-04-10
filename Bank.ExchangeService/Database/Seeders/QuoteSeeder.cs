@@ -254,7 +254,7 @@ public static class QuoteSeederExtension
 
         var quotes = new List<QuoteModel>();
 
-        var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
+        var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
         var request = new HttpRequestMessage
                       {
                           Method     = HttpMethod.Get,
@@ -315,7 +315,7 @@ public static class QuoteSeederExtension
             else
                 query.Remove("page_token");
 
-            var (apiKey, apiSecret) = Configuration.Security.Stock.ApiKeyAndSecret;
+            var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
             var request = new HttpRequestMessage
                           {
                               Method     = HttpMethod.Get,
