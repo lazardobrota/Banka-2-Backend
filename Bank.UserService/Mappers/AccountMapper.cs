@@ -45,31 +45,26 @@ public static class AccountMapper
                };
     }
 
-    public static Account ToAccount(this AccountCreateRequest accountCreateRequest, User employee, User client, Currency currency, AccountType accountType)
+    public static Account ToAccount(this AccountCreateRequest accountCreateRequest, Guid employeeId)
     {
         var account = new Account
                       {
-                          Id                = Guid.NewGuid(),
-                          EmployeeId        = employee.Id,
-                          Employee          = employee,
-                          CurrencyId        = currency.Id,
-                          Currency          = currency,
-                          Balance           = accountCreateRequest.Balance,
-                          AvailableBalance  = accountCreateRequest.Balance,
-                          DailyLimit        = accountCreateRequest.DailyLimit,
-                          MonthlyLimit      = accountCreateRequest.MonthlyLimit,
-                          CreatedAt         = DateTime.UtcNow,
-                          ModifiedAt        = DateTime.UtcNow,
-                          Client            = client,
-                          ClientId          = client.Id,
-                          Name              = accountCreateRequest.Name,
-                          Number            = GenerateAccountNumber(),
-                          Type              = accountType,
-                          AccountTypeId     = accountType.Id,
-                          AccountCurrencies = [],
-                          CreationDate      = DateOnly.FromDateTime(DateTime.UtcNow),
-                          ExpirationDate    = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(5)),
-                          Status            = accountCreateRequest.Status
+                          Id               = Guid.NewGuid(),
+                          EmployeeId       = employeeId,
+                          CurrencyId       = accountCreateRequest.CurrencyId,
+                          Balance          = accountCreateRequest.Balance,
+                          AvailableBalance = accountCreateRequest.Balance,
+                          DailyLimit       = accountCreateRequest.DailyLimit,
+                          MonthlyLimit     = accountCreateRequest.MonthlyLimit,
+                          CreatedAt        = DateTime.UtcNow,
+                          ModifiedAt       = DateTime.UtcNow,
+                          ClientId         = accountCreateRequest.ClientId,
+                          Name             = accountCreateRequest.Name,
+                          Number           = GenerateAccountNumber(),
+                          AccountTypeId    = accountCreateRequest.AccountTypeId,
+                          CreationDate     = DateOnly.FromDateTime(DateTime.UtcNow),
+                          ExpirationDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(5)),
+                          Status           = accountCreateRequest.Status
                       };
 
         return account;
@@ -81,7 +76,7 @@ public static class AccountMapper
         account.Name         = accountUpdate.Name;
         account.DailyLimit   = accountUpdate.DailyLimit;
         account.MonthlyLimit = accountUpdate.MonthlyLimit;
-        
+
         return account;
     }
 

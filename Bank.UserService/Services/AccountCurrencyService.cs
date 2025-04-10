@@ -61,7 +61,7 @@ public class AccountCurrencyService(
         if (account == null || currency == null || employee == null)
             return Result.BadRequest<AccountCurrencyResponse>("Invalid data.");
 
-        var accountCurrency = await m_AccountCurrencyRepository.Add(accountCurrencyCreateRequest.ToAccountCurrency(employee, currency, account));
+        var accountCurrency = await m_AccountCurrencyRepository.Add(accountCurrencyCreateRequest.ToAccountCurrency());
 
         return Result.Ok(accountCurrency.ToResponse());
     }

@@ -28,9 +28,9 @@ public static class CardMapper
                    ModifiedAt = card.ModifiedAt,
                    CVV        = card.CVV,
                    Status     = card.Status,
-                   Type       = card.Type.ToResponse(),
+                   Type       = card.Type!.ToResponse(),
                    ExpiresAt  = card.ExpiresAt,
-                   Account    = card.Account.ToResponse(),
+                   Account    = card.Account!.ToResponse(),
                    Limit      = card.Limit,
                    Number     = card.Number
                };

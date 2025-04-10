@@ -20,7 +20,7 @@ public static class CompanyMapper
                };
     }
 
-    public static Company ToCompany(this CompanyCreateRequest companyCreateRequest, User majorityOwner)
+    public static Company ToCompany(this CompanyCreateRequest companyCreateRequest)
     {
         return new Company
                {
@@ -31,17 +31,15 @@ public static class CompanyMapper
                    ActivityCode            = companyCreateRequest.ActivityCode,
                    Address                 = companyCreateRequest.Address,
                    MajorityOwnerId         = companyCreateRequest.MajorityOwnerId,
-                   MajorityOwner           = majorityOwner,
                };
     }
 
-    public static Company Update(this Company company, CompanyUpdateRequest updateRequest, User majorityOwner)
+    public static Company Update(this Company company, CompanyUpdateRequest updateRequest)
     {
         company.Name            = updateRequest.Name;
         company.ActivityCode    = updateRequest.ActivityCode;
         company.Address         = updateRequest.Address;
         company.MajorityOwnerId = updateRequest.MajorityOwnerId;
-        company.MajorityOwner   = majorityOwner;
 
         return company;
     }
