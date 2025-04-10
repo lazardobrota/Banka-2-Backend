@@ -1,4 +1,5 @@
-﻿using Bank.Application.Requests;
+﻿using Bank.Application.Domain;
+using Bank.Application.Requests;
 using Bank.UserService.Database.Sample;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
@@ -35,7 +36,8 @@ public static partial class Example
                                                                CreatedAt                  = Seeder.Employee.Employee01.CreatedAt,
                                                                ModifiedAt                 = Seeder.Employee.Employee01.ModifiedAt,
                                                                Employed                   = Seeder.Employee.Employee01.Employed,
-                                                               Activated                  = Seeder.Employee.Employee01.Activated
+                                                               Activated                  = Seeder.Employee.Employee01.Activated,
+                                                               Permissions                = (long)Permission.Employee
                                                            };
 
             public static readonly UserModel UpdateEmployee = new()
@@ -58,7 +60,8 @@ public static partial class Example
                                                                   CreatedAt                  = Seeder.Employee.Employee02.CreatedAt,
                                                                   ModifiedAt                 = Seeder.Employee.Employee02.ModifiedAt,
                                                                   Employed                   = Seeder.Employee.Employee02.Employed,
-                                                                  Activated                  = Seeder.Employee.Employee02.Activated
+                                                                  Activated                  = Seeder.Employee.Employee02.Activated,
+                                                                  Permissions                = (long)Permission.Employee
                                                               };
 
             public static readonly UserActivationRequest UserActivationRequest = Sample.User.ActivationRequest;

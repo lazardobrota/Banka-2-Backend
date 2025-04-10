@@ -53,7 +53,6 @@ public static class TransactionMapper
                    FromAmount      = transactionCreateRequest.Amount,
                    ToAmount        = 0,
                    CodeId          = transactionCreateRequest.CodeId,
-                   Code            = code,
                    ReferenceNumber = transactionCreateRequest.ReferenceNumber,
                    Purpose         = transactionCreateRequest.Purpose,
                    Status          = TransactionStatus.Pending,

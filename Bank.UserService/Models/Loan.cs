@@ -18,8 +18,8 @@ public class Loan
     public required DateTime     ModifiedAt   { get; set; }
 
     // Navigation properties
-    public LoanType?                 LoanType     { get;  set; }
-    public Account?                  Account      { get;  set; }
-    public Currency?                 Currency     { get;  set; }
-    public ICollection<Installment>? Installments { init; get; } = [];
+    public LoanType?         LoanType     { get;  set; }
+    public Account?          Account      { get;  set; }
+    public Currency?         Currency     { get;  set; }
+    public List<Installment> Installments { init; get; } = [];
 }
