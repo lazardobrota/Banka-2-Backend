@@ -81,6 +81,11 @@ public class AccountService(
 
         var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(m_AuthorizationService.UserId));
 
+        account.Type     = accountType;
+        account.Client   = client;
+        account.Currency = currency;
+        account.Employee = employee;
+        
         return Result.Ok(account.ToResponse());
     }
 
