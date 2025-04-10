@@ -1,8 +1,11 @@
-﻿using Bank.Application.Queries;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Queries;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -15,7 +18,7 @@ public interface IExchangeRepository
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId);
 
     public Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Currency firstCurrency, Currency secondCurrency);
-    
+
     public Task<Exchange> Add(Exchange exchange);
 
     public Task<Exchange> Update(Exchange exchange);
@@ -28,11 +31,10 @@ public class ExchangeRepository(ApplicationContext context, IDbContextFactory<Ap
     private readonly IDbContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
     private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
-    
+
     public async Task<List<Exchange>> FindAll(ExchangeFilterQuery exchangeFilterQuery)
     {
-        var exchangeQueue = m_Context.Exchanges.Include(exchange => exchange.CurrencyFrom)
-                                     .Include(exchange => exchange.CurrencyTo)
+        var exchangeQueue = m_Context.Exchanges.IncludeAll()
                                      .AsQueryable();
 
         if (!string.IsNullOrEmpty(exchangeFilterQuery.CurrencyCode))
@@ -88,24 +90,67 @@ public class ExchangeRepository(ApplicationContext context, IDbContextFactory<Ap
 
         return exchange;
     }
-    
+
     #region Static Repository Calls
-    
+
     private static async Task<Exchange?> FindById(Guid id, ApplicationContext context)
     {
-        return await context.Exchanges.Include(exchange => exchange.CurrencyFrom)
-                            .Include(exchange => exchange.CurrencyTo)
+        return await context.Exchanges.IncludeAll()
                             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     private static async Task<Exchange?> FindByCurrencyFromAndCurrencyTo(Guid firstCurrencyId, Guid secondCurrencyId, ApplicationContext context)
     {
-        return await context.Exchanges.Include(exchange => exchange.CurrencyFrom)
-                            .Include(exchange => exchange.CurrencyTo)
+        return await context.Exchanges.IncludeAll()
                             .OrderByDescending(exchange => exchange.CreatedAt)
                             .FirstOrDefaultAsync(exchange => (exchange.CurrencyFromId == firstCurrencyId  && exchange.CurrencyToId == secondCurrencyId) ||
                                                              (exchange.CurrencyFromId == secondCurrencyId && exchange.CurrencyToId == firstCurrencyId));
     }
-    
+
     #endregion
+}
+
+public static partial class RepositoryExtensions
+{
+    public static IIncludableQueryable<Exchange, object?> IncludeAll(this DbSet<Exchange> set)
+    {
+        return set.Include(exchange => exchange.CurrencyFrom)
+                  .ThenIncludeAll(exchange => exchange.CurrencyFrom)
+                  .Include(exchange => exchange.CurrencyTo)
+                  .ThenIncludeAll(exchange => exchange.CurrencyTo);
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Exchange?> value,
+                                                                                 Expression<Func<TEntity, Exchange?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Exchange.CurrencyFrom)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(exchange => exchange!.CurrencyFrom);
+
+        if (!excludeProperties.Contains(nameof(Exchange.CurrencyTo)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(exchange => exchange!.CurrencyTo);
+
+        return query;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Exchange>> value,
+                                                                                 Expression<Func<TEntity, List<Exchange>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Exchange.CurrencyFrom)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(exchange => exchange.CurrencyFrom);
+
+        if (!excludeProperties.Contains(nameof(Exchange.CurrencyTo)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(exchange => exchange.CurrencyTo);
+
+        return query;
+    }
 }

@@ -1,8 +1,11 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -36,7 +39,7 @@ public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepositor
 
     public async Task<LoanType?> FindById(Guid id)
     {
-        return await m_Context.LoanTypes.FindAsync(id);
+        return await m_Context.LoanTypes.FirstOrDefaultAsync(loanType => loanType.Id == id);
     }
 
     public async Task<LoanType> Add(LoanType loanType)
@@ -54,5 +57,28 @@ public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepositor
                                                              .SetProperty(dbLoanType => dbLoanType.ModifiedAt, loanType.ModifiedAt));
 
         return loanType;
+    }
+}
+
+public static partial class RepositoryExtensions
+{
+    [Obsolete("This method does not have implementation.", true)]
+    public static IIncludableQueryable<LoanType, object?> IncludeAll(this DbSet<LoanType> set)
+    {
+        return set.Include(loanType => loanType);
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, LoanType?> value,
+                                                                                 Expression<Func<TEntity, LoanType?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<LoanType>> value,
+                                                                                 Expression<Func<TEntity, List<LoanType>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
     }
 }

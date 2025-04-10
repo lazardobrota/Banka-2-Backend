@@ -1,9 +1,12 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -28,11 +31,7 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
 
     public async Task<Page<Loan>> FindAll(LoanFilterQuery filter, Pageable pageable)
     {
-        var query = m_Context.Loans.Include(l => l.LoanType)
-                             .Include(l => l.Account)
-                             .Include(l => l.Currency)
-                             .Include(l => l.Currency.Countries)
-                             .Include(l => l.Account.Client)
+        var query = m_Context.Loans.IncludeAll()
                              .AsQueryable();
 
         if (filter.LoanTypeId.HasValue)
@@ -61,10 +60,7 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
 
     public async Task<Loan?> FindById(Guid id)
     {
-        return await m_Context.Loans.Include(l => l.LoanType)
-                              .Include(l => l.Account)
-                              .Include(l => l.Currency)
-                              .Include(l => l.Account.Client)
+        return await m_Context.Loans.IncludeAll()
                               .FirstOrDefaultAsync(l => l.Id == id);
     }
 
@@ -94,22 +90,17 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
 
     public async Task<List<Loan>> GetLoansWithDueInstallmentsAsync(DateTime dueDate)
     {
-        return await m_Context.Loans.Include(l => l.LoanType)
-                              .Include(l => l.Account)
-                              .Include(l => l.Currency)
-                              .Include(l => l.Account.Client)
-                              .Include(l => l.Installments)
-                              .Where(l => l.Status == LoanStatus.Active && l.Installments.Any(i => i.ExpectedDueDate.Date <= dueDate.Date && i.Status == InstallmentStatus.Pending))
+        return await m_Context.Loans.IncludeAll()
+                              .Where(loan => loan.Status == LoanStatus.Active &&
+                                             loan.Installments.Any(installment => installment.ExpectedDueDate.Date <= dueDate.Date &&
+                                                                                  installment.Status               == InstallmentStatus.Pending))
                               .ToListAsync();
     }
 
     public async Task<Page<Loan>> FindByClientId(Guid clientId, Pageable pageable)
     {
-        var query = m_Context.Loans.Include(l => l.LoanType)
-                             .Include(l => l.Account)
-                             .Include(l => l.Currency)
-                             .Include(l => l.Account.Client)
-                             .Where(l => l.Account.ClientId == clientId)
+        var query = m_Context.Loans.IncludeAll()
+                             .Where(loan => loan.Account.ClientId == clientId)
                              .AsQueryable();
 
         var total = await query.CountAsync();
@@ -119,5 +110,70 @@ public class LoanRepository(ApplicationContext context) : ILoanRepository
                                .ToListAsync();
 
         return new Page<Loan>(items, pageable.Page, pageable.Size, total);
+    }
+}
+
+public static partial class RepositoryExtensions
+{
+    public static IIncludableQueryable<Loan, object?> IncludeAll(this DbSet<Loan> set)
+    {
+        return set.Include(loan => loan.LoanType)
+                  .ThenIncludeAll(loan => loan.LoanType)
+                  .Include(loan => loan.Account)
+                  .ThenIncludeAll(loan => loan.Account)
+                  .Include(loan => loan.Currency)
+                  .ThenIncludeAll(loan => loan.Currency)
+                  .Include(loan => loan.Installments)
+                  .ThenIncludeAll(loan => loan.Installments, nameof(Installment.Loan));
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Loan?> value,
+                                                                                 Expression<Func<TEntity, Loan?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Loan.LoanType)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan!.LoanType);
+
+        if (!excludeProperties.Contains(nameof(Loan.Account)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan!.Account);
+
+        if (!excludeProperties.Contains(nameof(Loan.Currency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan!.Currency);
+
+        if (!excludeProperties.Contains(nameof(Loan.Installments)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan!.Installments);
+
+        return query;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Loan>> value,
+                                                                                 Expression<Func<TEntity, List<Loan>>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        IIncludableQueryable<TEntity, object?> query = value;
+
+        if (!excludeProperties.Contains(nameof(Loan.LoanType)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan.LoanType);
+
+        if (!excludeProperties.Contains(nameof(Loan.Account)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan.Account);
+
+        if (!excludeProperties.Contains(nameof(Loan.Currency)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan.Currency);
+
+        if (!excludeProperties.Contains(nameof(Loan.Installments)))
+            query = query.Include(navigationExpression)
+                         .ThenInclude(loan => loan.Installments);
+
+        return query;
     }
 }
