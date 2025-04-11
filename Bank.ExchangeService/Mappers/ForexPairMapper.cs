@@ -11,31 +11,58 @@ public static class ForexPairMapper
     {
         return new ForexPairResponse()
                {
-                   Id                 = forexPair.Id,
-                   Liquidity          = forexPair.Liquidity,
-                   ExchangeRate       = forexPair.ExchangeRate,
-                   BaseCurrency       = currencyBaseResponse,
-                   QuoteCurrency      = currencyQuoteResponse,
-                   MaintenanceDecimal = forexPair.MaintenanceDecimal,
-                   Name               = forexPair.Name,
-                   Ticker             = forexPair.Ticker,
-                   StockExchange      = forexPair.StockExchange!.ToResponse(currencyResponse),
-                   Quotes = forexPair.Quotes.Select(quote => quote.ToSimpleResponse())
-                                     .ToList(),
+                   Id                           = forexPair.Id,
+                   Liquidity                    = forexPair.Liquidity,
+                   ExchangeRate                 = forexPair.ExchangeRate,
+                   BaseCurrency                 = currencyBaseResponse,
+                   QuoteCurrency                = currencyQuoteResponse,
+                   MaintenanceDecimal           = forexPair.MaintenanceDecimal,
+                   Name                         = forexPair.Name,
+                   Ticker                       = forexPair.Ticker,
+                   StockExchange                = forexPair.StockExchange!.ToResponse(currencyResponse),
                    HighPrice                    = forexPair.HighPrice,
                    LowPrice                     = forexPair.LowPrice,
-                   //Volume                       = forexPair.Volume,
                    PriceChangeInInterval        = forexPair.PriceChange,
                    PriceChangePercentInInterval = forexPair.PriceChangePercent,
-                   Price                        = forexPair.Price,
+                   AskPrice                     = forexPair.AskPrice,
+                   BidPrice                     = forexPair.BidPrice,
                    CreatedAt                    = forexPair.CreatedAt,
-                   ModifiedAt                   = forexPair.ModifiedAt
+                   ModifiedAt                   = forexPair.ModifiedAt,
+                   Quotes = forexPair.Quotes.Select(quote => quote.ToSimpleResponse())
+                                     .ToList(),
+               };
+    }
+
+    public static ForexPairDailyResponse ToCandleResponse(this ForexPair         forexPair, CurrencySimpleResponse currencyResponse, CurrencySimpleResponse currencyBaseResponse,
+                                                          CurrencySimpleResponse currencyQuoteResponse)
+    {
+        return new ForexPairDailyResponse
+               {
+                   Id                           = forexPair.Id,
+                   Liquidity                    = forexPair.Liquidity,
+                   ExchangeRate                 = forexPair.ExchangeRate,
+                   BaseCurrency                 = currencyBaseResponse,
+                   QuoteCurrency                = currencyQuoteResponse,
+                   MaintenanceDecimal           = forexPair.MaintenanceDecimal,
+                   Name                         = forexPair.Name,
+                   Ticker                       = forexPair.Ticker,
+                   StockExchange                = forexPair.StockExchange!.ToResponse(currencyResponse),
+                   HighPrice                    = forexPair.HighPrice,
+                   LowPrice                     = forexPair.LowPrice,
+                   PriceChangeInInterval        = forexPair.PriceChange,
+                   PriceChangePercentInInterval = forexPair.PriceChangePercent,
+                   CreatedAt                    = forexPair.CreatedAt,
+                   ModifiedAt                   = forexPair.ModifiedAt,
+                   OpeningPrice                 = forexPair.OpeningPrice,
+                   ClosePrice                   = forexPair.ClosePrice,
+                   Quotes = forexPair.DailyQuotes.Select(quote => quote.ToCandleSimpleResponse())
+                                     .ToList()
                };
     }
 
     public static ForexPairSimpleResponse ToSimpleResponse(this ForexPair forexPair, CurrencySimpleResponse currencyBaseResponse, CurrencySimpleResponse currencyQuoteResponse)
     {
-        return new ForexPairSimpleResponse()
+        return new ForexPairSimpleResponse
                {
                    Id                           = forexPair.Id,
                    Liquidity                    = forexPair.Liquidity,
@@ -47,17 +74,18 @@ public static class ForexPairMapper
                    Ticker                       = forexPair.Ticker,
                    HighPrice                    = forexPair.HighPrice,
                    LowPrice                     = forexPair.LowPrice,
-                   Count                        = forexPair.Volume,
+                   AskPrice                     = forexPair.AskPrice,
+                   BidPrice                     = forexPair.BidPrice,
                    PriceChangeInInterval        = forexPair.PriceChange,
                    PriceChangePercentInInterval = forexPair.PriceChangePercent,
-                   Price                        = forexPair.Price,
+                   Price                        = forexPair.AskPrice,
                    CreatedAt                    = forexPair.CreatedAt,
-                   ModifiedAt                   = forexPair.ModifiedAt
+                   ModifiedAt                   = forexPair.ModifiedAt,
                };
     }
 
     public static ForexPair ToForexPair(this FetchForexPairLatestResponse fetchForexPair, CurrencySimpleResponse currencyFrom, CurrencySimpleResponse currencyTo,
-                                        Liquidity                         liquidity, Guid stockExchangeId)
+                                        Liquidity                         liquidity,      Guid                   stockExchangeId)
     {
         return new ForexPair
                {

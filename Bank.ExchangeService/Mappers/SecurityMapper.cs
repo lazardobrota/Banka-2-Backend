@@ -15,6 +15,7 @@ public static class SecurityMapper
                    StockExchange   = security.StockExchange,
                    StockExchangeId = security.StockExchangeId,
                    Quotes          = security.Quotes,
+                   DailyQuotes     = security.DailyQuotes
                };
     }
 
@@ -32,7 +33,8 @@ public static class SecurityMapper
                    StockExchange   = security.StockExchange,
                    Quotes          = security.Quotes,
                    ContractSize    = security.ContractSize,
-                   StockExchangeId = security.StockExchangeId
+                   StockExchangeId = security.StockExchangeId,
+                   DailyQuotes     = security.DailyQuotes
                };
     }
 
@@ -56,17 +58,16 @@ public static class SecurityMapper
     {
         return new Option()
                {
-                   Id                = security.Id,
-                   StrikePrice       = security.StrikePrice,
-                   ImpliedVolatility = security.ImpliedVolatility,
-                   OpenInterest      = security.OpenInterest,
-                   SettlementDate    = security.SettlementDate,
-                   Name              = security.Name,
-                   Ticker            = security.Ticker,
-                   StockExchange     = security.StockExchange,
-                   StockExchangeId   = security.StockExchangeId,
-                   OptionType        = (OptionType)security.OptionType!,
-                   Quotes            = security.Quotes,
+                   Id              = security.Id,
+                   StrikePrice     = security.StrikePrice,
+                   SettlementDate  = security.SettlementDate,
+                   Name            = security.Name,
+                   Ticker          = security.Ticker,
+                   StockExchange   = security.StockExchange,
+                   StockExchangeId = security.StockExchangeId,
+                   OptionType      = (OptionType)security.OptionType!,
+                   Quotes          = security.Quotes,
+                   DailyQuotes     = security.DailyQuotes
                };
     }
 
@@ -110,18 +111,16 @@ public static class SecurityMapper
     {
         return new Security
                {
-                   Id                = option.Id,
-                   StrikePrice       = option.StrikePrice,
-                   ImpliedVolatility = option.ImpliedVolatility,
-                   OpenInterest      = option.OpenInterest,
-                   SettlementDate    = option.SettlementDate,
-                   Name              = option.Name,
-                   Ticker            = option.Ticker,
-                   StockExchange     = option.StockExchange,
-                   StockExchangeId   = option.StockExchangeId,
-                   OptionType        = option.OptionType,
-                   Quotes            = option.Quotes,
-                   SecurityType      = SecurityType.Option,
+                   Id              = option.Id,
+                   StrikePrice     = option.StrikePrice,
+                   SettlementDate  = option.SettlementDate,
+                   Name            = option.Name,
+                   Ticker          = option.Ticker,
+                   StockExchange   = option.StockExchange,
+                   StockExchangeId = option.StockExchangeId,
+                   OptionType      = option.OptionType,
+                   Quotes          = option.Quotes,
+                   SecurityType    = SecurityType.Option,
                };
     }
 

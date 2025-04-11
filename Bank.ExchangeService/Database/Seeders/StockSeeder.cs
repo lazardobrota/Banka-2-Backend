@@ -60,12 +60,13 @@ public static class StockSeederExtension
     {
         if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
             return;
-        
+
         var stopwatch = new Stopwatch();
 
         stopwatch.Start();
 
         var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
+
         var request = new HttpRequestMessage
                       {
                           Method     = HttpMethod.Get,

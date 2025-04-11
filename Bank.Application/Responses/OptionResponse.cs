@@ -6,24 +6,46 @@ namespace Bank.Application.Responses;
 
 public class OptionResponse
 {
-    public required Guid                      Id                           { get; set; }
-    public required decimal                   StrikePrice                  { get; set; }
-    public required decimal                   ImpliedVolatility            { get; set; }
-    public required int                       OpenInterest                 { get; set; }
-    public required DateOnly                  SettlementDate               { get; set; }
-    public required string                    Name                         { get; set; }
-    public required string                    Ticker                       { get; set; }
-    public required OptionType                OptionType                   { get; set; }
-    public required StockExchangeResponse     StockExchange                { get; set; }
-    public required List<QuoteSimpleResponse> SortedQuotes                 { get; set; } = [];
-    public          decimal                   HighPrice                    { get; set; }
-    public          decimal                   LowPrice                     { get; set; }
-    public          int                       Volume                       { get; set; }
-    public required decimal                   PriceChangeInInterval        { get; set; }
-    public required decimal                   PriceChangePercentInInterval { get; set; }
-    public          decimal                   Price                        { get; set; }
-    public          DateTime                  CreatedAt                    { get; set; }
-    public          DateTime                  ModifiedAt                   { get; set; }
+    public required Guid                           Id                           { get; set; }
+    public required decimal                        StrikePrice                  { get; set; }
+    public required decimal                        ImpliedVolatility            { get; set; }
+    public required DateOnly                       SettlementDate               { get; set; }
+    public required string                         Name                         { get; set; }
+    public required string                         Ticker                       { get; set; }
+    public required OptionType                     OptionType                   { get; set; }
+    public required decimal                        HighPrice                    { get; set; }
+    public required decimal                        LowPrice                     { get; set; }
+    public required long                           Volume                       { get; set; }
+    public required decimal                        PriceChangeInInterval        { get; set; }
+    public required decimal                        PriceChangePercentInInterval { get; set; }
+    public required decimal                        AskPrice                     { get; set; }
+    public required decimal                        BidPrice                     { get; set; }
+    public required DateTime                       CreatedAt                    { get; set; }
+    public required DateTime                       ModifiedAt                   { get; set; }
+    public required StockExchangeResponse          StockExchange                { get; set; }
+    public required List<QuoteChartSimpleResponse> Quotes                       { get; set; } = [];
+}
+
+public class OptionDailyResponse
+{
+    public required Guid                           Id                           { get; set; }
+    public required decimal                        StrikePrice                  { get; set; }
+    public required decimal                        ImpliedVolatility            { get; set; }
+    public required DateOnly                       SettlementDate               { get; set; }
+    public required string                         Name                         { get; set; }
+    public required string                         Ticker                       { get; set; }
+    public required OptionType                     OptionType                   { get; set; }
+    public required decimal                        HighPrice                    { get; set; }
+    public required decimal                        LowPrice                     { get; set; }
+    public required decimal                        OpeningPrice                 { get; set; }
+    public required decimal                        ClosePrice                   { get; set; }
+    public required long                           Volume                       { get; set; }
+    public required decimal                        PriceChangeInInterval        { get; set; }
+    public required decimal                        PriceChangePercentInInterval { get; set; }
+    public required DateTime                       CreatedAt                    { get; set; }
+    public required DateTime                       ModifiedAt                   { get; set; }
+    public required StockExchangeResponse          StockExchange                { get; set; }
+    public required List<QuoteDailySimpleResponse> Quotes                       { get; set; } = [];
 }
 
 public class OptionSimpleResponse
@@ -31,26 +53,26 @@ public class OptionSimpleResponse
     public required Guid       Id                           { get; set; }
     public required decimal    StrikePrice                  { get; set; }
     public required decimal    ImpliedVolatility            { get; set; }
-    public required int        OpenInterest                 { get; set; }
     public required DateOnly   SettlementDate               { get; set; }
     public required string     Name                         { get; set; }
     public required string     Ticker                       { get; set; }
     public required OptionType OptionType                   { get; set; }
-    public          decimal    HighPrice                    { get; set; }
-    public          decimal    LowPrice                     { get; set; }
-    public          int        Volume                       { get; set; }
-    public          decimal    PriceChange                  { get; set; }
+    public required decimal    HighPrice                    { get; set; }
+    public required decimal    LowPrice                     { get; set; }
+    public required long       Volume                       { get; set; }
+    public required decimal    PriceChange                  { get; set; }
     public required decimal    PriceChangeInInterval        { get; set; }
     public required decimal    PriceChangePercentInInterval { get; set; }
-    public          decimal    Price                        { get; set; }
-    public          DateTime   CreatedAt                    { get; set; }
-    public          DateTime   ModifiedAt                   { get; set; }
+    public required decimal    AskPrice                     { get; set; }
+    public required decimal    BidPrice                     { get; set; }
+    public required DateTime   CreatedAt                    { get; set; }
+    public required DateTime   ModifiedAt                   { get; set; }
 }
 
 public class FetchOptionOneBarResponse
 {
     [JsonPropertyName("c")]
-    public required double ClosingPrice { get; set; }
+    public required decimal ClosingPrice { get; set; }
 
     [JsonPropertyName("h")]
     public required decimal HighPrice { get; set; }

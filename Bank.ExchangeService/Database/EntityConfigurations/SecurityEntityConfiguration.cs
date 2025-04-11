@@ -40,9 +40,6 @@ public class SecurityEntityConfiguration : IEntityTypeConfiguration<Security>
         builder.Property(security => security.StrikePrice)
                .IsRequired();
 
-        builder.Property(security => security.ImpliedVolatility)
-               .IsRequired();
-
         builder.Property(security => security.OpenInterest)
                .IsRequired();
 
@@ -54,7 +51,6 @@ public class SecurityEntityConfiguration : IEntityTypeConfiguration<Security>
                .IsRequired(false);
 
         //Foreign keys
-
         builder.Property(security => security.BaseCurrencyId)
                .IsRequired();
 

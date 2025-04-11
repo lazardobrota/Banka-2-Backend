@@ -10,7 +10,7 @@ public static class QuoteMapper
         return new QuoteSimpleResponse
                {
                    Id         = quote.Id,
-                   Price      = quote.Price,
+                   Price      = quote.AskPrice,
                    HighPrice  = quote.HighPrice,
                    LowPrice   = quote.LowPrice,
                    Volume     = quote.Volume,
@@ -19,18 +19,69 @@ public static class QuoteMapper
                };
     }
 
-    public static Quote ToQuote(this FetchBarResponse barResponse, Guid stockId)
+    public static QuoteDailySimpleResponse ToCandleSimpleResponse(this DailyQuote quote)
+    {
+        return new QuoteDailySimpleResponse
+               {
+                   HighPrice  = quote.HighPrice,
+                   LowPrice   = quote.LowPrice,
+                   Volume     = quote.Volume,
+                   CreatedAt  = DateOnly.FromDateTime(quote.Date),
+                   ModifiedAt = DateOnly.FromDateTime(quote.Date),
+                   OpenPrice  = quote.OpeningPrice,
+                   ClosePrice = quote.ClosePrice,
+               };
+    }
+
+    public static QuoteChartSimpleResponse ToChartSimpleResponse(this Quote quote)
+    {
+        return new QuoteChartSimpleResponse()
+               {
+                   Id         = quote.Id,
+                   Price      = quote.AskPrice,
+                   HighPrice  = quote.HighPrice,
+                   LowPrice   = quote.LowPrice,
+                   Volume     = quote.Volume,
+                   CreatedAt  = quote.CreatedAt,
+                   ModifiedAt = quote.ModifiedAt,
+                   AskPrice   = quote.AskPrice,
+                   BidPrice   = quote.BidPrice,
+               };
+    }
+
+    public static Quote ToQuote(this FetchStockBarOneResponse stockBarOneResponse, Guid stockId)
     {
         return new Quote
                {
-                   Id         = Guid.NewGuid(),
-                   Price      = barResponse.LatestPrice,
-                   SecurityId = stockId,
-                   HighPrice  = barResponse.HighPrice,
-                   LowPrice   = barResponse.LowPrice,
-                   Volume     = barResponse.NumberOfTradesInInterval,
-                   CreatedAt  = barResponse.Date,
-                   ModifiedAt = barResponse.Date
+                   Id           = Guid.NewGuid(),
+                   AskPrice     = stockBarOneResponse.ClosePrice,
+                   BidPrice     = 0,
+                   SecurityId   = stockId,
+                   HighPrice    = stockBarOneResponse.HighPrice,
+                   LowPrice     = stockBarOneResponse.LowPrice,
+                   Volume       = stockBarOneResponse.NumberOfTradesInInterval,
+                   CreatedAt    = stockBarOneResponse.Date,
+                   ModifiedAt   = stockBarOneResponse.Date,
+                   ClosePrice   = stockBarOneResponse.ClosePrice,
+                   OpeningPrice = stockBarOneResponse.OpeningPrice
+               };
+    }
+
+    public static Quote ToQuote(this FetchStockSnapshotResponse stockSnapshotResponse, Guid stockId)
+    {
+        return new Quote
+               {
+                   Id           = Guid.NewGuid(),
+                   SecurityId   = stockId,
+                   AskPrice     = stockSnapshotResponse.LatestQuote!.AskPrice,
+                   BidPrice     = stockSnapshotResponse.LatestQuote!.BidPrice,
+                   HighPrice    = stockSnapshotResponse.DailyBar!.HighPrice,
+                   LowPrice     = stockSnapshotResponse.DailyBar!.LowPrice,
+                   Volume       = stockSnapshotResponse.MinuteBar!.NumberOfSharesInInterval,
+                   CreatedAt    = stockSnapshotResponse.LatestQuote!.Date,
+                   ModifiedAt   = stockSnapshotResponse.LatestQuote!.Date,
+                   ClosePrice   = stockSnapshotResponse.DailyBar!.ClosePrice,
+                   OpeningPrice = stockSnapshotResponse.DailyBar!.OpeningPrice,
                };
     }
 
@@ -38,29 +89,35 @@ public static class QuoteMapper
     {
         return new Quote
                {
-                   Id         = Guid.NewGuid(),
-                   SecurityId = forexPairId,
-                   Price      = fetchForexPairQuote.Close,
-                   HighPrice  = fetchForexPairQuote.High,
-                   LowPrice   = fetchForexPairQuote.Low,
-                   Volume     = 0,
-                   CreatedAt  = date.ToUniversalTime(),
-                   ModifiedAt = date.ToUniversalTime()
+                   Id           = Guid.NewGuid(),
+                   SecurityId   = forexPairId,
+                   AskPrice     = fetchForexPairQuote.Close,
+                   BidPrice     = 0,
+                   HighPrice    = fetchForexPairQuote.High,
+                   LowPrice     = fetchForexPairQuote.Low,
+                   Volume       = 0,
+                   CreatedAt    = date.ToUniversalTime(),
+                   ModifiedAt   = date.ToUniversalTime(),
+                   ClosePrice   = fetchForexPairQuote.Close,
+                   OpeningPrice = fetchForexPairQuote.Open
                };
     }
-    
+
     public static Quote ToQuote(this FetchForexPairLatestResponse fetchForexPairLatest, Guid forexPairId)
     {
         return new Quote
                {
-                   Id         = Guid.NewGuid(),
-                   SecurityId = forexPairId,
-                   Price      = 0, 
-                   HighPrice  = fetchForexPairLatest.AskPrice,
-                   LowPrice   = fetchForexPairLatest.BidPrice,
-                   Volume     = 0,
-                   CreatedAt  = fetchForexPairLatest.Date.ToUniversalTime(),
-                   ModifiedAt = fetchForexPairLatest.Date.ToUniversalTime()
+                   Id           = Guid.NewGuid(),
+                   SecurityId   = forexPairId,
+                   AskPrice     = fetchForexPairLatest.AskPrice,
+                   BidPrice     = fetchForexPairLatest.BidPrice,
+                   HighPrice    = 0,
+                   LowPrice     = 0,
+                   Volume       = 0,
+                   CreatedAt    = fetchForexPairLatest.Date.ToUniversalTime(),
+                   ModifiedAt   = fetchForexPairLatest.Date.ToUniversalTime(),
+                   ClosePrice   = 0,
+                   OpeningPrice = 0
                };
     }
 
@@ -68,14 +125,18 @@ public static class QuoteMapper
     {
         return new Quote
                {
-                   Id         = Guid.NewGuid(),
-                   SecurityId = optionId,
-                   Price      = optionResponse.LatestQuote!.AskPrice,
-                   HighPrice  = optionResponse.DailyBar!.HighPrice,
-                   LowPrice   = optionResponse.DailyBar!.LowPrice,
-                   Volume     = optionResponse.DailyBar!.Volume,
-                   CreatedAt  = optionResponse.DailyBar!.TimeStamp,
-                   ModifiedAt = optionResponse.DailyBar!.TimeStamp
+                   Id                = Guid.NewGuid(),
+                   SecurityId        = optionId,
+                   AskPrice          = optionResponse.LatestQuote!.AskPrice,
+                   BidPrice          = optionResponse.LatestQuote!.BidPrice,
+                   HighPrice         = optionResponse.DailyBar!.HighPrice,
+                   LowPrice          = optionResponse.DailyBar!.LowPrice,
+                   Volume            = optionResponse.DailyBar!.Volume,
+                   CreatedAt         = optionResponse.DailyBar!.TimeStamp,
+                   ModifiedAt        = optionResponse.DailyBar!.TimeStamp,
+                   ImpliedVolatility = optionResponse.ImpliedVolatility,
+                   OpeningPrice      = optionResponse.DailyBar.OpeningPrice,
+                   ClosePrice        = optionResponse.DailyBar.ClosingPrice
                };
     }
 }

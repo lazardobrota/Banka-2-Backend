@@ -10,7 +10,7 @@ public static partial class Configuration
         {
             public const string GetAllApi                 = "https://paper-api.alpaca.markets/v2/assets";
             public const string GetHistoryApi             = "https://data.alpaca.markets/v2/stocks/bars";
-            public const string GetLatest                 = "https://data.alpaca.markets/v2/stocks/bars/latest";
+            public const string GetLatest                 = "https://data.alpaca.markets/v2/stocks/snapshots";
             public const int    HistoryTimeFrameInMinutes = 15;
             public const int    LatestTimeFrameInMinutes  = 1;
 
@@ -27,7 +27,7 @@ public static partial class Configuration
 
         public static class Option
         {
-            public const string OptionChainApi  = "https://data.alpaca.markets/v1beta1/options/snapshots";
+            public const string OptionChainApi = "https://data.alpaca.markets/v1beta1/options/snapshots";
         }
 
         public static class Keys

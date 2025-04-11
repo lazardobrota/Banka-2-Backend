@@ -15,6 +15,8 @@ public interface ISecurityRepository
 
     Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter);
 
+    Task<Security?> FindByIdDaily(Guid id, QuoteFilterIntervalQuery filter);
+
     Task<Security?> Create(Security security);
 
     Task<bool> CreateSecurities(List<Security> securities);
@@ -90,6 +92,49 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
                                                                             DateOnly.FromDateTime(quote.CreatedAt) <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)))
                                                      .OrderByDescending(quote => quote.CreatedAt))
                               .FirstOrDefaultAsync(stock => stock.Id == id);
+    }
+
+    public async Task<Security?> FindByIdDaily(Guid id, QuoteFilterIntervalQuery filter)
+    {
+        var fromDate = DateOnly.FromDateTime(filter.Interval switch
+                                             {
+                                                 QuoteIntervalType.Week        => DateTime.Today.AddDays(-7),
+                                                 QuoteIntervalType.Month       => DateTime.Today.AddMonths(-1),
+                                                 QuoteIntervalType.ThreeMonths => DateTime.Today.AddMonths(-3),
+                                                 QuoteIntervalType.Year        => DateTime.Today.AddYears(-1),
+                                                 QuoteIntervalType.Max         => DateTime.MinValue,
+                                                 _                             => DateTime.Today
+                                             });
+
+        var security = await m_Context.Securities.Include(security => security.StockExchange)
+                                      .FirstOrDefaultAsync(security => security.Id == id);
+
+        if (security is null)
+            return null;
+
+        var quotes = await m_Context.Quotes.AsNoTracking()
+                                    .Where(quote => quote.SecurityId == id)
+                                    .Where(quote => fromDate                               <= DateOnly.FromDateTime(quote.CreatedAt) &&
+                                                    DateOnly.FromDateTime(quote.CreatedAt) <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)))
+                                    .GroupBy(quote => quote.CreatedAt.Date)
+                                    .Select(group => new DailyQuote
+                                                     {
+                                                         HighPrice = group.Max(quote => quote.HighPrice),
+                                                         LowPrice  = group.Min(quote => quote.LowPrice),
+                                                         ClosePrice = group.OrderBy(quote => quote.CreatedAt)
+                                                                           .Last()
+                                                                           .ClosePrice,
+                                                         OpeningPrice = group.OrderBy(quote => quote.CreatedAt)
+                                                                             .First()
+                                                                             .OpeningPrice,
+                                                         Volume = group.Sum(quote => quote.Volume),
+                                                         Date   = group.Key.Date
+                                                     })
+                                    .OrderByDescending(candle => candle.Date)
+                                    .ToListAsync();
+
+        security.DailyQuotes = quotes;
+        return security;
     }
 
     public async Task<Security?> Create(Security security)

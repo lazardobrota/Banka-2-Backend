@@ -13,16 +13,18 @@ public static class StockMapper
                    Name          = stock.Name,
                    Ticker        = stock.Ticker,
                    StockExchange = stock.StockExchange!.ToResponse(currencyResponse),
-                   Quotes = stock.Quotes.Select(quote => quote.ToSimpleResponse())
+                   Quotes = stock.Quotes.Select(quote => quote.ToChartSimpleResponse())
                                  .ToList(),
                    HighPrice                    = stock.HighPrice,
                    LowPrice                     = stock.LowPrice,
                    Volume                       = stock.Volume,
                    PriceChangeInInterval        = stock.PriceChange,
                    PriceChangePercentInInterval = stock.PriceChangePercent,
-                   Price                        = stock.Price,
+                   Price                        = stock.AskPrice,
                    CreatedAt                    = stock.CreatedAt,
                    ModifiedAt                   = stock.ModifiedAt,
+                   AskPrice                     = stock.AskPrice,
+                   BidPrice                     = stock.BidPrice
                };
     }
 
@@ -38,9 +40,33 @@ public static class StockMapper
                    Volume                       = stock.Volume,
                    PriceChangeInInterval        = stock.PriceChange,
                    PriceChangePercentInInterval = stock.PriceChangePercent,
-                   Price                        = stock.Price,
+                   Price                        = stock.AskPrice,
                    CreatedAt                    = stock.CreatedAt,
-                   ModifiedAt                   = stock.ModifiedAt
+                   ModifiedAt                   = stock.ModifiedAt,
+                   AskPrice                     = stock.AskPrice,
+                   BidPrice                     = stock.BidPrice
+               };
+    }
+
+    public static StockDailyResponse ToCandleResponse(this Stock stock, CurrencySimpleResponse currencyResponse)
+    {
+        return new StockDailyResponse
+               {
+                   Id                           = stock.Id,
+                   Name                         = stock.Name,
+                   Ticker                       = stock.Ticker,
+                   HighPrice                    = stock.HighPrice,
+                   LowPrice                     = stock.LowPrice,
+                   Volume                       = stock.Volume,
+                   PriceChangeInInterval        = stock.PriceChange,
+                   PriceChangePercentInInterval = stock.PriceChangePercent,
+                   CreatedAt                    = stock.CreatedAt,
+                   ModifiedAt                   = stock.ModifiedAt,
+                   OpenPrice                    = stock.OpeningPrice,
+                   ClosePrice                   = stock.ClosePrice,
+                   Quotes = stock.DailyQuotes.Select(quote => quote.ToCandleSimpleResponse())
+                                 .ToList(),
+                   StockExchange = stock.StockExchange!.ToResponse(currencyResponse),
                };
     }
 

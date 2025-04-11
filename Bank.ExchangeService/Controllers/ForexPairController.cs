@@ -20,6 +20,13 @@ public class ForexPairController(IForexPairService forexPairService) : Controlle
         return result.ActionResult;
     }
 
+    [HttpGet(Endpoints.ForexPair.GetOneDaily)]
+    public async Task<ActionResult<ForexPairDailyResponse>> GetOneDaily([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
+    {
+        var result = await m_ForexPairService.GetOneDaily(id, filter);
+        return result.ActionResult;
+    }
+
     [HttpGet(Endpoints.ForexPair.GetOne)]
     public async Task<ActionResult<ForexPairResponse>> GetOne([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
     {

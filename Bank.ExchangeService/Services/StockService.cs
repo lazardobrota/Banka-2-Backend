@@ -15,6 +15,8 @@ public interface IStockService
     Task<Result<Page<StockSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable);
 
     Task<Result<StockResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter);
+
+    Task<Result<StockDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
 public class StockService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IStockService
@@ -47,5 +49,21 @@ public class StockService(ISecurityRepository securityRepository, ICurrencyClien
 
         return Result.Ok(security.ToStock()
                                  .ToResponse(currencyResponse));
+    }
+
+    public async Task<Result<StockDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter)
+    {
+        var security = await m_SecurityRepository.FindByIdDaily(id, filter);
+
+        if (security is null)
+            return Result.NotFound<StockDailyResponse>($"No Stock found wih Id: {id}");
+
+        var currencyResponse = await m_Client.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
+
+        if (currencyResponse is null)
+            throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
+
+        return Result.Ok(security.ToStock()
+                                 .ToCandleResponse(currencyResponse));
     }
 }

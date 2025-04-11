@@ -15,6 +15,8 @@ public interface IForexPairService
     Task<Result<Page<ForexPairSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable);
 
     Task<Result<ForexPairResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter);
+
+    Task<Result<ForexPairDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
 public class ForexPairService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IForexPairService
@@ -67,5 +69,35 @@ public class ForexPairService(ISecurityRepository securityRepository, ICurrencyC
 
         return Result.Ok(forexPair.ToForexPair()
                                   .ToResponse(currencyResponse, currencyBaseResponse, currencyQuoteResponse));
+    }
+
+    public async Task<Result<ForexPairDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter)
+    {
+        var forexPair = await m_SecurityRepository.FindByIdDaily(id, filter);
+
+        if (forexPair is null)
+            return Result.NotFound<ForexPairDailyResponse>($"No Forex pair found wih Id: {id}");
+
+        var currencyBaseResponseTask  = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.BaseCurrencyId));
+        var currencyQuoteResponseTask = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.QuoteCurrencyId));
+        var currencyResponseTask      = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.StockExchange!.CurrencyId));
+
+        Task.WaitAll(currencyBaseResponseTask, currencyQuoteResponseTask, currencyResponseTask);
+
+        var currencyBaseResponse  = currencyBaseResponseTask.Result;
+        var currencyQuoteResponse = currencyQuoteResponseTask.Result;
+        var currencyResponse      = currencyResponseTask.Result;
+
+        if (currencyBaseResponse is null)
+            throw new Exception($"No Currency with Id: {forexPair.BaseCurrencyId}");
+
+        if (currencyQuoteResponse is null)
+            throw new Exception($"No Currency with Id: {forexPair.QuoteCurrencyId}");
+
+        if (currencyResponse is null)
+            throw new Exception($"No Currency with Id: {forexPair.StockExchange!.CurrencyId}");
+
+        return Result.Ok(forexPair.ToForexPair()
+                                  .ToCandleResponse(currencyResponse, currencyBaseResponse, currencyQuoteResponse));
     }
 }

@@ -23,7 +23,7 @@ public static class FutureContractMapper
                    Volume                       = futureContract.Volume,
                    PriceChangeInInterval        = futureContract.PriceChange,
                    PriceChangePercentInInterval = futureContract.PriceChangePercent,
-                   Price                        = futureContract.Price,
+                   Price                        = futureContract.AskPrice,
                    CreatedAt                    = futureContract.CreatedAt,
                    ModifiedAt                   = futureContract.ModifiedAt
                };
@@ -42,7 +42,7 @@ public static class FutureContractMapper
                    HighPrice                    = futureContract.HighPrice,
                    LowPrice                     = futureContract.LowPrice,
                    Volume                       = futureContract.Volume,
-                   Price                        = futureContract.Price,
+                   Price                        = futureContract.AskPrice,
                    CreatedAt                    = futureContract.CreatedAt,
                    ModifiedAt                   = futureContract.ModifiedAt,
                    PriceChangeInInterval        = futureContract.PriceChange,

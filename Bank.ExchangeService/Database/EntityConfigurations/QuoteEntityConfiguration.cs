@@ -14,7 +14,11 @@ public class QuoteEntityConfiguration : IEntityTypeConfiguration<Quote>
         builder.Property(quote => quote.Id)
                .IsRequired();
 
-        builder.Property(quote => quote.Price)
+        builder.Property(quote => quote.AskPrice)
+               .IsRequired()
+               .HasPrecision(18, 6);
+
+        builder.Property(quote => quote.BidPrice)
                .IsRequired()
                .HasPrecision(18, 6);
 
@@ -23,6 +27,18 @@ public class QuoteEntityConfiguration : IEntityTypeConfiguration<Quote>
                .HasPrecision(18, 6);
 
         builder.Property(quote => quote.LowPrice)
+               .IsRequired()
+               .HasPrecision(18, 6);
+
+        builder.Property(quote => quote.ImpliedVolatility)
+               .IsRequired()
+               .HasPrecision(18, 6);
+
+        builder.Property(quote => quote.ClosePrice)
+               .IsRequired()
+               .HasPrecision(18, 6);
+
+        builder.Property(quote => quote.OpeningPrice)
                .IsRequired()
                .HasPrecision(18, 6);
 
@@ -42,5 +58,8 @@ public class QuoteEntityConfiguration : IEntityTypeConfiguration<Quote>
                .WithMany()
                .HasForeignKey(quote => quote.SecurityId)
                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(quote => new { quote.SecurityId, quote.CreatedAt })
+               .IncludeProperties(quote => new { quote.OpeningPrice, quote.HighPrice, quote.LowPrice, quote.ClosePrice, quote.Volume });
     }
 }

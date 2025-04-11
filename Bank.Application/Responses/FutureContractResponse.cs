@@ -12,7 +12,7 @@ public class FutureContractResponse
     public required string                    Ticker                       { get; set; }
     public required decimal                   HighPrice                    { get; set; }
     public required decimal                   LowPrice                     { get; set; }
-    public required int                       Volume                       { get; set; }
+    public required long                      Volume                       { get; set; }
     public required decimal                   PriceChangeInInterval        { get; set; }
     public required decimal                   PriceChangePercentInInterval { get; set; }
     public required decimal                   Price                        { get; set; }
@@ -32,7 +32,7 @@ public class FutureContractSimpleResponse
     public required string       Ticker                       { get; set; }
     public required decimal      HighPrice                    { get; set; }
     public required decimal      LowPrice                     { get; set; }
-    public required int          Volume                       { get; set; }
+    public required long         Volume                       { get; set; }
     public required decimal      PriceChangeInInterval        { get; set; }
     public required decimal      PriceChangePercentInInterval { get; set; }
     public required decimal      Price                        { get; set; }

@@ -20,6 +20,13 @@ public class StockController(IStockService stockService) : ControllerBase
         return result.ActionResult;
     }
 
+    [HttpGet(Endpoints.Stock.GetOneDaily)]
+    public async Task<ActionResult<StockDailyResponse>> GetOneDaily([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
+    {
+        var result = await m_StockService.GetOneDaily(id, filter);
+        return result.ActionResult;
+    }
+
     [HttpGet(Endpoints.Stock.GetOne)]
     public async Task<ActionResult<StockResponse>> GetOne([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
     {

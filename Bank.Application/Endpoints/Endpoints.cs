@@ -11,18 +11,22 @@ public static partial class Endpoints
 {
     public static class Stock
     {
-        public const string Base = $"{ApiBase}/stock";
+        public const string Base      = $"{ApiBase}/stock";
+        public const string BaseDaily = $"{Base}/daily";
 
-        public const string GetAll = $"{Base}";
-        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
     }
 
     public static class ForexPair
     {
-        public const string Base = $"{ApiBase}/forex/pair";
+        public const string Base      = $"{ApiBase}/forex/pair";
+        public const string BaseDaily = $"{Base}/daily";
 
-        public const string GetAll = $"{Base}";
-        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
     }
 
     public static class FutureContract
@@ -35,10 +39,12 @@ public static partial class Endpoints
 
     public static class Option
     {
-        public const string Base = $"{ApiBase}/option";
+        public const string Base      = $"{ApiBase}/option";
+        public const string BaseDaily = $"{Base}/daily";
 
-        public const string GetAll = $"{Base}";
-        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
     }
 }
 

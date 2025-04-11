@@ -47,24 +47,24 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         Context.SeedFutureContractHardcoded()
                .Wait();
 
-        Context.SeedForexPair(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository)
+        Context.SeedForexPair(client, m_CurrencyClient, m_SecurityRepository)
                .Wait();
-        
+
         Context.SeedStock(client)
                .Wait();
 
         Context.SeedOptions(client, m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
-        // if (!Context.Quotes.Any())
-        // {
-        //     Context.SeedQuoteStocks(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
-        //            .Wait();
-        //
-        //     Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository, m_QuoteRepository)
-        //            .Wait();
-        // }
-        
+        if (!Context.Quotes.Any()) //TODO Need different way to check because SeedOptions fills Quotes
+        {
+            Context.SeedStockQuotes(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
+                   .Wait();
+
+            Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository, m_QuoteRepository)
+                   .Wait();
+        }
+
         InitializeTimers();
     }
 
@@ -72,8 +72,8 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
 
     public void InitializeTimers()
     {
-        m_StockTimer     = new Timer(async _ => await FetchStocksLatest(),    null, TimeSpan.FromMinutes(1),  TimeSpan.FromMinutes(1));
-        m_ForexPairTimer = new Timer(async _ => await FetchForexPairLatest(), null, TimeSpan.FromMinutes(1),  TimeSpan.FromMinutes(1));
+        m_StockTimer     = new Timer(async _ => await FetchStocksLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        m_ForexPairTimer = new Timer(async _ => await FetchForexPairLatest(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
         m_OptionTimer    = new Timer(async _ => await FetchOptionLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
     }
 

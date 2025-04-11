@@ -13,7 +13,6 @@ public static class OptionMapper
                    Id                           = option.Id,
                    StrikePrice                  = option.StrikePrice,
                    ImpliedVolatility            = option.ImpliedVolatility,
-                   OpenInterest                 = option.OpenInterest,
                    SettlementDate               = option.SettlementDate,
                    Name                         = option.Name,
                    Ticker                       = option.Ticker,
@@ -24,11 +23,38 @@ public static class OptionMapper
                    Volume                       = option.Volume,
                    PriceChangeInInterval        = option.PriceChange,
                    PriceChangePercentInInterval = option.PriceChangePercent,
-                   Price                        = option.Price,
+                   AskPrice                     = option.AskPrice,
+                   BidPrice                     = option.BidPrice,
                    CreatedAt                    = option.CreatedAt,
                    ModifiedAt                   = option.ModifiedAt,
-                   SortedQuotes = option.Quotes.Select(quote => quote.ToSimpleResponse())
-                                        .ToList(),
+                   Quotes = option.Quotes.Select(quote => quote.ToChartSimpleResponse())
+                                  .ToList(),
+               };
+    }
+
+    public static OptionDailyResponse ToCandleResponse(this Option option, CurrencySimpleResponse currencySimpleResponse)
+    {
+        return new OptionDailyResponse
+               {
+                   Id                           = option.Id,
+                   StrikePrice                  = option.StrikePrice,
+                   ImpliedVolatility            = option.ImpliedVolatility,
+                   SettlementDate               = option.SettlementDate,
+                   Name                         = option.Name,
+                   Ticker                       = option.Ticker,
+                   StockExchange                = option.StockExchange!.ToResponse(currencySimpleResponse),
+                   OptionType                   = option.OptionType,
+                   HighPrice                    = option.HighPrice,
+                   LowPrice                     = option.LowPrice,
+                   Volume                       = option.Volume,
+                   PriceChangeInInterval        = option.PriceChange,
+                   PriceChangePercentInInterval = option.PriceChangePercent,
+                   CreatedAt                    = option.CreatedAt,
+                   ModifiedAt                   = option.ModifiedAt,
+                   Quotes = option.DailyQuotes.Select(quote => quote.ToCandleSimpleResponse())
+                                  .ToList(),
+                   OpeningPrice = option.OpeningPrice,
+                   ClosePrice   = option.ClosePrice,
                };
     }
 
@@ -39,7 +65,6 @@ public static class OptionMapper
                    Id                           = option.Id,
                    StrikePrice                  = option.StrikePrice,
                    ImpliedVolatility            = option.ImpliedVolatility,
-                   OpenInterest                 = option.OpenInterest,
                    SettlementDate               = option.SettlementDate,
                    Name                         = option.Name,
                    Ticker                       = option.Ticker,
@@ -48,7 +73,8 @@ public static class OptionMapper
                    LowPrice                     = option.LowPrice,
                    Volume                       = option.Volume,
                    PriceChange                  = option.PriceChange,
-                   Price                        = option.Price,
+                   AskPrice                     = option.AskPrice,
+                   BidPrice                     = option.BidPrice,
                    CreatedAt                    = option.CreatedAt,
                    ModifiedAt                   = option.ModifiedAt,
                    PriceChangeInInterval        = option.PriceChange,
@@ -64,7 +90,6 @@ public static class OptionMapper
                    OptionType        = optionType,
                    StrikePrice       = strikePrice,
                    ImpliedVolatility = optionResponse.ImpliedVolatility,
-                   OpenInterest      = 0, //TODO Remove
                    SettlementDate    = settlementDate,
                    Name              = stock.Name,
                    Ticker            = optionTicker,

@@ -1,9 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.Json;
-using System.Web;
 
 using Bank.Application.Domain;
-using Bank.Application.Endpoints;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.HttpClients;
@@ -166,7 +164,7 @@ public static class ForexPairSeederExtension
             }
         }
 
-        Console.WriteLine("Seeding database...");
+        Console.WriteLine("Seeding ForexPairs database...");
 
         await securityRepository.CreateSecurities(securities);
 
@@ -217,8 +215,6 @@ public static class ForexPairSeederExtension
                 }
 
                 var parsed = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-                // Console.WriteLine($"CurrencyFrom | {currencyFrom.Code} | CurrencyTo | {currencyTo.Code}");
-                // Console.WriteLine(parsed);
 
                 if (!parsed.RootElement.TryGetProperty("Realtime Currency Exchange Rate", out var forexPairElement))
                     continue;
@@ -311,7 +307,7 @@ public static class ForexPairSeederExtension
             }
         }
 
-        Console.WriteLine("Seeding database...");
+        Console.WriteLine("Seeding ForexPair Quotes database...");
 
         await quoteRepository.CreateQuotes(quotes);
 
