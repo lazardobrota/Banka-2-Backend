@@ -6,7 +6,7 @@ public static partial class Sample
 {
     public static class LoanType
     {
-        public static readonly LoanTypeRequest Request = new()
+        public static readonly LoanTypeCreateRequest Request = new()
                                                          {
                                                              Name   = "Lični kredit",
                                                              Margin = 3.5m,

@@ -1,8 +1,11 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Bank.UserService.Repositories;
 
@@ -14,7 +17,7 @@ public interface ILoanTypeRepository
 
     Task<LoanType> Add(LoanType loanType);
 
-    Task<LoanType> Update(LoanType oldLoanType, LoanType loanType);
+    Task<LoanType> Update(LoanType loanType);
 }
 
 public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepository
@@ -36,7 +39,7 @@ public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepositor
 
     public async Task<LoanType?> FindById(Guid id)
     {
-        return await m_Context.LoanTypes.FindAsync(id);
+        return await m_Context.LoanTypes.FirstOrDefaultAsync(loanType => loanType.Id == id);
     }
 
     public async Task<LoanType> Add(LoanType loanType)
@@ -46,15 +49,36 @@ public class LoanTypeRepository(ApplicationContext context) : ILoanTypeRepositor
         return loanType;
     }
 
-    public async Task<LoanType> Update(LoanType oldLoanType, LoanType loanType)
+    public async Task<LoanType> Update(LoanType loanType)
     {
-        m_Context.Entry(oldLoanType)
-                 .State = EntityState.Detached;
+        await m_Context.LoanTypes.Where(dbLoanType => dbLoanType.Id == loanType.Id)
+                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbLoanType => dbLoanType.Name, loanType.Name)
+                                                             .SetProperty(dbLoanType => dbLoanType.Margin,     loanType.Margin)
+                                                             .SetProperty(dbLoanType => dbLoanType.ModifiedAt, loanType.ModifiedAt));
 
-        var updatedLoanType = m_Context.LoanTypes.Update(loanType);
+        return loanType;
+    }
+}
 
-        await m_Context.SaveChangesAsync();
+public static partial class RepositoryExtensions
+{
+    [Obsolete("This method does not have implementation.", true)]
+    public static IIncludableQueryable<LoanType, object?> IncludeAll(this DbSet<LoanType> set)
+    {
+        return set.Include(loanType => loanType);
+    }
 
-        return updatedLoanType.Entity;
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, LoanType?> value,
+                                                                                 Expression<Func<TEntity, LoanType?>>          navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
+    }
+
+    public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<LoanType>> value,
+                                                                                 Expression<Func<TEntity, List<LoanType>>> navigationExpression, params string[] excludeProperties)
+    where TEntity : class
+    {
+        return value;
     }
 }

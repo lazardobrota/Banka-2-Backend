@@ -10,7 +10,7 @@ public static partial class Example
     {
         public static class Installment
         {
-            public static readonly InstallmentRequest Request = Sample.Installment.Request;
+            public static readonly InstallmentCreateRequest Request = Sample.Installment.Request;
 
             public static readonly InstallmentUpdateRequest UpdateRequest = Sample.Installment.UpdateRequest;
 

@@ -37,7 +37,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
     [Authorize]
     [HttpGet(Endpoints.Account.GetOne)]
-    public async Task<ActionResult<AccountResponse>> GetOne([FromQuery] Guid id)
+    public async Task<ActionResult<AccountResponse>> GetOne([FromRoute] Guid id)
     {
         var result = await m_AccountService.GetOne(id);
 

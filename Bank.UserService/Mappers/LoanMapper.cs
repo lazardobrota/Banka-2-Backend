@@ -7,22 +7,22 @@ namespace Bank.UserService.Mappers;
 
 public static class LoanMapper
 {
-    public static Loan ToLoan(this LoanRequest request)
+    public static Loan ToLoan(this LoanCreateRequest createRequest)
     {
         var now = DateTime.UtcNow;
 
         return new Loan
                {
                    Id           = Guid.NewGuid(),
-                   TypeId       = request.TypeId,
-                   AccountId    = request.AccountId,
-                   Amount       = request.Amount,
-                   Period       = request.Period,
+                   TypeId       = createRequest.TypeId,
+                   AccountId    = createRequest.AccountId,
+                   Amount       = createRequest.Amount,
+                   Period       = createRequest.Period,
                    CreationDate = now,
-                   MaturityDate = CalculateMaturityDate(now, request.Period),
-                   CurrencyId   = request.CurrencyId,
+                   MaturityDate = CalculateMaturityDate(now, createRequest.Period),
+                   CurrencyId   = createRequest.CurrencyId,
                    Status       = LoanStatus.Pending,
-                   InterestType = request.InterestType,
+                   InterestType = createRequest.InterestType,
                    CreatedAt    = now,
                    ModifiedAt   = now
                };
@@ -33,13 +33,13 @@ public static class LoanMapper
         return new LoanResponse
                {
                    Id           = loan.Id,
-                   Type         = loan.LoanType.ToResponse(),
-                   Account      = loan.Account.ToResponse(),
+                   Type         = loan.LoanType!.ToResponse(),
+                   Account      = loan.Account!.ToResponse(),
                    Amount       = loan.Amount,
                    Period       = loan.Period,
                    CreationDate = DateOnly.FromDateTime(loan.CreationDate),
                    MaturityDate = DateOnly.FromDateTime(loan.MaturityDate),
-                   Currency     = loan.Currency.ToResponse(),
+                   Currency     = loan.Currency!.ToResponse(),
                    Status       = loan.Status,
                    InterestType = loan.InterestType,
                    CreatedAt    = loan.CreatedAt,
@@ -49,59 +49,41 @@ public static class LoanMapper
 
     public static LoanTypeResponse ToResponse(this LoanType loanType)
     {
-        return new LoanTypeResponse()
+        return new LoanTypeResponse
                {
                    Id     = loanType.Id,
                    Name   = loanType.Name,
-                   Margin = loanType.Margin,
+                   Margin = loanType.Margin
                };
     }
 
-    public static LoanType ToLoanType(this LoanTypeRequest request)
+    public static LoanType ToLoanType(this LoanTypeCreateRequest createRequest)
     {
         return new LoanType
                {
                    Id         = Guid.NewGuid(),
-                   Name       = request.Name,
-                   Margin     = request.Margin,
+                   Name       = createRequest.Name,
+                   Margin     = createRequest.Margin,
                    CreatedAt  = DateTime.UtcNow,
                    ModifiedAt = DateTime.UtcNow
                };
     }
 
-    public static Loan ToLoan(this LoanUpdateRequest request, Loan oldLoan)
+    public static Loan Update(this Loan loan, LoanUpdateRequest updateRequest)
     {
-        return new Loan()
-               {
-                   Id           = oldLoan.Id,
-                   TypeId       = oldLoan.TypeId,
-                   Account      = oldLoan.Account,
-                   Amount       = oldLoan.Amount,
-                   Period       = oldLoan.Period,
-                   CreationDate = oldLoan.CreationDate,
-                   MaturityDate = oldLoan.MaturityDate,
-                   Currency     = oldLoan.Currency,
-                   Status       = request.Status ?? oldLoan.Status,
-                   InterestType = oldLoan.InterestType,
-                   CreatedAt    = oldLoan.CreatedAt,
-                   ModifiedAt   = DateTime.UtcNow,
-                   AccountId    = oldLoan.AccountId,
-                   CurrencyId   = oldLoan.CurrencyId,
-               };
+        loan.Status     = updateRequest.Status ?? loan.Status;
+        loan.ModifiedAt = DateTime.UtcNow;
+
+        return loan;
     }
 
-    public static LoanType ToEntity(this LoanTypeUpdateRequest request, LoanType oldLoanType)
+    public static LoanType Update(this LoanType loanType, LoanTypeUpdateRequest updateRequest)
     {
-        var updatedLoanType = new LoanType
-                              {
-                                  Id         = oldLoanType.Id,
-                                  Name       = request.Name   ?? oldLoanType.Name,
-                                  Margin     = request.Margin ?? oldLoanType.Margin,
-                                  CreatedAt  = oldLoanType.CreatedAt,
-                                  ModifiedAt = DateTime.UtcNow
-                              };
+        loanType.Name       = updateRequest.Name   ?? loanType.Name;
+        loanType.Margin     = updateRequest.Margin ?? loanType.Margin;
+        loanType.ModifiedAt = DateTime.UtcNow;
 
-        return updatedLoanType;
+        return loanType;
     }
 
     private static DateTime CalculateMaturityDate(DateTime creationDate, int periodInMonths)

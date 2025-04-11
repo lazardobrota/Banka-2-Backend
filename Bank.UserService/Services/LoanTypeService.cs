@@ -13,7 +13,7 @@ public interface ILoanTypeService
 
     Task<Result<LoanTypeResponse>> GetOne(Guid id);
 
-    Task<Result<LoanTypeResponse>> Create(LoanTypeRequest request);
+    Task<Result<LoanTypeResponse>> Create(LoanTypeCreateRequest createRequest);
 
     Task<Result<LoanTypeResponse>> Update(LoanTypeUpdateRequest request, Guid id);
 }
@@ -42,9 +42,9 @@ public class LoanTypeService(ILoanTypeRepository loanTypeRepository) : ILoanType
         return Result.Ok(loanType.ToResponse());
     }
 
-    public async Task<Result<LoanTypeResponse>> Create(LoanTypeRequest request)
+    public async Task<Result<LoanTypeResponse>> Create(LoanTypeCreateRequest createRequest)
     {
-        var loanType = request.ToLoanType();
+        var loanType = createRequest.ToLoanType();
 
         var createdLoanType = await m_LoanTypeRepository.Add(loanType);
 
@@ -53,15 +53,13 @@ public class LoanTypeService(ILoanTypeRepository loanTypeRepository) : ILoanType
 
     public async Task<Result<LoanTypeResponse>> Update(LoanTypeUpdateRequest request, Guid id)
     {
-        var existingLoanType = await m_LoanTypeRepository.FindById(id);
+        var dbLoanType = await m_LoanTypeRepository.FindById(id);
 
-        if (existingLoanType == null)
+        if (dbLoanType == null)
             return Result.NotFound<LoanTypeResponse>($"Loan type with ID {id} not found");
 
-        var updatedLoanType = request.ToEntity(existingLoanType);
+        var loanType = await m_LoanTypeRepository.Update(dbLoanType.Update(request));
 
-        var result = await m_LoanTypeRepository.Update(existingLoanType, updatedLoanType);
-
-        return Result.Ok(result.ToResponse());
+        return Result.Ok(loanType.ToResponse());
     }
 }

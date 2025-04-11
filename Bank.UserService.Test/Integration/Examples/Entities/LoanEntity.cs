@@ -10,7 +10,7 @@ public static partial class Example
     {
         public static class Loan
         {
-            public static readonly LoanRequest Request = Sample.Loan.Request;
+            public static readonly LoanCreateRequest Request = Sample.Loan.Request;
 
             public static readonly LoanUpdateRequest UpdateRequest = Sample.Loan.UpdateRequest;
 

@@ -26,7 +26,7 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
     [When(@"installment is created in the database")]
     public async Task WhenInstallmentIsCreatedInTheDatabase()
     {
-        var installmentCreateRequest = m_ScenarioContext.Get<InstallmentRequest>(Constant.InstallmentCreateRequest);
+        var installmentCreateRequest = m_ScenarioContext.Get<InstallmentCreateRequest>(Constant.InstallmentCreateRequest);
 
         var installment = await m_InstallmentService.Create(installmentCreateRequest);
 

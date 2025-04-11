@@ -79,8 +79,13 @@ public class AccountService(
         if (accountType == null || client == null || currency == null || employee == null)
             return Result.BadRequest<AccountResponse>("Invalid data.");
 
-        var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(employee, client, currency, accountType));
+        var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(m_AuthorizationService.UserId));
 
+        account.Type     = accountType;
+        account.Client   = client;
+        account.Currency = currency;
+        account.Employee = employee;
+        
         return Result.Ok(account.ToResponse());
     }
 

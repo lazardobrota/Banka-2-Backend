@@ -20,16 +20,16 @@ public interface ICardService
 
     Task<Result<CardResponse>> Create(CardCreateRequest request);
 
-    Task<Result<CardResponse>> Update(CardStatusUpdateRequest request, Guid id);
+    Task<Result<CardResponse>> Update(CardUpdateStatusRequest request, Guid id);
 
-    Task<Result<CardResponse>> Update(CardLimitUpdateRequest request, Guid id);
+    Task<Result<CardResponse>> Update(CardUpdateLimitRequest request, Guid id);
 }
 
 public class CardService(ICardRepository repository, ICardTypeRepository cardTypeRepository, IAccountRepository accountRepository) : ICardService
 {
+    private readonly IAccountRepository  m_AccountRepository  = accountRepository;
     private readonly ICardRepository     m_CardRepository     = repository;
     private readonly ICardTypeRepository m_CardTypeRepository = cardTypeRepository;
-    private readonly IAccountRepository  m_AccountRepository  = accountRepository;
 
     public async Task<Result<Page<CardResponse>>> GetAll(CardFilterQuery cardFilterQuery, Pageable pageable)
     {
@@ -65,14 +65,16 @@ public class CardService(ICardRepository repository, ICardTypeRepository cardTyp
 
         const int maxRetries = 5;
 
-        for (int attempt = 0; attempt < maxRetries; attempt++)
-        {
+        for (var attempt = 0; attempt < maxRetries; attempt++)
             try
             {
                 var cardToCreate = cardCreateRequest.ToCard(cardType, account);
 
                 var card = await m_CardRepository.Add(cardToCreate);
 
+                card.Type    = cardType;
+                card.Account = account;
+                
                 return Result.Ok(card.ToResponse());
             }
             catch (DbUpdateException ex) when (IsDuplicateKeyException(ex))
@@ -82,31 +84,30 @@ public class CardService(ICardRepository repository, ICardTypeRepository cardTyp
 
                 await Task.Delay(50 * (attempt + 1));
             }
-        }
 
         return Result.BadRequest<CardResponse>("Unexpected error creating card");
     }
 
-    public async Task<Result<CardResponse>> Update(CardStatusUpdateRequest request, Guid id)
+    public async Task<Result<CardResponse>> Update(CardUpdateStatusRequest request, Guid id)
     {
-        var oldCard = await m_CardRepository.FindById(id);
+        var dbCard = await m_CardRepository.FindById(id);
 
-        if (oldCard is null)
+        if (dbCard is null)
             return Result.NotFound<CardResponse>($"No Card found with Id: {id}");
 
-        var card = await m_CardRepository.Update(oldCard, request.ToCard(oldCard));
+        var card = await m_CardRepository.Update(dbCard.Update(request));
 
         return Result.Ok(card.ToResponse());
     }
 
-    public async Task<Result<CardResponse>> Update(CardLimitUpdateRequest request, Guid id)
+    public async Task<Result<CardResponse>> Update(CardUpdateLimitRequest request, Guid id)
     {
-        var oldCard = await m_CardRepository.FindById(id);
+        var dbCard = await m_CardRepository.FindById(id);
 
-        if (oldCard is null)
+        if (dbCard is null)
             return Result.NotFound<CardResponse>($"No Card found with Id: {id}");
 
-        var card = await m_CardRepository.Update(oldCard, request.ToCard(oldCard));
+        var card = await m_CardRepository.Update(dbCard.Update(request));
 
         return Result.Ok(card.ToResponse());
     }

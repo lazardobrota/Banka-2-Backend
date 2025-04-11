@@ -11,7 +11,7 @@ public static partial class Sample
                                                                      {
                                                                          FirstName                  = "Nikola",
                                                                          LastName                   = "Jovanović",
-                                                                         DateOfBirth                = new(2005, 5, 17),
+                                                                         DateOfBirth                = new DateOnly(2005, 5, 17),
                                                                          Gender                     = Gender.Male,
                                                                          UniqueIdentificationNumber = "1705005710032",
                                                                          Username                   = "nikolaj",
@@ -20,7 +20,8 @@ public static partial class Sample
                                                                          Address                    = "Kneza Miloša 88",
                                                                          Role                       = Role.Employee,
                                                                          Department                 = "HR",
-                                                                         Employed                   = true
+                                                                         Employed                   = true,
+                                                                         Permissions                = 1 << 2
                                                                      };
 
         public static readonly EmployeeUpdateRequest UpdateRequest = new()

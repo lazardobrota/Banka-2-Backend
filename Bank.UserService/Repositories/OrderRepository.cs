@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bank.UserService.Repositories;
 
+//TODO: Move to Exchange Service Project
+
 public interface IOrderRepository
 {
     Task<Page<Order>> FindAll(OrderFilterQuery orderFilterQuery, Pageable pageable); // filter

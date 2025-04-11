@@ -24,21 +24,18 @@ public static class AccountCurrencyMapper
                };
     }
 
-    public static AccountCurrency ToAccountCurrency(this AccountCurrencyCreateRequest accountCurrencyCreateRequest, User employee, Currency currency, Account account)
+    public static AccountCurrency ToAccountCurrency(this AccountCurrencyCreateRequest createRequest)
     {
         return new AccountCurrency
                {
                    Id               = Guid.NewGuid(),
-                   AccountId        = account.Id,
-                   Account          = account,
-                   EmployeeId       = employee.Id,
-                   Employee         = employee,
-                   CurrencyId       = currency.Id,
-                   Currency         = currency,
+                   AccountId        = createRequest.AccountId,
+                   EmployeeId       = createRequest.EmployeeId,
+                   CurrencyId       = createRequest.CurrencyId,
                    Balance          = 0,
                    AvailableBalance = 0,
-                   DailyLimit       = accountCurrencyCreateRequest.DailyLimit,
-                   MonthlyLimit     = accountCurrencyCreateRequest.MonthlyLimit,
+                   DailyLimit       = createRequest.DailyLimit,
+                   MonthlyLimit     = createRequest.MonthlyLimit,
                    CreatedAt        = DateTime.UtcNow,
                    ModifiedAt       = DateTime.UtcNow
                };

@@ -37,9 +37,9 @@ public class LoanTypeController(ILoanTypeService loanTypeService) : ControllerBa
 
     [HttpPost(Endpoints.LoanType.Create)]
     [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
-    public async Task<ActionResult<LoanTypeResponse>> Create([FromBody] LoanTypeRequest request)
+    public async Task<ActionResult<LoanTypeResponse>> Create([FromBody] LoanTypeCreateRequest createRequest)
     {
-        var result = await m_LoanTypeService.Create(request);
+        var result = await m_LoanTypeService.Create(createRequest);
 
         return result.ActionResult;
     }
