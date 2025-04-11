@@ -169,7 +169,7 @@ public static class OptionSeederExtension
         Console.WriteLine("Completed");
     }
 
-    public static async Task SeedOptions(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
+    public static async Task SeedOptionsAndQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
         if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
             return;

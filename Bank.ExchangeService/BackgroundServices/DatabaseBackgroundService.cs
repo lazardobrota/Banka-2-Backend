@@ -1,4 +1,5 @@
-﻿using Bank.ExchangeService.Configurations;
+﻿using Bank.Application.Domain;
+using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Seeders;
 using Bank.ExchangeService.HttpClients;
@@ -16,6 +17,9 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
     private          Timer?              m_StockTimer;
     private          Timer?              m_ForexPairTimer;
     private          Timer?              m_OptionTimer;
+    private          Timer?              m_SecurityTimer;
+    private          bool                m_IsProcessRunning = false;
+    private          int                 m_IterationCount   = 0;
 
     private DatabaseContext Context =>
     m_ServiceProvider.CreateScope()
@@ -41,11 +45,22 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         Context.SeedStockExchanges()
                .Wait();
 
-        // Context.SeedForexPairHardcoded()
-        //        .Wait();
+        if (Configuration.Application.Profile == Profile.Testing)
+        {
+            Context.SeedFutureContractHardcoded()
+                   .Wait();
 
-        Context.SeedFutureContractHardcoded()
-               .Wait();
+            Context.SeedForexPairHardcoded()
+                   .Wait();
+
+            Context.SeedStockHardcoded()
+                   .Wait();
+
+            Context.SeedOptionHardcoded()
+                   .Wait();
+
+            return;
+        }
 
         Context.SeedForexPair(client, m_CurrencyClient, m_SecurityRepository)
                .Wait();
@@ -53,17 +68,14 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         Context.SeedStock(client)
                .Wait();
 
-        Context.SeedOptions(client, m_SecurityRepository, m_QuoteRepository)
+        Context.SeedOptionsAndQuotes(client, m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
-        if (!Context.Quotes.Any()) //TODO Need different way to check because SeedOptions fills Quotes
-        {
-            Context.SeedStockQuotes(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
-                   .Wait();
+        Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository, m_QuoteRepository)
+               .Wait();
 
-            Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository, m_QuoteRepository)
-                   .Wait();
-        }
+        Context.SeedStockQuotes(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
+               .Wait();
 
         InitializeTimers();
     }
@@ -72,9 +84,35 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
 
     public void InitializeTimers()
     {
-        m_StockTimer     = new Timer(async _ => await FetchStocksLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        m_ForexPairTimer = new Timer(async _ => await FetchForexPairLatest(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        m_OptionTimer    = new Timer(async _ => await FetchOptionLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        m_SecurityTimer = new Timer(_ => SecurityTimerCallBack()
+                                    .Wait(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        // m_StockTimer     = new Timer(async _ => await FetchStocksLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        // m_ForexPairTimer = new Timer(async _ => await FetchForexPairLatest(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+        // m_OptionTimer    = new Timer(async _ => await FetchOptionLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+    }
+
+    private async Task SecurityTimerCallBack()
+    {
+        if (m_IsProcessRunning)
+            return;
+
+        m_IsProcessRunning = true;
+
+        try
+        {
+            if (m_IterationCount is < 9 or 10)
+                await FetchStocksLatest();
+            else if (m_IterationCount == 9)
+                await FetchOptionLatest();
+            else
+                await FetchForexPairLatest();
+
+            m_IterationCount = (m_IterationCount + 1) % 12;
+        }
+        finally
+        {
+            m_IsProcessRunning = false;
+        }
     }
 
     private async Task FetchStocksLatest()

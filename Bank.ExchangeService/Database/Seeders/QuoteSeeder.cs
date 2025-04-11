@@ -343,6 +343,9 @@ public static class QuoteSeederExtension
 
     public static async Task SeedStockQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
+        if (context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.Stock))
+            return;
+
         var stopwatchFull = new Stopwatch();
         stopwatchFull.Start();
 

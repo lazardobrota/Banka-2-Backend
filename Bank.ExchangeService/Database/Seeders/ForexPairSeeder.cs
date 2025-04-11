@@ -242,6 +242,9 @@ public static class ForexPairSeederExtension
     public static async Task SeedForexPairQuotes(this DatabaseContext context, HttpClient httpClient, ICurrencyClient currencyClient, ISecurityRepository securityRepository,
                                                  IQuoteRepository     quoteRepository)
     {
+        if (context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.ForexPair))
+            return;
+
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
 
@@ -294,7 +297,8 @@ public static class ForexPairSeederExtension
                     return;
                 }
 
-                var forexPairId = tickerAndForexPair[$"{currencyFrom.Code}{currencyTo.Code}"].Id;
+                if (!tickerAndForexPair.TryGetValue($"{currencyFrom.Code}{currencyTo.Code}", out var forexPair))
+                    continue;
 
                 quotes.AddRange(body.Quotes.Select(pair =>
                                                    {
@@ -302,7 +306,7 @@ public static class ForexPairSeederExtension
                                                                           .ToUniversalTime()
                                                                           .AddHours(2);
 
-                                                       return pair.Value.ToQuote(forexPairId, date);
+                                                       return pair.Value.ToQuote(forexPair.Id, date);
                                                    }));
             }
         }
