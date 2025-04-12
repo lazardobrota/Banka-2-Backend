@@ -218,9 +218,10 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
         m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
+                                           .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
                                            .GroupJoin(context.Transactions, account => account.Id, transaction => transaction.FromAccountId,
                                                       (account, transaction) => new { account, transaction })
-                                           .Select(group => new Spending<Account>()
+                                           .Select(group => new
                                                             {
                                                                 Entity = group.account,
                                                                 Daily = group.transaction
@@ -246,9 +247,10 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
                                                                                                          (account.Id == accountId ? accountAmount : bankAccountAmount)));
 
         var updatedAccountCurrencies = await context.AccountCurrencies.Where(account => account.Id == accountId || account.Id == bankAccountId)
+                                                    .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
                                                     .GroupJoin(context.Transactions, account => account.Id, transaction => transaction.FromAccountId,
                                                                (account, transaction) => new { account, transaction })
-                                                    .Select(group => new Spending<AccountCurrency>()
+                                                    .Select(group => new
                                                                      {
                                                                          Entity = group.account,
                                                                          Daily = group.transaction
@@ -286,6 +288,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
         m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
+                                           .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
                                            .ExecuteUpdateAsync(setters => setters.SetProperty(account => account.AvailableBalance,
                                                                                               account => account.AvailableBalance -
                                                                                                          (account.Id == accountId ? accountAmount : bankAccountAmount)));

@@ -41,10 +41,3 @@ public class Account
         return false;
     }
 };
-
-public class Spending<T>
-{
-    public required T       Entity  { init; get; }
-    public required decimal Daily   { init; get; }
-    public required decimal Monthly { init; get; }
-}
