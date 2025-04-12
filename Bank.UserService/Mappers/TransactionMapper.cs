@@ -28,8 +28,10 @@ public static class TransactionMapper
         return new TransactionResponse
                {
                    Id              = transaction.Id,
-                   FromAccount     = transaction.FromAccount?.ToSimpleResponse()!,
-                   ToAccount       = transaction.ToAccount?.ToSimpleResponse()!,
+                   FromAccount     = transaction.FromAccount!.ToSimpleResponse(),
+                   FromCurrency    = transaction.FromCurrency!.ToResponse(),
+                   ToAccount       = transaction.ToAccount!.ToSimpleResponse(),
+                   ToCurrency      = transaction.ToCurrency!.ToResponse(),
                    FromAmount      = transaction.FromAmount,
                    ToAmount        = transaction.ToAmount,
                    Code            = transaction.Code?.ToResponse()!,
