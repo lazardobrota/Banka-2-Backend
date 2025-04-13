@@ -107,10 +107,10 @@ public static class TransactionMapper
                    Id              = Guid.NewGuid(),
                    FromAccountId   = internalTransaction.FromAccount!.Id,
                    FromCurrencyId  = internalTransaction.FromCurrencyId,
-                   FromAmount      = internalTransaction.Amount,
+                   FromAmount      = internalTransaction.Amount, //TODO: fix
                    ToAccountId     = internalTransaction.ToAccount!.Id,
                    ToCurrencyId    = internalTransaction.ToCurrencyId,
-                   ToAmount        = internalTransaction.Amount,
+                   ToAmount        = internalTransaction.Amount * internalTransaction.ExchangeDetails.ExchangeRate, 
                    CodeId          = internalTransaction.TransactionCodeId,
                    Status          = TransactionStatus.Pending,
                    Purpose         = internalTransaction.Purpose,
