@@ -14,9 +14,6 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
     private readonly ICurrencyClient     m_CurrencyClient     = currencyClient;
     private          ISecurityRepository m_SecurityRepository = null!;
     private          IQuoteRepository    m_QuoteRepository    = null!;
-    private          Timer?              m_StockTimer;
-    private          Timer?              m_ForexPairTimer;
-    private          Timer?              m_OptionTimer;
     private          Timer?              m_SecurityTimer;
     private          bool                m_IsProcessRunning = false;
     private          int                 m_IterationCount   = 0;
@@ -86,9 +83,6 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
     {
         m_SecurityTimer = new Timer(_ => SecurityTimerCallBack()
                                     .Wait(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        // m_StockTimer     = new Timer(async _ => await FetchStocksLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        // m_ForexPairTimer = new Timer(async _ => await FetchForexPairLatest(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        // m_OptionTimer    = new Timer(async _ => await FetchOptionLatest(),    null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
     }
 
     private async Task SecurityTimerCallBack()

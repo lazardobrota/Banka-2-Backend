@@ -27,16 +27,12 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
 
     private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
 
-    public async Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery)
-
     public async Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery, bool includeForeignEntity)
     {
-        var currencyQuery = m_Context.Currencies.IncludeAll()
-                                     .AsQueryable();
         var currencyQuery = m_Context.Currencies.AsQueryable();
 
         if (includeForeignEntity)
-            currencyQuery = currencyQuery.Include(c => c.Countries);
+            currencyQuery = m_Context.Currencies.IncludeAll().AsQueryable();
 
         if (!string.IsNullOrEmpty(currencyFilterQuery.Name))
             currencyQuery = currencyQuery.Where(currency => EF.Functions.ILike(currency.Name, $"%{currencyFilterQuery.Name}%"));
@@ -70,17 +66,13 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
 
     #region Static Repository Calls
 
-    private static async Task<Currency?> FindById(Guid id, ApplicationContext context)
-
     private static async Task<Currency?> FindById(Guid id, bool includeForeignEntity, ApplicationContext context)
     {
-        return await context.Currencies.IncludeAll()
-                            .Where(currency => currency.Id == id)
-                            .FirstOrDefaultAsync();
         var currencyQuery = context.Currencies.AsQueryable();
 
         if (includeForeignEntity)
-            currencyQuery = currencyQuery.Include(c => c.Countries);
+            currencyQuery = context.Currencies.IncludeAll()
+                                   .AsQueryable();
 
         return await currencyQuery.Where(currency => currency.Id == id)
                                   .FirstOrDefaultAsync();
@@ -88,13 +80,11 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
 
     private static async Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity, ApplicationContext context)
     {
-        return await context.Currencies.IncludeAll()
-                            .Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
-                            .FirstOrDefaultAsync();
         var currencyQuery = context.Currencies.AsQueryable();
 
         if (includeForeignEntity)
-            currencyQuery = currencyQuery.Include(c => c.Countries);
+            currencyQuery = context.Currencies.IncludeAll()
+                                   .AsQueryable();
 
         return await currencyQuery.Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
                                   .FirstOrDefaultAsync();
