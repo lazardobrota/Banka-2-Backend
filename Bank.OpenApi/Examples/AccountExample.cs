@@ -7,55 +7,55 @@ public static partial class Example
 {
     public static class Account
     {
-        public static readonly AccountCreateRequest CreateRequest = new()
-                                                                    {
-                                                                        Name          = Constant.AccountName,
-                                                                        DailyLimit    = Constant.DailyLimit,
-                                                                        MonthlyLimit  = Constant.MonthlyLimit,
-                                                                        ClientId      = Constant.Id,
-                                                                        Balance       = Constant.Balance,
-                                                                        CurrencyId    = Constant.Id,
-                                                                        AccountTypeId = Constant.Id,
-                                                                        Status        = Constant.Boolean
-                                                                    };
+        public static readonly AccountCreateRequest DefaultCreateRequest = new()
+                                                                           {
+                                                                               Name          = Constant.AccountName,
+                                                                               DailyLimit    = Constant.DailyLimit,
+                                                                               MonthlyLimit  = Constant.MonthlyLimit,
+                                                                               ClientId      = Constant.Id,
+                                                                               Balance       = Constant.Balance,
+                                                                               CurrencyId    = Constant.Id,
+                                                                               AccountTypeId = Constant.Id,
+                                                                               Status        = Constant.Boolean
+                                                                           };
 
-        public static readonly AccountUpdateClientRequest UpdateClientRequest = new()
-                                                                                {
-                                                                                    Name         = Constant.AccountName,
-                                                                                    DailyLimit   = Constant.DailyLimit,
-                                                                                    MonthlyLimit = Constant.MonthlyLimit,
-                                                                                };
+        public static readonly AccountUpdateClientRequest DefaultUpdateClientRequest = new()
+                                                                                       {
+                                                                                           Name         = Constant.AccountName,
+                                                                                           DailyLimit   = Constant.DailyLimit,
+                                                                                           MonthlyLimit = Constant.MonthlyLimit,
+                                                                                       };
 
-        public static readonly AccountUpdateEmployeeRequest UpdateEmployeeRequest = new()
-                                                                                    {
-                                                                                        Status = Constant.Boolean
-                                                                                    };
+        public static readonly AccountUpdateEmployeeRequest DefaultUpdateEmployeeRequest = new()
+                                                                                           {
+                                                                                               Status = Constant.Boolean
+                                                                                           };
 
-        public static readonly AccountResponse Response = new()
-                                                          {
-                                                              Id                = Constant.Id,
-                                                              AccountNumber     = Constant.AccountNumber,
-                                                              Name              = Constant.AccountName,
-                                                              Balance           = Constant.Balance,
-                                                              AvailableBalance  = Constant.Balance,
-                                                              Type              = AccountType.Response,
-                                                              Currency          = Currency.Response,
-                                                              Employee          = Employee.SimpleResponse,
-                                                              Client            = Client.SimpleResponse,
-                                                              AccountCurrencies = [AccountCurrency.Response],
-                                                              DailyLimit        = Constant.DailyLimit,
-                                                              MonthlyLimit      = Constant.MonthlyLimit,
-                                                              CreationDate      = Constant.CreationDate,
-                                                              ExpirationDate    = Constant.CreationDate,
-                                                              Status            = Constant.Boolean,
-                                                              CreatedAt         = Constant.CreatedAt,
-                                                              ModifiedAt        = Constant.ModifiedAt
-                                                          };
+        public static readonly AccountResponse DefaultResponse = new()
+                                                                 {
+                                                                     Id                = Constant.Id,
+                                                                     AccountNumber     = Constant.AccountNumber,
+                                                                     Name              = Constant.AccountName,
+                                                                     Balance           = Constant.Balance,
+                                                                     AvailableBalance  = Constant.Balance,
+                                                                     Type              = AccountType.DefaultResponse,
+                                                                     Currency          = Currency.DefaultResponse,
+                                                                     Employee          = Employee.DefaultSimpleResponse,
+                                                                     Client            = Client.DefaultSimpleResponse,
+                                                                     AccountCurrencies = [AccountCurrency.DefaultResponse],
+                                                                     DailyLimit        = Constant.DailyLimit,
+                                                                     MonthlyLimit      = Constant.MonthlyLimit,
+                                                                     CreationDate      = Constant.CreationDate,
+                                                                     ExpirationDate    = Constant.CreationDate,
+                                                                     Status            = Constant.Boolean,
+                                                                     CreatedAt         = Constant.CreatedAt,
+                                                                     ModifiedAt        = Constant.ModifiedAt
+                                                                 };
 
-        public static readonly AccountSimpleResponse SimpleResponse = new()
-                                                                      {
-                                                                          Id            = Constant.Id,
-                                                                          AccountNumber = Constant.AccountNumber,
-                                                                      };
+        public static readonly AccountSimpleResponse DefaultSimpleResponse = new()
+                                                                             {
+                                                                                 Id            = Constant.Id,
+                                                                                 AccountNumber = Constant.AccountNumber,
+                                                                             };
     }
 }
