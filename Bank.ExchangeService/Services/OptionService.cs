@@ -24,7 +24,7 @@ public class OptionService(ISecurityRepository securityRepository, ICurrencyClie
 
     public async Task<Result<Page<OptionSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
-        var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.Option, pageable);
+        var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.Option, pageable, false);
 
         var responses = page.Items.Select(security => security.ToOption()
                                                               .ToSimpleResponse())
@@ -35,7 +35,7 @@ public class OptionService(ISecurityRepository securityRepository, ICurrencyClie
 
     public async Task<Result<OptionResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter)
     {
-        var security = await m_SecurityRepository.FindById(id, filter);
+        var security = await m_SecurityRepository.FindById(id, filter, true);
 
         if (security is null)
             return Result.NotFound<OptionResponse>($"No Option found with Id: {id}");

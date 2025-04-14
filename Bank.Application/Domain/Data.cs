@@ -91,6 +91,7 @@ public enum Permission : long
     Employee = 1 << 2,
     Client   = 1 << 3
 }
+
 public enum Liquidity
 {
     High,
@@ -108,7 +109,10 @@ public enum ContractUnit
 {
     Kilogram,
     Liter,
-    Barrel
+    Barrel,
+    Bushel,
+    Pound,
+    CubicMeter
 }
 
 public enum SecurityType

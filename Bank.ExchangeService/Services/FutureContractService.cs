@@ -24,7 +24,7 @@ public class FutureContractService(ISecurityRepository securityRepository, ICurr
 
     public async Task<Result<Page<FutureContractSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
-        var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.FutureContract, pageable);
+        var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.FutureContract, pageable, false);
 
         var responses = page.Items.Select(contract => contract.ToFutureContract()
                                                               .ToSimpleResponse())

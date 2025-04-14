@@ -11,9 +11,9 @@ public interface ISecurityRepository
 {
     Task<List<Security>> FindAll(SecurityType securityType);
 
-    Task<Page<Security>> FindAll(QuoteFilterQuery quoteFilterQuery, SecurityType securityType, Pageable pageable);
+    Task<Page<Security>> FindAll(QuoteFilterQuery quoteFilterQuery, SecurityType securityType, Pageable pageable, bool inPast = true);
 
-    Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter);
+    Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter, bool inPast = true);
 
     Task<Security?> FindByIdDaily(Guid id, QuoteFilterIntervalQuery filter);
 
@@ -36,26 +36,22 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
                               .ToListAsync();
     }
 
-    public async Task<Page<Security>> FindAll(QuoteFilterQuery quoteFilterQuery, SecurityType securityType, Pageable pageable)
+    public async Task<Page<Security>> FindAll(QuoteFilterQuery quoteFilterQuery, SecurityType securityType, Pageable pageable, bool inPast)
     {
         var query = m_Context.Securities.Include(stock => stock.StockExchange)
                              .AsQueryable();
 
-        query = query.Where(security => security.SecurityType == securityType);
+        query = query.Where(security => security.SecurityType == securityType && security.Quotes.Any());
 
-        var fromDate = DateOnly.FromDateTime(quoteFilterQuery.Interval switch
-                                             {
-                                                 QuoteIntervalType.Week        => DateTime.Today.AddDays(-7),
-                                                 QuoteIntervalType.Month       => DateTime.Today.AddMonths(-1),
-                                                 QuoteIntervalType.ThreeMonths => DateTime.Today.AddMonths(-3),
-                                                 QuoteIntervalType.Year        => DateTime.Today.AddYears(-1),
-                                                 QuoteIntervalType.Max         => DateTime.MinValue,
-                                                 _                             => DateTime.Today
-                                             });
+        var fromDateQuote = CalculateDateInterval(quoteFilterQuery.Interval);
 
-        query = query.Include(stock => stock.Quotes.Where(quote => fromDate                               <= DateOnly.FromDateTime(quote.CreatedAt) &&
+        query = query.Include(stock => stock.Quotes.Where(quote => fromDateQuote                          <= DateOnly.FromDateTime(quote.CreatedAt) &&
                                                                    DateOnly.FromDateTime(quote.CreatedAt) <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)))
                                             .OrderByDescending(quote => quote.CreatedAt));
+
+        var date     = CalculateDateInterval(quoteFilterQuery.Interval, inPast);
+        var fromDate = inPast ? date : DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+        var toDate   = inPast ? DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)) : date;
 
         if (!string.IsNullOrEmpty(quoteFilterQuery.Name))
             query = query.Where(stock => EF.Functions.ILike(stock.Name, $"%{quoteFilterQuery.Name}%"));
@@ -68,30 +64,42 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
 
         var total = await query.CountAsync();
 
-        var items = await query.Skip((pageable.Page - 1) * pageable.Size)
+        var items = await query.Where(security => security.SettlementDate == DateOnly.MinValue || fromDate <= security.SettlementDate && security.SettlementDate <= toDate)
+                               .AsNoTracking()
+                               .OrderByDescending(security => security.Quotes.First()
+                                                                      .CreatedAt)
+                               .Skip((pageable.Page - 1) * pageable.Size)
                                .Take(pageable.Size)
                                .ToListAsync();
 
         return new Page<Security>(items, pageable.Page, pageable.Size, total);
     }
 
-    public async Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter)
+    public async Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter, bool inPast)
     {
-        var fromDate = DateOnly.FromDateTime(filter.Interval switch
-                                             {
-                                                 QuoteIntervalType.Week        => DateTime.Today.AddDays(-7),
-                                                 QuoteIntervalType.Month       => DateTime.Today.AddMonths(-1),
-                                                 QuoteIntervalType.ThreeMonths => DateTime.Today.AddMonths(-3),
-                                                 QuoteIntervalType.Year        => DateTime.Today.AddYears(-1),
-                                                 QuoteIntervalType.Max         => DateTime.MinValue,
-                                                 _                             => DateTime.Today
-                                             });
+        var date = DateOnly.FromDateTime(filter.Interval switch
+                                         {
+                                             QuoteIntervalType.Week        => DateTime.Today.AddDays(-7),
+                                             QuoteIntervalType.Month       => DateTime.Today.AddMonths(-1),
+                                             QuoteIntervalType.ThreeMonths => DateTime.Today.AddMonths(-3),
+                                             QuoteIntervalType.Year        => DateTime.Today.AddYears(-1),
+                                             QuoteIntervalType.Max         => inPast ? DateTime.MinValue : DateTime.MaxValue,
+                                             _                             => inPast ? DateTime.Today : DateTime.Today.AddDays(1)
+                                         });
 
-        return await m_Context.Securities.Include(stock => stock.StockExchange)
-                              .Include(stock => stock.Quotes.Where(quote => fromDate                               <= DateOnly.FromDateTime(quote.CreatedAt) &&
-                                                                            DateOnly.FromDateTime(quote.CreatedAt) <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)))
-                                                     .OrderByDescending(quote => quote.CreatedAt))
-                              .FirstOrDefaultAsync(stock => stock.Id == id);
+        var fromDate = inPast ? date : DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+        var toDate   = inPast ? DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)) : date;
+
+        var query = m_Context.Securities.Include(stock => stock.StockExchange)
+                             .AsNoTracking()
+                             .Where(stock => stock.Id == id)
+                             .AsQueryable();
+
+        if (inPast)
+            query = query.Include(security => security.Quotes.Where(quote => fromDate <= DateOnly.FromDateTime(quote.CreatedAt) && DateOnly.FromDateTime(quote.CreatedAt) <= toDate)
+                                                      .OrderByDescending(quote => quote.CreatedAt));
+
+        return await query.FirstOrDefaultAsync(stock => stock.Id == id);
     }
 
     public async Task<Security?> FindByIdDaily(Guid id, QuoteFilterIntervalQuery filter)
@@ -151,5 +159,21 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
         await context.Securities.AddRangeAsync(securities);
 
         return await context.SaveChangesAsync() == securities.Count;
+    }
+
+    private DateOnly CalculateDateInterval(QuoteIntervalType intervalType, bool inPast = true)
+    {
+        var inPastValue = inPast ? -1 : 1;
+
+        return DateOnly.FromDateTime(intervalType switch
+                                     {
+                                         QuoteIntervalType.Day         => inPast ? DateTime.Today : DateTime.Today.AddDays(1),
+                                         QuoteIntervalType.Week        => DateTime.Today.AddDays(7   * inPastValue),
+                                         QuoteIntervalType.Month       => DateTime.Today.AddMonths(1 * inPastValue),
+                                         QuoteIntervalType.ThreeMonths => DateTime.Today.AddMonths(3 * inPastValue),
+                                         QuoteIntervalType.Year        => DateTime.Today.AddYears(1  * inPastValue),
+                                         QuoteIntervalType.Max         => inPast ? DateTime.MinValue : DateTime.MaxValue,
+                                         _                             => DateTime.Today.AddDays(7 * inPastValue)
+                                     });
     }
 }

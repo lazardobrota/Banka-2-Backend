@@ -98,6 +98,71 @@ public static partial class Seeder
                                                                     CreatedAt  = DateTime.UtcNow,
                                                                     ModifiedAt = DateTime.UtcNow
                                                                 };
+
+        public static readonly StockExchangeModel CME = new()
+                                                        {
+                                                            Id         = Guid.Parse("c3d8d466-22c0-487c-8247-c229efda2a03"),
+                                                            Name       = "Chicago Mercantile Exchange",
+                                                            Acronym    = "CME",
+                                                            MIC        = "XCME",
+                                                            Polity     = "United States",
+                                                            CurrencyId = Guid.Parse("81bf331a-0a35-4716-ad12-d1d1bcf66627"), // USD
+                                                            TimeZone   = TimeSpan.FromHours(-6),                             // CST/CDT
+                                                            CreatedAt  = DateTime.UtcNow,
+                                                            ModifiedAt = DateTime.UtcNow
+                                                        };
+
+        public static readonly StockExchangeModel ICE = new()
+                                                        {
+                                                            Id         = Guid.Parse("bdeb3a2c-831c-44a3-8ce0-81bc7a9c3773"),
+                                                            Name       = "Intercontinental Exchange",
+                                                            Acronym    = "ICE",
+                                                            MIC        = "IEPA",
+                                                            Polity     = "United States",
+                                                            CurrencyId = Guid.Parse("81bf331a-0a35-4716-ad12-d1d1bcf66627"), // USD
+                                                            TimeZone   = TimeSpan.FromHours(-5),                             // EST/EDT
+                                                            CreatedAt  = DateTime.UtcNow,
+                                                            ModifiedAt = DateTime.UtcNow
+                                                        };
+
+        public static readonly StockExchangeModel LME = new()
+                                                        {
+                                                            Id         = Guid.Parse("030500c4-f824-4662-a77e-799d22863381"),
+                                                            Name       = "London Metal Exchange",
+                                                            Acronym    = "LME",
+                                                            MIC        = "XLME",
+                                                            Polity     = "United Kingdom",
+                                                            CurrencyId = Guid.Parse("8e8e9283-4ced-4d9e-aa4a-1036d0174c8c"), // GBP
+                                                            TimeZone   = TimeSpan.Zero,                                      // GMT/BST
+                                                            CreatedAt  = DateTime.UtcNow,
+                                                            ModifiedAt = DateTime.UtcNow
+                                                        };
+
+        // public static readonly StockExchangeModel SHFE = new()
+        //                                                  {
+        //                                                      Id         = Guid.Parse("4ef58041-fce8-4725-8449-ffa98c48d1ed"),
+        //                                                      Name       = "Shanghai Futures Exchange",
+        //                                                      Acronym    = "SHFE",
+        //                                                      MIC        = "XSFE",
+        //                                                      Polity     = "China",
+        //                                                      CurrencyId = Guid.Parse("c3d4e5f6-a7b8-4950-1d2e-3f4a5b6c7d8e"), // CNY
+        //                                                      TimeZone   = TimeSpan.FromHours(8),                              // China Standard Time
+        //                                                      CreatedAt  = DateTime.UtcNow,
+        //                                                      ModifiedAt = DateTime.UtcNow
+        //                                                  };
+
+        public static readonly StockExchangeModel TOCOM = new()
+                                                          {
+                                                              Id         = Guid.Parse("0e6b8da5-ef55-442b-af78-7bf8040980e1"),
+                                                              Name       = "Tokyo Commodity Exchange",
+                                                              Acronym    = "TOCOM",
+                                                              MIC        = "XTKM",
+                                                              Polity     = "Japan",
+                                                              CurrencyId = Guid.Parse("1a77ed84-d984-4410-85ec-ffde69508625"), // JPY
+                                                              TimeZone   = TimeSpan.FromHours(9),                              // JST
+                                                              CreatedAt  = DateTime.UtcNow,
+                                                              ModifiedAt = DateTime.UtcNow
+                                                          };
     }
 }
 
@@ -109,7 +174,8 @@ public static class StockExchangeSeederExtension
             return;
 
         await context.StockExchanges.AddRangeAsync(Seeder.StockExchange.Nasdaq, Seeder.StockExchange.ASX, Seeder.StockExchange.EDGADark, Seeder.StockExchange.ClearStreet,
-                                                   Seeder.StockExchange.MarexIreland, Seeder.StockExchange.BorsaItaliana, Seeder.StockExchange.ForexMarket);
+                                                   Seeder.StockExchange.MarexIreland, Seeder.StockExchange.BorsaItaliana, Seeder.StockExchange.ForexMarket,
+                                                   Seeder.StockExchange.CME, Seeder.StockExchange.ICE, Seeder.StockExchange.LME, Seeder.StockExchange.TOCOM);
 
         await context.SaveChangesAsync();
     }

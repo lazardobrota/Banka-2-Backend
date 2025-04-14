@@ -32,7 +32,8 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
         var currencyQuery = m_Context.Currencies.AsQueryable();
 
         if (includeForeignEntity)
-            currencyQuery = m_Context.Currencies.IncludeAll().AsQueryable();
+            currencyQuery = m_Context.Currencies.IncludeAll()
+                                     .AsQueryable();
 
         if (!string.IsNullOrEmpty(currencyFilterQuery.Name))
             currencyQuery = currencyQuery.Where(currency => EF.Functions.ILike(currency.Name, $"%{currencyFilterQuery.Name}%"));
@@ -107,7 +108,7 @@ public static partial class RepositoryExtensions
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Currency?> value,
-                                                                                 Expression<Func<TEntity, Currency?>>          navigationExpression, params string[] excludeProperties)
+                                                                                 Expression<Func<TEntity, Currency?>> navigationExpression, params string[] excludeProperties)
     where TEntity : class
     {
         IIncludableQueryable<TEntity, object?> query = value;

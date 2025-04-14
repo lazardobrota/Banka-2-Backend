@@ -56,7 +56,7 @@ public static class ExchangeMapper
     public static Exchange Update(this Exchange exchange, ExchangeUpdateRequest exchangeUpdateRequest)
     {
         exchange.Commission = exchangeUpdateRequest.Commission;
-        
+
         return exchange;
     }
 }

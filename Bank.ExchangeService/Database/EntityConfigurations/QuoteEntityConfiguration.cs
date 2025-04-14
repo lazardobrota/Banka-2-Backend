@@ -11,6 +11,8 @@ public class QuoteEntityConfiguration : IEntityTypeConfiguration<Quote>
     {
         builder.HasKey(quote => quote.Id);
 
+        builder.HasIndex(quote => quote.CreatedAt);
+
         builder.Property(quote => quote.Id)
                .IsRequired();
 

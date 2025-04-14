@@ -80,7 +80,7 @@ public static partial class RepositoryExtensions
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, CardType?> query,
-                                                                                 Expression<Func<TEntity, CardType?>>          navigationExpression, params string[] excludeProperties)
+                                                                                 Expression<Func<TEntity, CardType?>> navigationExpression, params string[] excludeProperties)
     where TEntity : class
     {
         return query;

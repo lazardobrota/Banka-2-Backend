@@ -4,10 +4,13 @@ using System.Text.Json;
 using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
+using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HttpClients;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
+
+using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
@@ -172,7 +175,7 @@ public static class ForexPairSeederExtension
     }
 
     public static async Task SeedForexPairLatest(this DatabaseContext context, HttpClient httpClient, ICurrencyClient currencyClient, ISecurityRepository securityRepository,
-                                                 IQuoteRepository     quoteRepository)
+                                                 IQuoteRepository     quoteRepository, IHubContext<SecurityHub, ISecurityClient> securityHub)
     {
         var currencies = await currencyClient.GetAllCurrenciesSimple();
 
@@ -227,8 +230,14 @@ public static class ForexPairSeederExtension
                     return;
                 }
 
-                var forexPairId = tickerAndForexPair[$"{currencyFrom.Code}{currencyTo.Code}"].Id;
-                quotes.Add(body.ToQuote(forexPairId));
+                var ticker                    = $"{currencyFrom.Code}{currencyTo.Code}";
+                var forexPairId               = tickerAndForexPair[ticker].Id;
+                var quote                     = body.ToQuote(forexPairId);
+                var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse(ticker);
+                quotes.Add(quote);
+
+                await securityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
+                                 .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
             }
         }
 

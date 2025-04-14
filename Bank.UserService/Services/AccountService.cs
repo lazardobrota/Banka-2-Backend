@@ -85,7 +85,7 @@ public class AccountService(
         account.Client   = client;
         account.Currency = currency;
         account.Employee = employee;
-        
+
         return Result.Ok(account.ToResponse());
     }
 

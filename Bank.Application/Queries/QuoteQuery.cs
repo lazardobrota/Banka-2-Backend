@@ -2,8 +2,8 @@
 
 public enum QuoteIntervalType
 {
-    Day,
     Week,
+    Day,
     Month,
     ThreeMonths,
     Year,

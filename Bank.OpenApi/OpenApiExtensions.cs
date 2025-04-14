@@ -18,8 +18,7 @@ public static class OpenApiExtensions
     {
         application.MapOpenApi();
         application.MapScalarApiReference();
-        
+
         return application;
     }
-
 }

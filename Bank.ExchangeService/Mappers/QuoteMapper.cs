@@ -10,12 +10,28 @@ public static class QuoteMapper
         return new QuoteSimpleResponse
                {
                    Id         = quote.Id,
-                   Price      = quote.AskPrice,
                    HighPrice  = quote.HighPrice,
                    LowPrice   = quote.LowPrice,
                    Volume     = quote.Volume,
                    CreatedAt  = quote.CreatedAt,
                    ModifiedAt = quote.ModifiedAt,
+                   AskPrice   = quote.AskPrice,
+                   BidPrice   = quote.BidPrice,
+               };
+    }
+
+    public static QuoteLatestSimpleResponse ToLatestSimpleResponse(this Quote quote, string securityTicker)
+    {
+        return new QuoteLatestSimpleResponse
+               {
+                   SecurityTicker = securityTicker,
+                   AskPrice       = quote.AskPrice,
+                   BidPrice       = quote.BidPrice,
+                   HighPrice      = quote.HighPrice,
+                   LowPrice       = quote.LowPrice,
+                   Volume         = quote.Volume,
+                   CreatedAt      = quote.CreatedAt,
+                   ModifiedAt     = quote.ModifiedAt,
                };
     }
 
@@ -33,12 +49,11 @@ public static class QuoteMapper
                };
     }
 
-    public static QuoteChartSimpleResponse ToChartSimpleResponse(this Quote quote)
+    public static QuoteSimpleResponse ToChartSimpleResponse(this Quote quote)
     {
-        return new QuoteChartSimpleResponse()
+        return new QuoteSimpleResponse()
                {
                    Id         = quote.Id,
-                   Price      = quote.AskPrice,
                    HighPrice  = quote.HighPrice,
                    LowPrice   = quote.LowPrice,
                    Volume     = quote.Volume,

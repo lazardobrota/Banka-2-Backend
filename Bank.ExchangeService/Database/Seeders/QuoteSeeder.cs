@@ -4,9 +4,12 @@ using System.Web;
 using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
+using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
+
+using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
@@ -293,7 +296,8 @@ public static class QuoteSeederExtension
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedQuoteStocksLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
+    public static async Task SeedQuoteStocksLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository,
+                                                   IHubContext<SecurityHub, ISecurityClient> securityHub)
     {
         var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
 
@@ -304,7 +308,6 @@ public static class QuoteSeederExtension
         query["symbols"] = symbols;
 
         var quotes = new List<QuoteModel>();
-
         var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
 
         var request = new HttpRequestMessage
@@ -335,8 +338,18 @@ public static class QuoteSeederExtension
             return;
         }
 
-        quotes.AddRange(body.Where(pair => pair.Value is { DailyBar: not null, LatestQuote: not null, MinuteBar: not null })
-                            .Select(pair => pair.Value.ToQuote(stocks[pair.Key].Id)));
+        foreach (var pair in body)
+        {
+            if (pair.Value is not { DailyBar: not null, LatestQuote: not null, MinuteBar: not null })
+                continue;
+
+            var quote                     = pair.Value.ToQuote(stocks[pair.Key].Id);
+            var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse(pair.Key);
+            quotes.Add(quote);
+
+            await securityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
+                             .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
+        }
 
         await quoteRepository.CreateQuotes(quotes);
     }

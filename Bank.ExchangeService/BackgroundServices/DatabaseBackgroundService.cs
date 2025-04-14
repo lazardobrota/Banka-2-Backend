@@ -2,21 +2,30 @@
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Seeders;
+using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HttpClients;
 using Bank.ExchangeService.Repositories;
 
+using Microsoft.AspNetCore.SignalR;
+
 namespace Bank.ExchangeService.BackgroundServices;
 
-public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, ICurrencyClient currencyClient)
+public class DatabaseBackgroundService(
+    IServiceProvider                          serviceProvider,
+    IHttpClientFactory                        httpClientFactory,
+    ICurrencyClient                           currencyClient,
+    IHubContext<SecurityHub, ISecurityClient> securityHub
+)
 {
-    private readonly IServiceProvider    m_ServiceProvider    = serviceProvider;
-    private readonly IHttpClientFactory  m_HttpClientFactory  = httpClientFactory;
-    private readonly ICurrencyClient     m_CurrencyClient     = currencyClient;
-    private          ISecurityRepository m_SecurityRepository = null!;
-    private          IQuoteRepository    m_QuoteRepository    = null!;
-    private          Timer?              m_SecurityTimer;
-    private          bool                m_IsProcessRunning = false;
-    private          int                 m_IterationCount   = 0;
+    private readonly IServiceProvider                          m_ServiceProvider    = serviceProvider;
+    private readonly IHttpClientFactory                        m_HttpClientFactory  = httpClientFactory;
+    private readonly ICurrencyClient                           m_CurrencyClient     = currencyClient;
+    private readonly IHubContext<SecurityHub, ISecurityClient> m_SecurityHub        = securityHub;
+    private          ISecurityRepository                       m_SecurityRepository = null!;
+    private          IQuoteRepository                          m_QuoteRepository    = null!;
+    private          Timer?                                    m_SecurityTimer;
+    private          bool                                      m_IsProcessRunning = false;
+    private          int                                       m_IterationCount   = 0;
 
     private DatabaseContext Context =>
     m_ServiceProvider.CreateScope()
@@ -58,6 +67,9 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
 
             return;
         }
+
+        Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
+               .Wait();
 
         Context.SeedForexPair(client, m_CurrencyClient, m_SecurityRepository)
                .Wait();
@@ -116,7 +128,7 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
         var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
 
-        await context.SeedQuoteStocksLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository);
+        await context.SeedQuoteStocksLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository, m_SecurityHub);
     }
 
     private async Task FetchForexPairLatest()
@@ -126,7 +138,7 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
         var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
 
-        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), m_CurrencyClient, securityRepository, quoteRepository);
+        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), m_CurrencyClient, securityRepository, quoteRepository, m_SecurityHub);
     }
 
     private async Task FetchOptionLatest()
@@ -136,6 +148,6 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
         var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
 
-        await context.SeedOptionsLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository);
+        await context.SeedOptionsLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository, m_SecurityHub);
     }
 }

@@ -66,7 +66,7 @@ public class AccountCurrencyService(
         accountCurrency.Account  = account;
         accountCurrency.Currency = currency;
         accountCurrency.Employee = employee;
-        
+
         return Result.Ok(accountCurrency.ToResponse());
     }
 
