@@ -10,8 +10,8 @@ public static partial class Configuration
     {
         public static class Global
         {
-            public static readonly int HistoryTimeFrameInMinutes = EnvironmentUtilities.GetIntVariable("HISTORY_TIME_FRAME_IN_MINUTES");
-            public static readonly int LatestTimeFrameInMinutes  = EnvironmentUtilities.GetIntVariable("LATEST_TIME_FRAME_IN_MINUTES");
+            public static readonly int HistoryTimeFrameInMinutes = EnvironmentUtilities.GetIntVariable("BANK_EXCHANGE_HISTORY_TIME_FRAME_IN_MINUTES");
+            public static readonly int LatestTimeFrameInMinutes  = EnvironmentUtilities.GetIntVariable("BANK_EXCHANGE_LATEST_TIME_FRAME_IN_MINUTES");
         }
 
         public static class Stock

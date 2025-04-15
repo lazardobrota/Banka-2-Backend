@@ -42,9 +42,8 @@ public class ExchangeApplication
         builder.Services.AddHttpServices();
 
         builder.Services.AddCors();
-        //TODO Commented this because it crashes
-        // builder.Services.AddAuthenticationServices();
-        // builder.Services.AddAuthorizationServices();
+        builder.Services.AddAuthenticationServices();
+        builder.Services.AddAuthorizationServices();
 
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
@@ -86,7 +85,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISecurityRepository, SecurityRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
-        
+
         return services;
     }
 
@@ -117,12 +116,12 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient();
         services.AddHttpContextAccessor();
 
-        // services.AddHttpClient(Configuration.HttpClient.Name.UserService, httpClient =>
-        //                                                                   {
-        //                                                                       httpClient.BaseAddress = new Uri($"{Configuration.HttpClient.BaseUrl.UserService}");
-        //                                                                       //TODO
-        //                                                                       //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDU5MzY1NzI1NCwiaWQiOiJjNmY0NDEzMy0wOGYyLTRhNDMtYmQ2NS05Y2ZiNmIxM2ZhNWIiLCJwZXJtaXNzaW9uIjoiMiIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTc0NDYzODQzNCwibmJmIjoxNzQ0NjM4NDM0fQ.1cA329l2bWUlENwYrq03l1yQ0Jxw597kw-YUT0WipiI");
-        //                                                                   });
+        services.AddHttpClient(Configuration.HttpClient.Name.UserService, httpClient =>
+                                                                          {
+                                                                              httpClient.BaseAddress = new Uri($"{Configuration.HttpClient.BaseUrl.UserService}");
+                                                                              //TODO
+                                                                              //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDU5MzY1NzI1NCwiaWQiOiJjNmY0NDEzMy0wOGYyLTRhNDMtYmQ2NS05Y2ZiNmIxM2ZhNWIiLCJwZXJtaXNzaW9uIjoiMiIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTc0NDYzODQzNCwibmJmIjoxNzQ0NjM4NDM0fQ.1cA329l2bWUlENwYrq03l1yQ0Jxw597kw-YUT0WipiI");
+                                                                          });
 
         return services;
     }

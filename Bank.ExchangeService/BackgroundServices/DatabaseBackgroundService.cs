@@ -60,6 +60,8 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
 
             return;
         }
+        
+        Console.WriteLine("Wait for 'Seeding Completed' message");
 
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
                .Wait();
