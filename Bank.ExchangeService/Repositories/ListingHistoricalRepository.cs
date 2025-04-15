@@ -5,7 +5,7 @@ using Bank.ExchangeService.Model;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.ExchangeService.Repositorties;
+namespace Bank.ExchangeService.Repositories;
 
 public interface IListingHistoricalRepository
 {

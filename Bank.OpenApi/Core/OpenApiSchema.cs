@@ -68,7 +68,7 @@ internal class OpenApiSchemaContext
     {
         foreach (var defaultOpenApiExample in defaultOpenApiExamples)
             ExampleRepository[defaultOpenApiExample.Type] = defaultOpenApiExample.Example;
-        
+
         foreach (var openApiExample in openApiExamples)
             ExampleRepository[openApiExample.Type] = openApiExample.Example;
 

@@ -5,7 +5,7 @@ using Bank.Application.Responses;
 using Bank.ExchangeService.HttpClients;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Model;
-using Bank.ExchangeService.Repositorties;
+using Bank.ExchangeService.Repositories;
 
 namespace Bank.ExchangeService.Services;
 

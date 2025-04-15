@@ -89,8 +89,8 @@ public static partial class RepositoryExtensions
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, AccountCurrency?> value,
-                                                                                 Expression<Func<TEntity, AccountCurrency?>> navigationExpression, params string[] excludeProperties)
-    where TEntity : class
+                                                                                 Expression<Func<TEntity, AccountCurrency?>>          navigationExpression,
+                                                                                 params string[]                                      excludeProperties) where TEntity : class
     {
         IIncludableQueryable<TEntity, object?> query = value;
 
@@ -110,8 +110,8 @@ public static partial class RepositoryExtensions
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<AccountCurrency>> value,
-                                                                                 Expression<Func<TEntity, List<AccountCurrency>>> navigationExpression, params string[] excludeProperties)
-    where TEntity : class
+                                                                                 Expression<Func<TEntity, List<AccountCurrency>>>          navigationExpression,
+                                                                                 params string[]                                           excludeProperties) where TEntity : class
     {
         IIncludableQueryable<TEntity, object?> query = value;
 

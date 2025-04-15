@@ -224,18 +224,15 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
                                            .Select(group => new
                                                             {
                                                                 Entity = group.account,
-                                                                Daily = group.transaction
-                                                                             .Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
-                                                                                                   transaction.CreatedAt      >= Midnight                   &&
-                                                                                                   transaction.Status         != TransactionStatus.Canceled &&
-                                                                                                   transaction.Status         != TransactionStatus.Failed)
+                                                                Daily = group.transaction.Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                               transaction.CreatedAt      >= Midnight                   &&
+                                                                                                               transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                               transaction.Status         != TransactionStatus.Failed)
                                                                              .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m,
-                                                                Monthly = group.transaction
-                                                                               .Where(transaction =>
-                                                                                      transaction.FromCurrencyId == group.account.CurrencyId   &&
-                                                                                      transaction.CreatedAt      >= FirstDayOfMonth            &&
-                                                                                      transaction.Status         != TransactionStatus.Canceled &&
-                                                                                      transaction.Status         != TransactionStatus.Failed)
+                                                                Monthly = group.transaction.Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                                 transaction.CreatedAt      >= FirstDayOfMonth            &&
+                                                                                                                 transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                                 transaction.Status         != TransactionStatus.Failed)
                                                                                .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m
                                                             })
                                            .Where(spending =>
@@ -254,20 +251,16 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
                                                                      {
                                                                          Entity = group.account,
                                                                          Daily = group.transaction
-                                                                                      .Where(transaction =>
-                                                                                             transaction.FromCurrencyId ==
-                                                                                             group.account.CurrencyId                            &&
-                                                                                             transaction.CreatedAt >= Midnight                   &&
-                                                                                             transaction.Status    != TransactionStatus.Canceled &&
-                                                                                             transaction.Status    != TransactionStatus.Failed)
+                                                                                      .Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                            transaction.CreatedAt      >= Midnight                   &&
+                                                                                                            transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                            transaction.Status         != TransactionStatus.Failed)
                                                                                       .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m,
                                                                          Monthly = group.transaction
-                                                                                        .Where(transaction =>
-                                                                                               transaction.FromCurrencyId ==
-                                                                                               group.account.CurrencyId                            &&
-                                                                                               transaction.CreatedAt >= FirstDayOfMonth            &&
-                                                                                               transaction.Status    != TransactionStatus.Canceled &&
-                                                                                               transaction.Status    != TransactionStatus.Failed)
+                                                                                        .Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                              transaction.CreatedAt      >= FirstDayOfMonth            &&
+                                                                                                              transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                              transaction.Status         != TransactionStatus.Failed)
                                                                                         .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m
                                                                      })
                                                     .Where(spending => spending.Daily + (spending.Entity.Id == accountId ? accountAmount : bankAccountAmount) <=
@@ -351,7 +344,7 @@ public static partial class RepositoryExtensions
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Account?> value,
-                                                                                 Expression<Func<TEntity, Account?>>          navigationExpression, params string[] excludeProperties)
+                                                                                 Expression<Func<TEntity, Account?>> navigationExpression, params string[] excludeProperties)
     where TEntity : class
     {
         IIncludableQueryable<TEntity, object?> query = value;

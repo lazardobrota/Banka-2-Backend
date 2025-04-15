@@ -3,12 +3,12 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.UserService.Services;
+using Bank.ExchangeService.Services;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Bank.UserService.Controllers;
+namespace Bank.ExchangeService.Controllers;
 
 [ApiController]
 public class OrderController(IOrderService orderService) : ControllerBase
@@ -20,6 +20,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
     public async Task<ActionResult<List<OrderResponse>>> GetAll([FromQuery] OrderFilterQuery orderFilterQuery, [FromQuery] Pageable pageable)
     {
         var result = await m_OrderService.GetAll(orderFilterQuery, pageable);
+
         return result.ActionResult;
     }
 
@@ -28,6 +29,7 @@ public class OrderController(IOrderService orderService) : ControllerBase
     public async Task<ActionResult<OrderResponse>> GetOne([FromRoute] Guid id)
     {
         var result = await m_OrderService.GetOne(id);
+
         return result.ActionResult;
     }
 

@@ -1,5 +1,6 @@
 ﻿using Bank.ExchangeService.Database.EntityConfigurations;
 using Bank.ExchangeService.Model;
+using Bank.ExchangeService.Models;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -10,11 +11,13 @@ public class DatabaseContext(DbContextOptions options) : DbContext(options)
     public DbSet<StockExchange>     StockExchanges     { init; get; }
     public DbSet<Listing>           Listings           { init; get; }
     public DbSet<ListingHistorical> ListingHistoricals { init; get; }
+    public DbSet<Order>             Orders             { init; get; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfiguration(new StockExchangeEntityConfiguration());
         builder.ApplyConfiguration(new ListingEntityConfiguration());
         builder.ApplyConfiguration(new ListingHistoricalEntityConfiguration());
+        builder.ApplyConfiguration(new OrderEntityConfiguration());
     }
 }

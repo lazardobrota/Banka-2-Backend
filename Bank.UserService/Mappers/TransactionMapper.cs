@@ -110,7 +110,7 @@ public static class TransactionMapper
                    FromAmount      = internalTransaction.Amount, //TODO: fix
                    ToAccountId     = internalTransaction.ToAccount!.Id,
                    ToCurrencyId    = internalTransaction.ToCurrencyId,
-                   ToAmount        = internalTransaction.Amount * internalTransaction.ExchangeDetails.ExchangeRate, 
+                   ToAmount        = internalTransaction.Amount * internalTransaction.ExchangeDetails.ExchangeRate,
                    CodeId          = internalTransaction.TransactionCodeId,
                    Status          = TransactionStatus.Pending,
                    Purpose         = internalTransaction.Purpose,
