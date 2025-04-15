@@ -118,17 +118,17 @@ public class ExchangeService(
             return Result.NotFound<ExchangeResponse>($"Cannot make exchange");
 
         await TransactionService.PrepareInternalTransaction(new PrepareInternalTransaction
-                                                              {
-                                                                  FromAccount       = account,
-                                                                  FromCurrencyId    = exchangeMakeExchangeRequest.CurrencyFromId,
-                                                                  ToAccount         = account,
-                                                                  ToCurrencyId      = exchangeMakeExchangeRequest.CurrencyToId,
-                                                                  Amount            = exchangeMakeExchangeRequest.Amount,
-                                                                  ExchangeDetails   = exchangeDetails,
-                                                                  TransactionCodeId = Seeder.TransactionCode.TransactionCode285.Id,
-                                                                  ReferenceNumber   = null,
-                                                                  Purpose           = null
-                                                              });
+                                                            {
+                                                                FromAccount       = account,
+                                                                FromCurrencyId    = exchangeMakeExchangeRequest.CurrencyFromId,
+                                                                ToAccount         = account,
+                                                                ToCurrencyId      = exchangeMakeExchangeRequest.CurrencyToId,
+                                                                Amount            = exchangeMakeExchangeRequest.Amount,
+                                                                ExchangeDetails   = exchangeDetails,
+                                                                TransactionCodeId = Seeder.TransactionCode.TransactionCode285.Id,
+                                                                ReferenceNumber   = null,
+                                                                Purpose           = null
+                                                            });
 
         return Result.Ok<ExchangeResponse>();
     }
@@ -150,7 +150,7 @@ public class ExchangeService(
         var currencyFromTask    = m_CurrencyRepository.FindById(currencyFromId);
         var currencyToTask      = m_CurrencyRepository.FindById(currencyToId);
         var defaultCurrencyTask = m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode);
-        
+
         await Task.WhenAll(currencyFromTask, currencyToTask, defaultCurrencyTask);
 
         var currencyFrom    = await currencyFromTask;
@@ -165,7 +165,7 @@ public class ExchangeService(
 
         var exchangeFromTask = m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyFrom);
         var exchangeToTask   = m_ExchangeRepository.FindByCurrencyFromAndCurrencyTo(defaultCurrency, currencyTo);
-        
+
         await Task.WhenAll(exchangeFromTask, exchangeToTask);
 
         var exchangeFrom = await exchangeFromTask;

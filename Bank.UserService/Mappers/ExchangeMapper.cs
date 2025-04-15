@@ -36,7 +36,7 @@ public static class ExchangeMapper
                    ModifiedAt     = exchange.ModifiedAt
                };
     }
-    
+
     public static Exchange ToExchange(this ExchangeFetchResponse exchangeFetchResponse, Currency currencyFrom, Currency currencyTo, decimal commission)
     {
         return new Exchange
@@ -56,7 +56,7 @@ public static class ExchangeMapper
     public static Exchange Update(this Exchange exchange, ExchangeUpdateRequest exchangeUpdateRequest)
     {
         exchange.Commission = exchangeUpdateRequest.Commission;
-        
+
         return exchange;
     }
 }

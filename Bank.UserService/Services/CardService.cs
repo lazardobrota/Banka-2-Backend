@@ -74,7 +74,7 @@ public class CardService(ICardRepository repository, ICardTypeRepository cardTyp
 
                 card.Type    = cardType;
                 card.Account = account;
-                
+
                 return Result.Ok(card.ToResponse());
             }
             catch (DbUpdateException ex) when (IsDuplicateKeyException(ex))

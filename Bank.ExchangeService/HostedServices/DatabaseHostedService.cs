@@ -28,7 +28,7 @@ public class DatabaseHostedService
         await Context.Database.EnsureCreatedAsync();
 
         await Context.SeedStockExchanges();
-        await Context.SeedListings(); 
+        await Context.SeedListings();
         await Context.SeedListingHistoricals();
     }
 

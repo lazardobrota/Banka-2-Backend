@@ -47,6 +47,9 @@ public class UserRepository(ApplicationContext context) : IUserRepository
         if (!string.IsNullOrEmpty(userFilterQuery.Email))
             userQuery = userQuery.Where(user => EF.Functions.ILike(user.Email, $"%{userFilterQuery.Email}%"));
 
+        if (userFilterQuery.Ids.Count > 0)
+            userQuery = userQuery.Where(user => userFilterQuery.Ids.Contains(user.Id));
+
         if (userFilterQuery.Role != Role.Invalid)
             userQuery = userQuery.Where(user => user.Role == userFilterQuery.Role);
 
@@ -93,7 +96,7 @@ public class UserRepository(ApplicationContext context) : IUserRepository
                                                              .SetProperty(dbUser => dbUser.Employed,    user.Employed)
                                                              .SetProperty(dbUser => dbUser.Activated,   user.Activated)
                                                              .SetProperty(dbUser => dbUser.ModifiedAt,  user.ModifiedAt)
-                                                             .SetProperty(dbUser => dbUser.Permissions,  user.Permissions));
+                                                             .SetProperty(dbUser => dbUser.Permissions, user.Permissions));
 
         return user;
     }
@@ -133,7 +136,7 @@ public static partial class RepositoryExtensions
         if (!excludeProperties.Contains(nameof(User.Bank)))
             query = query.Include(navigationExpression)
                          .ThenInclude(user => user!.Bank);
-        
+
         if (!excludeProperties.Contains(nameof(User.Accounts)))
             query = query.Include(navigationExpression)
                          .ThenInclude(user => user!.Accounts);
@@ -142,7 +145,7 @@ public static partial class RepositoryExtensions
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<User>> value,
-                                                                                 Expression<Func<TEntity, List<User>>>          navigationExpression, params string[] excludeProperties)
+                                                                                 Expression<Func<TEntity, List<User>>> navigationExpression, params string[] excludeProperties)
     where TEntity : class
     {
         IIncludableQueryable<TEntity, object?> query = value;
@@ -150,7 +153,7 @@ public static partial class RepositoryExtensions
         if (!excludeProperties.Contains(nameof(User.Bank)))
             query = query.Include(navigationExpression)
                          .ThenInclude(user => user.Bank);
-        
+
         if (!excludeProperties.Contains(nameof(User.Accounts)))
             query = query.Include(navigationExpression)
                          .ThenInclude(user => user.Accounts);

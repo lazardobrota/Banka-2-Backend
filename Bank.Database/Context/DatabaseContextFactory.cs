@@ -52,9 +52,8 @@ internal class PostgresContextFactory<TDatabaseContext>(IDatabaseContextPool<TDa
         context.DisposeActionAsync = contextParam => DisposeContextAsync((TDatabaseContext)contextParam);
 
         return context;
-
     }
-    
+
     [SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize")]
     public void DisposeContext(TDatabaseContext context)
     {
@@ -67,9 +66,9 @@ internal class PostgresContextFactory<TDatabaseContext>(IDatabaseContextPool<TDa
                 context.Database.CloseConnection();
                 ContextPool.ClosedConnectionQueue.Enqueue(context);
             }
-            
+
             ContextPool.Semaphore.Release();
-        }   
+        }
     }
 
     [SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize")]

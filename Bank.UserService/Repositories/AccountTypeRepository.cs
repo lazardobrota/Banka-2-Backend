@@ -78,15 +78,15 @@ public static partial class RepositoryExtensions
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, AccountType?> value,
-                                                                                 Expression<Func<TEntity, AccountType?>>          navigationExpression, params string[] excludeProperties)
+                                                                                 Expression<Func<TEntity, AccountType?>> navigationExpression, params string[] excludeProperties)
     where TEntity : class
     {
         return value;
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<AccountType>> value,
-                                                                                 Expression<Func<TEntity, List<AccountType>>> navigationExpression, params string[] excludeProperties)
-    where TEntity : class
+                                                                                 Expression<Func<TEntity, List<AccountType>>>          navigationExpression,
+                                                                                 params string[]                                       excludeProperties) where TEntity : class
     {
         return value;
     }

@@ -1,28 +1,26 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.UserService.Models;
+using Bank.ExchangeService.Models;
 
-namespace Bank.UserService.Mappers;
+namespace Bank.ExchangeService.Mappers;
 
 public static class OrderMapper
 {
-    public static OrderResponse ToResponse(this Order order)
+    public static OrderResponse ToResponse(this Order order, UserResponse actuary, UserResponse? supervisor)
     {
         return new OrderResponse
                {
                    Id = order.Id,
                    //TODO asset
-                   Actuary = order.Actuary?.ToEmployee()
-                                  .ToSimpleResponse(),
-                   OrderType     = order.OrderType,
-                   Quantity      = order.Quantity,
-                   ContractCount = order.ContractCount,
-                   PricePerUnit  = order.PricePerUnit,
-                   Direction     = order.Direction,
-                   Status        = order.Status,
-                   Supervisor = order.Supervisor?.ToEmployee()
-                                     .ToSimpleResponse(),
+                   Actuary           = actuary,
+                   OrderType         = order.OrderType,
+                   Quantity          = order.Quantity,
+                   ContractCount     = order.ContractCount,
+                   PricePerUnit      = order.PricePerUnit,
+                   Direction         = order.Direction,
+                   Status            = order.Status,
+                   Supervisor        = supervisor,
                    Done              = order.Done,
                    RemainingPortions = order.RemainingPortions,
                    AfterHours        = order.AfterHours,
@@ -37,13 +35,14 @@ public static class OrderMapper
         order.ModifiedAt = DateTime.UtcNow;
         return order;
     }
-    
+
     public static Order ToOrder(this OrderCreateRequest createRequest)
     {
         return new Order
                {
                    Id                = Guid.NewGuid(),
                    ActuaryId         = createRequest.ActuaryId,
+                   SupervisorId      = createRequest.SupervisorId == Guid.Empty ? null : createRequest.SupervisorId,
                    OrderType         = createRequest.OrderType,
                    Quantity          = createRequest.Quantity,
                    ContractCount     = createRequest.ContractCount,
@@ -56,6 +55,5 @@ public static class OrderMapper
                    CreatedAt         = DateTime.UtcNow,
                    ModifiedAt        = DateTime.UtcNow
                };
-
     }
 }

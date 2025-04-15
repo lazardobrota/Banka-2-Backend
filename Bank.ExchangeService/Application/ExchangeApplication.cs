@@ -8,7 +8,7 @@ using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.HttpClients;
-using Bank.ExchangeService.Repositorties;
+using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 
 using DotNetEnv;
@@ -79,6 +79,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IListingHistoricalRepository, ListingHistoricalRepository>();
         services.AddScoped<IListingHistoricalService, ListingHistoricalService>();
         services.AddScoped<ICurrencyClient, CurrencyClient>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderService, OrderService>();
 
         return services;
     }
@@ -111,6 +113,13 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient<ICurrencyClient, CurrencyClient>(client => { client.BaseAddress = new Uri("http://localhost:5075"); });
         services.AddHttpContextAccessor();
 
+        services.AddHttpClient(Configuration.HttpClient.Name.UserService, httpClient =>
+                                                                          {
+                                                                              httpClient.BaseAddress = new Uri($"{Configuration.HttpClient.BaseUrl.UserService}");
+                                                                              //TODO
+                                                                              //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDU5MzY1NzI1NCwiaWQiOiJjNmY0NDEzMy0wOGYyLTRhNDMtYmQ2NS05Y2ZiNmIxM2ZhNWIiLCJwZXJtaXNzaW9uIjoiMiIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTc0NDYzODQzNCwibmJmIjoxNzQ0NjM4NDM0fQ.1cA329l2bWUlENwYrq03l1yQ0Jxw597kw-YUT0WipiI");
+                                                                          });
+
         return services;
     }
 
@@ -140,8 +149,9 @@ public static class ServiceCollectionExtensions
                 .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
                                                                                    {
                                                                                        IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
-                                                                                                                                                    .SecretKey)),
+                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
+                                                                                                                                       .Jwt
+                                                                                                                                       .SecretKey)),
                                                                                        ValidateIssuerSigningKey = true,
                                                                                        ValidateLifetime         = true,
                                                                                        ValidateIssuer           = false,
