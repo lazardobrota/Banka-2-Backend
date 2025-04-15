@@ -11,11 +11,11 @@ namespace Bank.UserService.Repositories;
 
 public interface ICurrencyRepository
 {
-    Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery);
+    Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery, bool includeForeignEntity = true);
 
-    Task<Currency?> FindById(Guid id);
+    Task<Currency?> FindById(Guid id, bool includeForeignEntity = true);
 
-    Task<Currency?> FindByCode(string currencyCode);
+    Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity = true);
 
     Task<bool> Exists(Guid currencyId);
 }
@@ -27,9 +27,12 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
 
     private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
 
-    public async Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery)
+    public async Task<List<Currency>> FindAll(CurrencyFilterQuery currencyFilterQuery, bool includeForeignEntity)
     {
-        var currencyQuery = m_Context.Currencies.IncludeAll()
+        var currencyQuery = m_Context.Currencies.AsQueryable();
+
+        if (includeForeignEntity)
+            currencyQuery = m_Context.Currencies.IncludeAll()
                                      .AsQueryable();
 
         if (!string.IsNullOrEmpty(currencyFilterQuery.Name))
@@ -41,18 +44,18 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
         return await currencyQuery.ToListAsync();
     }
 
-    public async Task<Currency?> FindById(Guid id)
+    public async Task<Currency?> FindById(Guid id, bool includeForeignEntity)
     {
         await using var context = await CreateContext;
 
-        return await FindById(id, context);
+        return await FindById(id, includeForeignEntity, context);
     }
 
-    public async Task<Currency?> FindByCode(string currencyCode)
+    public async Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity)
     {
         await using var context = await CreateContext;
 
-        return await FindByCode(currencyCode, context);
+        return await FindByCode(currencyCode, includeForeignEntity, context);
     }
 
     public async Task<bool> Exists(Guid currencyId)
@@ -64,18 +67,28 @@ public class CurrencyRepository(ApplicationContext context, IDbContextFactory<Ap
 
     #region Static Repository Calls
 
-    private static async Task<Currency?> FindById(Guid id, ApplicationContext context)
+    private static async Task<Currency?> FindById(Guid id, bool includeForeignEntity, ApplicationContext context)
     {
-        return await context.Currencies.IncludeAll()
-                            .Where(currency => currency.Id == id)
-                            .FirstOrDefaultAsync();
+        var currencyQuery = context.Currencies.AsQueryable();
+
+        if (includeForeignEntity)
+            currencyQuery = context.Currencies.IncludeAll()
+                                   .AsQueryable();
+
+        return await currencyQuery.Where(currency => currency.Id == id)
+                                  .FirstOrDefaultAsync();
     }
 
-    private static async Task<Currency?> FindByCode(string currencyCode, ApplicationContext context)
+    private static async Task<Currency?> FindByCode(string currencyCode, bool includeForeignEntity, ApplicationContext context)
     {
-        return await context.Currencies.IncludeAll()
-                            .Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
-                            .FirstOrDefaultAsync();
+        var currencyQuery = context.Currencies.AsQueryable();
+
+        if (includeForeignEntity)
+            currencyQuery = context.Currencies.IncludeAll()
+                                   .AsQueryable();
+
+        return await currencyQuery.Where(currency => EF.Functions.ILike(currency.Code, $"{currencyCode}"))
+                                  .FirstOrDefaultAsync();
     }
 
     private static Task<bool> Exists(Guid currencyId, ApplicationContext context)

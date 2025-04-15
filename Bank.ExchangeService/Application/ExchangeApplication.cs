@@ -6,8 +6,8 @@ using Bank.Application.Domain;
 using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
+using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
-using Bank.ExchangeService.HttpClients;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 
@@ -33,6 +33,7 @@ public class ExchangeApplication
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+        builder.Services.AddSignalR();
         builder.Services.AddValidation();
         builder.Services.AddServices();
         builder.Services.AddDatabase();
@@ -58,6 +59,8 @@ public class ExchangeApplication
 
         app.UseCors(Configuration.Policy.FrontendApplication);
 
+        app.MapHub<SecurityHub>("security-hub");
+
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -74,11 +77,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IStockExchangeRepository, StockExchangeRepository>();
         services.AddScoped<IStockExchangeService, StockExchangeService>();
-        services.AddScoped<IListingRepository, ListingRepository>();
-        services.AddScoped<IListingService, ListingService>();
-        services.AddScoped<IListingHistoricalRepository, ListingHistoricalRepository>();
-        services.AddScoped<IListingHistoricalService, ListingHistoricalService>();
-        services.AddScoped<ICurrencyClient, CurrencyClient>();
+        services.AddScoped<IStockService, StockService>();
+        services.AddScoped<IOptionService, OptionService>();
+        services.AddScoped<IForexPairService, ForexPairService>();
+        services.AddScoped<IFutureContractService, FutureContractService>();
+        services.AddScoped<IQuoteRepository, QuoteRepository>();
+        services.AddScoped<ISecurityRepository, SecurityRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
 
@@ -95,13 +99,13 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDatabase(this IServiceCollection services)
     {
         services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
+        services.AddDbContextFactory<DatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()));
 
         return services;
     }
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
-        services.AddSingleton<DatabaseHostedService>();
         services.AddHostedService<ApplicationHostedService>();
 
         return services;
@@ -110,7 +114,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddHttpServices(this IServiceCollection services)
     {
         services.AddHttpClient();
-        services.AddHttpClient<ICurrencyClient, CurrencyClient>(client => { client.BaseAddress = new Uri("http://localhost:5075"); });
         services.AddHttpContextAccessor();
 
         services.AddHttpClient(Configuration.HttpClient.Name.UserService, httpClient =>
@@ -138,7 +141,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddCors(options => options.AddPolicy(Configuration.Policy.FrontendApplication, policy => policy.WithOrigins(Configuration.Frontend.BaseUrl)
                                                                                                                 .AllowAnyHeader()
-                                                                                                                .AllowAnyMethod()));
+                                                                                                                .AllowAnyMethod()
+                                                                                                                .AllowCredentials()));
 
         return services;
     }

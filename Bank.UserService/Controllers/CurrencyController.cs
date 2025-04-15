@@ -13,7 +13,7 @@ public class CurrencyController(ICurrencyService currencyService) : ControllerBa
 {
     private readonly ICurrencyService m_CurrencyService = currencyService;
 
-    [Authorize]
+    // [Authorize]
     [HttpGet(Endpoints.Currency.GetAll)]
     public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyFilterQuery currencyFilterQuery)
     {
@@ -21,11 +21,27 @@ public class CurrencyController(ICurrencyService currencyService) : ControllerBa
         return result.ActionResult;
     }
 
-    [Authorize]
+    // [Authorize]
+    [HttpGet(Endpoints.Currency.GetAllSimple)]
+    public async Task<ActionResult<List<CurrencyResponse>>> GetAllSimple([FromQuery] CurrencyFilterQuery currencyFilterQuery)
+    {
+        var result = await m_CurrencyService.FindAllSimple(currencyFilterQuery);
+        return result.ActionResult;
+    }
+
+    // [Authorize]
     [HttpGet(Endpoints.Currency.GetOne)]
     public async Task<ActionResult<CurrencyResponse>> GetOne([FromRoute] Guid id)
     {
         var result = await m_CurrencyService.FindById(id);
+        return result.ActionResult;
+    }
+
+    // [Authorize]
+    [HttpGet(Endpoints.Currency.GetOneSimple)]
+    public async Task<ActionResult<CurrencyResponse>> GetOneSimple([FromRoute] Guid id)
+    {
+        var result = await m_CurrencyService.FindByIdSimple(id);
         return result.ActionResult;
     }
 }

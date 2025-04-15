@@ -2,32 +2,16 @@
 
 namespace Bank.ExchangeService.HostedServices;
 
-public class ApplicationHostedService : IHostedService
+public class ApplicationHostedService(IHostApplicationLifetime applicationLifetime, DatabaseBackgroundService databaseBackgroundService) : IHostedService
 {
-    private readonly IHostApplicationLifetime  m_ApplicationLifetime;
-    private readonly DatabaseBackgroundService m_DatabaseBackgroundService;
-    private readonly DatabaseHostedService     m_DatabaseHostedService;
-
-    public ApplicationHostedService(IHostApplicationLifetime applicationLifetime, DatabaseBackgroundService databaseBackgroundService, DatabaseHostedService databaseHostedService)
-    {
-        m_ApplicationLifetime       = applicationLifetime;
-        m_DatabaseBackgroundService = databaseBackgroundService;
-        m_DatabaseHostedService     = databaseHostedService;
-    }
+    private readonly IHostApplicationLifetime  m_ApplicationLifetime       = applicationLifetime;
+    private readonly DatabaseBackgroundService m_DatabaseBackgroundService = databaseBackgroundService;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        m_ApplicationLifetime.ApplicationStarted.Register(async () =>
-                                                          {
-                                                              m_DatabaseBackgroundService.OnApplicationStarted();
-                                                              await m_DatabaseHostedService.OnApplicationStarted();
-                                                          });
+        m_ApplicationLifetime.ApplicationStarted.Register(() => { m_DatabaseBackgroundService.OnApplicationStarted(); });
 
-        m_ApplicationLifetime.ApplicationStopped.Register(() =>
-                                                          {
-                                                              m_DatabaseBackgroundService.OnApplicationStopped();
-                                                              m_DatabaseHostedService.OnApplicationStopped();
-                                                          });
+        m_ApplicationLifetime.ApplicationStopped.Register(() => { m_DatabaseBackgroundService.OnApplicationStopped(); });
 
         return Task.CompletedTask;
     }

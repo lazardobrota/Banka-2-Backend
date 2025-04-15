@@ -5,6 +5,53 @@ public static partial class Endpoints
     public const string ApiBase = "api/v1";
 }
 
+#region Exchange Service
+
+public static partial class Endpoints
+{
+    public static class Stock
+    {
+        public const string Base      = $"{ApiBase}/stock";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+
+    public static class ForexPair
+    {
+        public const string Base      = $"{ApiBase}/forex/pair";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+
+    public static class FutureContract
+    {
+        public const string Base      = $"{ApiBase}/future/contract";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+
+    public static class Option
+    {
+        public const string Base      = $"{ApiBase}/option";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+}
+
+#endregion
+
 #region User Service
 
 public static partial class Endpoints
@@ -68,9 +115,11 @@ public static partial class Endpoints
 {
     public static class Currency
     {
-        public const string Base   = $"{ApiBase}/currencies";
-        public const string GetOne = $"{Base}/{{id:guid}}";
-        public const string GetAll = $"{Base}";
+        public const string Base         = $"{ApiBase}/currencies";
+        public const string GetOne       = $"{Base}/{{id:guid}}";
+        public const string GetAll       = $"{Base}";
+        public const string GetAllSimple = $"{Base}/simple";
+        public const string GetOneSimple = $"{Base}/simple/{{id:guid}}";
     }
 }
 

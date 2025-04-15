@@ -2,7 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
-using Bank.ExchangeService.HttpClients;
+using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Repositories;
 
@@ -14,13 +14,15 @@ public interface IStockExchangeService
 
     Task<Result<StockExchangeResponse>> GetOne(Guid id);
 
+    Task<Result<StockExchangeResponse>> GetOne(string acronym);
+
     Task<Result<StockExchangeResponse>> Create(ExchangeCreateRequest request);
 }
 
-public class StockExchangeService(IStockExchangeRepository stockExchangeRepository, ICurrencyClient currencyClient) : IStockExchangeService
+public class StockExchangeService(IStockExchangeRepository stockExchangeRepository, IHttpClientFactory httpClientFactory) : IStockExchangeService
 {
-    private readonly IStockExchangeRepository m_Repo   = stockExchangeRepository;
-    private readonly ICurrencyClient          m_Client = currencyClient;
+    private readonly IStockExchangeRepository m_Repo              = stockExchangeRepository;
+    private readonly IHttpClientFactory       m_HttpClientFactory = httpClientFactory;
 
     public async Task<Result<Page<StockExchangeResponse>>> GetAll(StockExchangeFilterQuery filter, Pageable pageable)
     {
@@ -29,7 +31,9 @@ public class StockExchangeService(IStockExchangeRepository stockExchangeReposito
         var currencyIds = page.Items.Select(se => se.CurrencyId)
                               .Distinct();
 
-        var currencyTasks = currencyIds.Select(id => m_Client.GetCurrencyById(id))
+        using var httpClient = m_HttpClientFactory.CreateClient();
+
+        var currencyTasks = currencyIds.Select(id => httpClient.GetCurrencyByIdSimple(id))
                                        .ToList();
 
         var currencies = await Task.WhenAll(currencyTasks);
@@ -47,13 +51,39 @@ public class StockExchangeService(IStockExchangeRepository stockExchangeReposito
     public async Task<Result<StockExchangeResponse>> GetOne(Guid id)
     {
         var stockExchange = await m_Repo.FindById(id);
-        var currency      = await m_Client.GetCurrencyById(stockExchange.CurrencyId);
-        return stockExchange is null ? Result.NotFound<StockExchangeResponse>($"No StockExchange found with ID: {id}") : Result.Ok(stockExchange.ToResponse(currency));
+
+        if (stockExchange is null)
+            return Result.NotFound<StockExchangeResponse>($"No StockExchange found with ID: {id}");
+
+        using var httpClient = m_HttpClientFactory.CreateClient();
+        var       currency   = await httpClient.GetCurrencyByIdSimple(stockExchange.CurrencyId);
+
+        if (currency is null)
+            throw new Exception($"StockExchange currency doesn't exist with id: {stockExchange.CurrencyId}");
+
+        return Result.Ok(stockExchange.ToResponse(currency));
+    }
+
+    public async Task<Result<StockExchangeResponse>> GetOne(string acronym)
+    {
+        var stockExchange = await m_Repo.FindByAcronym(acronym);
+
+        if (stockExchange is null)
+            Result.NotFound<StockExchangeResponse>($"No StockExchange found with acronym: {acronym}");
+
+        using var httpClient = m_HttpClientFactory.CreateClient();
+        var       currency   = await httpClient.GetCurrencyByIdSimple(stockExchange!.CurrencyId);
+
+        if (currency is null)
+            throw new Exception($"StockExchange currency doesn't exist with id: {stockExchange.CurrencyId}");
+
+        return Result.Ok(stockExchange.ToResponse(currency));
     }
 
     public async Task<Result<StockExchangeResponse>> Create(ExchangeCreateRequest request)
     {
-        var currency = await m_Client.GetCurrencyById(request.CurrencyId);
+        using var httpClient = m_HttpClientFactory.CreateClient();
+        var       currency   = await httpClient.GetCurrencyByIdSimple(request.CurrencyId);
 
         if (currency == null)
             return Result.NotFound<StockExchangeResponse>($"Currency not found: {request.CurrencyId}");
