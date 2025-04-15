@@ -25,10 +25,10 @@ public class AccountController(IAccountService accountService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet(Endpoints.Account.GetAllCards)]
-    public async Task<ActionResult<Page<AccountResponse>>> GetAllCards([FromRoute] Guid id, [FromQuery] CardFilterQuery filter, [FromQuery] Pageable pageable)
+    [HttpGet(Endpoints.Account.GetAllForClient)]
+    public async Task<ActionResult<Page<AccountResponse>>> GetAllAccounts([FromRoute] Guid clientId, [FromQuery] AccountFilterQuery filter, [FromQuery] Pageable pageable)
     {
-        var result = await m_AccountService.GetAllCards(id, filter, pageable);
+        var result = await m_AccountService.GetAllForClient(clientId, filter, pageable);
 
         return result.ActionResult;
     }

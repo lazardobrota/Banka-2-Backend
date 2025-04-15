@@ -13,7 +13,7 @@ public interface IAccountService
 {
     Task<Result<Page<AccountResponse>>> GetAll(AccountFilterQuery accountFilterQuery, Pageable pageable);
 
-    Task<Result<Page<CardResponse>>> GetAllCards(Guid id, CardFilterQuery filter, Pageable pageable);
+    Task<Result<Page<AccountResponse>>> GetAllForClient(Guid clientId, AccountFilterQuery filter, Pageable pageable);
 
     Task<Result<AccountResponse>> GetOne(Guid id);
 
@@ -29,14 +29,12 @@ public class AccountService(
     IAccountTypeRepository accountTypeRepository,
     ICurrencyRepository    currencyRepository,
     IUserRepository        userRepository,
-    IAuthorizationService  authorizationService,
-    ICardRepository        cardRepository
+    IAuthorizationService  authorizationService
 ) : IAccountService
 {
     private readonly IAccountRepository     m_AccountRepository     = accountRepository;
     private readonly IAccountTypeRepository m_AccountTypeRepository = accountTypeRepository;
     private readonly IUserRepository        m_UserRepository        = userRepository;
-    private readonly ICardRepository        m_CardRepository        = cardRepository;
     private readonly ICurrencyRepository    m_CurrencyRepository    = currencyRepository;
     private readonly IAuthorizationService  m_AuthorizationService  = authorizationService;
 
@@ -50,14 +48,14 @@ public class AccountService(
         return Result.Ok(new Page<AccountResponse>(accountResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
-    public async Task<Result<Page<CardResponse>>> GetAllCards(Guid id, CardFilterQuery filter, Pageable pageable)
+    public async Task<Result<Page<AccountResponse>>> GetAllForClient(Guid clientId, AccountFilterQuery filter, Pageable pageable)
     {
-        var page = await m_CardRepository.FindAllByAccountId(id, pageable);
+        var page = await m_AccountRepository.FindAllByClientId(clientId, pageable);
 
-        var cardResponses = page.Items.Select(card => card.ToResponse())
-                                .ToList();
+        var accountResponses = page.Items.Select(account => account.ToResponse())
+                                   .ToList();
 
-        return Result.Ok(new Page<CardResponse>(cardResponses, page.PageNumber, page.PageSize, page.TotalElements));
+        return Result.Ok(new Page<AccountResponse>(accountResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
     public async Task<Result<AccountResponse>> GetOne(Guid id)

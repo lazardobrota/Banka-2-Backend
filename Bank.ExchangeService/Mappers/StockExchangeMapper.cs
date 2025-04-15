@@ -5,7 +5,7 @@ namespace Bank.ExchangeService.Mappers;
 
 public static class StockExchangeMapper
 {
-    public static StockExchangeResponse ToResponse(this StockExchange exchange, CurrencyResponse currency)
+    public static StockExchangeResponse ToResponse(this StockExchange exchange, CurrencySimpleResponse currency)
     {
         return new StockExchangeResponse
                {

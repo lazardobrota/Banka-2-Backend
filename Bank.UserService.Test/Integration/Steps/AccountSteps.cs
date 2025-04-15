@@ -139,27 +139,27 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
         accountUpdateResult.Value.Status.ShouldBe(Example.Entity.Account.UpdateEmployeeRequest.Status);
     }
 
-    [When(@"all cards are fetched for the account")]
-    public async Task WhenAllCardsAreFetchedForTheAccount()
-    {
-        var accountId = m_ScenarioContext.Get<Guid>(Constant.AccountId);
+    // [When(@"all cards are fetched for the account")]
+    // public async Task WhenAllCardsAreFetchedForTheAccount()
+    // {
+    //     var accountId = m_ScenarioContext.Get<Guid>(Constant.AccountId);
+    //
+    //     var cardResult = await m_AccountService.GetAllCards(accountId, new CardFilterQuery(), new Pageable());
+    //
+    //     m_ScenarioContext[Constant.CardsResult] = cardResult;
+    // }
 
-        var cardResult = await m_AccountService.GetAllCards(accountId, new CardFilterQuery(), new Pageable());
-
-        m_ScenarioContext[Constant.CardsResult] = cardResult;
-    }
-
-    [Then(@"all cards should be returned for the account")]
-    public void ThenAllCardsShouldBeReturnedForTheAccount()
-    {
-        var cardResult = m_ScenarioContext.Get<Result<Page<CardResponse>>>(Constant.CardsResult);
-
-        cardResult.ActionResult.ShouldBeOfType<OkObjectResult>();
-        cardResult.Value.ShouldNotBeNull();
-
-        cardResult.Value.Items.All(card => card.Account.Id == m_ScenarioContext.Get<Guid>(Constant.AccountId))
-                  .ShouldBeTrue();
-    }
+    // [Then(@"all cards should be returned for the account")]
+    // public void ThenAllCardsShouldBeReturnedForTheAccount()
+    // {
+    //     var cardResult = m_ScenarioContext.Get<Result<Page<CardResponse>>>(Constant.CardsResult);
+    //
+    //     cardResult.ActionResult.ShouldBeOfType<OkObjectResult>();
+    //     cardResult.Value.ShouldNotBeNull();
+    //
+    //     cardResult.Value.Items.All(card => card.Account.Id == m_ScenarioContext.Get<Guid>(Constant.AccountId))
+    //               .ShouldBeTrue();
+    // }
 
     [When(@"all acounts are fetched")]
     public async Task WhenAllAcountsAreFetched()

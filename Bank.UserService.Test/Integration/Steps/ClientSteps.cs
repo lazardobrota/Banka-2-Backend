@@ -114,58 +114,58 @@ public class ClientSteps(ScenarioContext scenarioContext, IClientService clientS
         getClientsResult.Value.Items.ShouldAllBe(client => client.Role == Role.Client);
     }
 
-    [Given(@"client Id")]
-    public void GivenClientId()
-    {
-        m_ScenarioContext[Constant.IdForAccount] = Example.Entity.Client.Id2;
-    }
+    // [Given(@"client Id")]
+    // public void GivenClientId()
+    // {
+    //     m_ScenarioContext[Constant.IdForAccount] = Example.Entity.Client.Id2;
+    // }
 
-    [When(@"all accounts are fetched from the database")]
-    public async Task WhenAllAccountsAreFetchedFromTheDatabase()
-    {
-        var id                = m_ScenarioContext.Get<Guid>(Constant.IdForAccount);
-        var getAccountsResult = await m_ClientService.FindAllAccounts(id, new AccountFilterQuery(), new Pageable());
+    // [When(@"all accounts are fetched from the database")]
+    // public async Task WhenAllAccountsAreFetchedFromTheDatabase()
+    // {
+    //     var id                = m_ScenarioContext.Get<Guid>(Constant.IdForAccount);
+    //     var getAccountsResult = await m_ClientService.FindAllAccounts(id, new AccountFilterQuery(), new Pageable());
+    //
+    //     m_ScenarioContext[Constant.AccountResult] = getAccountsResult;
+    // }
 
-        m_ScenarioContext[Constant.AccountResult] = getAccountsResult;
-    }
+    // [Then(@"all accounts  should be returned")]
+    // public void ThenAllAccountsShouldBeReturned()
+    // {
+    //     var accountResult = m_ScenarioContext.Get<Result<Page<AccountResponse>>>(Constant.AccountResult);
+    //
+    //     accountResult.ActionResult.ShouldBeOfType<OkObjectResult>();
+    //     accountResult.Value.ShouldNotBeNull();
+    //     accountResult.Value.Items.ShouldNotBeEmpty();
+    //     accountResult.Value.Items.ShouldAllBe(account => account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.IdForAccount));
+    // }
 
-    [Then(@"all accounts  should be returned")]
-    public void ThenAllAccountsShouldBeReturned()
-    {
-        var accountResult = m_ScenarioContext.Get<Result<Page<AccountResponse>>>(Constant.AccountResult);
+    // [Given(@"client Id which has cards")]
+    // public void GivenClientIdWhichHasCards()
+    // {
+    //     m_ScenarioContext[Constant.Id] = Example.Entity.Client.Id2;
+    // }
 
-        accountResult.ActionResult.ShouldBeOfType<OkObjectResult>();
-        accountResult.Value.ShouldNotBeNull();
-        accountResult.Value.Items.ShouldNotBeEmpty();
-        accountResult.Value.Items.ShouldAllBe(account => account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.IdForAccount));
-    }
+    // [When(@"all cards are fetched from the database for the client")]
+    // public async Task WhenAllCardsAreFetchedFromTheDatabaseForTheClient()
+    // {
+    //     var id = m_ScenarioContext.Get<Guid>(Constant.Id);
+    //
+    //     var getCardsResult = await m_ClientService.FindAllCards(id);
+    //
+    //     m_ScenarioContext[Constant.CardsResult] = getCardsResult;
+    // }
 
-    [Given(@"client Id which has cards")]
-    public void GivenClientIdWhichHasCards()
-    {
-        m_ScenarioContext[Constant.Id] = Example.Entity.Client.Id2;
-    }
-
-    [When(@"all cards are fetched from the database for the client")]
-    public async Task WhenAllCardsAreFetchedFromTheDatabaseForTheClient()
-    {
-        var id = m_ScenarioContext.Get<Guid>(Constant.Id);
-
-        var getCardsResult = await m_ClientService.FindAllCards(id);
-
-        m_ScenarioContext[Constant.CardsResult] = getCardsResult;
-    }
-
-    [Then(@"all cards  should be returned")]
-    public void ThenAllCardsShouldBeReturned()
-    {
-        var cardsResult = m_ScenarioContext.Get<Result<List<CardResponse>>>(Constant.CardsResult);
-
-        cardsResult.ActionResult.ShouldBeOfType<OkObjectResult>();
-        cardsResult.Value.ShouldNotBeNull();
-        cardsResult.Value.ShouldNotBeEmpty();
-        cardsResult.Value.ShouldAllBe(card => card.Account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.Id));
-    }
+    // [Then(@"all cards  should be returned")]
+    // public void ThenAllCardsShouldBeReturned()
+    // {
+    //     var cardsResult = m_ScenarioContext.Get<Result<List<CardResponse>>>(Constant.CardsResult);
+    //
+    //     cardsResult.ActionResult.ShouldBeOfType<OkObjectResult>();
+    //     cardsResult.Value.ShouldNotBeNull();
+    //     cardsResult.Value.ShouldNotBeEmpty();
+    //     cardsResult.Value.ShouldAllBe(card => card.Account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.Id));
+    // }
 }
 
 file static class Constant

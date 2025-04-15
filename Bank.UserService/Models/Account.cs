@@ -1,4 +1,4 @@
-﻿namespace Bank.UserService.Models;
+namespace Bank.UserService.Models;
 
 public class Account
 {

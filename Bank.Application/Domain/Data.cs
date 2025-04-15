@@ -103,3 +103,44 @@ public enum Permission : long
     Agent      = Employee | Trade,
     Supervisor = Employee | Trade | ApproveTrade,
 }
+
+public enum Liquidity
+{
+    High,
+    Medium,
+    Low
+}
+
+public enum OptionType
+{
+    Call,
+    Put
+}
+
+public enum ContractUnit
+{
+    Kilogram,
+    Liter,
+    Barrel,
+    Bushel,
+    Pound,
+    CubicMeter
+}
+
+public enum SecurityType
+{
+    Stock,
+    Option,
+    FutureContract,
+    ForexPair
+}
+
+public enum QuoteIntervalType
+{
+    Week,
+    Day,
+    Month,
+    ThreeMonths,
+    Year,
+    Max
+}

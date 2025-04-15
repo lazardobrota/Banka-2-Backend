@@ -52,14 +52,17 @@ public class InstallmentService(IInstallmentRepository installmentRepository, IL
 
         var page = await m_InstallmentRepository.FindAllByLoanId(loanId, pageable);
 
-        var installmentResponses = new List<InstallmentResponse>();
+        var installmentAmount = await m_LoanHostedService.CalculateInstallmentAmount(loan);
 
-        foreach (var installment in page.Items)
-        {
-            var response = installment.ToResponse();
-            response.Amount = await m_LoanHostedService.CalculateInstallmentAmount(loan);
-            installmentResponses.Add(response);
-        }
+        var installmentResponses = page.Items.Select(installment =>
+                                                     {
+                                                         var installmentResponse = installment.ToResponse();
+
+                                                         installmentResponse.Amount = installmentAmount;
+
+                                                         return installmentResponse;
+                                                     })
+                                       .ToList();
 
         return Result.Ok(new Page<InstallmentResponse>(installmentResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }

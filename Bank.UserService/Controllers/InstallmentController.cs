@@ -15,8 +15,8 @@ public class InstallmentController(IInstallmentService installmentService) : Con
     private readonly IInstallmentService m_InstallmentService = installmentService;
 
     [Authorize]
-    [HttpGet(Endpoints.Installment.GetAll)]
-    public async Task<ActionResult<Page<InstallmentResponse>>> GetAllByLoan([FromQuery] Guid loanId, [FromQuery] Pageable pageable)
+    [HttpGet(Endpoints.Installment.GetAllByLoan)]
+    public async Task<ActionResult<Page<InstallmentResponse>>> GetAllByLoan([FromRoute] Guid loanId, [FromQuery] Pageable pageable)
     {
         var result = await m_InstallmentService.GetAllByLoanId(loanId, pageable);
 

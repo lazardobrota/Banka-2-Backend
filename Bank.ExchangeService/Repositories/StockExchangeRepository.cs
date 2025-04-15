@@ -11,6 +11,8 @@ public interface IStockExchangeRepository
 {
     Task<StockExchange?> FindById(Guid id);
 
+    Task<StockExchange?> FindByAcronym(string acronym);
+
     Task<StockExchange> Add(StockExchange stockExchange);
 
     Task<StockExchange> Update(StockExchange stockExchange);
@@ -50,6 +52,12 @@ public class StockExchangeRepository(DatabaseContext context) : IStockExchangeRe
     public async Task<StockExchange?> FindById(Guid id)
     {
         return await m_Context.StockExchanges.FindAsync(id);
+    }
+
+    public async Task<StockExchange?> FindByAcronym(string acronym)
+    {
+        return await m_Context.StockExchanges.Where(stockExchange => EF.Functions.ILike(stockExchange.Acronym, $"%{acronym}%"))
+                              .FirstAsync();
     }
 
     public async Task<StockExchange> Add(StockExchange stockExchange)

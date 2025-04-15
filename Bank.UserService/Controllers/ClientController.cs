@@ -25,15 +25,6 @@ public class ClientController(IClientService clientService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet(Endpoints.Client.GetAllAccounts)]
-    public async Task<ActionResult<Page<ClientResponse>>> GetAllAccounts([FromRoute] Guid id, [FromQuery] AccountFilterQuery filter, [FromQuery] Pageable pageable)
-    {
-        var result = await m_ClientService.FindAllAccounts(id, filter, pageable);
-
-        return result.ActionResult;
-    }
-
-    [Authorize]
     [HttpGet(Endpoints.Client.GetOne)]
     public async Task<ActionResult<ClientResponse>> GetOne([FromRoute] Guid id)
     {
@@ -57,14 +48,6 @@ public class ClientController(IClientService clientService) : ControllerBase
     {
         var result = await m_ClientService.Update(clientUpdateRequest, id);
 
-        return result.ActionResult;
-    }
-
-    [Authorize]
-    [HttpGet(Endpoints.Client.Cards)]
-    public async Task<ActionResult<CardResponse>> Cards([FromRoute] Guid id)
-    {
-        var result = await m_ClientService.FindAllCards(id);
         return result.ActionResult;
     }
 }

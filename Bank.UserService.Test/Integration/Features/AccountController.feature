@@ -18,10 +18,11 @@
         When account is updated with employee request in the database
         Then account details in employee request should match the updated account
 
-    Scenario: Get All Cards for Account
-        Given account Id
-        When all cards are fetched for the account
-        Then all cards should be returned for the account
+#    TODO: Move Scenario to Cards
+#    Scenario: Get All Cards for Account 
+#        Given account Id
+#        When all cards are fetched for the account
+#        Then all cards should be returned for the account
 
     Scenario: Get All Acounts
         When all acounts are fetched

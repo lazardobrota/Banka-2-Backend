@@ -5,6 +5,53 @@ public static partial class Endpoints
     public const string ApiBase = "api/v1";
 }
 
+#region Exchange Service
+
+public static partial class Endpoints
+{
+    public static class Stock
+    {
+        public const string Base      = $"{ApiBase}/stock";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+
+    public static class ForexPair
+    {
+        public const string Base      = $"{ApiBase}/forex/pair";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+
+    public static class FutureContract
+    {
+        public const string Base      = $"{ApiBase}/future/contract";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+
+    public static class Option
+    {
+        public const string Base      = $"{ApiBase}/option";
+        public const string BaseDaily = $"{Base}/daily";
+
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
+    }
+}
+
+#endregion
+
 #region User Service
 
 public static partial class Endpoints
@@ -42,12 +89,10 @@ public static partial class Endpoints
     {
         public const string Base = $"{ApiBase}/clients";
 
-        public const string GetAll         = $"{Base}";
-        public const string GetAllAccounts = $"{Base}/{{id:guid}}/accounts";
-        public const string Create         = $"{Base}";
-        public const string GetOne         = $"{Base}/{{id:guid}}";
-        public const string Update         = $"{Base}/{{id:guid}}";
-        public const string Cards          = $"{Base}/{{id:guid}}/cards";
+        public const string GetAll = $"{Base}";
+        public const string Create = $"{Base}";
+        public const string GetOne = $"{Base}/{{id:guid}}";
+        public const string Update = $"{Base}/{{id:guid}}";
     }
 }
 
@@ -68,9 +113,11 @@ public static partial class Endpoints
 {
     public static class Currency
     {
-        public const string Base   = $"{ApiBase}/currencies";
-        public const string GetOne = $"{Base}/{{id:guid}}";
-        public const string GetAll = $"{Base}";
+        public const string Base         = $"{ApiBase}/currencies";
+        public const string GetOne       = $"{Base}/{{id:guid}}";
+        public const string GetAll       = $"{Base}";
+        public const string GetAllSimple = $"{Base}/simple";
+        public const string GetOneSimple = $"{Base}/simple/{{id:guid}}";
     }
 }
 
@@ -99,13 +146,13 @@ public static partial class Endpoints
 {
     public static class Account
     {
-        public const string Base           = $"{ApiBase}/accounts";
-        public const string GetAll         = $"{Base}";
-        public const string GetAllCards    = $"{Base}/{{id:guid}}/cards";
-        public const string GetOne         = $"{Base}/{{id:guid}}";
-        public const string Create         = $"{Base}";
-        public const string UpdateEmployee = $"{Base}/employee/{{id:guid}}";
-        public const string UpdateClient   = $"{Base}/client/{{id:guid}}";
+        public const string Base            = $"{ApiBase}/accounts";
+        public const string GetAll          = $"{Base}";
+        public const string GetAllForClient = $"{Base}/{{clientId:guid}}/accounts";
+        public const string GetOne          = $"{Base}/{{id:guid}}";
+        public const string Create          = $"{Base}";
+        public const string UpdateEmployee  = $"{Base}/employee/{{id:guid}}";
+        public const string UpdateClient    = $"{Base}/client/{{id:guid}}";
     }
 }
 
@@ -125,13 +172,14 @@ public static partial class Endpoints
 {
     public static class Card
     {
-        public const string Base                 = $"{ApiBase}/cards";
-        public const string GetOne               = $"{Base}/{{id:guid}}";
-        public const string GetAll               = $"{Base}";
-        public const string Create               = $"{Base}";
-        public const string UpdateEmployee       = $"{Base}/{{id:guid}}/employee";
-        public const string UpdateClient         = $"{Base}/{{id:guid}}/client";
-        public const string UpdateStatusAsClient = $"{Base}/{{id:guid}}/client/status";
+        public const string Base             = $"{ApiBase}/cards";
+        public const string GetAll           = $"{Base}";
+        public const string GetAllForAccount = $"{Account.Base}/{{accountId:guid}}/cards";
+        public const string GetAllForClient  = $"{Client.Base}/{{accountId:guid}}/cards";
+        public const string GetOne           = $"{Base}/{{id:guid}}";
+        public const string Create           = $"{Base}";
+        public const string UpdateStatus     = $"{Base}/{{id:guid}}/status";
+        public const string UpdateLimit      = $"{Base}/{{id:guid}}/limit";
     }
 }
 
@@ -212,12 +260,11 @@ public static partial class Endpoints
     {
         public const string Base = $"{ApiBase}/loans";
 
-        public const string GetAll          = $"{Base}";
-        public const string GetOne          = $"{Base}/{{id:guid}}";
-        public const string Create          = $"{Base}";
-        public const string Update          = $"{Base}/{{id:guid}}";
-        public const string GetByClient     = $"{Base}/clients/{{clientId:guid}}";
-        public const string GetInstallments = $"{Base}/{{id:guid}}/installments";
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string Create      = $"{Base}";
+        public const string Update      = $"{Base}/{{id:guid}}";
+        public const string GetByClient = $"{Base}/clients/{{clientId:guid}}";
     }
 }
 
@@ -227,11 +274,10 @@ public static partial class Endpoints
     {
         public const string Base = $"{ApiBase}/installments";
 
-        public const string GetAll       = $"{Base}";
+        public const string GetAllByLoan = $"{Loan.Base}/{{loanId:guid}}/installments";
         public const string GetOne       = $"{Base}/{{id:guid}}";
         public const string Create       = $"{Base}";
         public const string Update       = $"{Base}/{{id:guid}}";
-        public const string UpdateStatus = $"{Base}/{{id:guid}}/status";
     }
 }
 
@@ -240,22 +286,6 @@ public static partial class Endpoints
     public static class StockExchange
     {
         public const string Base   = $"{ApiBase}/exchanges";
-        public const string GetAll = $"{Base}";
-        public const string GetOne = $"{Base}/{{id:guid}}";
-        public const string Create = $"{Base}";
-    }
-
-    public static class Listing
-    {
-        public const string Base   = $"{ApiBase}/listings";
-        public const string GetAll = $"{Base}";
-        public const string GetOne = $"{Base}/{{id:guid}}";
-        public const string Create = $"{Base}";
-    }
-
-    public static class ListingHistorical
-    {
-        public const string Base   = $"{ApiBase}/listings/historical";
         public const string GetAll = $"{Base}";
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string Create = $"{Base}";
