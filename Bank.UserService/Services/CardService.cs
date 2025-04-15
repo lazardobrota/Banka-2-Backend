@@ -114,7 +114,6 @@ public class CardService(ICardRepository repository, ICardTypeRepository cardTyp
 
     private bool IsDuplicateKeyException(DbUpdateException ex)
     {
-        // For PostgreSQL
         return ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505";
     }
 }

@@ -1,9 +1,9 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Responses;
+using Bank.Permissions.Core;
 using Bank.UserService.Services;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.UserService.Controllers;

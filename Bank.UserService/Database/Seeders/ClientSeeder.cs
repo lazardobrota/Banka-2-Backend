@@ -6,6 +6,7 @@ using Bank.UserService.Models;
 namespace Bank.UserService.Database.Seeders;
 
 using ClientModel = Client;
+using Permissions = Permissions.Domain.Permissions;
 
 public static partial class Seeder
 {
@@ -29,7 +30,7 @@ public static partial class Seeder
                                                       CreatedAt                  = DateTime.UtcNow,
                                                       ModifiedAt                 = DateTime.UtcNow,
                                                       Activated                  = true,
-                                                      Permissions                = (long)Permission.Client
+                                                      Permissions                = new Permissions(Permission.Client)
                                                   };
 
         public static readonly ClientModel Client01 = new()
@@ -50,7 +51,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client02 = new()
@@ -71,7 +72,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client03 = new()
@@ -92,7 +93,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client04 = new()
@@ -113,7 +114,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client05 = new()
@@ -134,7 +135,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client06 = new()
@@ -155,7 +156,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client07 = new()
@@ -176,7 +177,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client08 = new()
@@ -197,7 +198,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client09 = new()
@@ -218,7 +219,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
 
         public static readonly ClientModel Client10 = new()
@@ -239,7 +240,7 @@ public static partial class Seeder
                                                           CreatedAt                  = DateTime.UtcNow,
                                                           ModifiedAt                 = DateTime.UtcNow,
                                                           Activated                  = true,
-                                                          Permissions                = (long)Permission.Client
+                                                          Permissions                = new Permissions(Permission.Client)
                                                       };
     }
 }

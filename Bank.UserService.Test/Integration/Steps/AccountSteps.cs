@@ -6,6 +6,7 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.Permissions.Services;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
 

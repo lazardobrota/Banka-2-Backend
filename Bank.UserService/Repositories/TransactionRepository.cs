@@ -2,9 +2,9 @@
 
 using Bank.Application.Domain;
 using Bank.Application.Queries;
+using Bank.Permissions.Services;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
-using Bank.UserService.Services;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -40,7 +40,7 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
         var transactionQuery = m_Context.Transactions.IncludeAll()
                                         .AsQueryable();
 
-        if (m_AuthorizationService.Role == Role.Client)
+        if (m_AuthorizationService.Permissions == Permission.Client)
             transactionQuery = transactionQuery.Where(transaction => transaction.FromAccount!.ClientId == m_AuthorizationService.UserId ||
                                                                      transaction.ToAccount!.ClientId   == m_AuthorizationService.UserId);
 
