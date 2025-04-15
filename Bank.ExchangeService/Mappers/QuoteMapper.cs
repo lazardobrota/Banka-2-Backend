@@ -35,7 +35,7 @@ public static class QuoteMapper
                };
     }
 
-    public static QuoteDailySimpleResponse ToCandleSimpleResponse(this DailyQuote quote)
+    public static QuoteDailySimpleResponse ToDailySimpleResponse(this DailyQuote quote)
     {
         return new QuoteDailySimpleResponse
                {

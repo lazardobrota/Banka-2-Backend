@@ -98,8 +98,6 @@ public static class FutureContractSeederExtension
 
                 var parts = line.Split(',');
 
-                var id = Guid.NewGuid();
-
                 var ticker = parts[4]
                 .Trim();
 

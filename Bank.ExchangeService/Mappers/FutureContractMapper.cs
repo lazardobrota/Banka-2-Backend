@@ -23,7 +23,8 @@ public static class FutureContractMapper
                    Volume                       = futureContract.Volume,
                    PriceChangeInInterval        = futureContract.PriceChange,
                    PriceChangePercentInInterval = futureContract.PriceChangePercent,
-                   Price                        = futureContract.AskPrice,
+                   AskPrice                     = futureContract.AskPrice,
+                   BidPrice                     = futureContract.BidPrice,
                    CreatedAt                    = futureContract.CreatedAt,
                    ModifiedAt                   = futureContract.ModifiedAt
                };
@@ -47,6 +48,31 @@ public static class FutureContractMapper
                    ModifiedAt                   = futureContract.ModifiedAt,
                    PriceChangeInInterval        = futureContract.PriceChange,
                    PriceChangePercentInInterval = futureContract.PriceChangePercent
+               };
+    }
+
+    public static FutureContractDailyResponse ToDailyResponse(this FutureContract futureContract, CurrencySimpleResponse currencyResponse)
+    {
+        return new FutureContractDailyResponse
+               {
+                   Id             = futureContract.Id,
+                   ContractSize   = futureContract.ContractSize,
+                   ContractUnit   = futureContract.ContractUnit,
+                   SettlementDate = futureContract.SettlementDate,
+                   Name           = futureContract.Name,
+                   Ticker         = futureContract.Ticker,
+                   StockExchange  = futureContract.StockExchange!.ToResponse(currencyResponse),
+                   Quotes = futureContract.DailyQuotes.Select(quote => quote.ToDailySimpleResponse())
+                                          .ToList(),
+                   HighPrice                    = futureContract.HighPrice,
+                   LowPrice                     = futureContract.LowPrice,
+                   Volume                       = futureContract.Volume,
+                   PriceChangeInInterval        = futureContract.PriceChange,
+                   PriceChangePercentInInterval = futureContract.PriceChangePercent,
+                   OpenPrice                    = futureContract.OpeningPrice,
+                   ClosePrice                   = futureContract.ClosePrice,
+                   CreatedAt                    = futureContract.CreatedAt,
+                   ModifiedAt                   = futureContract.ModifiedAt,
                };
     }
 }

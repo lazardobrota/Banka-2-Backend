@@ -122,3 +122,13 @@ public enum SecurityType
     FutureContract,
     ForexPair
 }
+
+public enum QuoteIntervalType
+{
+    Week,
+    Day,
+    Month,
+    ThreeMonths,
+    Year,
+    Max
+}

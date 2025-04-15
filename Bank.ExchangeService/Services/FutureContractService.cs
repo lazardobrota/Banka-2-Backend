@@ -2,7 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
-using Bank.ExchangeService.HttpClients;
+using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Repositories;
 
@@ -15,12 +15,14 @@ public interface IFutureContractService
     Task<Result<Page<FutureContractSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable);
 
     Task<Result<FutureContractResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter);
+
+    Task<Result<FutureContractDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class FutureContractService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IFutureContractService
+public class FutureContractService(ISecurityRepository securityRepository, HttpClient httpClient) : IFutureContractService
 {
     private readonly ISecurityRepository m_SecurityRepository = securityRepository;
-    private readonly ICurrencyClient     m_CurrencyClient     = currencyClient;
+    private readonly HttpClient          m_HttpClient         = httpClient;
 
     public async Task<Result<Page<FutureContractSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
@@ -40,12 +42,28 @@ public class FutureContractService(ISecurityRepository securityRepository, ICurr
         if (futureContract is null)
             return Result.NotFound<FutureContractResponse>($"No FutureContract found wih Id: {id}");
 
-        var currencyResponse = await m_CurrencyClient.GetCurrencyByIdSimple(futureContract.StockExchange!.CurrencyId);
+        var currencyResponse = await m_HttpClient.GetCurrencyByIdSimple(futureContract.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {futureContract.StockExchange!.CurrencyId}");
 
         return Result.Ok(futureContract.ToFutureContract()
                                        .ToResponse(currencyResponse));
+    }
+
+    public async Task<Result<FutureContractDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter)
+    {
+        var futureContract = await m_SecurityRepository.FindByIdDaily(id, filter);
+
+        if (futureContract is null)
+            return Result.NotFound<FutureContractDailyResponse>($"No FutureContract found wih Id: {id}");
+
+        var currencyResponse = await m_HttpClient.GetCurrencyByIdSimple(futureContract.StockExchange!.CurrencyId);
+
+        if (currencyResponse is null)
+            throw new Exception($"No Currency with Id: {futureContract.StockExchange!.CurrencyId}");
+
+        return Result.Ok(futureContract.ToFutureContract()
+                                       .ToDailyResponse(currencyResponse));
     }
 }

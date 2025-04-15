@@ -2,7 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
-using Bank.ExchangeService.HttpClients;
+using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Repositories;
 
@@ -17,10 +17,10 @@ public interface IOptionService
     Task<Result<OptionDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class OptionService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IOptionService
+public class OptionService(ISecurityRepository securityRepository, IHttpClientFactory httpClientFactory) : IOptionService
 {
     private readonly ISecurityRepository m_SecurityRepository = securityRepository;
-    private readonly ICurrencyClient     m_Client             = currencyClient;
+    private readonly IHttpClientFactory  m_HttpClientFactory  = httpClientFactory;
 
     public async Task<Result<Page<OptionSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
@@ -35,12 +35,14 @@ public class OptionService(ISecurityRepository securityRepository, ICurrencyClie
 
     public async Task<Result<OptionResponse>> GetOne(Guid id, QuoteFilterIntervalQuery filter)
     {
-        var security = await m_SecurityRepository.FindById(id, filter, true);
+        var security = await m_SecurityRepository.FindById(id, filter);
 
         if (security is null)
             return Result.NotFound<OptionResponse>($"No Option found with Id: {id}");
 
-        var currencyResponse = await m_Client.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
+        using var httpClient = m_HttpClientFactory.CreateClient();
+
+        var currencyResponse = await httpClient.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
@@ -56,7 +58,9 @@ public class OptionService(ISecurityRepository securityRepository, ICurrencyClie
         if (security is null)
             return Result.NotFound<OptionDailyResponse>($"No Option found with Id: {id}");
 
-        var currencyResponse = await m_Client.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
+        using var httpClient = m_HttpClientFactory.CreateClient();
+
+        var currencyResponse = await httpClient.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");

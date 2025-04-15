@@ -88,8 +88,10 @@ public class FutureContract
     public long             Volume             => Quotes.Count > 0 ? Quotes[0].Volume : 0;
     public decimal          PriceChange        => SecurityUtils.GetPriceChange(Quotes, DailyQuotes);
     public decimal          PriceChangePercent => SecurityUtils.GetPriceChangePercent(Quotes, DailyQuotes);
-    public decimal          AskPrice           => Quotes.Count > 0 ? Quotes[0].AskPrice : 0;
-    public decimal          BidPrice           => Quotes.Count > 0 ? Quotes[0].BidPrice : 0;
+    public decimal          AskPrice           => Quotes.Count      > 0 ? Quotes[0].AskPrice : 0;
+    public decimal          BidPrice           => Quotes.Count      > 0 ? Quotes[0].BidPrice : 0;
+    public decimal          ClosePrice         => DailyQuotes.Count > 0 ? DailyQuotes[0].ClosePrice : 0;
+    public decimal          OpeningPrice       => SecurityUtils.GetOpeningPrice(Quotes, DailyQuotes);
     public DateTime         CreatedAt          => SecurityUtils.GetCreatedAtDate(Quotes, DailyQuotes);
     public DateTime         ModifiedAt         => SecurityUtils.GetModifiedAtDate(Quotes, DailyQuotes);
 }

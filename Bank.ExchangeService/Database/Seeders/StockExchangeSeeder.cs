@@ -138,19 +138,6 @@ public static partial class Seeder
                                                             ModifiedAt = DateTime.UtcNow
                                                         };
 
-        // public static readonly StockExchangeModel SHFE = new()
-        //                                                  {
-        //                                                      Id         = Guid.Parse("4ef58041-fce8-4725-8449-ffa98c48d1ed"),
-        //                                                      Name       = "Shanghai Futures Exchange",
-        //                                                      Acronym    = "SHFE",
-        //                                                      MIC        = "XSFE",
-        //                                                      Polity     = "China",
-        //                                                      CurrencyId = Guid.Parse("c3d4e5f6-a7b8-4950-1d2e-3f4a5b6c7d8e"), // CNY
-        //                                                      TimeZone   = TimeSpan.FromHours(8),                              // China Standard Time
-        //                                                      CreatedAt  = DateTime.UtcNow,
-        //                                                      ModifiedAt = DateTime.UtcNow
-        //                                                  };
-
         public static readonly StockExchangeModel TOCOM = new()
                                                           {
                                                               Id         = Guid.Parse("0e6b8da5-ef55-442b-af78-7bf8040980e1"),

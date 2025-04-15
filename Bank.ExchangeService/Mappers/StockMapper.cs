@@ -46,7 +46,7 @@ public static class StockMapper
                };
     }
 
-    public static StockDailyResponse ToCandleResponse(this Stock stock, CurrencySimpleResponse currencyResponse)
+    public static StockDailyResponse ToDailyResponse(this Stock stock, CurrencySimpleResponse currencyResponse)
     {
         return new StockDailyResponse
                {
@@ -62,7 +62,7 @@ public static class StockMapper
                    ModifiedAt                   = stock.ModifiedAt,
                    OpenPrice                    = stock.OpeningPrice,
                    ClosePrice                   = stock.ClosePrice,
-                   Quotes = stock.DailyQuotes.Select(quote => quote.ToCandleSimpleResponse())
+                   Quotes = stock.DailyQuotes.Select(quote => quote.ToDailySimpleResponse())
                                  .ToList(),
                    StockExchange = stock.StockExchange!.ToResponse(currencyResponse),
                };

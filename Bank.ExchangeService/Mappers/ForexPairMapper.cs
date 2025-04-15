@@ -55,7 +55,7 @@ public static class ForexPairMapper
                    ModifiedAt                   = forexPair.ModifiedAt,
                    OpeningPrice                 = forexPair.OpeningPrice,
                    ClosePrice                   = forexPair.ClosePrice,
-                   Quotes = forexPair.DailyQuotes.Select(quote => quote.ToCandleSimpleResponse())
+                   Quotes = forexPair.DailyQuotes.Select(quote => quote.ToDailySimpleResponse())
                                      .ToList()
                };
     }

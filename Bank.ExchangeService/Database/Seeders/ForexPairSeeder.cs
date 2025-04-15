@@ -5,7 +5,7 @@ using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database.WebSockets;
-using Bank.ExchangeService.HttpClients;
+using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
@@ -96,18 +96,15 @@ public static class ForexPairSeederExtension
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedForexPair(this DatabaseContext context, HttpClient httpClient, ICurrencyClient currencyClient, ISecurityRepository securityRepository)
+    public static async Task SeedForexPair(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository)
     {
         if (context.Securities.Any(security => security.SecurityType == SecurityType.ForexPair))
             return;
 
-        var currencies = await currencyClient.GetAllCurrenciesSimple();
+        var currencies = await httpClient.GetAllCurrenciesSimple();
 
         if (currencies is null)
-        {
-            Console.WriteLine($"CURRENCY RESPONSE | Bad request");
             return;
-        }
 
         var apiKey     = Configuration.Security.Keys.ApiKeyForex;
         var securities = new List<SecurityModel>();
@@ -133,10 +130,7 @@ public static class ForexPairSeederExtension
                 var response = await httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
                     return;
-                }
 
                 var parsed = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
@@ -146,10 +140,7 @@ public static class ForexPairSeederExtension
                 var body = JsonSerializer.Deserialize<FetchForexPairLatestResponse>(forexPairElement.GetRawText());
 
                 if (body is null)
-                {
-                    Console.WriteLine($"RESULT IS NULL");
                     return;
-                }
 
                 Liquidity liquidity;
                 var       ticker        = $"{currencyFrom}{currencyTo}";
@@ -167,23 +158,16 @@ public static class ForexPairSeederExtension
             }
         }
 
-        Console.WriteLine("Seeding ForexPairs database...");
-
         await securityRepository.CreateSecurities(securities);
-
-        Console.WriteLine("Completed");
     }
 
-    public static async Task SeedForexPairLatest(this DatabaseContext context, HttpClient httpClient, ICurrencyClient currencyClient, ISecurityRepository securityRepository,
-                                                 IQuoteRepository     quoteRepository, IHubContext<SecurityHub, ISecurityClient> securityHub)
+    public static async Task SeedForexPairLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository,
+                                                 IHubContext<SecurityHub, ISecurityClient> securityHub)
     {
-        var currencies = await currencyClient.GetAllCurrenciesSimple();
+        var currencies = await httpClient.GetAllCurrenciesSimple();
 
         if (currencies is null)
-        {
-            Console.WriteLine($"CURRENCY RESPONSE | Bad request");
             return;
-        }
 
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
@@ -212,10 +196,7 @@ public static class ForexPairSeederExtension
                 var response = await httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
                     return;
-                }
 
                 var parsed = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
 
@@ -225,10 +206,7 @@ public static class ForexPairSeederExtension
                 var body = JsonSerializer.Deserialize<FetchForexPairLatestResponse>(forexPairElement.GetRawText());
 
                 if (body is null)
-                {
-                    Console.WriteLine($"RESULT IS NULL");
                     return;
-                }
 
                 var ticker                    = $"{currencyFrom.Code}{currencyTo.Code}";
                 var forexPairId               = tickerAndForexPair[ticker].Id;
@@ -241,15 +219,10 @@ public static class ForexPairSeederExtension
             }
         }
 
-        Console.WriteLine("Seeding database...");
-
         await quoteRepository.CreateQuotes(quotes);
-
-        Console.WriteLine("Completed");
     }
 
-    public static async Task SeedForexPairQuotes(this DatabaseContext context, HttpClient httpClient, ICurrencyClient currencyClient, ISecurityRepository securityRepository,
-                                                 IQuoteRepository     quoteRepository)
+    public static async Task SeedForexPairQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
         if (context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.ForexPair))
             return;
@@ -257,13 +230,10 @@ public static class ForexPairSeederExtension
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
 
-        var currencies = await currencyClient.GetAllCurrenciesSimple();
+        var currencies = await httpClient.GetAllCurrenciesSimple();
 
         if (currencies is null)
-        {
-            Console.WriteLine($"CURRENCY RESPONSE | Bad request");
             return;
-        }
 
         var apiKey = Configuration.Security.Keys.ApiKeyForex;
         var quotes = new List<Quote>();
@@ -289,10 +259,7 @@ public static class ForexPairSeederExtension
                 var response = await httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
                     return;
-                }
 
                 if (!JsonDocument.Parse(await response.Content.ReadAsStringAsync())
                                  .RootElement.TryGetProperty("Meta Data", out _))
@@ -301,10 +268,7 @@ public static class ForexPairSeederExtension
                 var body = await response.Content.ReadFromJsonAsync<FetchForexPairQuotesResponse>();
 
                 if (body is null)
-                {
-                    Console.WriteLine($"RESULT IS NULL");
                     return;
-                }
 
                 if (!tickerAndForexPair.TryGetValue($"{currencyFrom.Code}{currencyTo.Code}", out var forexPair))
                     continue;
@@ -320,10 +284,6 @@ public static class ForexPairSeederExtension
             }
         }
 
-        Console.WriteLine("Seeding ForexPair Quotes database...");
-
         await quoteRepository.CreateQuotes(quotes);
-
-        Console.WriteLine("Completed");
     }
 }

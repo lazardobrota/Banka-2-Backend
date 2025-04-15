@@ -3,23 +3,16 @@ using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Seeders;
 using Bank.ExchangeService.Database.WebSockets;
-using Bank.ExchangeService.HttpClients;
 using Bank.ExchangeService.Repositories;
 
 using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.BackgroundServices;
 
-public class DatabaseBackgroundService(
-    IServiceProvider                          serviceProvider,
-    IHttpClientFactory                        httpClientFactory,
-    ICurrencyClient                           currencyClient,
-    IHubContext<SecurityHub, ISecurityClient> securityHub
-)
+public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IHubContext<SecurityHub, ISecurityClient> securityHub)
 {
     private readonly IServiceProvider                          m_ServiceProvider    = serviceProvider;
     private readonly IHttpClientFactory                        m_HttpClientFactory  = httpClientFactory;
-    private readonly ICurrencyClient                           m_CurrencyClient     = currencyClient;
     private readonly IHubContext<SecurityHub, ISecurityClient> m_SecurityHub        = securityHub;
     private          ISecurityRepository                       m_SecurityRepository = null!;
     private          IQuoteRepository                          m_QuoteRepository    = null!;
@@ -71,20 +64,22 @@ public class DatabaseBackgroundService(
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
-        Context.SeedForexPair(client, m_CurrencyClient, m_SecurityRepository)
+        Context.SeedStock(client)
                .Wait();
 
-        Context.SeedStock(client)
+        Context.SeedForexPair(client, m_SecurityRepository)
                .Wait();
 
         Context.SeedOptionsAndQuotes(client, m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
-        Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_CurrencyClient, m_SecurityRepository, m_QuoteRepository)
+        Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
         Context.SeedStockQuotes(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
                .Wait();
+
+        Console.WriteLine("Seeding Completed");
 
         InitializeTimers();
     }
@@ -94,7 +89,8 @@ public class DatabaseBackgroundService(
     public void InitializeTimers()
     {
         m_SecurityTimer = new Timer(_ => SecurityTimerCallBack()
-                                    .Wait(), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+                                    .Wait(), null, TimeSpan.FromMinutes(Configuration.Security.Global.LatestTimeFrameInMinutes),
+                                    TimeSpan.FromMinutes(Configuration.Security.Global.LatestTimeFrameInMinutes));
     }
 
     private async Task SecurityTimerCallBack()
@@ -106,14 +102,15 @@ public class DatabaseBackgroundService(
 
         try
         {
-            if (m_IterationCount is < 9 or 10)
+            //TODO Add more Alpaca API keys for stocks and options to work at the same time
+            if (m_IterationCount < Configuration.Security.Global.HistoryTimeFrameInMinutes)
                 await FetchStocksLatest();
-            else if (m_IterationCount == 9)
-                await FetchOptionLatest();
             else
-                await FetchForexPairLatest();
+            {
+                Task.WaitAll(FetchOptionLatest(), FetchForexPairLatest());
+            }
 
-            m_IterationCount = (m_IterationCount + 1) % 12;
+            m_IterationCount = (m_IterationCount + 1) % Configuration.Security.Global.HistoryTimeFrameInMinutes;
         }
         finally
         {
@@ -138,7 +135,7 @@ public class DatabaseBackgroundService(
         var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
         var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
 
-        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), m_CurrencyClient, securityRepository, quoteRepository, m_SecurityHub);
+        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository, m_SecurityHub);
     }
 
     private async Task FetchOptionLatest()

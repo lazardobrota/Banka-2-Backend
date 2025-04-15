@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Web;
+﻿using System.Web;
 
 using Bank.Application.Domain;
 using Bank.Application.Responses;
@@ -359,9 +358,6 @@ public static class QuoteSeederExtension
         if (context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.Stock))
             return;
 
-        var stopwatchFull = new Stopwatch();
-        stopwatchFull.Start();
-
         var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
 
         var symbols = string.Join(",", stocks.Values.Select(stock => stock.Ticker)
@@ -369,11 +365,15 @@ public static class QuoteSeederExtension
 
         string? nextPage = null;
         var     query    = HttpUtility.ParseQueryString(string.Empty);
+        var     toDate   = DateTime.Parse(Configuration.Security.Stock.ToDateTime);
         query["symbols"] = symbols;
-        query["start"]   = Configuration.Security.Stock.StartTime;
-        // query["end"]       = Configuration.Security.Stock.EndTime;
+        query["start"]   = Configuration.Security.Stock.FromDateTime;
+
+        if (toDate.Day < DateTime.Today.Day)
+            query["end"] = Configuration.Security.Stock.ToDateTime;
+
         query["limit"]     = "10000";
-        query["timeframe"] = "15Min";
+        query["timeframe"] = $"{Configuration.Security.Global.HistoryTimeFrameInMinutes}Min";
 
         var quotes = new List<QuoteModel>();
 
@@ -401,18 +401,12 @@ public static class QuoteSeederExtension
             var response = await httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
-            {
-                Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
                 break;
-            }
 
             var body = await response.Content.ReadFromJsonAsync<FetchStockBarsResponse>();
 
             if (body is null)
-            {
-                Console.WriteLine($"RESULT IS NULL");
                 break;
-            }
 
             quotes.AddRange(body.Bars.SelectMany(pair =>
                                                  {
@@ -423,12 +417,6 @@ public static class QuoteSeederExtension
             nextPage = body.NextPage;
         } while (!string.IsNullOrEmpty(nextPage));
 
-        Console.WriteLine("Please wait for Stock Quotes to seed...");
-
         await quoteRepository.CreateQuotes(quotes);
-
-        stopwatchFull.Stop();
-
-        Console.WriteLine($"SeedQuoteStocks | All | Time Elapsed: {stopwatchFull.ElapsedMilliseconds}ms");
     }
 }

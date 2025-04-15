@@ -2,7 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
-using Bank.ExchangeService.HttpClients;
+using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Repositories;
 
@@ -19,16 +19,18 @@ public interface IForexPairService
     Task<Result<ForexPairDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class ForexPairService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IForexPairService
+public class ForexPairService(ISecurityRepository securityRepository, IHttpClientFactory httpClientFactory) : IForexPairService
 {
     private readonly ISecurityRepository m_SecurityRepository = securityRepository;
-    private readonly ICurrencyClient     m_CurrencyClient     = currencyClient;
+    private readonly IHttpClientFactory  m_HttpClientFactory  = httpClientFactory;
 
     public async Task<Result<Page<ForexPairSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
         var page = await m_SecurityRepository.FindAll(quoteFilterQuery, SecurityType.ForexPair, pageable);
 
-        var list = m_CurrencyClient.GetAllCurrenciesSimple();
+        using var httpClient = m_HttpClientFactory.CreateClient();
+
+        var list = httpClient.GetAllCurrenciesSimple();
 
         if (list.Result is null)
             throw new Exception("There are no currencies in a database");
@@ -48,9 +50,11 @@ public class ForexPairService(ISecurityRepository securityRepository, ICurrencyC
         if (forexPair is null)
             return Result.NotFound<ForexPairResponse>($"No Forex pair found wih Id: {id}");
 
-        var currencyBaseResponseTask  = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.BaseCurrencyId));
-        var currencyQuoteResponseTask = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.QuoteCurrencyId));
-        var currencyResponseTask      = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.StockExchange!.CurrencyId));
+        using var httpClient = m_HttpClientFactory.CreateClient();
+
+        var currencyBaseResponseTask  = httpClient.GetCurrencyByIdSimple(forexPair.BaseCurrencyId);
+        var currencyQuoteResponseTask = httpClient.GetCurrencyByIdSimple(forexPair.QuoteCurrencyId);
+        var currencyResponseTask      = httpClient.GetCurrencyByIdSimple(forexPair.StockExchange!.CurrencyId);
 
         Task.WaitAll(currencyBaseResponseTask, currencyQuoteResponseTask, currencyResponseTask);
 
@@ -78,9 +82,11 @@ public class ForexPairService(ISecurityRepository securityRepository, ICurrencyC
         if (forexPair is null)
             return Result.NotFound<ForexPairDailyResponse>($"No Forex pair found wih Id: {id}");
 
-        var currencyBaseResponseTask  = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.BaseCurrencyId));
-        var currencyQuoteResponseTask = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.QuoteCurrencyId));
-        var currencyResponseTask      = Task.Run(() => m_CurrencyClient.GetCurrencyByIdSimple(forexPair.StockExchange!.CurrencyId));
+        using var httpClient = m_HttpClientFactory.CreateClient();
+
+        var currencyBaseResponseTask  = httpClient.GetCurrencyByIdSimple(forexPair.BaseCurrencyId);
+        var currencyQuoteResponseTask = httpClient.GetCurrencyByIdSimple(forexPair.QuoteCurrencyId);
+        var currencyResponseTask      = httpClient.GetCurrencyByIdSimple(forexPair.StockExchange!.CurrencyId);
 
         Task.WaitAll(currencyBaseResponseTask, currencyQuoteResponseTask, currencyResponseTask);
 

@@ -51,7 +51,7 @@ public static class OptionMapper
                    PriceChangePercentInInterval = option.PriceChangePercent,
                    CreatedAt                    = option.CreatedAt,
                    ModifiedAt                   = option.ModifiedAt,
-                   Quotes = option.DailyQuotes.Select(quote => quote.ToCandleSimpleResponse())
+                   Quotes = option.DailyQuotes.Select(quote => quote.ToDailySimpleResponse())
                                   .ToList(),
                    OpeningPrice = option.OpeningPrice,
                    ClosePrice   = option.ClosePrice,

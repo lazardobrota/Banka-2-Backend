@@ -50,6 +50,7 @@ public static class SecurityMapper
                    Ticker          = security.Ticker,
                    StockExchange   = security.StockExchange,
                    Quotes          = security.Quotes,
+                   DailyQuotes     = security.DailyQuotes,
                    StockExchangeId = security.StockExchangeId
                };
     }

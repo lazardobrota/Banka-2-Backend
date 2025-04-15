@@ -1,14 +1,6 @@
-﻿namespace Bank.Application.Queries;
+﻿using Bank.Application.Domain;
 
-public enum QuoteIntervalType
-{
-    Week,
-    Day,
-    Month,
-    ThreeMonths,
-    Year,
-    Max
-}
+namespace Bank.Application.Queries;
 
 public class QuoteFilterQuery
 {

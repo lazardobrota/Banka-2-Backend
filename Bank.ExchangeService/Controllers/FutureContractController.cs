@@ -26,4 +26,11 @@ public class FutureContractController(IFutureContractService futureContractServi
         var result = await m_FutureContractService.GetOne(id, filter);
         return result.ActionResult;
     }
+
+    [HttpGet(Endpoints.FutureContract.GetOneDaily)]
+    public async Task<ActionResult<FutureContractResponse>> GetOneDaily([FromRoute] Guid id, [FromQuery] QuoteFilterIntervalQuery filter)
+    {
+        var result = await m_FutureContractService.GetOneDaily(id, filter);
+        return result.ActionResult;
+    }
 }

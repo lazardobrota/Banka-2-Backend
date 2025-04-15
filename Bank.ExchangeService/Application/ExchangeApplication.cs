@@ -8,7 +8,6 @@ using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
-using Bank.ExchangeService.HttpClients;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 
@@ -78,7 +77,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IStockExchangeRepository, StockExchangeRepository>();
         services.AddScoped<IStockExchangeService, StockExchangeService>();
-        services.AddScoped<ICurrencyClient, CurrencyClient>();
         services.AddScoped<IStockService, StockService>();
         services.AddScoped<IOptionService, OptionService>();
         services.AddScoped<IForexPairService, ForexPairService>();
@@ -113,7 +111,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddHttpServices(this IServiceCollection services)
     {
         services.AddHttpClient();
-        services.AddHttpClient<ICurrencyClient, CurrencyClient>(client => { client.BaseAddress = new Uri("http://localhost:5075"); });
         services.AddHttpContextAccessor();
 
         return services;

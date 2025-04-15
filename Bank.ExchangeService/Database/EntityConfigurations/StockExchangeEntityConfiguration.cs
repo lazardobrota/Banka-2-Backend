@@ -11,7 +11,7 @@ public class StockExchangeEntityConfiguration : IEntityTypeConfiguration<StockEx
     {
         builder.HasKey(exchange => exchange.Id);
 
-        // builder.HasAlternateKey(nameof(StockExchange.Acronym));
+        builder.HasAlternateKey(nameof(StockExchange.Acronym));
 
         builder.Property(exchange => exchange.Id)
                .IsRequired();

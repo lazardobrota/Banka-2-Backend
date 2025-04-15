@@ -154,10 +154,7 @@ public static class OptionSeederExtension
                 var body = await response.Content.ReadFromJsonAsync<FetchOptionsResponse>();
 
                 if (body == null)
-                {
-                    Console.WriteLine("No options data received or invalid format");
                     continue;
-                }
 
                 foreach (var pair in body.Snapshots)
                 {
@@ -180,10 +177,7 @@ public static class OptionSeederExtension
             } while (!string.IsNullOrEmpty(nextPage));
         }
 
-        Console.WriteLine("Please wait for latest options to seed...");
         await quoteRepository.CreateQuotes(quotes);
-
-        Console.WriteLine("Completed");
     }
 
     public static async Task SeedOptionsAndQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
@@ -228,18 +222,12 @@ public static class OptionSeederExtension
                 using var response = await httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"Failed to fetch options chain: {response.StatusCode}");
                     return;
-                }
 
                 var body = await response.Content.ReadFromJsonAsync<FetchOptionsResponse>();
 
                 if (body == null)
-                {
-                    Console.WriteLine("No options data received or invalid format");
                     return;
-                }
 
                 foreach (var pair in body.Snapshots)
                 {
@@ -259,11 +247,8 @@ public static class OptionSeederExtension
             } while (!string.IsNullOrEmpty(nextPage));
         }
 
-        Console.WriteLine("Please wait for options to seed...");
         await securityRepository.CreateSecurities(securities);
         await quoteRepository.CreateQuotes(quotes);
-
-        Console.WriteLine("Completed");
     }
 
     private static (DateOnly ExpirationDate, decimal StrikePrice, OptionType OptionType) ParseOptionTracker(string optionTracker)

@@ -18,31 +18,31 @@ public class QuoteEntityConfiguration : IEntityTypeConfiguration<Quote>
 
         builder.Property(quote => quote.AskPrice)
                .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12);
 
         builder.Property(quote => quote.BidPrice)
                .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12);
 
         builder.Property(quote => quote.HighPrice)
                .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12);
 
         builder.Property(quote => quote.LowPrice)
                .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12);
 
         builder.Property(quote => quote.ImpliedVolatility)
                .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12);
 
         builder.Property(quote => quote.ClosePrice)
                .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12);
 
         builder.Property(quote => quote.OpeningPrice)
                .IsRequired()
-               .HasPrecision(18, 6);
+               .HasPrecision(28, 12);
 
         builder.Property(quote => quote.Volume)
                .IsRequired();

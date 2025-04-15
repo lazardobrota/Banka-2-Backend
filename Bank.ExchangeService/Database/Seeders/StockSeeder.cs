@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Mappers;
@@ -61,10 +59,6 @@ public static class StockSeederExtension
         if (context.Securities.Any(security => security.SecurityType == SecurityType.Stock))
             return;
 
-        var stopwatch = new Stopwatch();
-
-        stopwatch.Start();
-
         var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
 
         var request = new HttpRequestMessage
@@ -89,14 +83,6 @@ public static class StockSeederExtension
         if (body is null)
             throw new Exception("List of stocks can't be null");
 
-        stopwatch.Stop();
-
-        Console.WriteLine($"SeedStock | API | Time Elapsed: {stopwatch.ElapsedMilliseconds}ms");
-
-        stopwatch.Restart();
-
-        Console.WriteLine(body);
-
         var stockExchanges = await context.StockExchanges.ToListAsync();
 
         var stocks = body.Select(stockResponse =>
@@ -115,10 +101,6 @@ public static class StockSeederExtension
         await context.Securities.AddRangeAsync(stocks);
 
         await context.SaveChangesAsync();
-
-        stopwatch.Stop();
-
-        Console.WriteLine($"SeedStock | Save | Time Elapsed: {stopwatch.ElapsedMilliseconds}ms");
     }
 
     public static async Task SeedStockHardcoded(this DatabaseContext context)

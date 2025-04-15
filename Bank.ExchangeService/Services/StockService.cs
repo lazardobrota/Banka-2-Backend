@@ -2,7 +2,7 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
-using Bank.ExchangeService.HttpClients;
+using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Repositories;
 
@@ -19,10 +19,10 @@ public interface IStockService
     Task<Result<StockDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class StockService(ISecurityRepository securityRepository, ICurrencyClient currencyClient) : IStockService
+public class StockService(ISecurityRepository securityRepository, IHttpClientFactory httpClientFactory) : IStockService
 {
     private readonly ISecurityRepository m_SecurityRepository = securityRepository;
-    private readonly ICurrencyClient     m_Client             = currencyClient;
+    private readonly IHttpClientFactory  m_HttpClientFactory  = httpClientFactory;
 
     public async Task<Result<Page<StockSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
@@ -42,7 +42,8 @@ public class StockService(ISecurityRepository securityRepository, ICurrencyClien
         if (security is null)
             return Result.NotFound<StockResponse>($"No Stock found wih Id: {id}");
 
-        var currencyResponse = await m_Client.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
+        using var httpClient       = m_HttpClientFactory.CreateClient();
+        var       currencyResponse = await httpClient.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
@@ -58,12 +59,13 @@ public class StockService(ISecurityRepository securityRepository, ICurrencyClien
         if (security is null)
             return Result.NotFound<StockDailyResponse>($"No Stock found wih Id: {id}");
 
-        var currencyResponse = await m_Client.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
+        using var httpClient       = m_HttpClientFactory.CreateClient();
+        var       currencyResponse = await httpClient.GetCurrencyByIdSimple(security.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
 
         return Result.Ok(security.ToStock()
-                                 .ToCandleResponse(currencyResponse));
+                                 .ToDailyResponse(currencyResponse));
     }
 }
