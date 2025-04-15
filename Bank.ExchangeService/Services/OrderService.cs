@@ -93,8 +93,6 @@ public class OrderService(IOrderRepository orderRepository, IHttpClientFactory h
 
         var response     = await httpClient.GetAsync($"{Endpoints.User.GetAll}?{query}");
         var responsePage = await response.Content.ReadFromJsonAsync<Page<UserResponse>>();
-        // b5d36c22-3b6c-4de0-845b-a1a74e7b9856
-        // 3d9bd4c3-a467-4676-ac4b-2b392e7315fa
 
         if (request.SupervisorId == Guid.Empty && responsePage?.PageSize != 1 || request.SupervisorId != Guid.Empty && responsePage?.PageSize != 2)
             return Result.BadRequest<OrderResponse>("Could not find Supervisor or Actuary");

@@ -21,7 +21,6 @@ public static partial class Sample
                                                                          Role                       = Role.Employee,
                                                                          Department                 = "HR",
                                                                          Employed                   = true,
-                                                                         Permissions                = 1 << 2
                                                                      };
 
         public static readonly EmployeeUpdateRequest UpdateRequest = new()

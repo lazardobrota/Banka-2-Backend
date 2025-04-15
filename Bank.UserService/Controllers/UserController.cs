@@ -3,7 +3,7 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.UserService.Security;
+using Bank.Permissions.Core;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Mvc;
@@ -15,8 +15,8 @@ public class UserController(IUserService userService) : ControllerBase
 {
     private readonly IUserService m_UserService = userService;
 
-    [HttpGet(Endpoints.User.GetAll)]
     [Authorize(Permission.Admin, Permission.Employee)]
+    [HttpGet(Endpoints.User.GetAll)]
     public async Task<ActionResult<Page<UserResponse>>> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
         var result = await m_UserService.GetAll(userFilterQuery, pageable);
@@ -65,10 +65,11 @@ public class UserController(IUserService userService) : ControllerBase
         return result.ActionResult;
     }
 
-    [HttpPut(Endpoints.User.UpdatePermissions)]
-    public async Task<ActionResult> UpdatePermissions(Guid id, [FromBody] UpdatePermissionsRequest request)
+    [Authorize(Permission.Admin, Permission.Employee)]
+    [HttpPut(Endpoints.User.UpdatePermission)]
+    public async Task<ActionResult> UpdatePermission(Guid id, [FromBody] UserUpdatePermissionRequest request)
     {
-        var result = await m_UserService.UpdatePermissions(id, request);
+        var result = await m_UserService.UpdatePermission(id, request);
 
         return result.ActionResult;
     }

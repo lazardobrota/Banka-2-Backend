@@ -3,6 +3,7 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.Permissions.Services;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
 
@@ -150,7 +151,8 @@ public class UserSteps(IUserService userService, ScenarioContext scenarioContext
     [Given(@"a user has received a valid activation token")]
     public void GivenAUserHasReceivedAValidActivationToken()
     {
-        string token = m_AuthorizationService.GenerateTokenFor(Example.Entity.User.GetEmployee);
+        string token = m_AuthorizationService.GenerateTokenFor(Example.Entity.User.GetEmployee.Id, Example.Entity.User.GetEmployee.Permissions);
+
         m_ScenarioContext[Constant.Token] = token;
     }
 

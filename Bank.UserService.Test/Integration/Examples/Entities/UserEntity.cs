@@ -1,5 +1,4 @@
-﻿using Bank.Application.Domain;
-using Bank.Application.Requests;
+﻿using Bank.Application.Requests;
 using Bank.UserService.Database.Sample;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
@@ -37,7 +36,7 @@ public static partial class Example
                                                                ModifiedAt                 = Seeder.Employee.Employee01.ModifiedAt,
                                                                Employed                   = Seeder.Employee.Employee01.Employed,
                                                                Activated                  = Seeder.Employee.Employee01.Activated,
-                                                               Permissions                = (long)Permission.Employee
+                                                               Permissions                = Seeder.Employee.Employee01.Permissions
                                                            };
 
             public static readonly UserModel UpdateEmployee = new()
@@ -61,7 +60,7 @@ public static partial class Example
                                                                   ModifiedAt                 = Seeder.Employee.Employee02.ModifiedAt,
                                                                   Employed                   = Seeder.Employee.Employee02.Employed,
                                                                   Activated                  = Seeder.Employee.Employee02.Activated,
-                                                                  Permissions                = (long)Permission.Employee
+                                                                  Permissions                = Seeder.Employee.Employee02.Permissions
                                                               };
 
             public static readonly UserActivationRequest UserActivationRequest = Sample.User.ActivationRequest;

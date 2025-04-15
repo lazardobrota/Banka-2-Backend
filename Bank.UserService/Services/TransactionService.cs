@@ -3,6 +3,7 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.Permissions.Services;
 using Bank.UserService.BackgroundServices;
 using Bank.UserService.Database;
 using Bank.UserService.Mappers;
@@ -36,14 +37,12 @@ public class TransactionService(
     IAccountRepository                    accountRepository,
     ICurrencyRepository                   currencyRepository,
     TransactionBackgroundService          transactionBackgroundService,
-    IAccountCurrencyRepository            accountCurrencyRepository,
     IExchangeService                      exchangeService,
     IDbContextFactory<ApplicationContext> contextFactory
 ) : ITransactionService
 {
     private readonly ITransactionRepository                m_TransactionRepository        = transactionRepository;
     private readonly IAccountRepository                    m_AccountRepository            = accountRepository;
-    private readonly IAccountCurrencyRepository            m_AccountCurrencyRepository    = accountCurrencyRepository;
     private readonly ICurrencyRepository                   m_CurrencyRepository           = currencyRepository;
     private readonly IAuthorizationService                 m_AuthorizationService         = authorizationService;
     private readonly IExchangeService                      m_ExchangeService              = exchangeService;
@@ -69,8 +68,8 @@ public class TransactionService(
         if (transaction is null)
             return Result.NotFound<TransactionResponse>($"No Transaction found with Id: {id}");
 
-        if (m_AuthorizationService.Role     == Role.Client && transaction.FromAccount?.ClientId != m_AuthorizationService.UserId &&
-            transaction.ToAccount?.ClientId != m_AuthorizationService.UserId)
+        if (m_AuthorizationService.Permissions == Permission.Client && transaction.FromAccount?.ClientId != m_AuthorizationService.UserId &&
+            transaction.ToAccount?.ClientId    != m_AuthorizationService.UserId)
             return Result.Unauthorized<TransactionResponse>();
 
         return Result.Ok(transaction.ToResponse());
@@ -80,7 +79,7 @@ public class TransactionService(
     {
         var page = await m_TransactionRepository.FindAllByAccountId(accountId, transactionFilterQuery, pageable);
 
-        if (m_AuthorizationService.Role == Role.Client &&
+        if (m_AuthorizationService.Permissions == Permission.Client &&
             page.Items.Any(transaction => transaction.FromAccount!.ClientId != m_AuthorizationService.UserId && transaction.ToAccount!.ClientId != m_AuthorizationService.UserId))
             return Result.Forbidden<Page<TransactionResponse>>();
 
@@ -366,8 +365,6 @@ public class TransactionService(
         await using var databaseContext     = await CreateContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
 
-        var transferSucceeded = true;
-
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
         var fromAccountTask = m_AccountRepository.FindById(processTransaction.FromAccountId);
         var toAccountTask   = m_AccountRepository.FindById(processTransaction.ToAccountId);
@@ -390,8 +387,8 @@ public class TransactionService(
 
         fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var fromAccountId);
 
-        transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
-                                                                      processTransaction.FromBankAmount, databaseContext);
+        var transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
+                                                                          processTransaction.FromBankAmount, databaseContext);
 
         if (!transferSucceeded)
         {

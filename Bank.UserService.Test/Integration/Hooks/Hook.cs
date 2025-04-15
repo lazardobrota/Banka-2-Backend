@@ -1,4 +1,5 @@
 using Bank.Application.Extensions;
+using Bank.Permissions;
 using Bank.UserService.Application;
 using Bank.UserService.BackgroundServices;
 using Bank.UserService.HostedServices;
@@ -29,6 +30,8 @@ public class Hooks
 
         var services = new ServiceCollection();
 
+        services.AddAuthorizationServices();
+        services.AddAuthenticationServices();
         services.AddServices();
         services.AddBackgroundServices();
         services.AddHttpServices();

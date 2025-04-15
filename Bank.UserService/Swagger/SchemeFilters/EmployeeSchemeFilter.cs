@@ -1,4 +1,5 @@
-﻿using Bank.Application.Extensions;
+﻿using Bank.Application.Domain;
+using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.UserService.Database.Sample;
@@ -9,6 +10,8 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Bank.UserService.Swagger.SchemeFilters;
+
+using Permissions = Permissions.Domain.Permissions;
 
 file static class Example
 {
@@ -30,6 +33,7 @@ file static class Example
                                                                PhoneNumber                = Sample.Employee.CreateRequest.PhoneNumber,
                                                                Address                    = Sample.Employee.CreateRequest.Address,
                                                                Role                       = Sample.Employee.CreateRequest.Role,
+                                                               Permissions                = new Permissions(Permission.Client),
                                                                Department                 = Sample.Employee.CreateRequest.Department,
                                                                CreatedAt                  = DateTime.UtcNow,
                                                                ModifiedAt                 = DateTime.UtcNow,
@@ -50,6 +54,7 @@ file static class Example
                                                                            PhoneNumber                = Sample.Employee.CreateRequest.PhoneNumber,
                                                                            Address                    = Sample.Employee.CreateRequest.Address,
                                                                            Role                       = Sample.Employee.CreateRequest.Role,
+                                                                           Permissions                = new Permissions(Permission.Client),
                                                                            Department                 = Sample.Employee.CreateRequest.Department,
                                                                            CreatedAt                  = DateTime.UtcNow,
                                                                            ModifiedAt                 = DateTime.UtcNow,
