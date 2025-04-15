@@ -47,6 +47,9 @@ public class UserRepository(ApplicationContext context) : IUserRepository
         if (!string.IsNullOrEmpty(userFilterQuery.Email))
             userQuery = userQuery.Where(user => EF.Functions.ILike(user.Email, $"%{userFilterQuery.Email}%"));
 
+        if (userFilterQuery.Ids.Count > 0)
+            userQuery = userQuery.Where(user => userFilterQuery.Ids.Contains(user.Id));
+
         if (userFilterQuery.Role != Role.Invalid)
             userQuery = userQuery.Where(user => user.Role == userFilterQuery.Role);
 

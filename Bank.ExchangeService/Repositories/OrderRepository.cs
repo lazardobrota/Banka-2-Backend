@@ -1,14 +1,12 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Queries;
-using Bank.UserService.Database;
-using Bank.UserService.Models;
+using Bank.ExchangeService.Database;
+using Bank.ExchangeService.Models;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
-namespace Bank.UserService.Repositories;
-
-//TODO: Move to Exchange Service Project
+namespace Bank.ExchangeService.Repositories;
 
 public interface IOrderRepository
 {
@@ -23,16 +21,14 @@ public interface IOrderRepository
     Task<Order> UpdateStatus(Guid id, OrderStatus status);
 }
 
-public class OrderRepository(ApplicationContext context, IAuthorizationService authorizationService) : IOrderRepository
+public class OrderRepository(DatabaseContext context, IAuthorizationService authorizationService) : IOrderRepository
 {
-    private readonly ApplicationContext    m_Context              = context;
+    private readonly DatabaseContext       m_Context              = context;
     private readonly IAuthorizationService m_AuthorizationService = authorizationService;
 
     public async Task<Page<Order>> FindAll(OrderFilterQuery filter, Pageable pageable)
     {
-        var orderQuery = m_Context.Orders.Include(order => order.Actuary)
-                                  .Include(order => order.Supervisor)
-                                  .AsQueryable();
+        var orderQuery = m_Context.Orders.AsQueryable();
 
         if (filter.Status != OrderStatus.Invalid)
             orderQuery = orderQuery.Where(order => order.Status == filter.Status);

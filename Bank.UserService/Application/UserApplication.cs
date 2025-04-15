@@ -114,8 +114,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILoanService, LoanService>();
         services.AddScoped<IInstallmentService, InstallmentService>();
         services.AddScoped<ILoanTypeService, LoanTypeService>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<Lazy<ITransactionService>>(provider => new Lazy<ITransactionService>(provider.GetRequiredService<ITransactionService>));
 
         return services;

@@ -218,23 +218,21 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
         m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
+                                           .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
                                            .GroupJoin(context.Transactions, account => account.Id, transaction => transaction.FromAccountId,
                                                       (account, transaction) => new { account, transaction })
-                                           .Select(group => new Spending<Account>()
+                                           .Select(group => new
                                                             {
                                                                 Entity = group.account,
-                                                                Daily = group.transaction
-                                                                             .Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
-                                                                                                   transaction.CreatedAt      >= Midnight                   &&
-                                                                                                   transaction.Status         != TransactionStatus.Canceled &&
-                                                                                                   transaction.Status         != TransactionStatus.Failed)
+                                                                Daily = group.transaction.Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                               transaction.CreatedAt      >= Midnight                   &&
+                                                                                                               transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                               transaction.Status         != TransactionStatus.Failed)
                                                                              .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m,
-                                                                Monthly = group.transaction
-                                                                               .Where(transaction =>
-                                                                                      transaction.FromCurrencyId == group.account.CurrencyId   &&
-                                                                                      transaction.CreatedAt      >= FirstDayOfMonth            &&
-                                                                                      transaction.Status         != TransactionStatus.Canceled &&
-                                                                                      transaction.Status         != TransactionStatus.Failed)
+                                                                Monthly = group.transaction.Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                                 transaction.CreatedAt      >= FirstDayOfMonth            &&
+                                                                                                                 transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                                 transaction.Status         != TransactionStatus.Failed)
                                                                                .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m
                                                             })
                                            .Where(spending =>
@@ -246,26 +244,23 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
                                                                                                          (account.Id == accountId ? accountAmount : bankAccountAmount)));
 
         var updatedAccountCurrencies = await context.AccountCurrencies.Where(account => account.Id == accountId || account.Id == bankAccountId)
+                                                    .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
                                                     .GroupJoin(context.Transactions, account => account.Id, transaction => transaction.FromAccountId,
                                                                (account, transaction) => new { account, transaction })
-                                                    .Select(group => new Spending<AccountCurrency>()
+                                                    .Select(group => new
                                                                      {
                                                                          Entity = group.account,
                                                                          Daily = group.transaction
-                                                                                      .Where(transaction =>
-                                                                                             transaction.FromCurrencyId ==
-                                                                                             group.account.CurrencyId                            &&
-                                                                                             transaction.CreatedAt >= Midnight                   &&
-                                                                                             transaction.Status    != TransactionStatus.Canceled &&
-                                                                                             transaction.Status    != TransactionStatus.Failed)
+                                                                                      .Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                            transaction.CreatedAt      >= Midnight                   &&
+                                                                                                            transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                            transaction.Status         != TransactionStatus.Failed)
                                                                                       .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m,
                                                                          Monthly = group.transaction
-                                                                                        .Where(transaction =>
-                                                                                               transaction.FromCurrencyId ==
-                                                                                               group.account.CurrencyId                            &&
-                                                                                               transaction.CreatedAt >= FirstDayOfMonth            &&
-                                                                                               transaction.Status    != TransactionStatus.Canceled &&
-                                                                                               transaction.Status    != TransactionStatus.Failed)
+                                                                                        .Where(transaction => transaction.FromCurrencyId == group.account.CurrencyId   &&
+                                                                                                              transaction.CreatedAt      >= FirstDayOfMonth            &&
+                                                                                                              transaction.Status         != TransactionStatus.Canceled &&
+                                                                                                              transaction.Status         != TransactionStatus.Failed)
                                                                                         .Sum(transaction => (decimal?)transaction.FromAmount) ?? 0m
                                                                      })
                                                     .Where(spending => spending.Daily + (spending.Entity.Id == accountId ? accountAmount : bankAccountAmount) <=
@@ -286,6 +281,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
         m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
+                                           .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
                                            .ExecuteUpdateAsync(setters => setters.SetProperty(account => account.AvailableBalance,
                                                                                               account => account.AvailableBalance -
                                                                                                          (account.Id == accountId ? accountAmount : bankAccountAmount)));

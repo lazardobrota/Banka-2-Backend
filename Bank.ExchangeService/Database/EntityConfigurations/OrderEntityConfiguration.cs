@@ -1,9 +1,9 @@
-﻿using Bank.UserService.Models;
+﻿using Bank.ExchangeService.Models;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Bank.UserService.Database.EntityConfigurations;
+namespace Bank.ExchangeService.Database.EntityConfigurations;
 
 public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
 {
@@ -27,6 +27,7 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
                .IsRequired();
 
         builder.Property(order => order.PricePerUnit)
+               .HasPrecision(28, 12)
                .IsRequired();
 
         builder.Property(order => order.Direction)
@@ -36,7 +37,7 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
                .IsRequired();
 
         builder.Property(order => order.SupervisorId)
-               .IsRequired();
+               .IsRequired(false);
 
         builder.Property(order => order.Done)
                .IsRequired();
@@ -52,15 +53,5 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(order => order.ModifiedAt)
                .IsRequired();
-
-        builder.HasOne(order => order.Actuary)
-               .WithMany()
-               .HasForeignKey(order => order.ActuaryId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(order => order.Supervisor)
-               .WithMany()
-               .HasForeignKey(order => order.SupervisorId)
-               .OnDelete(DeleteBehavior.Restrict);
     }
 }
