@@ -19,18 +19,11 @@ public interface IInstallmentService
     Task<Result<InstallmentResponse>> Update(InstallmentUpdateRequest request, Guid id);
 }
 
-public class InstallmentService : IInstallmentService
+public class InstallmentService(IInstallmentRepository installmentRepository, ILoanRepository loanRepository, LoanHostedService loanHostedService) : IInstallmentService
 {
-    private readonly IInstallmentRepository m_InstallmentRepository;
-    private readonly LoanHostedService      m_LoanHostedService;
-    private readonly ILoanRepository        m_LoanRepository;
-
-    public InstallmentService(IInstallmentRepository installmentRepository, ILoanRepository loanRepository, LoanHostedService loanHostedService)
-    {
-        m_InstallmentRepository = installmentRepository;
-        m_LoanRepository        = loanRepository;
-        m_LoanHostedService     = loanHostedService;
-    }
+    private readonly IInstallmentRepository m_InstallmentRepository = installmentRepository;
+    private readonly LoanHostedService      m_LoanHostedService     = loanHostedService;
+    private readonly ILoanRepository        m_LoanRepository        = loanRepository;
 
     public async Task<Result<InstallmentResponse>> GetOne(Guid id)
     {

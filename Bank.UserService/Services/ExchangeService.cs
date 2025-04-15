@@ -28,18 +28,16 @@ public interface IExchangeService
 }
 
 public class ExchangeService(
-    IExchangeRepository        exchangeRepository,
-    ICurrencyRepository        currencyRepository,
-    IAccountRepository         accountRepository,
-    IAccountCurrencyRepository accountCurrencyRepository,
-    Lazy<ITransactionService>  transactionServiceLazy
+    IExchangeRepository       exchangeRepository,
+    ICurrencyRepository       currencyRepository,
+    IAccountRepository        accountRepository,
+    Lazy<ITransactionService> transactionServiceLazy
 ) : IExchangeService
 {
-    private readonly IExchangeRepository        m_ExchangeRepository        = exchangeRepository;
-    private readonly ICurrencyRepository        m_CurrencyRepository        = currencyRepository;
-    private readonly IAccountRepository         m_AccountRepository         = accountRepository;
-    private readonly Lazy<ITransactionService>  m_TransactionServiceLazy    = transactionServiceLazy;
-    private readonly IAccountCurrencyRepository m_AccountCurrencyRepository = accountCurrencyRepository;
+    private readonly IExchangeRepository       m_ExchangeRepository     = exchangeRepository;
+    private readonly ICurrencyRepository       m_CurrencyRepository     = currencyRepository;
+    private readonly IAccountRepository        m_AccountRepository      = accountRepository;
+    private readonly Lazy<ITransactionService> m_TransactionServiceLazy = transactionServiceLazy;
 
     private ITransactionService TransactionService => m_TransactionServiceLazy.Value;
 

@@ -84,12 +84,24 @@ public enum OrderStatus
     Failed
 }
 
+public enum PermissionType
+{
+    Invalid,
+    Set,
+    Clear,
+}
+
 public enum Permission : long
 {
-    Invalid  = 1 << 0,
-    Admin    = 1 << 1,
-    Employee = 1 << 2,
-    Client   = 1 << 3
+    Invalid      = 0,
+    Client       = 1 << 0,
+    Employee     = 1 << 1,
+    Admin        = 1 << 2,
+    Trade        = 1 << 3,
+    ApproveTrade = 1 << 4,
+
+    Agent      = Employee | Trade,
+    Supervisor = Employee | Trade | ApproveTrade,
 }
 
 public enum Liquidity

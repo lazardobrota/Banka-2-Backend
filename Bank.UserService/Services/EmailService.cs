@@ -3,6 +3,7 @@ using System.Net.Mail;
 
 using Bank.Application.Domain;
 using Bank.Application.Endpoints;
+using Bank.Permissions.Services;
 using Bank.UserService.Configurations;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
@@ -33,8 +34,10 @@ public class EmailService(IEmailRepository emailRepository, IAuthorizationServic
             client.Credentials           = new NetworkCredential(Configuration.Email.Address, Configuration.Email.Password);
 
             var body = type == EmailType.UserActivateAccount
-                       ? email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.Activate}?token={m_AuthorizationService.GenerateTokenFor(user)}")
-                       : email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.ResetPassword}?token={m_AuthorizationService.GenerateTokenFor(user)}");
+                       ? email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.Activate}?token={
+                           m_AuthorizationService.GenerateTokenFor(user.Id, user.Permissions)}")
+                       : email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.ResetPassword}?token={
+                           m_AuthorizationService.GenerateTokenFor(user.Id, user.Permissions)}");
 
             var mailMessage = new MailMessage();
             mailMessage.From       = new MailAddress(Configuration.Email.Address);
@@ -50,7 +53,7 @@ public class EmailService(IEmailRepository emailRepository, IAuthorizationServic
 
             return Result.Ok();
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return Result.BadRequest();
         }
@@ -91,7 +94,7 @@ public class EmailService(IEmailRepository emailRepository, IAuthorizationServic
             await client.SendMailAsync(mailMessage);
             return Result.Ok();
         }
-        catch (Exception _)
+        catch (Exception)
         {
             return Result.BadRequest();
         }

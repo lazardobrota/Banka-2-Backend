@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
 
 using Bank.Application.Domain;
+using Bank.Permissions.Services;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
-using Bank.UserService.Services;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;

@@ -11,6 +11,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Bank.UserService.Swagger.SchemeFilters;
 
+using Permissions = Permissions.Domain.Permissions;
+
 file static class Example
 {
     public static class Client
@@ -29,6 +31,7 @@ file static class Example
                                                              PhoneNumber                = Sample.Client.CreateRequest.PhoneNumber,
                                                              Address                    = Sample.Client.CreateRequest.Address,
                                                              Role                       = Role.Client,
+                                                             Permissions                = new Permissions(Permission.Client),
                                                              Accounts                   = [],
                                                              CreatedAt                  = DateTime.UtcNow,
                                                              ModifiedAt                 = DateTime.UtcNow,
@@ -47,6 +50,7 @@ file static class Example
                                                                          PhoneNumber                = Sample.Client.CreateRequest.PhoneNumber,
                                                                          Address                    = Sample.Client.CreateRequest.Address,
                                                                          Role                       = Role.Client,
+                                                                         Permissions                = new Permissions(Permission.Client),
                                                                          CreatedAt                  = DateTime.UtcNow,
                                                                          ModifiedAt                 = DateTime.UtcNow,
                                                                          Activated                  = Sample.Client.UpdateRequest.Activated

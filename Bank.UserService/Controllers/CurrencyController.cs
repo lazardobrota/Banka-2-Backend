@@ -1,6 +1,7 @@
 ﻿using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
+using Bank.Permissions.Core;
 using Bank.UserService.Services;
 
 using Microsoft.AspNetCore.Mvc;

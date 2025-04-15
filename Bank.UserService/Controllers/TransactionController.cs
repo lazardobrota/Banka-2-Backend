@@ -3,12 +3,10 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.Permissions.Core;
 using Bank.UserService.Services;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
 
 namespace Bank.UserService.Controllers;
 
@@ -54,7 +52,7 @@ public class TransactionController(ITransactionService transactionService) : Con
         return result.ActionResult;
     }
 
-    [Authorize(Roles = $"{Role.Admin}")]
+    [Authorize(Permission.Admin)]
     [HttpPut(Endpoints.Transaction.Update)]
     public async Task<ActionResult<TransactionResponse>> Update([FromBody] TransactionUpdateRequest transactionUpdateRequest, [FromRoute] Guid id)
     {

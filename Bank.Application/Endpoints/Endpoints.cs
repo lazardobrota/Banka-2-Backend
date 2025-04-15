@@ -66,7 +66,7 @@ public static partial class Endpoints
         public const string Activate             = $"{Base}/activate";
         public const string RequestPasswordReset = $"{Base}/password-reset/request";
         public const string PasswordReset        = $"{Base}/password-reset";
-        public const string UpdatePermissions    = $"{Base}/permissions/{{id:guid}}";
+        public const string UpdatePermission     = $"{Base}/{{id:guid}}/permission";
     }
 }
 
