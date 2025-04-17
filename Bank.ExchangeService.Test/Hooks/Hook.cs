@@ -32,7 +32,7 @@ public class Hooks
         services.AddHttpServices();
         services.AddDatabase();
         services.AddHostedServices();
-        services.AddSwagger();
+        services.AddOpenApiExamples();
 
         return services;
     }

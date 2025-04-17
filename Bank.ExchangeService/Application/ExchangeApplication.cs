@@ -9,6 +9,7 @@ using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 using Bank.Http;
+using Bank.OpenApi;
 using Bank.Permissions;
 
 using DotNetEnv;
@@ -17,7 +18,6 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 
 namespace Bank.ExchangeService.Application;
 
@@ -42,26 +42,21 @@ public class ExchangeApplication
         builder.Services.AddCors();
         builder.Services.AddAuthenticationServices();
         builder.Services.AddAuthorizationServices();
-
+        
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwagger();
+        builder.Services.AddOpenApiServices();
+        builder.Services.AddOpenApiExamples();
 
         var app = builder.Build();
-
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
+        
         app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.MapHub<SecurityHub>("security-hub");
 
+        app.MapOpenApiServices();
         app.UseAuthentication();
         app.UseAuthorization();
-
         app.MapControllers();
 
         app.Run();
@@ -139,40 +134,8 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddSwagger(this IServiceCollection services)
+    public static IServiceCollection AddOpenApiExamples(this IServiceCollection services)
     {
-        services.AddSwaggerGen(config =>
-                               {
-                                   config.SwaggerDoc("v1", new OpenApiInfo { Title = "ExchangeService", Version = "v1" });
-
-                                   config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                                                                          {
-                                                                              Description = "Authorization: Bearer {token}",
-                                                                              Name        = "Authorization",
-                                                                              In          = ParameterLocation.Header,
-                                                                              Type        = SecuritySchemeType.ApiKey,
-                                                                              Scheme      = "Bearer"
-                                                                          });
-
-                                   config.AddSecurityRequirement(new OpenApiSecurityRequirement
-                                                                 {
-                                                                     {
-                                                                         new OpenApiSecurityScheme
-                                                                         {
-                                                                             Reference = new OpenApiReference
-                                                                                         {
-                                                                                             Type =
-                                                                                             ReferenceType
-                                                                                             .SecurityScheme,
-                                                                                             Id =
-                                                                                             "Bearer"
-                                                                                         }
-                                                                         },
-                                                                         []
-                                                                     }
-                                                                 });
-                               });
-
         return services;
     }
 }
