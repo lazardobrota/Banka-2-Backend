@@ -1,8 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 
 using Bank.Application;
-using Bank.Application.Domain;
 using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
@@ -10,15 +8,14 @@ using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
+using Bank.Permissions;
 
 using DotNetEnv;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace Bank.ExchangeService.Application;
@@ -143,35 +140,6 @@ public static class ServiceCollectionExtensions
                                                                                                                 .AllowAnyHeader()
                                                                                                                 .AllowAnyMethod()
                                                                                                                 .AllowCredentials()));
-
-        return services;
-    }
-
-    public static IServiceCollection AddAuthenticationServices(this IServiceCollection services)
-    {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
-                                                                                   {
-                                                                                       IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration
-                                                                                                                                       .Jwt
-                                                                                                                                       .SecretKey)),
-                                                                                       ValidateIssuerSigningKey = true,
-                                                                                       ValidateLifetime         = true,
-                                                                                       ValidateIssuer           = false,
-                                                                                       ValidateAudience         = false,
-                                                                                       ClockSkew                = TimeSpan.Zero
-                                                                                   });
-
-        return services;
-    }
-
-    public static IServiceCollection AddAuthorizationServices(this IServiceCollection services)
-    {
-        services.AddAuthorizationBuilder()
-                .AddPolicy(Configuration.Policy.Role.Admin,    policy => policy.RequireRole(nameof(Role.Admin)))
-                .AddPolicy(Configuration.Policy.Role.Employee, policy => policy.RequireRole(nameof(Role.Employee)))
-                .AddPolicy(Configuration.Policy.Role.Client,   policy => policy.RequireRole(nameof(Role.Client)));
 
         return services;
     }
