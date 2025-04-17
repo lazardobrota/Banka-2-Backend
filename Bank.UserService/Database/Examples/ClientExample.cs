@@ -1,9 +1,9 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Requests;
 
-namespace Bank.UserService.Database.Sample;
+namespace Bank.UserService.Database.Examples;
 
-public static partial class Sample
+public static partial class Example
 {
     public static class Client
     {

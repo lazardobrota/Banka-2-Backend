@@ -1,9 +1,9 @@
 ﻿using Bank.Application.Requests;
 using Bank.UserService.Database.Seeders;
 
-namespace Bank.UserService.Database.Sample;
+namespace Bank.UserService.Database.Examples;
 
-public static partial class Sample
+public static partial class Example
 {
     public static class AccountCurrency
     {
@@ -16,10 +16,10 @@ public static partial class Sample
                                                                                 MonthlyLimit = 3000
                                                                             };
 
-        public static readonly AccountCurrencyClientUpdateRequest UpdateRequest = new()
-                                                                                  {
-                                                                                      DailyLimit   = 2000,
-                                                                                      MonthlyLimit = 4000
-                                                                                  };
+        public static readonly AccountCurrencyClientUpdateRequest ClientUpdateRequest = new()
+                                                                                        {
+                                                                                            DailyLimit   = 2000,
+                                                                                            MonthlyLimit = 4000
+                                                                                        };
     }
 }

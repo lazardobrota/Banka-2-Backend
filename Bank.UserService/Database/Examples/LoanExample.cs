@@ -3,13 +3,13 @@ using Bank.Application.Requests;
 
 using Seeder = Bank.UserService.Database.Seeders.Seeder;
 
-namespace Bank.UserService.Database.Sample;
+namespace Bank.UserService.Database.Examples;
 
-public static partial class Sample
+public static partial class Example
 {
     public static class Loan
     {
-        public static readonly LoanCreateRequest Request = new()
+        public static readonly LoanCreateRequest CreateRequest = new()
                                                            {
                                                                TypeId       = Seeder.LoanType.Personal.Id,
                                                                AccountId    = Seeder.Account.DomesticAccount02.Id,

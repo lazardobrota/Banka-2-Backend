@@ -1,5 +1,4 @@
 ﻿using Bank.Application.Requests;
-using Bank.UserService.Database.Sample;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 
@@ -13,9 +12,9 @@ public static partial class Example
     {
         public static class Employee
         {
-            public static readonly EmployeeCreateRequest CreateRequest = Sample.Employee.CreateRequest;
+            public static readonly EmployeeCreateRequest CreateRequest = Database.Examples.Example.Employee.CreateRequest;
 
-            public static readonly EmployeeUpdateRequest UpdateRequest = Sample.Employee.UpdateRequest;
+            public static readonly EmployeeUpdateRequest UpdateRequest = Database.Examples.Example.Employee.UpdateRequest;
 
             public static readonly EmployeeModel GetEmployee = new()
                                                                {
