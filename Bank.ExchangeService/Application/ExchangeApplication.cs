@@ -8,6 +8,7 @@ using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
+using Bank.Http;
 using Bank.Permissions;
 
 using DotNetEnv;
@@ -112,13 +113,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddHttpClient();
         services.AddHttpContextAccessor();
-
-        services.AddHttpClient(Configuration.HttpClient.Name.UserService, httpClient =>
-                                                                          {
-                                                                              httpClient.BaseAddress = new Uri($"{Configuration.HttpClient.BaseUrl.UserService}");
-                                                                              //TODO
-                                                                              //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDU5MzY1NzI1NCwiaWQiOiJjNmY0NDEzMy0wOGYyLTRhNDMtYmQ2NS05Y2ZiNmIxM2ZhNWIiLCJwZXJtaXNzaW9uIjoiMiIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTc0NDYzODQzNCwibmJmIjoxNzQ0NjM4NDM0fQ.1cA329l2bWUlENwYrq03l1yQ0Jxw597kw-YUT0WipiI");
-                                                                          });
+        services.AddUserServiceHttpClient();
 
         return services;
     }

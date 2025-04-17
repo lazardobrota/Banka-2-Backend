@@ -22,6 +22,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Bank.Application\Bank.Application.csproj" />
+      <ProjectReference Include="..\Bank.Http\Bank.Http.csproj" />
       <ProjectReference Include="..\Bank.Permissions\Bank.Permissions.csproj" />
     </ItemGroup>
 
