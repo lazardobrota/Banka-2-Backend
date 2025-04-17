@@ -114,6 +114,7 @@ public static partial class Endpoints
     public static class Currency
     {
         public const string Base         = $"{ApiBase}/currencies";
+        
         public const string GetOne       = $"{Base}/{{id:guid}}";
         public const string GetAll       = $"{Base}";
         public const string GetAllSimple = $"{Base}/simple";
@@ -126,6 +127,7 @@ public static partial class Endpoints
     public static class Country
     {
         public const string Base   = $"{ApiBase}/countries";
+        
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string GetAll = $"{Base}";
     }
@@ -147,8 +149,9 @@ public static partial class Endpoints
     public static class Account
     {
         public const string Base            = $"{ApiBase}/accounts";
+        
         public const string GetAll          = $"{Base}";
-        public const string GetAllForClient = $"{Base}/{{clientId:guid}}/accounts";
+        public const string GetAllForClient = $"{Client.Base}/{{clientId:guid}}/accounts";
         public const string GetOne          = $"{Base}/{{id:guid}}";
         public const string Create          = $"{Base}";
         public const string UpdateEmployee  = $"{Base}/employee/{{id:guid}}";
@@ -161,6 +164,7 @@ public static partial class Endpoints
     public static class AccountCurrency
     {
         public const string Base         = $"{ApiBase}/accounts/currencies";
+        
         public const string GetAll       = $"{Base}";
         public const string GetOne       = $"{Base}/{{id:guid}}";
         public const string Create       = $"{Base}";
@@ -172,7 +176,8 @@ public static partial class Endpoints
 {
     public static class Card
     {
-        public const string Base             = $"{ApiBase}/cards";
+        public const string Base = $"{ApiBase}/cards";
+
         public const string GetAll           = $"{Base}";
         public const string GetAllForAccount = $"{Account.Base}/{{accountId:guid}}/cards";
         public const string GetAllForClient  = $"{Client.Base}/{{accountId:guid}}/cards";
@@ -187,7 +192,8 @@ public static partial class Endpoints
 {
     public static class CardType
     {
-        public const string Base   = $"{ApiBase}/cards/types";
+        public const string Base = $"{ApiBase}/cards/types";
+
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string GetAll = $"{Base}";
     }
@@ -197,7 +203,8 @@ public static partial class Endpoints
 {
     public static class Exchange
     {
-        public const string Base            = $"{ApiBase}/exchanges";
+        public const string Base = $"{ApiBase}/exchanges";
+
         public const string GetOne          = $"{Base}/{{id:guid}}";
         public const string GetAll          = $"{Base}";
         public const string GetByCurrencies = $"{Base}/currencies";
@@ -210,7 +217,8 @@ public static partial class Endpoints
 {
     public static class TransactionCode
     {
-        public const string Base   = $"{ApiBase}/transactions/codes";
+        public const string Base = $"{ApiBase}/transactions/codes";
+
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string GetAll = $"{Base}";
     }
@@ -220,7 +228,8 @@ public static partial class Endpoints
 {
     public static class TransactionTemplate
     {
-        public const string Base   = $"{ApiBase}/transactions/templates";
+        public const string Base = $"{ApiBase}/transactions/templates";
+
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string GetAll = $"{Base}";
         public const string Create = $"{Base}";
@@ -232,7 +241,8 @@ public static partial class Endpoints
 {
     public static class Transaction
     {
-        public const string Base             = $"{ApiBase}/transactions";
+        public const string Base = $"{ApiBase}/transactions";
+
         public const string GetAll           = $"{Base}";
         public const string GetAllForAccount = $"{Account.Base}/{{accountId:guid}}/transactions";
         public const string GetOne           = $"{Base}/{{id:guid}}";
@@ -260,11 +270,11 @@ public static partial class Endpoints
     {
         public const string Base = $"{ApiBase}/loans";
 
-        public const string GetAll      = $"{Base}";
-        public const string GetOne      = $"{Base}/{{id:guid}}";
-        public const string Create      = $"{Base}";
-        public const string Update      = $"{Base}/{{id:guid}}";
-        public const string GetByClient = $"{Base}/clients/{{clientId:guid}}";
+        public const string GetAll          = $"{Base}";
+        public const string GetOne          = $"{Base}/{{id:guid}}";
+        public const string Create          = $"{Base}";
+        public const string Update          = $"{Base}/{{id:guid}}";
+        public const string GetAllForClient = $"{Client.Base}/{{clientId:guid}}/loans";
     }
 }
 

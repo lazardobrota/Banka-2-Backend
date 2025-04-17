@@ -34,7 +34,7 @@ public class LoanController(ILoanService loanService) : ControllerBase
     }
 
     [Authorize]
-    [HttpGet(Endpoints.Loan.GetByClient)]
+    [HttpGet(Endpoints.Loan.GetAllForClient)]
     public async Task<ActionResult<Page<LoanResponse>>> GetByClient([FromRoute] Guid clientId, [FromQuery] Pageable pageable)
     {
         var result = await m_LoanService.GetByClient(clientId, pageable);
