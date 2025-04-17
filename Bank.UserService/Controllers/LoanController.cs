@@ -59,13 +59,4 @@ public class LoanController(ILoanService loanService) : ControllerBase
 
         return result.ActionResult;
     }
-
-    [Authorize]
-    [HttpGet(Endpoints.Loan.GetInstallments)]
-    public async Task<ActionResult<Page<InstallmentResponse>>> GetInstallments([FromRoute] Guid id, [FromQuery] Pageable pageable)
-    {
-        var result = await m_LoanService.GetAllInstallments(id, pageable);
-
-        return result.ActionResult;
-    }
 }

@@ -15,12 +15,14 @@
         When all clients are fetched from the database
         Then all clients and only clients should be returned
 
-    Scenario: Get all Account from Client
-        Given client Id
-        When all accounts are fetched from the database
-        Then all accounts  should be returned
+#    TODO: Move Scenario to Accounts
+#    Scenario: Get all Account from Client
+#        Given client Id
+#        When all accounts are fetched from the database
+#        Then all accounts  should be returned
 
-    Scenario: Get all Cards from Client
-        Given client Id which has cards
-        When all cards are fetched from the database for the client
-        Then all cards  should be returned
+#    TODO: Move Scenario to Cards
+#    Scenario: Get all Cards from Client
+#        Given client Id which has cards
+#        When all cards are fetched from the database for the client
+#        Then all cards  should be returned

@@ -16,6 +16,8 @@ public interface ICardRepository
 
     Task<Page<Card>> FindAllByAccountId(Guid accountId, Pageable pageable);
 
+    Task<Page<Card>> FindAllByClientId(Guid clientId, Pageable pageable);
+
     Task<Card?> FindById(Guid id);
 
     Task<Card?> FindByNumber(string number);
@@ -61,6 +63,19 @@ public class CardRepository(ApplicationContext context) : ICardRepository
     {
         var cards = await m_Context.Cards.IncludeAll()
                                    .Where(card => card.Account!.Id == accountId)
+                                   .Skip((pageable.Page - 1) * pageable.Size)
+                                   .Take(pageable.Size)
+                                   .ToListAsync();
+
+        var totalElements = await m_Context.Cards.CountAsync();
+
+        return new Page<Card>(cards, pageable.Page, pageable.Size, totalElements);
+    }
+
+    public async Task<Page<Card>> FindAllByClientId(Guid clientId, Pageable pageable)
+    {
+        var cards = await m_Context.Cards.IncludeAll()
+                                   .Where(card => card.Account!.Client!.Id == clientId)
                                    .Skip((pageable.Page - 1) * pageable.Size)
                                    .Take(pageable.Size)
                                    .ToListAsync();
