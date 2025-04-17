@@ -50,7 +50,7 @@ internal partial class UserServiceHttpClient
     {
         using var httpClient = m_HttpClientFactory.CreateClient(Configuration.Client.Name.UserService);
 
-        var domain = Endpoints.Loan.GetByClient.Replace("{clientId:guid}", clientId.ToString());
+        var domain = Endpoints.Loan.GetAllForClient.Replace("{clientId:guid}", clientId.ToString());
         var query  = pageable.ToQuery();
 
         var response = await httpClient.GetAsync($"{domain}?{query}");
