@@ -80,6 +80,8 @@ public class TransactionRepository(ApplicationContext context, IAuthorizationSer
 
         transactionQuery = transactionQuery.Where(transaction => transaction.FromAccountId == accountId || transaction.ToAccountId == accountId);
 
+        transactionQuery = transactionQuery.OrderByDescending(transaction => transaction.CreatedAt);
+
         var transactions = await transactionQuery.Skip((pageable.Page - 1) * pageable.Size)
                                                  .Take(pageable.Size)
                                                  .ToListAsync();
