@@ -25,23 +25,17 @@ public static class OrderValidator
             .GreaterThan(0)
             .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Quantity"));
 
-            ;
-
             RuleFor(request => request.ContractCount)
             .NotEmpty()
             .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Contract Count"))
             .GreaterThan(0)
             .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Contract Count"));
 
-            ;
-
             RuleFor(request => request.PricePerUnit)
             .NotEmpty()
             .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Price Per Unit"))
             .GreaterThan(0)
             .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Price Per Unit"));
-
-            ;
 
             RuleFor(request => request.Direction)
             .NotEqual(Direction.Invalid)
@@ -50,10 +44,6 @@ public static class OrderValidator
             RuleFor(request => request.SupervisorId)
             .NotEmpty()
             .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("SupervisorId"));
-
-            RuleFor(request => request.RemainingPortions)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Remaining Portions"));
         }
     }
 

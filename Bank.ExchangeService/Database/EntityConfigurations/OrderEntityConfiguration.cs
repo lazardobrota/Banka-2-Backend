@@ -53,5 +53,10 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(order => order.ModifiedAt)
                .IsRequired();
+
+        builder.HasOne(order => order.Security)
+               .WithMany()
+               .HasForeignKey(order => order.SecurityId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }
