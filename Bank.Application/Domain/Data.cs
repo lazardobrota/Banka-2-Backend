@@ -81,6 +81,7 @@ public enum OrderStatus
     Approved,
     Declined,
     Completed,
+    Canceled,
     Failed
 }
 

@@ -7,12 +7,12 @@ namespace Bank.ExchangeService.Mappers;
 
 public static class OrderMapper
 {
-    public static OrderResponse ToResponse(this Order order, UserResponse actuary, UserResponse? supervisor)
+    public static OrderResponse ToResponse(this Order order, UserResponse actuary, UserResponse? supervisor, AccountResponse account)
     {
         return new OrderResponse
                {
                    Id = order.Id,
-                   //TODO asset
+                   //TODO security no response quite yet, will (not) be
                    Actuary           = actuary,
                    OrderType         = order.OrderType,
                    Quantity          = order.Quantity,
@@ -25,18 +25,12 @@ public static class OrderMapper
                    RemainingPortions = order.RemainingPortions,
                    AfterHours        = order.AfterHours,
                    CreatedAt         = order.CreatedAt,
-                   ModifiedAt        = order.ModifiedAt
+                   ModifiedAt        = order.ModifiedAt,
+                   Account           = account
                };
     }
 
-    public static Order ToOrder(this Order order, OrderUpdateRequest updateRequest)
-    {
-        order.Status     = updateRequest.Status;
-        order.ModifiedAt = DateTime.UtcNow;
-        return order;
-    }
-
-    public static Order ToOrder(this OrderCreateRequest createRequest)
+    public static Order ToOrder(this OrderCreateRequest createRequest, Guid accountId)
     {
         return new Order
                {
@@ -50,10 +44,19 @@ public static class OrderMapper
                    Direction         = createRequest.Direction,
                    Status            = OrderStatus.Pending,
                    Done              = false,
-                   RemainingPortions = createRequest.RemainingPortions,
+                   RemainingPortions = createRequest.Quantity,
                    AfterHours        = createRequest.AfterHours,
                    CreatedAt         = DateTime.UtcNow,
-                   ModifiedAt        = DateTime.UtcNow
+                   ModifiedAt        = DateTime.UtcNow,
+                   AccountId         = accountId,
+                   SecurityId        = createRequest.SecurityId
                };
+    }
+
+    public static Order ToOrder(this Order order, OrderUpdateRequest updateRequest)
+    {
+        order.Status     = updateRequest.Status;
+        order.ModifiedAt = DateTime.UtcNow;
+        return order;
     }
 }

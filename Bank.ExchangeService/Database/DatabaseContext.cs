@@ -12,6 +12,7 @@ public class DatabaseContext(DbContextOptions options) : DbContext(options)
     public DbSet<Quote>         Quotes         { init; get; }
     public DbSet<Security>      Securities     { init; get; }
     public DbSet<Order>         Orders         { init; get; }
+    public DbSet<Asset>         Assets         { init; get; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -19,5 +20,6 @@ public class DatabaseContext(DbContextOptions options) : DbContext(options)
         builder.ApplyConfiguration(new QuoteEntityConfiguration());
         builder.ApplyConfiguration(new SecurityEntityConfiguration());
         builder.ApplyConfiguration(new OrderEntityConfiguration());
+        builder.ApplyConfiguration(new AssetEntityConfiguration());
     }
 }
