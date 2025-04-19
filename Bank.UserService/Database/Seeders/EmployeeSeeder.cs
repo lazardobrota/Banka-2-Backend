@@ -6,6 +6,7 @@ using Bank.UserService.Models;
 namespace Bank.UserService.Database.Seeders;
 
 using EmployeeModel = Employee;
+using Permissions = Permissions.Domain.Permissions;
 
 public static partial class Seeder
 {
@@ -30,7 +31,8 @@ public static partial class Seeder
                                                          CreatedAt                  = DateTime.UtcNow,
                                                          ModifiedAt                 = DateTime.UtcNow,
                                                          Employed                   = true,
-                                                         Activated                  = true
+                                                         Activated                  = true,
+                                                         Permissions                = new Permissions(Permission.Admin)
                                                      };
 
         public static readonly EmployeeModel Employee01 = new()
@@ -52,7 +54,8 @@ public static partial class Seeder
                                                               CreatedAt                  = DateTime.UtcNow,
                                                               ModifiedAt                 = DateTime.UtcNow,
                                                               Employed                   = true,
-                                                              Activated                  = true
+                                                              Activated                  = true,
+                                                              Permissions                = new Permissions(Permission.Employee)
                                                           };
 
         public static readonly EmployeeModel Employee02 = new()
@@ -75,6 +78,7 @@ public static partial class Seeder
                                                               ModifiedAt                 = DateTime.UtcNow,
                                                               Employed                   = true,
                                                               Activated                  = true,
+                                                              Permissions                = new Permissions(Permission.Employee)
                                                           };
 
         public static readonly EmployeeModel Employee03 = new()
@@ -97,6 +101,7 @@ public static partial class Seeder
                                                               ModifiedAt                 = DateTime.UtcNow,
                                                               Employed                   = true,
                                                               Activated                  = true,
+                                                              Permissions                = new Permissions(Permission.Employee)
                                                           };
 
         public static readonly EmployeeModel Employee04 = new()
@@ -119,6 +124,7 @@ public static partial class Seeder
                                                               ModifiedAt                 = DateTime.UtcNow,
                                                               Employed                   = true,
                                                               Activated                  = true,
+                                                              Permissions                = new Permissions(Permission.Employee)
                                                           };
     }
 }

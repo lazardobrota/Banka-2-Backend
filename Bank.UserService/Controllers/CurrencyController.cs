@@ -1,10 +1,9 @@
-﻿using Bank.Application.Domain;
-using Bank.Application.Endpoints;
+﻿using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
+using Bank.Permissions.Core;
 using Bank.UserService.Services;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Bank.UserService.Controllers;
@@ -16,9 +15,17 @@ public class CurrencyController(ICurrencyService currencyService) : ControllerBa
 
     [Authorize]
     [HttpGet(Endpoints.Currency.GetAll)]
-    public async Task<ActionResult<Page<CurrencyResponse>>> GetAll([FromQuery] CurrencyFilterQuery currencyFilterQuery, [FromQuery] Pageable pageable)
+    public async Task<ActionResult<List<CurrencyResponse>>> GetAll([FromQuery] CurrencyFilterQuery currencyFilterQuery)
     {
-        var result = await m_CurrencyService.FindAll(currencyFilterQuery, pageable);
+        var result = await m_CurrencyService.FindAll(currencyFilterQuery);
+        return result.ActionResult;
+    }
+
+    [Authorize]
+    [HttpGet(Endpoints.Currency.GetAllSimple)]
+    public async Task<ActionResult<List<CurrencyResponse>>> GetAllSimple([FromQuery] CurrencyFilterQuery currencyFilterQuery)
+    {
+        var result = await m_CurrencyService.FindAllSimple(currencyFilterQuery);
         return result.ActionResult;
     }
 
@@ -27,6 +34,14 @@ public class CurrencyController(ICurrencyService currencyService) : ControllerBa
     public async Task<ActionResult<CurrencyResponse>> GetOne([FromRoute] Guid id)
     {
         var result = await m_CurrencyService.FindById(id);
+        return result.ActionResult;
+    }
+
+    [Authorize]
+    [HttpGet(Endpoints.Currency.GetOneSimple)]
+    public async Task<ActionResult<CurrencyResponse>> GetOneSimple([FromRoute] Guid id)
+    {
+        var result = await m_CurrencyService.FindByIdSimple(id);
         return result.ActionResult;
     }
 }

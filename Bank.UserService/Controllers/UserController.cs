@@ -3,12 +3,10 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.Permissions.Core;
 using Bank.UserService.Services;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using Role = Bank.UserService.Configurations.Configuration.Policy.Role;
 
 namespace Bank.UserService.Controllers;
 
@@ -17,8 +15,8 @@ public class UserController(IUserService userService) : ControllerBase
 {
     private readonly IUserService m_UserService = userService;
 
+    [Authorize(Permission.Admin, Permission.Employee)]
     [HttpGet(Endpoints.User.GetAll)]
-    [Authorize(Roles = $"{Role.Admin}, {Role.Employee}")]
     public async Task<ActionResult<Page<UserResponse>>> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
         var result = await m_UserService.GetAll(userFilterQuery, pageable);
@@ -63,6 +61,15 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<ActionResult> PasswordReset([FromBody] UserPasswordResetRequest userPasswordResetRequest, [FromQuery] string token)
     {
         var result = await m_UserService.PasswordReset(userPasswordResetRequest, token);
+
+        return result.ActionResult;
+    }
+
+    [Authorize(Permission.Admin, Permission.Employee)]
+    [HttpPut(Endpoints.User.UpdatePermission)]
+    public async Task<ActionResult> UpdatePermission(Guid id, [FromBody] UserUpdatePermissionRequest request)
+    {
+        var result = await m_UserService.UpdatePermission(id, request);
 
         return result.ActionResult;
     }

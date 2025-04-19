@@ -1,25 +1,21 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-
-using Bank.Application;
-using Bank.Application.Domain;
+﻿using Bank.Application;
+using Bank.OpenApi;
+using Bank.Permissions;
+using Bank.UserService.BackgroundServices;
 using Bank.UserService.Configurations;
 using Bank.UserService.Database;
 using Bank.UserService.HostedServices;
 using Bank.UserService.Repositories;
-using Bank.UserService.Security;
 using Bank.UserService.Services;
-using Bank.UserService.Swagger.SchemeFilters;
 
 using DotNetEnv;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+
+using Example = Bank.UserService.Database.Examples.Example;
 
 namespace Bank.UserService.Application;
 
@@ -31,30 +27,30 @@ public class UserApplication
 
         Env.Load();
 
-        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-        builder.Services.AddApplicationAuthentication();
-        builder.Services.AddApplicationAuthorization();
+        builder.Services.AddValidation();
+        builder.Services.AddServices();
+        builder.Services.AddDatabase();
+        builder.Services.AddHostedServices();
+        builder.Services.AddBackgroundServices();
+        builder.Services.AddHttpServices();
 
-        builder.Services.AddServiceApplication();
-        builder.Services.AddApplicationCors();
+        builder.Services.AddCors();
+        builder.Services.AddAuthenticationServices();
+        builder.Services.AddAuthorizationServices();
+
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddApplicationSwagger();
+        builder.Services.AddOpenApiServices();
+        builder.Services.AddOpenApiExamples();
 
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        app.UseCors(Configuration.Policy.FrontendApplication);
-
+        app.MapOpenApiServices();
         app.UseAuthentication();
         app.UseAuthorization();
-
         app.MapControllers();
+        
+        app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.Run();
     }
@@ -62,11 +58,10 @@ public class UserApplication
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddServiceApplication(this IServiceCollection services)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddFluentValidationAutoValidation();
-        services.AddValidatorsFromAssemblyContaining<AssemblyInfo>();
-
+        services.AddScoped<IBankRepository, BankRepository>();
+        services.AddScoped<IBankService, BankService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUserService, Services.UserService>();
@@ -89,110 +84,71 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAccountTypeService, AccountTypeService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IAccountCurrencyService, AccountCurrencyService>();
-        services.AddScoped<IAuthorizationService, AuthorizationService>();
+        services.AddScoped<IExchangeRepository, ExchangeRepository>();
+        services.AddScoped<IExchangeService, ExchangeService>();
+        services.AddScoped<ILoanRepository, LoanRepository>();
+        services.AddScoped<ILoanTypeRepository, LoanTypeRepository>();
+        services.AddScoped<IInstallmentRepository, InstallmentRepository>();
+        services.AddScoped<ITransactionCodeRepository, TransactionCodeRepository>();
+        services.AddScoped<ITransactionCodeService, TransactionCodeService>();
+        services.AddScoped<ITransactionTemplateRepository, TransactionTemplateRepository>();
+        services.AddScoped<ITransactionTemplateService, TransactionTemplateService>();
+        services.AddScoped<ITransactionRepository, TransactionRepository>();
+        services.AddScoped<ITransactionService, TransactionService>();
+        services.AddScoped<ILoanService, LoanService>();
+        services.AddScoped<IInstallmentService, InstallmentService>();
+        services.AddScoped<ILoanTypeService, LoanTypeService>();
+        services.AddScoped<Lazy<ITransactionService>>(provider => new Lazy<ITransactionService>(provider.GetRequiredService<ITransactionService>));
 
-        services.AddHttpContextAccessor();
+        return services;
+    }
 
-        services.AddSingleton<TokenProvider>();
-        services.AddSingleton<DatabaseHostedService>();
+    public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
+    {
+        services.AddSingleton<TransactionBackgroundService>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddDatabase(this IServiceCollection services)
+    {
         services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
+        services.AddDbContextFactory<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()));
+
+        return services;
+    }
+
+    public static IServiceCollection AddHostedServices(this IServiceCollection services)
+    {
+        services.AddSingleton<DatabaseHostedService>();
+        services.AddSingleton<ExchangeHostedService>();
+        services.AddSingleton<LoanHostedService>();
 
         services.AddHostedService<ApplicationHostedService>();
 
         return services;
     }
 
-    public static IServiceCollection AddApplicationSwagger(this IServiceCollection services)
+    public static IServiceCollection AddHttpServices(this IServiceCollection services)
     {
-        services.AddSwaggerGen(config =>
-                               {
-                                   config.SwaggerDoc("v1", new OpenApiInfo() { Title = "UserService", Version = "v1" });
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.CreateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.UpdateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.Account.CreateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Account.UpdateClientRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Account.UpdateEmployeeRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Account.SimpleResponse>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Account.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.CreateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.UpdateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.AccountCurrency.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.AccountType.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.Card.CreateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Card.LimitUpdateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Card.StatusUpdateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Card.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.CardType.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.Client.UpdateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Client.CreateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Client.Response>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Client.SimpleResponse>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.Company.CreateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Company.UpdateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Company.SimpleResponse>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Company.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.Country.SimpleResponse>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Country.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.Currency.SimpleResponse>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Currency.Response>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.CreateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.UpdateRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.Response>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.Employee.SimpleResponse>();
-
-                                   config.SchemaFilter<SwaggerSchemaFilter.User.ActivationRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.User.LoginRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.User.PasswordResetRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.User.RequestPasswordResetRequest>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.User.Response>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.User.SimpleResponse>();
-                                   config.SchemaFilter<SwaggerSchemaFilter.User.LoginResponse>();
-
-                                   config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                                                                          {
-                                                                              Description = "Authorization: Bearer {token}",
-                                                                              Name        = "Authorization",
-                                                                              In          = ParameterLocation.Header,
-                                                                              Type        = SecuritySchemeType.ApiKey,
-                                                                              Scheme      = "Bearer"
-                                                                          });
-
-                                   config.AddSecurityRequirement(new OpenApiSecurityRequirement
-                                                                 {
-                                                                     {
-                                                                         new OpenApiSecurityScheme
-                                                                         {
-                                                                             Reference = new OpenApiReference
-                                                                                         {
-                                                                                             Type =
-                                                                                             ReferenceType
-                                                                                             .SecurityScheme,
-                                                                                             Id =
-                                                                                             "Bearer"
-                                                                                         }
-                                                                         },
-                                                                         []
-                                                                     }
-                                                                 });
-                               });
+        services.AddHttpClient();
+        services.AddHttpContextAccessor();
 
         return services;
     }
 
-    public static IServiceCollection AddApplicationCors(this IServiceCollection services)
+    public static IServiceCollection AddValidation(this IServiceCollection services)
+    {
+        ValidatorOptions.Global.DefaultClassLevelCascadeMode = CascadeMode.Continue;
+        ValidatorOptions.Global.DefaultRuleLevelCascadeMode  = CascadeMode.Stop;
+
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining<AssemblyInfo>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddCors(this IServiceCollection services)
     {
         services.AddCors(options => options.AddPolicy(Configuration.Policy.FrontendApplication, policy => policy.WithOrigins(Configuration.Frontend.BaseUrl)
                                                                                                                 .AllowAnyHeader()
@@ -201,31 +157,70 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddApplicationAuthentication(this IServiceCollection services)
+    public static IServiceCollection AddOpenApiExamples(this IServiceCollection services)
     {
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(jwtOptions => jwtOptions.TokenValidationParameters = new TokenValidationParameters
-                                                                                   {
-                                                                                       IssuerSigningKey =
-                                                                                       new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.Jwt
-                                                                                                                                                    .SecretKey)),
-                                                                                       ValidateIssuerSigningKey = true,
-                                                                                       ValidateLifetime         = true,
-                                                                                       ValidateIssuer           = false,
-                                                                                       ValidateAudience         = false,
-                                                                                       ClockSkew                = TimeSpan.Zero
-                                                                                   });
-
-        return services;
-    }
-
-    public static IServiceCollection AddApplicationAuthorization(this IServiceCollection services)
-    {
-        services.AddAuthorizationBuilder()
-                .AddPolicy(Configuration.Policy.Role.Admin,    policy => policy.RequireRole(nameof(Role.Admin)))
-                .AddPolicy(Configuration.Policy.Role.Employee, policy => policy.RequireRole(nameof(Role.Employee)))
-                .AddPolicy(Configuration.Policy.Role.Client,   policy => policy.RequireRole(nameof(Role.Client)));
-
+        services.AddOpenApiExample(Example.AccountCurrency.CreateRequest);
+        services.AddOpenApiExample(Example.AccountCurrency.ClientUpdateRequest);
+        // services.AddOpenApiExample(Example.AccountCurrency.Response);
+        services.AddOpenApiExample(Example.Account.CreateRequest);
+        services.AddOpenApiExample(Example.Account.UpdateClientRequest);
+        services.AddOpenApiExample(Example.Account.UpdateEmployeeRequest);
+        // services.AddOpenApiExample(Example.Account.Response);
+        // services.AddOpenApiExample(Example.Account.SimpleResponse);
+        services.AddOpenApiExample(Example.AccountType.CreateRequest);
+        services.AddOpenApiExample(Example.AccountType.UpdateRequest);
+        // services.AddOpenApiExample(Example.AccountType.Response);
+        // services.AddOpenApiExample(Example.Bank.Response);
+        services.AddOpenApiExample(Example.Card.CreateRequest);
+        services.AddOpenApiExample(Example.Card.UpdateStatusRequest);
+        services.AddOpenApiExample(Example.Card.UpdateLimitRequest);
+        // services.AddOpenApiExample(Example.Card.Response);
+        // services.AddOpenApiExample(Example.CardType.Response);
+        services.AddOpenApiExample(Example.Client.CreateRequest);
+        services.AddOpenApiExample(Example.Client.UpdateRequest);
+        // services.AddOpenApiExample(Example.Client.Response);
+        // services.AddOpenApiExample(Example.Client.SimpleResponse);
+        services.AddOpenApiExample(Example.Company.CreateRequest);
+        services.AddOpenApiExample(Example.Company.UpdateRequest);
+        // services.AddOpenApiExample(Example.Company.Response);
+        // services.AddOpenApiExample(Example.Company.SimpleResponse);
+        // services.AddOpenApiExample(Example.Country.Response);
+        // services.AddOpenApiExample(Example.Country.SimpleResponse);
+        // services.AddOpenApiExample(Example.Currency.Response);
+        // services.AddOpenApiExample(Example.Currency.SimpleResponse);
+        services.AddOpenApiExample(Example.Employee.CreateRequest);
+        services.AddOpenApiExample(Example.Employee.UpdateRequest);
+        // services.AddOpenApiExample(Example.Employee.Response);
+        // services.AddOpenApiExample(Example.Employee.SimpleResponse);
+        services.AddOpenApiExample(Example.Exchange.MakeExchangeRequest);
+        services.AddOpenApiExample(Example.Exchange.UpdateRequest);
+        // services.AddOpenApiExample(Example.Exchange.Response);
+        services.AddOpenApiExample(Example.Installment.CreateRequest);
+        services.AddOpenApiExample(Example.Installment.UpdateRequest);
+        // services.AddOpenApiExample(Example.Installment.Response);
+        services.AddOpenApiExample(Example.Loan.CreateRequest);
+        services.AddOpenApiExample(Example.Loan.UpdateRequest);
+        // services.AddOpenApiExample(Example.Loan.Response);
+        services.AddOpenApiExample(Example.LoanType.CreateRequest);
+        services.AddOpenApiExample(Example.LoanType.UpdateRequest);
+        // services.AddOpenApiExample(Example.LoanType.Response);
+        // services.AddOpenApiExample(Example.TransactionCode.Response);
+        services.AddOpenApiExample(Example.Transaction.CreateRequest);
+        services.AddOpenApiExample(Example.Transaction.UpdateRequest);
+        // services.AddOpenApiExample(Example.Transaction.Response);
+        // services.AddOpenApiExample(Example.Transaction.CreateResponse);
+        services.AddOpenApiExample(Example.TransactionTemplate.CreateRequest);
+        services.AddOpenApiExample(Example.TransactionTemplate.UpdateRequest);
+        // services.AddOpenApiExample(Example.TransactionTemplate.Response);
+        // services.AddOpenApiExample(Example.TransactionTemplate.SimpleResponse);
+        services.AddOpenApiExample(Example.User.LoginRequest);
+        services.AddOpenApiExample(Example.User.ActivationRequest);
+        services.AddOpenApiExample(Example.User.PasswordResetRequest);
+        services.AddOpenApiExample(Example.User.RequestPasswordResetRequest);
+        // services.AddOpenApiExample(Example.User.Response);
+        // services.AddOpenApiExample(Example.User.SimpleResponse);
+        // services.AddOpenApiExample(Example.User.LoginResponse);
+        
         return services;
     }
 }

@@ -1,4 +1,5 @@
-﻿using Bank.UserService.Models;
+﻿using Bank.UserService.Database.ValueConverters;
+using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -75,9 +76,18 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<User>
         builder.Property(user => user.Activated)
                .IsRequired();
 
+        builder.Property(user => user.Permissions)
+               .HasConversion(new PermissionsValueConverter())
+               .IsRequired();
+
         builder.HasMany(user => user.Accounts)
                .WithOne(account => account.Client)
                .HasForeignKey(account => account.ClientId)
+               .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(user => user.TransactionTemplates)
+               .WithOne(transactionTemplate => transactionTemplate.Client)
+               .HasForeignKey(transactionTemplate => transactionTemplate.ClientId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

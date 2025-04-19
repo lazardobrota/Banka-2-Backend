@@ -3,6 +3,7 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.Permissions.Services;
 using Bank.UserService.Mappers;
 using Bank.UserService.Repositories;
 
@@ -11,6 +12,8 @@ namespace Bank.UserService.Services;
 public interface IAccountService
 {
     Task<Result<Page<AccountResponse>>> GetAll(AccountFilterQuery accountFilterQuery, Pageable pageable);
+
+    Task<Result<Page<AccountResponse>>> GetAllForClient(Guid clientId, AccountFilterQuery filter, Pageable pageable);
 
     Task<Result<AccountResponse>> GetOne(Guid id);
 
@@ -45,6 +48,16 @@ public class AccountService(
         return Result.Ok(new Page<AccountResponse>(accountResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
+    public async Task<Result<Page<AccountResponse>>> GetAllForClient(Guid clientId, AccountFilterQuery filter, Pageable pageable)
+    {
+        var page = await m_AccountRepository.FindAllByClientId(clientId, pageable);
+
+        var accountResponses = page.Items.Select(account => account.ToResponse())
+                                   .ToList();
+
+        return Result.Ok(new Page<AccountResponse>(accountResponses, page.PageNumber, page.PageSize, page.TotalElements));
+    }
+
     public async Task<Result<AccountResponse>> GetOne(Guid id)
     {
         var account = await m_AccountRepository.FindById(id);
@@ -65,31 +78,36 @@ public class AccountService(
         if (accountType == null || client == null || currency == null || employee == null)
             return Result.BadRequest<AccountResponse>("Invalid data.");
 
-        var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(employee, client, currency, accountType));
+        var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(m_AuthorizationService.UserId));
+
+        account.Type     = accountType;
+        account.Client   = client;
+        account.Currency = currency;
+        account.Employee = employee;
 
         return Result.Ok(account.ToResponse());
     }
 
-    public async Task<Result<AccountResponse>> Update(AccountUpdateClientRequest accountUpdateRequest, Guid id)
+    public async Task<Result<AccountResponse>> Update(AccountUpdateClientRequest request, Guid id)
     {
-        var oldAccount = await m_AccountRepository.FindById(id);
+        var dbAccount = await m_AccountRepository.FindById(id);
 
-        if (oldAccount is null)
+        if (dbAccount is null)
             return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
 
-        var account = await m_AccountRepository.Update(oldAccount, accountUpdateRequest.ToAccount(oldAccount));
+        var account = await m_AccountRepository.Update(dbAccount.ToAccount(request));
 
         return Result.Ok(account.ToResponse());
     }
 
-    public async Task<Result<AccountResponse>> Update(AccountUpdateEmployeeRequest accountUpdateRequest, Guid id)
+    public async Task<Result<AccountResponse>> Update(AccountUpdateEmployeeRequest request, Guid id)
     {
-        var oldAccount = await m_AccountRepository.FindById(id);
+        var dbAccount = await m_AccountRepository.FindById(id);
 
-        if (oldAccount is null)
+        if (dbAccount is null)
             return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
 
-        var account = await m_AccountRepository.Update(oldAccount, accountUpdateRequest.ToAccount(oldAccount));
+        var account = await m_AccountRepository.Update(dbAccount.ToAccount(request));
 
         return Result.Ok(account.ToResponse());
     }
