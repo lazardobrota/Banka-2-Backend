@@ -97,6 +97,12 @@ public static class OpenApiExtensions
                 .AddOpenApiDefaultExample(Example.Exchange.DefaultMakeExchangeRequest)
                 .AddOpenApiDefaultExample(Example.Exchange.DefaultUpdateRequest)
                 .AddOpenApiDefaultExample(Example.Exchange.DefaultResponse)
+                .AddOpenApiDefaultExample(Example.ForexPair.DefaultResponse)
+                .AddOpenApiDefaultExample(Example.ForexPair.DefaultSimpleResponse)
+                .AddOpenApiDefaultExample(Example.ForexPair.DefaultDailyResponse)
+                .AddOpenApiDefaultExample(Example.FutureContract.DeafultResponse)
+                .AddOpenApiDefaultExample(Example.FutureContract.DefaultSimpleResponse)
+                .AddOpenApiDefaultExample(Example.FutureContract.DefaultDailyResponse)
                 .AddOpenApiDefaultExample(Example.Installment.DefaultCreateRequest)
                 .AddOpenApiDefaultExample(Example.Installment.DefaultUpdateRequest)
                 .AddOpenApiDefaultExample(Example.Installment.DefaultResponse)
@@ -106,6 +112,22 @@ public static class OpenApiExtensions
                 .AddOpenApiDefaultExample(Example.LoanType.DefaultCreateRequest)
                 .AddOpenApiDefaultExample(Example.LoanType.DefaultUpdateRequest)
                 .AddOpenApiDefaultExample(Example.LoanType.DefaultResponse)
+                .AddOpenApiDefaultExample(Example.Option.DefaultResponse)
+                .AddOpenApiDefaultExample(Example.Option.DefaultSimpleResponse)
+                .AddOpenApiDefaultExample(Example.Option.DefaultDailyResponse)
+                .AddOpenApiDefaultExample(Example.Order.DefaultCreateRequest)
+                .AddOpenApiDefaultExample(Example.Order.DefaultUpdateRequest)
+                .AddOpenApiDefaultExample(Example.Order.DefaultResponse)
+                .AddOpenApiDefaultExample(Example.Quote.DefaultSimpleResponse)
+                .AddOpenApiDefaultExample([Example.Quote.DefaultSimpleResponse])
+                .AddOpenApiDefaultExample(Example.Quote.DefaultDailySimpleResponse)
+                .AddOpenApiDefaultExample([Example.Quote.DefaultDailySimpleResponse])
+                .AddOpenApiDefaultExample(Example.Quote.DefaultLatestSimpleResponse)
+                .AddOpenApiDefaultExample(Example.Stock.DefaultResponse)
+                .AddOpenApiDefaultExample(Example.Stock.DefaultSimpleResponse)
+                .AddOpenApiDefaultExample(Example.Stock.DefaultDailyResponse)
+                .AddOpenApiDefaultExample(Example.StockExchange.DefaultCreateRequest)
+                .AddOpenApiDefaultExample(Example.StockExchange.DefaultResponse)
                 .AddOpenApiDefaultExample(Example.TransactionCode.DefaultResponse)
                 .AddOpenApiDefaultExample(Example.Transaction.DefaultCreateRequest)
                 .AddOpenApiDefaultExample(Example.Transaction.DefaultUpdateRequest)
@@ -241,6 +263,12 @@ public static class OpenApiExtensions
                                    config.SchemaFilter<SchemaSwagger.Exchange.MakeExchangeRequest>();
                                    config.SchemaFilter<SchemaSwagger.Exchange.UpdateRequest>();
                                    config.SchemaFilter<SchemaSwagger.Exchange.Response>();
+                                   config.SchemaFilter<SchemaSwagger.ForexPair.Response>();
+                                   config.SchemaFilter<SchemaSwagger.ForexPair.SimpleResponse>();
+                                   config.SchemaFilter<SchemaSwagger.ForexPair.DailyResponse>();
+                                   config.SchemaFilter<SchemaSwagger.FutureContract.Response>();
+                                   config.SchemaFilter<SchemaSwagger.FutureContract.SimpleResponse>();
+                                   config.SchemaFilter<SchemaSwagger.FutureContract.DailyResponse>();
                                    config.SchemaFilter<SchemaSwagger.Installment.CreateRequest>();
                                    config.SchemaFilter<SchemaSwagger.Installment.UpdateRequest>();
                                    config.SchemaFilter<SchemaSwagger.Installment.Response>();
@@ -250,6 +278,20 @@ public static class OpenApiExtensions
                                    config.SchemaFilter<SchemaSwagger.LoanType.CreateRequest>();
                                    config.SchemaFilter<SchemaSwagger.LoanType.UpdateRequest>();
                                    config.SchemaFilter<SchemaSwagger.LoanType.Response>();
+                                   config.SchemaFilter<SchemaSwagger.Option.Response>();
+                                   config.SchemaFilter<SchemaSwagger.Option.SimpleResponse>();
+                                   config.SchemaFilter<SchemaSwagger.Option.DailyResponse>();
+                                   config.SchemaFilter<SchemaSwagger.Order.CreateRequest>();
+                                   config.SchemaFilter<SchemaSwagger.Order.UpdateRequest>();
+                                   config.SchemaFilter<SchemaSwagger.Order.Response>();
+                                   config.SchemaFilter<SchemaSwagger.Quote.SimpleResponse>();
+                                   config.SchemaFilter<SchemaSwagger.Quote.DailySimpleResponse>();
+                                   config.SchemaFilter<SchemaSwagger.Quote.LatestSimpleResponse>();
+                                   config.SchemaFilter<SchemaSwagger.Stock.Response>();
+                                   config.SchemaFilter<SchemaSwagger.Stock.SimpleResponse>();
+                                   config.SchemaFilter<SchemaSwagger.Stock.DailyResponse>();
+                                   config.SchemaFilter<SchemaSwagger.StockExchange.CreateRequest>();
+                                   config.SchemaFilter<SchemaSwagger.StockExchange.Response>();
                                    config.SchemaFilter<SchemaSwagger.TransactionCode.Response>();
                                    config.SchemaFilter<SchemaSwagger.Transaction.CreateRequest>();
                                    config.SchemaFilter<SchemaSwagger.Transaction.UpdateRequest>();

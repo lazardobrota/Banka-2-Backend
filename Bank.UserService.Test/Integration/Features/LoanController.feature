@@ -12,12 +12,6 @@
         When loan is updated in the database
         Then loant details should match the updated loan
 
-#    TODO: Move Scenario to Installments
-#    Scenario: Get all installemtns for Loan
-#        Given loan Id which has installemtns
-#        When all installemtns are fetched for the loan
-#        Then all installemtns should be returned for the loan
-
     Scenario: Get all Loans
         When all loans are fetched
         Then all loans should be returned

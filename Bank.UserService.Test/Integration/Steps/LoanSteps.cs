@@ -94,31 +94,7 @@ public class LoanSteps(ScenarioContext scenarioContext, ILoanService loanService
         //loanUpdateResult.Value?.MaturityDate.ShouldBe(DateOnly.FromDateTime(Example.Entity.Loan.UpdateRequest.MaturityDate!.Value)); Ovo se ne updatuje??
     }
 
-    // [Given(@"loan Id which has installemtns")]
-    // public void GivenLoanIdWhichHasInstallemtns()
-    // {
-    //     m_ScenarioContext[Constant.LoanId] = Example.Entity.Loan.Id;
-    // }
-
-    // [When(@"all installemtns are fetched for the loan")]
-    // public async Task WhenAllInstallemtnsAreFetchedForTheLoan()
-    // {
-    //     var loanId = m_ScenarioContext.Get<Guid>(Constant.LoanId);
-    //
-    //     var installments = await m_LoanService.GetAllInstallments(loanId, new Pageable());
-    //
-    //     m_ScenarioContext[Constant.Installments] = installments;
-    // }
-
-    // [Then(@"all installemtns should be returned for the loan")]
-    // public void ThenAllInstallemtnsShouldBeReturnedForTheLoan()
-    // {
-    //     var installments = m_ScenarioContext.Get<Result<Page<InstallmentResponse>>>(Constant.Installments);
-    //
-    //     installments.ActionResult.ShouldBeOfType<OkObjectResult>();
-    //     installments.ShouldNotBeNull();
-    //     installments.Value!.Items.ShouldNotBeEmpty();
-    // }
+   
 
     [When(@"all loans are fetched")]
     public async Task WhenAllLoansAreFetched()

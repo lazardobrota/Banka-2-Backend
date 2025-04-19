@@ -4,6 +4,7 @@ using Bank.Application;
 using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
+using Bank.ExchangeService.Database.Examples;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.Repositories;
@@ -42,14 +43,14 @@ public class ExchangeApplication
         builder.Services.AddCors();
         builder.Services.AddAuthenticationServices();
         builder.Services.AddAuthorizationServices();
-        
+
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddOpenApiServices();
         builder.Services.AddOpenApiExamples();
 
         var app = builder.Build();
-        
+
         app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.MapHub<SecurityHub>("security-hub");
@@ -136,6 +137,30 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddOpenApiExamples(this IServiceCollection services)
     {
+        services.AddOpenApiExample(Example.Currency.SimpleResponse);
+        services.AddOpenApiExample(Example.Currency.Response);
+        services.AddOpenApiExample(Example.StockExchange.CreateRequest);
+        services.AddOpenApiExample(Example.StockExchange.Response);
+        services.AddOpenApiExample(Example.ForexPair.Response);
+        services.AddOpenApiExample(Example.ForexPair.SimpleResponse);
+        services.AddOpenApiExample(Example.ForexPair.DailyResponse);
+        services.AddOpenApiExample(Example.FutureContract.Response);
+        services.AddOpenApiExample(Example.FutureContract.SimpleResponse);
+        services.AddOpenApiExample(Example.FutureContract.DailyResponse);
+        services.AddOpenApiExample(Example.Option.Response);
+        services.AddOpenApiExample(Example.Option.SimpleResponse);
+        services.AddOpenApiExample(Example.Option.DailyResponse);
+        services.AddOpenApiExample(Example.Order.CreateRequest);
+        services.AddOpenApiExample(Example.Order.UpdateRequest);
+        services.AddOpenApiExample(Example.Order.Response);
+        services.AddOpenApiExample(Example.Quote.SimpleResponse);
+        services.AddOpenApiExample(Example.Quote.DailySimpleResponse);
+        services.AddOpenApiExample(Example.Quote.LatestSimpleResponse);
+        services.AddOpenApiExample(Example.Stock.Response);
+        services.AddOpenApiExample(Example.Stock.SimpleResponse);
+        services.AddOpenApiExample(Example.Stock.DailyResponse);
+        services.AddOpenApiExample(Example.User.Response);
+
         return services;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.Database.Examples;
@@ -23,5 +24,17 @@ public static partial class Example
                                                                             ActualDueDate = new(2025, 6, 15),
                                                                             Status        = InstallmentStatus.Paid
                                                                         };
+
+        public static readonly InstallmentResponse Response = new()
+                                                              {
+                                                                  Id              = CreateRequest.InstallmentId,
+                                                                  Loan            = null!,
+                                                                  InterestRate    = CreateRequest.InterestRate,
+                                                                  ExpectedDueDate = CreateRequest.ExpectedDueDate,
+                                                                  ActualDueDate   = CreateRequest.ActualDueDate,
+                                                                  Status          = CreateRequest.Status,
+                                                                  CreatedAt       = DateTime.UtcNow,
+                                                                  ModifiedAt      = DateTime.UtcNow,
+                                                              };
     }
 }

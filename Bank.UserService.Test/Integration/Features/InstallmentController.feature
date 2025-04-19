@@ -16,3 +16,8 @@
         Given loan Id for installments
         When all installments are fetched for the account
         Then all installments should be returned for the account
+
+    Scenario: Get all installments for Loan
+        Given loan Id which has installments
+        When all installments are fetched for the loan
+        Then all installments should be returned for the loan

@@ -19,3 +19,13 @@
     Scenario: Get All Cards
         When all cards are fetched from the database
         Then all cards should be returned
+
+    Scenario: Get All Cards for Account
+        Given account Id so we can get cards
+        When all cards are fetched for the account
+        Then all cards should be returned for the account
+
+    Scenario: Get all Cards from Client
+        Given client Id which has cards
+        When all cards are fetched from the database for the client
+        Then all cards should be returned for that client

@@ -119,6 +119,34 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
         installments.Value!.Items.All(i => i.Loan.Id == m_ScenarioContext.Get<Guid>(Constant.LoanId))
                     .ShouldBeTrue();
     }
+
+    [Given(@"loan Id which has installments")]
+    public void GivenLoanIdWhichHasInstallments()
+    {
+        m_ScenarioContext[Constant.LoanId] = Example.Entity.Loan.Id;
+    }
+
+    [When(@"all installments are fetched for the loan")]
+    public async Task WhenAllInstallmentsAreFetchedForTheLoan()
+    {
+        var loanId = m_ScenarioContext.Get<Guid>(Constant.LoanId);
+
+        var installments = await m_InstallmentService.GetAllByLoanId(loanId, new Pageable());
+
+        m_ScenarioContext[Constant.Installments] = installments;
+    }
+
+    [Then(@"all installments should be returned for the loan")]
+    public void ThenAllInstallmentsShouldBeReturnedForTheLoan()
+    {
+        var installments = m_ScenarioContext.Get<Result<Page<InstallmentResponse>>>(Constant.Installments);
+
+        installments.ActionResult.ShouldBeOfType<OkObjectResult>();
+        installments.ShouldNotBeNull();
+        installments.Value!.Items.ShouldNotBeEmpty();
+    }
+
+    
 }
 
 file static class Constant

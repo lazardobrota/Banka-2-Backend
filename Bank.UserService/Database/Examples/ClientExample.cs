@@ -1,5 +1,6 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Requests;
+using Bank.Application.Responses;
 
 namespace Bank.UserService.Database.Examples;
 
@@ -27,5 +28,42 @@ public static partial class Example
                                                                        Address     = "Kralja Petra 12",
                                                                        Activated   = true
                                                                    };
+
+        public static readonly ClientResponse Response = new()
+                                                         {
+                                                             Id                         = Guid.Parse("f39d319e-db3e-4af5-bada-6bcb908b29e3"),
+                                                             FirstName                  = CreateRequest.FirstName,
+                                                             LastName                   = CreateRequest.LastName,
+                                                             DateOfBirth                = CreateRequest.DateOfBirth,
+                                                             Gender                     = CreateRequest.Gender,
+                                                             UniqueIdentificationNumber = CreateRequest.UniqueIdentificationNumber,
+                                                             Email                      = CreateRequest.Email,
+                                                             PhoneNumber                = CreateRequest.PhoneNumber,
+                                                             Address                    = CreateRequest.Address,
+                                                             Role                       = Role.Client,
+                                                             Accounts                   = [],
+                                                             CreatedAt                  = DateTime.UtcNow,
+                                                             ModifiedAt                 = DateTime.UtcNow,
+                                                             Activated                  = UpdateRequest.Activated,
+                                                             Permissions                = 1
+                                                         };
+
+        public static readonly ClientSimpleResponse SimpleResponse = new()
+                                                                     {
+                                                                         Id                         = Guid.Parse("f39d319e-db3e-4af5-bada-6bcb908b29e3"),
+                                                                         FirstName                  = CreateRequest.FirstName,
+                                                                         LastName                   = CreateRequest.LastName,
+                                                                         DateOfBirth                = CreateRequest.DateOfBirth,
+                                                                         Gender                     = CreateRequest.Gender,
+                                                                         UniqueIdentificationNumber = CreateRequest.UniqueIdentificationNumber,
+                                                                         Email                      = CreateRequest.Email,
+                                                                         PhoneNumber                = CreateRequest.PhoneNumber,
+                                                                         Address                    = CreateRequest.Address,
+                                                                         Role                       = Role.Client,
+                                                                         CreatedAt                  = DateTime.UtcNow,
+                                                                         ModifiedAt                 = DateTime.UtcNow,
+                                                                         Activated                  = UpdateRequest.Activated,
+                                                                         Permissions                = 1
+                                                                     };
     }
 }
