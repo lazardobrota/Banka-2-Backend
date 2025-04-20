@@ -4,26 +4,31 @@ namespace Bank.Database.Core;
 
 public class DatabaseContext(DbContextOptions options) : DbContext(options)
 {
-    internal bool   BaseDispose   { get; set; } = true;
-    internal Action DisposeAction { get; set; } = () => { };
+    internal bool   BaseDispose         { get; set; } = true;
+    internal Action DisposeBeforeAction { get; set; } = () => { };
+    internal Action DisposeAfterAction  { get; set; } = () => { };
 
     public override void Dispose()
     {
-        DisposeAction();
+        DisposeBeforeAction();
 
         if (BaseDispose)
             base.Dispose();
 
         GC.SuppressFinalize(this);
+
+        DisposeAfterAction();
     }
 
     public override async ValueTask DisposeAsync()
     {
-        DisposeAction();
+        DisposeBeforeAction();
 
         if (BaseDispose)
             await base.DisposeAsync();
 
         GC.SuppressFinalize(this);
+        
+        DisposeAfterAction();
     }
 }

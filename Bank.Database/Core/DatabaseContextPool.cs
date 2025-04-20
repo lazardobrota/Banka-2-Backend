@@ -23,7 +23,7 @@ internal class PostgresDefaultContextPool : IDefaultContextPool
 {
     public SemaphoreSlim Semaphore { private set; get; } = null!;
 
-    public const int ConnectionExcess = 5;
+    public const int ConnectionExcess = 10;
     public       int MinConnections { private set; get; } = Configuration.Database.MinConnections;
     public       int MaxConnections { private set; get; } = Configuration.Database.MaxConnections;
 

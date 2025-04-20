@@ -33,7 +33,7 @@ internal class PostgresDefaultContextFactory<TDatabaseContext>(IDefaultContextPo
 
         var context = await m_ContextFactory.CreateDbContextAsync();
 
-        context.DisposeAction = () => ContextPool.Semaphore.Release();
+        context.DisposeAfterAction = () => ContextPool.Semaphore.Release();
 
         return context;
     }
