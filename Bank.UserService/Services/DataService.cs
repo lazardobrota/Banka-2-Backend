@@ -20,6 +20,8 @@ public interface IDataService
     public Currency  DefaultCurrency { get; }
     public Account   BankAccount     { get; }
 
+    Task<bool> Instantiate();
+
     Task<(ImmutableArray<AccountCurrency> values, bool upToDate)> GetAccountCurrencies();
 
     Task<(ImmutableArray<Account> values, bool upToDate)> GetAccounts();
@@ -56,73 +58,61 @@ public interface IDataService
 }
 
 [SuppressMessage("ReSharper", "ConvertIfStatementToReturnStatement")]
-public class DataService : IDataService
+public class DataService(
+    IAccountCurrencyRepository     accountCurrencyRepository,
+    IAccountRepository             accountRepository,
+    IAccountTypeRepository         accountTypeRepository,
+    IBankRepository                bankRepository,
+    ICardRepository                cardRepository,
+    ICardTypeRepository            cardTypeRepository,
+    ICompanyRepository             companyRepository,
+    ICountryRepository             countryRepository,
+    ICurrencyRepository            currencyRepository,
+    IExchangeRepository            exchangeRepository,
+    IInstallmentRepository         installmentRepository,
+    ILoanRepository                loanRepository,
+    ILoanTypeRepository            loanTypeRepository,
+    ITransactionCodeRepository     transactionCodeRepository,
+    ITransactionRepository         transactionRepository,
+    ITransactionTemplateRepository transactionTemplateRepository,
+    IUserRepository                userRepository,
+    IHttpClientFactory             httpClientFactory
+) : IDataService
 {
-    private readonly IAccountCurrencyRepository     m_AccountCurrencyRepository;
-    private readonly IAccountRepository             m_AccountRepository;
-    private readonly IAccountTypeRepository         m_AccountTypeRepository;
-    private readonly IBankRepository                m_BankRepository;
-    private readonly ICardRepository                m_CardRepository;
-    private readonly ICardTypeRepository            m_CardTypeRepository;
-    private readonly ICompanyRepository             m_CompanyRepository;
-    private readonly ICountryRepository             m_CountryRepository;
-    private readonly ICurrencyRepository            m_CurrencyRepository;
-    private readonly IExchangeRepository            m_ExchangeRepository;
-    private readonly IInstallmentRepository         m_InstallmentRepository;
-    private readonly ILoanRepository                m_LoanRepository;
-    private readonly ILoanTypeRepository            m_LoanTypeRepository;
-    private readonly ITransactionCodeRepository     m_TransactionCodeRepository;
-    private readonly ITransactionRepository         m_TransactionRepository;
-    private readonly ITransactionTemplateRepository m_TransactionTemplateRepository;
-    private readonly IUserRepository                m_UserRepository;
-    private readonly IHttpClientFactory             m_HttpClientFactory;
+    private readonly IAccountCurrencyRepository     m_AccountCurrencyRepository     = accountCurrencyRepository;
+    private readonly IAccountRepository             m_AccountRepository             = accountRepository;
+    private readonly IAccountTypeRepository         m_AccountTypeRepository         = accountTypeRepository;
+    private readonly IBankRepository                m_BankRepository                = bankRepository;
+    private readonly ICardRepository                m_CardRepository                = cardRepository;
+    private readonly ICardTypeRepository            m_CardTypeRepository            = cardTypeRepository;
+    private readonly ICompanyRepository             m_CompanyRepository             = companyRepository;
+    private readonly ICountryRepository             m_CountryRepository             = countryRepository;
+    private readonly ICurrencyRepository            m_CurrencyRepository            = currencyRepository;
+    private readonly IExchangeRepository            m_ExchangeRepository            = exchangeRepository;
+    private readonly IInstallmentRepository         m_InstallmentRepository         = installmentRepository;
+    private readonly ILoanRepository                m_LoanRepository                = loanRepository;
+    private readonly ILoanTypeRepository            m_LoanTypeRepository            = loanTypeRepository;
+    private readonly ITransactionCodeRepository     m_TransactionCodeRepository     = transactionCodeRepository;
+    private readonly ITransactionRepository         m_TransactionRepository         = transactionRepository;
+    private readonly ITransactionTemplateRepository m_TransactionTemplateRepository = transactionTemplateRepository;
+    private readonly IUserRepository                m_UserRepository                = userRepository;
+    private readonly IHttpClientFactory             m_HttpClientFactory             = httpClientFactory;
 
-    public BankModel Bank            { get; }
-    public Currency  DefaultCurrency { get; }
-    public Account   BankAccount     { get; }
+    public BankModel Bank            { private set; get; } = null!;
+    public Currency  DefaultCurrency { private set; get; } = null!;
+    public Account   BankAccount     { private set; get; } = null!;
 
-    public DataService(IAccountCurrencyRepository     accountCurrencyRepository, IAccountRepository accountRepository, IAccountTypeRepository accountTypeRepository,
-                       IBankRepository                bankRepository, ICardRepository cardRepository, ICardTypeRepository cardTypeRepository, ICompanyRepository companyRepository,
-                       ICountryRepository             countryRepository, ICurrencyRepository currencyRepository, IExchangeRepository exchangeRepository,
-                       IInstallmentRepository         installmentRepository, ILoanRepository loanRepository, ILoanTypeRepository loanTypeRepository,
-                       ITransactionCodeRepository     transactionCodeRepository, ITransactionRepository transactionRepository,
-                       ITransactionTemplateRepository transactionTemplateRepository, IUserRepository userRepository, IHttpClientFactory httpClientFactory)
+    public async Task<bool> Instantiate()
     {
-        m_AccountCurrencyRepository     = accountCurrencyRepository;
-        m_AccountRepository             = accountRepository;
-        m_AccountTypeRepository         = accountTypeRepository;
-        m_BankRepository                = bankRepository;
-        m_CardRepository                = cardRepository;
-        m_CardTypeRepository            = cardTypeRepository;
-        m_CompanyRepository             = companyRepository;
-        m_CountryRepository             = countryRepository;
-        m_CurrencyRepository            = currencyRepository;
-        m_ExchangeRepository            = exchangeRepository;
-        m_InstallmentRepository         = installmentRepository;
-        m_LoanRepository                = loanRepository;
-        m_LoanTypeRepository            = loanTypeRepository;
-        m_TransactionCodeRepository     = transactionCodeRepository;
-        m_TransactionRepository         = transactionRepository;
-        m_TransactionTemplateRepository = transactionTemplateRepository;
-        m_UserRepository                = userRepository;
-        m_HttpClientFactory             = httpClientFactory;
+        Bank = await m_BankRepository.FindById(Seeder.Bank.Bank02.Id) ?? throw new Exception("Invalid bank.");
 
-        Bank = m_BankRepository.FindById(Seeder.Bank.Bank02.Id)
-                               .ConfigureAwait(false)
-                               .GetAwaiter()
-                               .GetResult() ?? throw new Exception("Invalid bank.");
+        DefaultCurrency = await m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode) ?? throw new Exception("Invalid default currency.");
 
-        DefaultCurrency = m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode)
-                                              .ConfigureAwait(false)
-                                              .GetAwaiter()
-                                              .GetResult() ?? throw new Exception("Invalid default currency.");
-
-        BankAccount = m_AccountRepository.FindById(Seeder.Account.BankAccount.Id)
-                                         .ConfigureAwait(false)
-                                         .GetAwaiter()
-                                         .GetResult() ?? throw new Exception("Invalid bank account.");
+        BankAccount = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id) ?? throw new Exception("Invalid bank account.");
+        
+        return true;
     }
-
+    
     public async Task<(ImmutableArray<AccountCurrency> values, bool upToDate)> GetAccountCurrencies()
     {
         return (Seeder.AccountCurrency.All, await m_AccountCurrencyRepository.IsEmpty() is not true);
