@@ -1,6 +1,6 @@
-﻿using Bank.Application.Domain;
-using Bank.Application.Utilities;
-using Bank.UserService.Mappers;
+﻿using System.Collections.Immutable;
+
+using Bank.Application.Domain;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Database.Seeders;
@@ -126,29 +126,10 @@ public static partial class Seeder
                                                               Activated                  = true,
                                                               Permissions                = new Permissions(Permission.Employee)
                                                           };
-    }
-}
 
-public static class EmployeeSeederExtension
-{
-    public static async Task SeedEmployee(this ApplicationContext context)
-    {
-        if (context.Users.Any(user => user.Role == Role.Admin || user.Role == Role.Employee))
-            return;
-
-        EmployeeModel[] employees =
+        public static readonly ImmutableArray<EmployeeModel> All =
         [
-            Seeder.Employee.Admin, Seeder.Employee.Employee01, Seeder.Employee.Employee02, Seeder.Employee.Employee03, Seeder.Employee.Employee04
+            Admin, Employee01, Employee02, Employee03, Employee04
         ];
-
-        await context.Users.AddRangeAsync(employees.Select(client =>
-                                                           {
-                                                               client.Password = HashingUtilities.HashPassword(client.Password!, client.Salt);
-                                                               return client;
-                                                           })
-                                                   .Select(client => client.ToUser())
-                                                   .ToList());
-
-        await context.SaveChangesAsync();
     }
 }

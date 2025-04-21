@@ -10,14 +10,14 @@ public static partial class Example
     public static class Loan
     {
         public static readonly LoanCreateRequest CreateRequest = new()
-                                                           {
-                                                               TypeId       = Seeder.LoanType.Personal.Id,
-                                                               AccountId    = Seeder.Account.DomesticAccount02.Id,
-                                                               Amount       = 50000.00m,
-                                                               Period       = 60,
-                                                               CurrencyId   = Seeder.Currency.SerbianDinar.Id,
-                                                               InterestType = InterestType.Mixed
-                                                           };
+                                                                 {
+                                                                     TypeId       = Seeder.LoanType.Personal.Id,
+                                                                     AccountId    = Seeder.Account.DomesticAccount02.Id,
+                                                                     Amount       = 50000.00m,
+                                                                     Period       = 60,
+                                                                     CurrencyId   = Seeder.Currency.SerbianDinar.Id,
+                                                                     InterestType = InterestType.Mixed
+                                                                 };
 
         public static readonly LoanUpdateRequest UpdateRequest = new()
                                                                  {

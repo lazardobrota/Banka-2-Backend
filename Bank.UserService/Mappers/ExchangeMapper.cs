@@ -42,9 +42,7 @@ public static class ExchangeMapper
         return new Exchange
                {
                    Id             = Guid.NewGuid(),
-                   CurrencyFrom   = currencyFrom,
                    CurrencyFromId = currencyFrom.Id,
-                   CurrencyTo     = currencyTo,
                    CurrencyToId   = currencyTo.Id,
                    Commission     = commission,
                    Rate           = exchangeFetchResponse.Rate,

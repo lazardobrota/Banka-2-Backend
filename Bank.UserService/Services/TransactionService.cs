@@ -1,16 +1,17 @@
-﻿using Bank.Application.Domain;
+﻿using System.Diagnostics;
+
+using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
+using Bank.Database.Core;
 using Bank.Permissions.Services;
 using Bank.UserService.BackgroundServices;
 using Bank.UserService.Database;
 using Bank.UserService.Mappers;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
-
-using Microsoft.EntityFrameworkCore;
 
 namespace Bank.UserService.Services;
 
@@ -32,24 +33,27 @@ public interface ITransactionService
 }
 
 public class TransactionService(
-    ITransactionRepository                transactionRepository,
-    IAuthorizationService                 authorizationService,
-    IAccountRepository                    accountRepository,
-    ICurrencyRepository                   currencyRepository,
-    TransactionBackgroundService          transactionBackgroundService,
-    IExchangeService                      exchangeService,
-    IDbContextFactory<ApplicationContext> contextFactory
+    ITransactionRepository                      transactionRepository,
+    IAuthorizationService                       authorizationService,
+    IAccountRepository                          accountRepository,
+    ICurrencyRepository                         currencyRepository,
+    IDatabaseContextFactory<ApplicationContext> contextFactory,
+    IExchangeService                            exchangeService,
+    Lazy<TransactionBackgroundService>          transactionBackgroundServiceLazy,
+    Lazy<IDataService>                          dataServiceLazy
 ) : ITransactionService
 {
-    private readonly ITransactionRepository                m_TransactionRepository        = transactionRepository;
-    private readonly IAccountRepository                    m_AccountRepository            = accountRepository;
-    private readonly ICurrencyRepository                   m_CurrencyRepository           = currencyRepository;
-    private readonly IAuthorizationService                 m_AuthorizationService         = authorizationService;
-    private readonly IExchangeService                      m_ExchangeService              = exchangeService;
-    private readonly TransactionBackgroundService          m_TransactionBackgroundService = transactionBackgroundService;
-    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory               = contextFactory;
+    private readonly ITransactionRepository                      m_TransactionRepository            = transactionRepository;
+    private readonly IAccountRepository                          m_AccountRepository                = accountRepository;
+    private readonly ICurrencyRepository                         m_CurrencyRepository               = currencyRepository;
+    private readonly IAuthorizationService                       m_AuthorizationService             = authorizationService;
+    private readonly IExchangeService                            m_ExchangeService                  = exchangeService;
+    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory                   = contextFactory;
+    private readonly Lazy<TransactionBackgroundService>          m_TransactionBackgroundServiceLazy = transactionBackgroundServiceLazy;
+    private readonly Lazy<IDataService>                          m_DataServiceLazy                  = dataServiceLazy;
 
-    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
+    private TransactionBackgroundService TransactionBackgroundService => m_TransactionBackgroundServiceLazy.Value;
+    private IDataService                 Data                         => m_DataServiceLazy.Value;
 
     public async Task<Result<Page<TransactionResponse>>> GetAll(TransactionFilterQuery transactionFilterQuery, Pageable pageable)
     {
@@ -133,7 +137,7 @@ public class TransactionService(
         var bankCodeFrom = tempyTransaction.FromAccountNumber?[..3];
         var bankCodeTo   = tempyTransaction.ToAccountNumber?[..3];
 
-        if (bankCodeTo == null && bankCodeFrom == m_TransactionBackgroundService.Bank.Code && fromAccount != null)
+        if (bankCodeTo == null && bankCodeFrom == Data.Bank.Code && fromAccount != null)
             return await PrepareWithdrawTransaction(new PrepareWithdrawTransaction
                                                     {
                                                         Account    = fromAccount,
@@ -141,7 +145,7 @@ public class TransactionService(
                                                         Amount     = tempyTransaction.Amount
                                                     });
 
-        if (bankCodeFrom == null && bankCodeTo == m_TransactionBackgroundService.Bank.Code && toAccount != null)
+        if (bankCodeFrom == null && bankCodeTo == Data.Bank.Code && toAccount != null)
             return await PrepareDepositTransaction(new PrepareDepositTransaction
                                                    {
                                                        Account    = toAccount,
@@ -152,7 +156,7 @@ public class TransactionService(
         if (bankCodeFrom == null || bankCodeTo == null || exchangeDetails == null)
             return Result.BadRequest<Transaction>("Some error");
 
-        if (bankCodeFrom == m_TransactionBackgroundService.Bank.Code && bankCodeTo == m_TransactionBackgroundService.Bank.Code && fromAccount != null && toAccount != null)
+        if (bankCodeFrom == Data.Bank.Code && bankCodeTo == Data.Bank.Code && fromAccount != null && toAccount != null)
             return await PrepareInternalTransaction(new PrepareInternalTransaction
                                                     {
                                                         FromAccount       = fromAccount,
@@ -182,7 +186,7 @@ public class TransactionService(
 
         var processTransaction = depositTransaction.ToProcessTransaction(transaction.Id);
 
-        m_TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
+        TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
 
         return Result.Ok(transaction);
     }
@@ -211,7 +215,7 @@ public class TransactionService(
 
         var processTransaction = withdrawTransaction.ToProcessTransaction(transaction.Id);
 
-        m_TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
+        TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
 
         return Result.Ok(transaction);
     }
@@ -243,7 +247,7 @@ public class TransactionService(
 
         var processTransaction = internalTransaction.ToProcessTransaction(transaction.Id);
 
-        m_TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
+        TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
 
         return Result.Ok(transaction);
     }
@@ -279,7 +283,7 @@ public class TransactionService(
 
     private async Task<bool> ProcessDepositTransaction(ProcessTransaction processTransaction)
     {
-        await using var databaseContext     = await CreateContext;
+        await using var databaseContext     = await m_ContextFactory.CreateContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
 
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
@@ -320,7 +324,7 @@ public class TransactionService(
 
     private async Task<bool> ProcessWithdrawTransaction(ProcessTransaction processTransaction)
     {
-        await using var databaseContext     = await CreateContext;
+        await using var databaseContext     = await m_ContextFactory.CreateContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
 
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
@@ -362,7 +366,7 @@ public class TransactionService(
 
     private async Task<bool> ProcessTransaction(ProcessTransaction processTransaction)
     {
-        await using var databaseContext     = await CreateContext;
+        await using var databaseContext     = await m_ContextFactory.CreateContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
 
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);

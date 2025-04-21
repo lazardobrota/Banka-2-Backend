@@ -48,19 +48,6 @@ public static partial class Seeder
                                                       ModifiedAt = DateTime.UtcNow
                                                   };
 
-        public static readonly ImmutableList<BankModel> All = [Bank01, Bank02, Bank03, Bank04];
-    }
-}
-
-public static class BankSeederExtension
-{
-    public static async Task SeedBank(this ApplicationContext context)
-    {
-        if (context.Banks.Any())
-            return;
-
-        await context.Banks.AddRangeAsync(Seeder.Bank.All);
-
-        await context.SaveChangesAsync();
+        public static readonly ImmutableArray<BankModel> All = [Bank01, Bank02, Bank03, Bank04];
     }
 }

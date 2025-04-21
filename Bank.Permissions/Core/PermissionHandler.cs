@@ -10,7 +10,8 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirements>
     {
         if (requirement.Permissions.Length == 0)
         {
-            context.Succeed(requirement);
+            if (!requirement.NeedsAuthentication || context.User.Identity?.IsAuthenticated is true)
+                context.Succeed(requirement);
 
             return Task.CompletedTask;
         }

@@ -1,4 +1,6 @@
-﻿using Bank.UserService.Models;
+﻿using System.Collections.Immutable;
+
+using Bank.UserService.Models;
 
 namespace Bank.UserService.Database.Seeders;
 
@@ -127,23 +129,10 @@ public static partial class Seeder
                                                                    ModifiedAt       = DateTime.UtcNow,
                                                                    Status           = true
                                                                };
-    }
-}
 
-public static class AccountSeederExtension
-{
-    public static async Task SeedAccount(this ApplicationContext context)
-    {
-        if (context.Accounts.Any())
-            return;
-
-        var x = Seeder.Account.BankAccount;
-
-        await context.Accounts.AddRangeAsync([
-                                                 Seeder.Account.BankAccount, Seeder.Account.DomesticAccount01, Seeder.Account.DomesticAccount02, Seeder.Account.ForeignAccount01,
-                                                 Seeder.Account.ForeignAccount02, Seeder.Account.ForeignAccount03
-                                             ]);
-
-        await context.SaveChangesAsync();
+        public static readonly ImmutableArray<AccountModel> All =
+        [
+            BankAccount, DomesticAccount01, DomesticAccount02, ForeignAccount01, ForeignAccount02, ForeignAccount03
+        ];
     }
 }

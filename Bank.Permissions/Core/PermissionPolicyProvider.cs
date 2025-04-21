@@ -21,14 +21,13 @@ public class PermissionPolicyProvider(IOptions<AuthorizationOptions> options, IH
         if (endpoint is null)
             return m_FallbackPolicyProvider.GetDefaultPolicyAsync();
 
-        var authorizeAttributes = endpoint.Metadata.GetOrderedMetadata<AuthorizeAttribute>()
-                                          .SelectMany(authorizeAttribute => authorizeAttribute.Permissions)
-                                          .Distinct()
-                                          .ToArray();
+        var authorizeAttributes = endpoint.Metadata.GetOrderedMetadata<AuthorizeAttribute>();
 
-        Console.WriteLine(string.Join(", ", authorizeAttributes));
+        var permissions = authorizeAttributes.SelectMany(authorizeAttribute => authorizeAttribute.Permissions)
+                                             .Distinct()
+                                             .ToArray();
 
-        return Task.FromResult(new AuthorizationPolicyBuilder().AddRequirements(new PermissionRequirements(authorizeAttributes))
+        return Task.FromResult(new AuthorizationPolicyBuilder().AddRequirements(new PermissionRequirements(authorizeAttributes.Any(), permissions))
                                                                .Build());
     }
 
