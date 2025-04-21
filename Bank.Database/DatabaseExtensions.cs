@@ -8,13 +8,13 @@ namespace Bank.Database;
 
 public static class DatabaseExtensions
 {
-    public static IServiceCollection AddDatabaseServices<TDatabaseContext>(this IServiceCollection services)
-    where TDatabaseContext : DatabaseContext
+    public static IServiceCollection AddDatabaseServices<TDatabaseContext>(this IServiceCollection services) where TDatabaseContext : DatabaseContext
     {
         services.AddSingleton<IDefaultContextPool, PostgresDefaultContextPool>();
         services.AddSingleton<IDatabaseContextFactory<TDatabaseContext>, PostgresDefaultContextFactory<TDatabaseContext>>();
-        
-        services.AddDbContextFactory<TDatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()));
+
+        services.AddDbContextFactory<TDatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString(),
+                                                                                    pgOptions => pgOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
         return services;
     }
