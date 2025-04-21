@@ -1,4 +1,5 @@
 ﻿using Bank.Application;
+using Bank.Database;
 using Bank.OpenApi;
 using Bank.Permissions;
 using Bank.UserService.BackgroundServices;
@@ -12,8 +13,6 @@ using DotNetEnv;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
-
-using Microsoft.EntityFrameworkCore;
 
 using Example = Bank.UserService.Database.Examples.Example;
 
@@ -29,7 +28,7 @@ public class UserApplication
 
         builder.Services.AddValidation();
         builder.Services.AddServices();
-        builder.Services.AddDatabase();
+        builder.Services.AddDatabaseServices<ApplicationContext>();
         builder.Services.AddHostedServices();
         builder.Services.AddBackgroundServices();
         builder.Services.AddHttpServices();
@@ -49,7 +48,7 @@ public class UserApplication
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        
+
         app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.Run();
@@ -60,45 +59,48 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IBankRepository, BankRepository>();
-        services.AddScoped<IBankService, BankService>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IAccountRepository, AccountRepository>();
-        services.AddScoped<IUserService, Services.UserService>();
-        services.AddScoped<IClientService, ClientService>();
-        services.AddScoped<IEmployeeService, EmployeeService>();
-        services.AddScoped<IAccountCurrencyRepository, AccountCurrencyRepository>();
-        services.AddScoped<IEmailRepository, EmailRepository>();
-        services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<ICountryService, CountryService>();
-        services.AddScoped<ICardTypeService, CardTypeService>();
-        services.AddScoped<ICardService, CardService>();
-        services.AddScoped<ICountryRepository, CountryRepository>();
-        services.AddScoped<ICurrencyService, CurrencyService>();
-        services.AddScoped<ICurrencyRepository, CurrencyRepository>();
-        services.AddScoped<ICardTypeRepository, CardTypeRepository>();
-        services.AddScoped<ICardRepository, CardRepository>();
-        services.AddScoped<ICompanyService, CompanyService>();
-        services.AddScoped<ICompanyRepository, CompanyRepository>();
-        services.AddScoped<IAccountTypeRepository, AccountTypeRepository>();
-        services.AddScoped<IAccountTypeService, AccountTypeService>();
-        services.AddScoped<IAccountService, AccountService>();
-        services.AddScoped<IAccountCurrencyService, AccountCurrencyService>();
-        services.AddScoped<IExchangeRepository, ExchangeRepository>();
-        services.AddScoped<IExchangeService, ExchangeService>();
-        services.AddScoped<ILoanRepository, LoanRepository>();
-        services.AddScoped<ILoanTypeRepository, LoanTypeRepository>();
-        services.AddScoped<IInstallmentRepository, InstallmentRepository>();
-        services.AddScoped<ITransactionCodeRepository, TransactionCodeRepository>();
-        services.AddScoped<ITransactionCodeService, TransactionCodeService>();
-        services.AddScoped<ITransactionTemplateRepository, TransactionTemplateRepository>();
-        services.AddScoped<ITransactionTemplateService, TransactionTemplateService>();
-        services.AddScoped<ITransactionRepository, TransactionRepository>();
-        services.AddScoped<ITransactionService, TransactionService>();
-        services.AddScoped<ILoanService, LoanService>();
-        services.AddScoped<IInstallmentService, InstallmentService>();
-        services.AddScoped<ILoanTypeService, LoanTypeService>();
-        services.AddScoped<Lazy<ITransactionService>>(provider => new Lazy<ITransactionService>(provider.GetRequiredService<ITransactionService>));
+        services.AddSingleton<IBankRepository, BankRepository>();
+        services.AddSingleton<IBankService, BankService>();
+        services.AddSingleton<IUserRepository, UserRepository>();
+        services.AddSingleton<IAccountRepository, AccountRepository>();
+        services.AddSingleton<IUserService, Services.UserService>();
+        services.AddSingleton<IClientService, ClientService>();
+        services.AddSingleton<IEmployeeService, EmployeeService>();
+        services.AddSingleton<IAccountCurrencyRepository, AccountCurrencyRepository>();
+        services.AddSingleton<IEmailRepository, EmailRepository>();
+        services.AddSingleton<IEmailService, EmailService>();
+        services.AddSingleton<ICountryService, CountryService>();
+        services.AddSingleton<ICardTypeService, CardTypeService>();
+        services.AddSingleton<ICardService, CardService>();
+        services.AddSingleton<ICountryRepository, CountryRepository>();
+        services.AddSingleton<ICurrencyService, CurrencyService>();
+        services.AddSingleton<ICurrencyRepository, CurrencyRepository>();
+        services.AddSingleton<ICardTypeRepository, CardTypeRepository>();
+        services.AddSingleton<ICardRepository, CardRepository>();
+        services.AddSingleton<ICompanyService, CompanyService>();
+        services.AddSingleton<ICompanyRepository, CompanyRepository>();
+        services.AddSingleton<IAccountTypeRepository, AccountTypeRepository>();
+        services.AddSingleton<IAccountTypeService, AccountTypeService>();
+        services.AddSingleton<IAccountService, AccountService>();
+        services.AddSingleton<IAccountCurrencyService, AccountCurrencyService>();
+        services.AddSingleton<IExchangeRepository, ExchangeRepository>();
+        services.AddSingleton<IExchangeService, ExchangeService>();
+        services.AddSingleton<ILoanRepository, LoanRepository>();
+        services.AddSingleton<ILoanTypeRepository, LoanTypeRepository>();
+        services.AddSingleton<IInstallmentRepository, InstallmentRepository>();
+        services.AddSingleton<ITransactionCodeRepository, TransactionCodeRepository>();
+        services.AddSingleton<ITransactionCodeService, TransactionCodeService>();
+        services.AddSingleton<ITransactionTemplateRepository, TransactionTemplateRepository>();
+        services.AddSingleton<ITransactionTemplateService, TransactionTemplateService>();
+        services.AddSingleton<ITransactionRepository, TransactionRepository>();
+        services.AddSingleton<ITransactionService, TransactionService>();
+        services.AddSingleton<ILoanService, LoanService>();
+        services.AddSingleton<IInstallmentService, InstallmentService>();
+        services.AddSingleton<ILoanTypeService, LoanTypeService>();
+        services.AddSingleton<IDataService, DataService>();
+        services.AddSingleton<Lazy<IDataService>>(provider => new Lazy<IDataService>(provider.GetRequiredService<IDataService>));
+        services.AddSingleton<Lazy<ITransactionService>>(provider => new Lazy<ITransactionService>(provider.GetRequiredService<ITransactionService>));
+        services.AddSingleton<Lazy<TransactionBackgroundService>>(provider => new Lazy<TransactionBackgroundService>(provider.GetRequiredService<TransactionBackgroundService>));
 
         return services;
     }
@@ -106,22 +108,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<TransactionBackgroundService>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddDatabase(this IServiceCollection services)
-    {
-        services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
-        services.AddDbContextFactory<ApplicationContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()));
+        services.AddSingleton<DatabaseBackgroundService>();
+        services.AddSingleton<CurrencyExchangeBackgroundService>();
 
         return services;
     }
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
-        services.AddSingleton<DatabaseHostedService>();
-        services.AddSingleton<ExchangeHostedService>();
         services.AddSingleton<LoanHostedService>();
 
         services.AddHostedService<ApplicationHostedService>();
@@ -220,7 +214,7 @@ public static class ServiceCollectionExtensions
         // services.AddOpenApiExample(Example.User.Response);
         // services.AddOpenApiExample(Example.User.SimpleResponse);
         // services.AddOpenApiExample(Example.User.LoginResponse);
-        
+
         return services;
     }
 }

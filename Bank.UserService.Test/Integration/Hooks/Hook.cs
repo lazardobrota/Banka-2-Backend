@@ -1,8 +1,9 @@
 using Bank.Application.Extensions;
+using Bank.Database;
 using Bank.Permissions;
 using Bank.UserService.Application;
 using Bank.UserService.BackgroundServices;
-using Bank.UserService.HostedServices;
+using Bank.UserService.Database;
 
 using DotNetEnv;
 
@@ -35,17 +36,19 @@ public class Hooks
         services.AddServices();
         services.AddBackgroundServices();
         services.AddHttpServices();
-        services.AddDatabase();
+        services.AddDatabaseServices<ApplicationContext>();
         services.AddHostedServices();
         services.AddOpenApiExamples();
 
         var serviceProvider = services.BuildServiceProvider();
 
-        serviceProvider.GetRequiredService<DatabaseHostedService>()
-                       .OnApplicationStarted();
+        serviceProvider.GetRequiredService<DatabaseBackgroundService>()
+                       .OnApplicationStarted(CancellationToken.None)
+                       .Wait();
 
         serviceProvider.GetRequiredService<TransactionBackgroundService>()
-                       .OnApplicationStarted();
+                       .OnApplicationStarted()
+                       .Wait();
 
         return services;
     }

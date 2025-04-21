@@ -2,9 +2,12 @@
 
 using Bank.Application.Domain;
 using Bank.Application.Queries;
-using Bank.UserService.BackgroundServices;
+using Bank.Database.Core;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
+using Bank.UserService.Services;
+
+using EFCore.BulkExtensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -19,13 +22,17 @@ public interface IAccountRepository
 
     Task<Account?> FindById(Guid id);
 
-    Task<bool> Exists(Guid id);
-
     Task<Account?> FindByNumber(string number);
 
     Task<Account> Add(Account account);
 
+    Task<bool> AddRange(IEnumerable<Account> accounts);
+
     Task<Account> Update(Account account);
+
+    Task<bool> Exists(Guid id);
+
+    Task<bool> IsEmpty();
 
     Task<bool> DecreaseBalance(Guid accountId, Guid bankCurrencyId, decimal accountAmount, decimal bankAccountAmount);
 
@@ -48,14 +55,12 @@ public interface IAccountRepository
     Task<bool> DecreaseBalances(Guid accountId, Guid bankCurrencyId, decimal amount, ApplicationContext context);
 }
 
-public class AccountRepository(IDbContextFactory<ApplicationContext> contextFactory, ApplicationContext context, TransactionBackgroundService transactionBackgroundService)
-: IAccountRepository
+public class AccountRepository(IDatabaseContextFactory<ApplicationContext> contextFactory, Lazy<IDataService> dataServiceLazy) : IAccountRepository
 {
-    private readonly ApplicationContext                    m_Context                      = context;
-    private readonly IDbContextFactory<ApplicationContext> m_ContextFactory               = contextFactory;
-    private readonly TransactionBackgroundService          m_TransactionBackgroundService = transactionBackgroundService;
+    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory  = contextFactory;
+    private readonly Lazy<IDataService>                          m_DataServiceLazy = dataServiceLazy;
 
-    private Task<ApplicationContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
+    private IDataService Data => m_DataServiceLazy.Value;
 
     private static DateTime Midnight => DateTime.UtcNow.Date;
 
@@ -65,8 +70,10 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<Page<Account>> FindAll(AccountFilterQuery accountFilterQuery, Pageable pageable)
     {
-        var accountQuery = m_Context.Accounts.IncludeAll()
-                                    .AsQueryable();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var accountQuery = context.Accounts.IncludeAll()
+                                  .AsQueryable();
 
         if (!string.IsNullOrEmpty(accountFilterQuery.ClientEmail))
             accountQuery = accountQuery.Where(account => account.Client != null && EF.Functions.ILike(account.Client.Email, $"%{accountFilterQuery.ClientEmail}%"));
@@ -103,23 +110,22 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<Page<Account>> FindAllByClientId(Guid clientId, Pageable pageable)
     {
-        var accounts = await m_Context.Accounts.IncludeAll()
-                                      .Where(account => account.ClientId == clientId)
-                                      .Skip((pageable.Page - 1) * pageable.Size)
-                                      .Take(pageable.Size)
-                                      .ToListAsync();
+        await using var context = await m_ContextFactory.CreateContext;
 
-        var totalElements = await m_Context.Accounts.CountAsync();
+        var accounts = await context.Accounts.IncludeAll()
+                                    .Where(account => account.ClientId == clientId)
+                                    .Skip((pageable.Page - 1) * pageable.Size)
+                                    .Take(pageable.Size)
+                                    .ToListAsync();
+
+        var totalElements = await context.Accounts.CountAsync();
 
         return new Page<Account>(accounts, pageable.Page, pageable.Size, totalElements);
     }
 
     public async Task<Account?> FindById(Guid id)
     {
-        await using var context = await CreateContext;
-
-        Console.WriteLine($"FindById | {DateTime.Now:hh:mm:ss.fff}");
-        await Task.Delay(100);
+        await using var context = await m_ContextFactory.CreateContext;
 
         return await context.Accounts.IncludeAll()
                             .FirstOrDefaultAsync(a => a.Id == id);
@@ -127,12 +133,21 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<bool> Exists(Guid id)
     {
-        return await m_Context.Accounts.AnyAsync(account => account.Id == id);
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.Accounts.AnyAsync(account => account.Id == id);
+    }
+
+    public async Task<bool> IsEmpty()
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.Accounts.AnyAsync() is not true;
     }
 
     public async Task<Account?> FindByNumber(string number)
     {
-        await using var context = await CreateContext;
+        await using var context = await m_ContextFactory.CreateContext;
 
         return await context.Accounts.IncludeAll()
                             .FirstOrDefaultAsync(a => a.Number == number);
@@ -140,63 +155,76 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<Account> Add(Account account)
     {
-        var addedAccount = await m_Context.Accounts.AddAsync(account);
+        await using var context = await m_ContextFactory.CreateContext;
 
-        await m_Context.SaveChangesAsync();
+        var addedAccount = await context.Accounts.AddAsync(account);
+
+        await context.SaveChangesAsync();
 
         return addedAccount.Entity;
     }
 
+    public async Task<bool> AddRange(IEnumerable<Account> accounts)
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        await context.BulkInsertAsync(accounts, config => config.BatchSize = 2000);
+
+        return true;
+    }
+
     public async Task<Account> Update(Account account)
     {
-        await m_Context.Accounts.Where(dbAccount => dbAccount.Id == account.Id)
-                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbAccount => dbAccount.Status, account.Status)
-                                                             .SetProperty(dbAccount => dbAccount.Name,         account.Name)
-                                                             .SetProperty(dbAccount => dbAccount.DailyLimit,   account.DailyLimit)
-                                                             .SetProperty(dbAccount => dbAccount.MonthlyLimit, account.MonthlyLimit)
-                                                             .SetProperty(dbAccount => dbAccount.ModifiedAt,   account.ModifiedAt));
+        await using var context = await m_ContextFactory.CreateContext;
+
+        await context.Accounts.Where(dbAccount => dbAccount.Id == account.Id)
+                     .ExecuteUpdateAsync(setters => setters.SetProperty(dbAccount => dbAccount.Status, account.Status)
+                                                           .SetProperty(dbAccount => dbAccount.Name,         account.Name)
+                                                           .SetProperty(dbAccount => dbAccount.DailyLimit,   account.DailyLimit)
+                                                           .SetProperty(dbAccount => dbAccount.MonthlyLimit, account.MonthlyLimit)
+                                                           .SetProperty(dbAccount => dbAccount.ModifiedAt,   account.ModifiedAt));
 
         return account;
     }
 
     public async Task<bool> DecreaseBalance(Guid accountId, Guid bankCurrencyId, decimal accountAmount, decimal bankAccountAmount)
     {
-        await using var context = await CreateContext;
+        await using var context = await m_ContextFactory.CreateContext;
 
         return await DecreaseBalance(accountId, bankCurrencyId, accountAmount, bankAccountAmount, context);
     }
 
     public async Task<bool> DecreaseAvailableBalance(Guid accountId, Guid bankCurrencyId, decimal accountAmount, decimal bankAccountAmount)
     {
-        await using var context = await CreateContext;
+        await using var context = await m_ContextFactory.CreateContext;
 
         return await DecreaseAvailableBalance(accountId, bankCurrencyId, accountAmount, bankAccountAmount, context);
     }
 
     public async Task<bool> DecreaseAvailableBalanceWithoutLimitCheck(Guid accountId, Guid bankCurrencyId, decimal accountAmount, decimal bankAccountAmount)
     {
-        await using var context = await CreateContext;
+        await using var context = await m_ContextFactory.CreateContext;
 
         return await DecreaseAvailableBalanceWithoutLimitCheck(accountId, bankCurrencyId, accountAmount, bankAccountAmount, context);
     }
 
     public async Task<bool> IncreaseBalances(Guid accountId, Guid bankCurrencyId, decimal amount)
     {
-        await using var context = await CreateContext;
+        await using var context = await m_ContextFactory.CreateContext;
 
         return await IncreaseBalances(accountId, bankCurrencyId, amount, context);
     }
 
     public async Task<bool> DecreaseBalances(Guid accountId, Guid bankCurrencyId, decimal amount)
     {
-        await using var context = await CreateContext;
+        await using var context = await m_ContextFactory.CreateContext;
 
         return await DecreaseBalances(accountId, bankCurrencyId, amount, context);
     }
 
     public async Task<bool> DecreaseBalance(Guid accountId, Guid bankCurrencyId, decimal accountAmount, decimal bankAccountAmount, ApplicationContext context)
     {
-        m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
+        Data.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
                                            .ExecuteUpdateAsync(setters => setters.SetProperty(account => account.Balance,
@@ -215,7 +243,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<bool> DecreaseAvailableBalance(Guid accountId, Guid bankCurrencyId, decimal accountAmount, decimal bankAccountAmount, ApplicationContext context)
     {
-        m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
+        Data.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
                                            .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
@@ -278,7 +306,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
     public async Task<bool> DecreaseAvailableBalanceWithoutLimitCheck(Guid               accountId, Guid bankCurrencyId, decimal accountAmount, decimal bankAccountAmount,
                                                                       ApplicationContext context)
     {
-        m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
+        Data.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
                                            .Where(account => account.AvailableBalance - (account.Id == accountId ? accountAmount : bankAccountAmount) >= 0)
@@ -296,7 +324,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<bool> DecreaseBalances(Guid accountId, Guid bankCurrencyId, decimal amount, ApplicationContext context)
     {
-        m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
+        Data.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
                                            .ExecuteUpdateAsync(setters => setters.SetProperty(account => account.Balance, account => account.Balance                   - amount)
@@ -312,7 +340,7 @@ public class AccountRepository(IDbContextFactory<ApplicationContext> contextFact
 
     public async Task<bool> IncreaseBalances(Guid accountId, Guid bankCurrencyId, decimal amount, ApplicationContext context)
     {
-        m_TransactionBackgroundService.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
+        Data.BankAccount.TryFindAccount(bankCurrencyId, out var bankAccountId);
 
         var updatedAccounts = await context.Accounts.Where(account => account.Id == accountId || account.Id == bankAccountId)
                                            .ExecuteUpdateAsync(setters => setters.SetProperty(account => account.Balance, account => account.Balance                   + amount)

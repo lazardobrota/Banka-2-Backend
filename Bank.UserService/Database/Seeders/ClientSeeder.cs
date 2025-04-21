@@ -1,6 +1,6 @@
-﻿using Bank.Application.Domain;
-using Bank.Application.Utilities;
-using Bank.UserService.Mappers;
+﻿using System.Collections.Immutable;
+
+using Bank.Application.Domain;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Database.Seeders;
@@ -242,30 +242,10 @@ public static partial class Seeder
                                                           Activated                  = true,
                                                           Permissions                = new Permissions(Permission.Client)
                                                       };
-    }
-}
 
-public static class ClientSeederExtension
-{
-    public static async Task SeedClient(this ApplicationContext context)
-    {
-        if (context.Users.Any(user => user.Role == Role.Client))
-            return;
-
-        ClientModel[] clients =
+        public static readonly ImmutableArray<ClientModel> All =
         [
-            Seeder.Client.Bank, Seeder.Client.Client01, Seeder.Client.Client02, Seeder.Client.Client03, Seeder.Client.Client04, Seeder.Client.Client05,
-            Seeder.Client.Client06, Seeder.Client.Client07, Seeder.Client.Client08, Seeder.Client.Client09, Seeder.Client.Client10
+            Bank, Client01, Client02, Client03, Client04, Client05, Client06, Client07, Client08, Client09, Client10
         ];
-
-        await context.Users.AddRangeAsync(clients.Select(client =>
-                                                         {
-                                                             client.Password = HashingUtilities.HashPassword(client.Password!, client.Salt);
-                                                             return client;
-                                                         })
-                                                 .Select(client => client.ToUser())
-                                                 .ToList());
-
-        await context.SaveChangesAsync();
     }
 }

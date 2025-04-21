@@ -17,13 +17,13 @@ public static partial class Example
                                                                  };
 
         public static readonly CardUpdateStatusRequest UpdateStatusRequest = new()
-                                                                            {
-                                                                                Status = false
-                                                                            };
+                                                                             {
+                                                                                 Status = false
+                                                                             };
 
         public static readonly CardUpdateLimitRequest UpdateLimitRequest = new()
-                                                                            {
-                                                                                Limit = 10000.00m
-                                                                            };
+                                                                           {
+                                                                               Limit = 10000.00m
+                                                                           };
     }
 }

@@ -1,8 +1,11 @@
 ﻿using System.Linq.Expressions;
 
 using Bank.Application.Domain;
+using Bank.Database.Core;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
+
+using EFCore.BulkExtensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -14,15 +17,23 @@ public interface ITransactionCodeRepository
     Task<Page<TransactionCode>> FindAll(Pageable pageable);
 
     Task<TransactionCode?> FindById(Guid id);
+
+    Task<bool> AddRange(IEnumerable<TransactionCode> transactionCodes);
+
+    Task<bool> Exists(Guid id);
+
+    Task<bool> IsEmpty();
 }
 
-public class TransactionCodeRepository(ApplicationContext context) : ITransactionCodeRepository
+public class TransactionCodeRepository(IDatabaseContextFactory<ApplicationContext> contextFactory) : ITransactionCodeRepository
 {
-    private readonly ApplicationContext m_Context = context;
+    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
     public async Task<Page<TransactionCode>> FindAll(Pageable pageable)
     {
-        var transactionCodeQuery = m_Context.TransactionCodes.AsQueryable();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var transactionCodeQuery = context.TransactionCodes.AsQueryable();
 
         var transactionCodes = await transactionCodeQuery.Skip((pageable.Page - 1) * pageable.Size)
                                                          .Take(pageable.Size)
@@ -35,7 +46,32 @@ public class TransactionCodeRepository(ApplicationContext context) : ITransactio
 
     public async Task<TransactionCode?> FindById(Guid id)
     {
-        return await m_Context.TransactionCodes.FirstOrDefaultAsync(transactionCode => transactionCode.Id == id);
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.TransactionCodes.FirstOrDefaultAsync(transactionCode => transactionCode.Id == id);
+    }
+
+    public async Task<bool> AddRange(IEnumerable<TransactionCode> transactionCodes)
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        await context.BulkInsertAsync(transactionCodes, config => config.BatchSize = 2000);
+
+        return true;
+    }
+
+    public async Task<bool> Exists(Guid id)
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.TransactionCodes.AnyAsync(transactionCode => transactionCode.Id == id);
+    }
+
+    public async Task<bool> IsEmpty()
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.TransactionCodes.AnyAsync() is not true;
     }
 }
 
