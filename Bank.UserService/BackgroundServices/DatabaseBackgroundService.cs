@@ -132,6 +132,8 @@ public class DatabaseBackgroundService(
                            m_TransactionRepository.AddRange(transactions.upToDate ? [] : transactions.values));
         
         // @formatter:on
+
+        await m_DataService.Instantiate();
     }
 
     public Task OnApplicationStopped(CancellationToken _) => Task.CompletedTask;

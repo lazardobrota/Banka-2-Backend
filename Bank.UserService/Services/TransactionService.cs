@@ -23,7 +23,9 @@ public interface ITransactionService
 
     Task<Result<TransactionResponse>> GetOne(Guid id);
 
-    Task<Result<TransactionCreateResponse>> Create(TransactionCreateRequest transactionCreateRequest);
+    // Task<Result<TransactionResponse>> Create(TransactionCreateRequest transactionCreateRequest);
+    
+    Task<Result<Transaction>> Create(TransactionCreateRequest transactionCreateRequest);
 
     Task<Result<TransactionResponse>> Update(TransactionUpdateRequest transactionUpdateRequest, Guid id);
 
@@ -93,7 +95,8 @@ public class TransactionService(
         return Result.Ok(new Page<TransactionResponse>(transactionResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
-    public async Task<Result<TransactionCreateResponse>> Create(TransactionCreateRequest transactionCreateRequest)
+    // public async Task<Result<TransactionResponse>> Create(TransactionCreateRequest transactionCreateRequest)
+    public async Task<Result<Transaction>> Create(TransactionCreateRequest transactionCreateRequest)
     {
         var transaction = await CreateTransaction(new TempyTransaction
                                                   {
@@ -108,9 +111,11 @@ public class TransactionService(
                                                   });
 
         if (transaction.Value == null)
-            return Result.BadRequest<TransactionCreateResponse>("Not going thru.");
+            return Result.BadRequest<Transaction>("Not going thru.");
+            // return Result.BadRequest<TransactionResponse>("Not going thru.");
 
-        return Result.Ok(transaction.Value.ToCreateResponse());
+        // return Result.Ok(transaction.Value.ToResponse());
+        return Result.Ok(transaction.Value);
     }
 
     public async Task<Result<TransactionResponse>> Update(TransactionUpdateRequest request, Guid id)
@@ -283,7 +288,7 @@ public class TransactionService(
 
     private async Task<bool> ProcessDepositTransaction(ProcessTransaction processTransaction)
     {
-        await using var databaseContext     = await m_ContextFactory.CreateContext;
+        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
 
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
@@ -324,7 +329,7 @@ public class TransactionService(
 
     private async Task<bool> ProcessWithdrawTransaction(ProcessTransaction processTransaction)
     {
-        await using var databaseContext     = await m_ContextFactory.CreateContext;
+        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
 
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
@@ -366,9 +371,6 @@ public class TransactionService(
 
     private async Task<bool> ProcessTransaction(ProcessTransaction processTransaction)
     {
-        await using var databaseContext     = await m_ContextFactory.CreateContext;
-        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
-
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
         var fromAccountTask = m_AccountRepository.FindById(processTransaction.FromAccountId);
         var toAccountTask   = m_AccountRepository.FindById(processTransaction.ToAccountId);
@@ -391,6 +393,9 @@ public class TransactionService(
 
         fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var fromAccountId);
 
+        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
+        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
+        
         var transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
                                                                           processTransaction.FromBankAmount, databaseContext);
 

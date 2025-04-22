@@ -6,7 +6,8 @@ namespace Bank.Database.Core;
 
 public interface IDatabaseContextFactory<TDatabaseContext> where TDatabaseContext : DatabaseContext
 {
-    Task<TDatabaseContext> CreateContext { get; }
+    Task<TDatabaseContext> CreateContext            { get; }
+    Task<TDatabaseContext> CreateDistributedContext { get; }
 }
 
 #region Ado.NET Pooling
@@ -16,7 +17,8 @@ internal abstract class AbstractDefaultContextFactory<TDatabaseContext>(IDefault
 {
     internal readonly IDefaultContextPool ContextPool = contextPool;
 
-    public abstract Task<TDatabaseContext> CreateContext { get; }
+    public abstract Task<TDatabaseContext> CreateContext            { get; }
+    public abstract Task<TDatabaseContext> CreateDistributedContext { get; }
 }
 
 internal class PostgresDefaultContextFactory<TDatabaseContext>(IDefaultContextPool contextPool, IDbContextFactory<TDatabaseContext> contextFactory)
@@ -24,16 +26,37 @@ internal class PostgresDefaultContextFactory<TDatabaseContext>(IDefaultContextPo
 {
     private readonly IDbContextFactory<TDatabaseContext> m_ContextFactory = contextFactory;
 
-    public override Task<TDatabaseContext> CreateContext => GetOrCreateContext();
+    private readonly SemaphoreSlim m_SemaphoreDefault     = new(contextPool.MaxConnections);
+    private readonly SemaphoreSlim m_SemaphoreDistributed = new(contextPool.MaxConnections / 5);
+
+    public override Task<TDatabaseContext> CreateContext            => GetOrCreateContext();
+    public override Task<TDatabaseContext> CreateDistributedContext => GetOrCreateDistributedContext();
 
     [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
     private async Task<TDatabaseContext> GetOrCreateContext()
     {
-        await ContextPool.Semaphore.WaitAsync();
+        await m_SemaphoreDefault.WaitAsync();
 
         var context = await m_ContextFactory.CreateDbContextAsync();
 
-        context.DisposeAfterAction = () => ContextPool.Semaphore.Release();
+        context.DisposeAfterAction = () => m_SemaphoreDefault.Release();
+
+        return context;
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
+    private async Task<TDatabaseContext> GetOrCreateDistributedContext()
+    {
+        await m_SemaphoreDistributed.WaitAsync();
+        await m_SemaphoreDefault.WaitAsync();
+        
+        var context = await m_ContextFactory.CreateDbContextAsync();
+
+        context.DisposeAfterAction = () =>
+                                     {
+                                         m_SemaphoreDefault.Release();
+                                         m_SemaphoreDistributed.Release();
+                                     };
 
         return context;
     }
@@ -54,7 +77,8 @@ internal abstract class AbstractContextFactory<TDatabaseContext> : IDatabaseCont
                    .Wait();
     }
 
-    public abstract Task<TDatabaseContext> CreateContext { get; }
+    public abstract Task<TDatabaseContext> CreateContext            { get; }
+    public abstract Task<TDatabaseContext> CreateDistributedContext { get; }
 }
 
 [Obsolete("Manual Connection Pooling", true)]
@@ -63,7 +87,8 @@ internal class PostgresDatabaseContextFactory<TDatabaseContext>(IDatabaseContext
 {
     private readonly IDbContextFactory<TDatabaseContext> m_ContextFactory = contextFactory;
 
-    public override Task<TDatabaseContext> CreateContext => GetOrCreateContext();
+    public override Task<TDatabaseContext> CreateContext            => GetOrCreateContext();
+    public override Task<TDatabaseContext> CreateDistributedContext { get; } = null!;
 
     [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
     private async Task<TDatabaseContext> GetOrCreateContext()
