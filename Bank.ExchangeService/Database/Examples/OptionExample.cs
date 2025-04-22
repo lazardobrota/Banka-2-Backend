@@ -1,26 +1,8 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Responses;
+using Bank.ExchangeService.Database.Seeders;
 
 namespace Bank.ExchangeService.Database.Examples;
-
-file static class Values
-{
-    public static readonly Guid       Id                           = Guid.Parse("102d461a-022a-4d45-9f96-3f6dc267fcfb");
-    public const           decimal    StrikePrice                  = 150.0m;
-    public const           decimal    ImpliedVolatility            = 0.25m;
-    public static readonly DateOnly   SettlementDate               = DateOnly.FromDateTime(DateTime.UtcNow);
-    public const           string     Name                         = "AAPL Jun 2024 190 Call";
-    public const           string     Ticker                       = "AAPL240615C00190000";
-    public static readonly OptionType OptionType                   = OptionType.Call;
-    public const           decimal    HighPrice                    = 12.75m;
-    public const           decimal    LowPrice                     = 10.10m;
-    public const           long       Volume                       = 45000;
-    public const           decimal    PriceChange                  = 0.85m;
-    public const           decimal    PriceChangeInInterval        = 1.25m;
-    public const           decimal    PriceChangePercentInInterval = 0.084m;
-    public const           decimal    AskPrice                     = 12.50m;
-    public const           decimal    BidPrice                     = 12.25m;
-}
 
 public static partial class Example
 {
@@ -28,20 +10,20 @@ public static partial class Example
     {
         public static readonly OptionResponse Response = new()
                                                          {
-                                                             Id                           = Values.Id,
-                                                             StrikePrice                  = Values.StrikePrice,
-                                                             ImpliedVolatility            = Values.ImpliedVolatility,
-                                                             SettlementDate               = Values.SettlementDate,
-                                                             Name                         = Values.Name,
-                                                             Ticker                       = Values.Ticker,
-                                                             OptionType                   = Values.OptionType,
-                                                             HighPrice                    = Values.HighPrice,
-                                                             LowPrice                     = Values.LowPrice,
-                                                             Volume                       = Values.Volume,
-                                                             PriceChangeInInterval        = Values.PriceChangeInInterval,
-                                                             PriceChangePercentInInterval = Values.PriceChangePercentInInterval,
-                                                             AskPrice                     = Values.AskPrice,
-                                                             BidPrice                     = Values.BidPrice,
+                                                             Id                           = Seeder.Option.MicrosoftCallOption.Id,
+                                                             StrikePrice                  = Seeder.Option.MicrosoftCallOption.StrikePrice,
+                                                             ImpliedVolatility            = 0m,
+                                                             SettlementDate               = Seeder.Option.MicrosoftCallOption.SettlementDate,
+                                                             Name                         = Seeder.Option.MicrosoftCallOption.Name,
+                                                             Ticker                       = Seeder.Option.MicrosoftCallOption.Ticker,
+                                                             OptionType                   = (OptionType)Seeder.Option.MicrosoftCallOption.OptionType!,
+                                                             HighPrice                    = Seeder.Option.MicrosoftCallOption.HighPrice,
+                                                             LowPrice                     = Seeder.Option.MicrosoftCallOption.LowPrice,
+                                                             Volume                       = Seeder.Option.MicrosoftCallOption.Volume,
+                                                             PriceChangeInInterval        = Seeder.Option.MicrosoftCallOption.PriceChange,
+                                                             PriceChangePercentInInterval = Seeder.Option.MicrosoftCallOption.PriceChangePercent,
+                                                             AskPrice                     = Seeder.Option.MicrosoftCallOption.AskPrice,
+                                                             BidPrice                     = Seeder.Option.MicrosoftCallOption.BidPrice,
                                                              CreatedAt                    = DateTime.UtcNow,
                                                              ModifiedAt                   = DateTime.UtcNow,
                                                              StockExchange                = null!,
@@ -50,41 +32,41 @@ public static partial class Example
 
         public static readonly OptionSimpleResponse SimpleResponse = new()
                                                                      {
-                                                                         Id                           = Values.Id,
-                                                                         StrikePrice                  = Values.StrikePrice,
-                                                                         ImpliedVolatility            = Values.ImpliedVolatility,
-                                                                         SettlementDate               = Values.SettlementDate,
-                                                                         Name                         = Values.Name,
-                                                                         Ticker                       = Values.Ticker,
-                                                                         OptionType                   = Values.OptionType,
-                                                                         HighPrice                    = Values.HighPrice,
-                                                                         LowPrice                     = Values.LowPrice,
-                                                                         Volume                       = Values.Volume,
-                                                                         PriceChange                  = Values.PriceChange,
-                                                                         PriceChangeInInterval        = Values.PriceChangeInInterval,
-                                                                         PriceChangePercentInInterval = Values.PriceChangePercentInInterval,
-                                                                         AskPrice                     = Values.AskPrice,
-                                                                         BidPrice                     = Values.BidPrice,
+                                                                         Id                           = Seeder.Option.MicrosoftCallOption.Id,
+                                                                         StrikePrice                  = Seeder.Option.MicrosoftCallOption.StrikePrice,
+                                                                         ImpliedVolatility            = 0m,
+                                                                         SettlementDate               = Seeder.Option.MicrosoftCallOption.SettlementDate,
+                                                                         Name                         = Seeder.Option.MicrosoftCallOption.Name,
+                                                                         Ticker                       = Seeder.Option.MicrosoftCallOption.Ticker,
+                                                                         OptionType                   = (OptionType)Seeder.Option.MicrosoftCallOption.OptionType,
+                                                                         HighPrice                    = Seeder.Option.MicrosoftCallOption.HighPrice,
+                                                                         LowPrice                     = Seeder.Option.MicrosoftCallOption.LowPrice,
+                                                                         Volume                       = Seeder.Option.MicrosoftCallOption.Volume,
+                                                                         PriceChange                  = Seeder.Option.MicrosoftCallOption.PriceChange,
+                                                                         PriceChangeInInterval        = Seeder.Option.MicrosoftCallOption.PriceChange,
+                                                                         PriceChangePercentInInterval = Seeder.Option.MicrosoftCallOption.PriceChangePercent,
+                                                                         AskPrice                     = Seeder.Option.MicrosoftCallOption.AskPrice,
+                                                                         BidPrice                     = Seeder.Option.MicrosoftCallOption.BidPrice,
                                                                          CreatedAt                    = DateTime.UtcNow,
                                                                          ModifiedAt                   = DateTime.UtcNow
                                                                      };
 
         public static readonly OptionDailyResponse DailyResponse = new()
                                                                    {
-                                                                       Id                           = Values.Id,
-                                                                       StrikePrice                  = Values.StrikePrice,
-                                                                       ImpliedVolatility            = Values.ImpliedVolatility,
-                                                                       SettlementDate               = Values.SettlementDate,
-                                                                       Name                         = Values.Name,
-                                                                       Ticker                       = Values.Ticker,
-                                                                       OptionType                   = Values.OptionType,
-                                                                       HighPrice                    = Values.HighPrice,
-                                                                       LowPrice                     = Values.LowPrice,
-                                                                       OpeningPrice                 = 11.20m,
-                                                                       ClosePrice                   = 12.30m,
-                                                                       Volume                       = Values.Volume,
-                                                                       PriceChangeInInterval        = Values.PriceChangeInInterval,
-                                                                       PriceChangePercentInInterval = Values.PriceChangePercentInInterval,
+                                                                       Id                           = Seeder.Option.MicrosoftCallOption.Id,
+                                                                       StrikePrice                  = Seeder.Option.MicrosoftCallOption.StrikePrice,
+                                                                       ImpliedVolatility            = 0m,
+                                                                       SettlementDate               = Seeder.Option.MicrosoftCallOption.SettlementDate,
+                                                                       Name                         = Seeder.Option.MicrosoftCallOption.Name,
+                                                                       Ticker                       = Seeder.Option.MicrosoftCallOption.Ticker,
+                                                                       OptionType                   = (OptionType)Seeder.Option.MicrosoftCallOption.OptionType,
+                                                                       HighPrice                    = Seeder.Option.MicrosoftCallOption.HighPrice,
+                                                                       LowPrice                     = Seeder.Option.MicrosoftCallOption.LowPrice,
+                                                                       OpeningPrice                 = Seeder.Option.MicrosoftCallOption.OpeningPrice,
+                                                                       ClosePrice                   = Seeder.Option.MicrosoftCallOption.ClosePrice,
+                                                                       Volume                       = Seeder.Option.MicrosoftCallOption.Volume,
+                                                                       PriceChangeInInterval        = Seeder.Option.MicrosoftCallOption.PriceChange,
+                                                                       PriceChangePercentInInterval = Seeder.Option.MicrosoftCallOption.PriceChangePercent,
                                                                        CreatedAt                    = DateTime.UtcNow,
                                                                        ModifiedAt                   = DateTime.UtcNow,
                                                                        StockExchange                = null!,

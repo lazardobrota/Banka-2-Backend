@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Responses;
+using Bank.ExchangeService.Database.Seeders;
 
 namespace Bank.ExchangeService.Database.Examples;
 
@@ -18,7 +19,7 @@ public static partial class Example
 
         public static readonly StockExchangeResponse Response = new()
                                                                 {
-                                                                    Id         = Guid.Parse("fcd8af81-e51a-43f0-b251-c4e4e1ac6d3d"),
+                                                                    Id         = Seeder.StockExchange.Nasdaq.Id,
                                                                     Name       = CreateRequest.Name,
                                                                     Acronym    = CreateRequest.Acronym,
                                                                     MIC        = CreateRequest.MIC,
