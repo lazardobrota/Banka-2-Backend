@@ -23,8 +23,6 @@ public interface ITransactionService
 
     Task<Result<TransactionResponse>> GetOne(Guid id);
 
-    // Task<Result<TransactionResponse>> Create(TransactionCreateRequest transactionCreateRequest);
-    
     Task<Result<Transaction>> Create(TransactionCreateRequest transactionCreateRequest);
 
     Task<Result<TransactionResponse>> Update(TransactionUpdateRequest transactionUpdateRequest, Guid id);
@@ -95,7 +93,6 @@ public class TransactionService(
         return Result.Ok(new Page<TransactionResponse>(transactionResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
-    // public async Task<Result<TransactionResponse>> Create(TransactionCreateRequest transactionCreateRequest)
     public async Task<Result<Transaction>> Create(TransactionCreateRequest transactionCreateRequest)
     {
         var transaction = await CreateTransaction(new TempyTransaction
@@ -112,9 +109,7 @@ public class TransactionService(
 
         if (transaction.Value == null)
             return Result.BadRequest<Transaction>("Not going thru.");
-            // return Result.BadRequest<TransactionResponse>("Not going thru.");
 
-        // return Result.Ok(transaction.Value.ToResponse());
         return Result.Ok(transaction.Value);
     }
 
@@ -135,10 +130,16 @@ public class TransactionService(
         if (tempyTransaction.FromAccountNumber == null && tempyTransaction.ToAccountNumber == null)
             return Result.BadRequest<Transaction>("No valid account provided.");
 
-        var fromAccount     = await m_AccountRepository.FindByNumber(tempyTransaction.FromAccountNumber?.Substring(7, 9) ?? "");
-        var toAccount       = await m_AccountRepository.FindByNumber(tempyTransaction.ToAccountNumber?.Substring(7, 9)   ?? "");
-        var exchangeDetails = await m_ExchangeService.CalculateExchangeDetails(tempyTransaction.FromCurrencyId, tempyTransaction.ToCurrencyId);
-
+        var fromAccountTask     = m_AccountRepository.FindByNumber(tempyTransaction.FromAccountNumber?.Substring(7, 9) ?? "");
+        var toAccountTask       = m_AccountRepository.FindByNumber(tempyTransaction.ToAccountNumber?.Substring(7, 9)   ?? "");
+        var exchangeDetailsTask = m_ExchangeService.CalculateExchangeDetails(tempyTransaction.FromCurrencyId, tempyTransaction.ToCurrencyId);
+        
+        await Task.WhenAll(fromAccountTask, toAccountTask, exchangeDetailsTask);
+        
+        var fromAccount     = await fromAccountTask;
+        var toAccount       = await toAccountTask;
+        var exchangeDetails = await exchangeDetailsTask;
+        
         var bankCodeFrom = tempyTransaction.FromAccountNumber?[..3];
         var bankCodeTo   = tempyTransaction.ToAccountNumber?[..3];
 
@@ -234,7 +235,7 @@ public class TransactionService(
             return Result.BadRequest<Transaction>("Some error");
 
         var transaction = internalTransaction.ToTransaction();
-
+        
         await m_TransactionRepository.Add(transaction);
 
         internalTransaction.FromAccount.TryFindAccount(internalTransaction.FromCurrencyId, out var accountId);
@@ -253,6 +254,12 @@ public class TransactionService(
         var processTransaction = internalTransaction.ToProcessTransaction(transaction.Id);
 
         TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
+
+        // transaction.FromAccount = ;
+        // transaction.FromCurrency = ;
+        // transaction.ToAccount = ;
+        // transaction.ToCurrency = ;
+        // transaction.Code = ;
 
         return Result.Ok(transaction);
     }
@@ -395,7 +402,7 @@ public class TransactionService(
 
         await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
-        
+
         var transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
                                                                           processTransaction.FromBankAmount, databaseContext);
 
