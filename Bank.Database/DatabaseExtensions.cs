@@ -10,7 +10,7 @@ public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabaseServices<TDatabaseContext>(this IServiceCollection services) where TDatabaseContext : DatabaseContext
     {
-        services.AddSingleton<IDefaultContextPool, PostgresDefaultContextPool>();
+        services.AddSingleton<IDatabasePoolInfo, PostgresDatabasePoolInfo>();
         services.AddSingleton<IDatabaseContextFactory<TDatabaseContext>, PostgresDefaultContextFactory<TDatabaseContext>>();
 
         services.AddDbContextFactory<TDatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString(),
