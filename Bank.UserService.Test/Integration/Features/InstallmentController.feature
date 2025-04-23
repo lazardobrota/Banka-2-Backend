@@ -12,7 +12,7 @@
         When installment is updated with request in the database
         Then installment details in request should match the updated installment
 
-    Scenario: Get All Installments for Loan
+    Scenario: Get All Installments for Loan grouped by account
         Given loan Id for installments
         When all installments are fetched for the account
         Then all installments should be returned for the account
