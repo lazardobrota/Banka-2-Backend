@@ -1,5 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Net.Http.Json;
+using System.Web;
 
 using Bank.Application.Domain;
 using Bank.Application.Endpoints;
@@ -66,8 +67,10 @@ internal partial class UserServiceHttpClient
     {
         using var httpClient = m_HttpClientFactory.CreateClient(Configuration.Client.Name.UserService);
 
-        var domain  = Endpoints.User.Activate;
-        var query   = new NameValueCollection() { { nameof(token), token } };
+        var domain = Endpoints.User.Activate;
+        var query  = HttpUtility.ParseQueryString(string.Empty);
+        query[nameof(token)] = token;
+
         var content = activationRequest.ToContent();
 
         await httpClient.PostAsync($"{domain}?{query}", content);

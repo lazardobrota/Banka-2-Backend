@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Web;
 
 using Bank.Application.Extensions;
 using Bank.Application.Queries;
@@ -9,7 +10,7 @@ public static class TransactionMapper
 {
     public static NameValueCollection ToQuery(this TransactionFilterQuery query)
     {
-        return MapQuery(query, new NameValueCollection());
+        return MapQuery(query, HttpUtility.ParseQueryString(string.Empty));
     }
 
     public static NameValueCollection Map(this NameValueCollection collection, TransactionFilterQuery query)

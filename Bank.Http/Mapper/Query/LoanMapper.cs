@@ -1,5 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Globalization;
+using System.Web;
 
 using Bank.Application.Extensions;
 using Bank.Application.Queries;
@@ -10,7 +11,7 @@ public static class LoanMapper
 {
     public static NameValueCollection ToQuery(this LoanFilterQuery query)
     {
-        return MapQuery(query, new NameValueCollection());
+        return MapQuery(query, HttpUtility.ParseQueryString(string.Empty));
     }
 
     public static NameValueCollection Map(this NameValueCollection collection, LoanFilterQuery query)
