@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Web;
 
 using Bank.Application.Domain;
 using Bank.Application.Extensions;
@@ -9,7 +10,7 @@ public static class PageableMapper
 {
     public static NameValueCollection ToQuery(this Pageable pageable)
     {
-        return MapQuery(pageable, new NameValueCollection());
+        return MapQuery(pageable, HttpUtility.ParseQueryString(string.Empty));
     }
 
     public static NameValueCollection Map(this NameValueCollection collection, Pageable pageable)

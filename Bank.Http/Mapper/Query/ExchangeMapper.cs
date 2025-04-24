@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Web;
 
 using Bank.Application.Extensions;
 using Bank.Application.Queries;
@@ -9,7 +10,7 @@ public static class ExchangeMapper
 {
     public static NameValueCollection ToQuery(this ExchangeFilterQuery query)
     {
-        return MapQuery(query, new NameValueCollection());
+        return MapQuery(query, HttpUtility.ParseQueryString(string.Empty));
     }
 
     public static NameValueCollection Map(this NameValueCollection collection, ExchangeFilterQuery query)
@@ -36,7 +37,7 @@ public static class ExchangeMapper
 
     public static NameValueCollection ToQuery(this ExchangeBetweenQuery query)
     {
-        return MapQuery(query, new NameValueCollection());
+        return MapQuery(query, HttpUtility.ParseQueryString(string.Empty));
     }
 
     public static NameValueCollection Map(this NameValueCollection collection, ExchangeBetweenQuery query)
