@@ -179,7 +179,7 @@ public interface IUserServiceHttpClient
 
     #region TransactionCodeController methods
 
-    Task<Page<TransactionCodeResponse>> GetAllTransactionCodes(Pageable pageable);
+    Task<Page<TransactionCodeResponse>> GetAllTransactionCodes(TransactionCodeFilterQuery filter, Pageable pageable);
 
     Task<TransactionCodeResponse?> GetOneTransactionCode(Guid transactionCodeId);
 

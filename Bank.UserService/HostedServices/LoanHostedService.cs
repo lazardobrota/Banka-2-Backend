@@ -137,7 +137,7 @@ public class LoanHostedService(IServiceProvider serviceProvider)
             var       transactionRepo     = scope.ServiceProvider.GetRequiredService<ITransactionRepository>();
             var       transactionCodeRepo = scope.ServiceProvider.GetRequiredService<ITransactionCodeRepository>();
 
-            var allCodes        = await transactionCodeRepo.FindAll(new Pageable());
+            var allCodes        = await transactionCodeRepo.FindAll(new TransactionCodeFilterQuery(), new Pageable());
             var loanPaymentCode = allCodes.Items.FirstOrDefault(c => c.Code == "289");
 
             if (loanPaymentCode == null)

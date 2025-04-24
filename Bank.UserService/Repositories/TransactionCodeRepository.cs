@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 
 using Bank.Application.Domain;
+using Bank.Application.Queries;
 using Bank.Database.Core;
 using Bank.UserService.Database;
 using Bank.UserService.Models;
@@ -14,7 +15,7 @@ namespace Bank.UserService.Repositories;
 
 public interface ITransactionCodeRepository
 {
-    Task<Page<TransactionCode>> FindAll(Pageable pageable);
+    Task<Page<TransactionCode>> FindAll(TransactionCodeFilterQuery transactionCodeFilterQuery, Pageable pageable);
 
     Task<TransactionCode?> FindById(Guid id);
 
@@ -29,11 +30,14 @@ public class TransactionCodeRepository(IDatabaseContextFactory<ApplicationContex
 {
     private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
 
-    public async Task<Page<TransactionCode>> FindAll(Pageable pageable)
+    public async Task<Page<TransactionCode>> FindAll(TransactionCodeFilterQuery transactionCodeFilterQuery, Pageable pageable)
     {
         await using var context = await m_ContextFactory.CreateContext;
 
         var transactionCodeQuery = context.TransactionCodes.AsQueryable();
+
+        if (!string.IsNullOrEmpty(transactionCodeFilterQuery.Code))
+            transactionCodeQuery = transactionCodeQuery.Where(transactionCode => EF.Functions.ILike(transactionCode.Code, $"%{transactionCodeFilterQuery.Code}%"));
 
         var transactionCodes = await transactionCodeQuery.Skip((pageable.Page - 1) * pageable.Size)
                                                          .Take(pageable.Size)
