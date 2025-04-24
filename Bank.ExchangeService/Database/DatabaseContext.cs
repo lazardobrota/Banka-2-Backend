@@ -6,7 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bank.ExchangeService.Database;
 
-public class DatabaseContext(DbContextOptions options) : DbContext(options)
+using DatabaseContextBase = Bank.Database.Core.DatabaseContext;
+
+public class DatabaseContext(DbContextOptions options) : DatabaseContextBase(options)
 {
     public DbSet<StockExchange> StockExchanges { init; get; }
     public DbSet<Quote>         Quotes         { init; get; }

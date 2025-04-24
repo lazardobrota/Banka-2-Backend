@@ -1,10 +1,12 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Queries;
-using Bank.ExchangeService.Database;
+using Bank.Database.Core;
 using Bank.ExchangeService.Models;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+
+using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
 
 namespace Bank.ExchangeService.Repositories;
 
@@ -21,14 +23,16 @@ public interface IOrderRepository
     Task<Order> UpdateStatus(Guid id, OrderStatus status);
 }
 
-public class OrderRepository(DatabaseContext context, IAuthorizationService authorizationService) : IOrderRepository
+public class OrderRepository(IAuthorizationService authorizationService, IDatabaseContextFactory<DatabaseContext> contextFactory) : IOrderRepository
 {
-    private readonly DatabaseContext       m_Context              = context;
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory       = contextFactory;
+    private readonly IAuthorizationService                    m_AuthorizationService = authorizationService;
 
     public async Task<Page<Order>> FindAll(OrderFilterQuery filter, Pageable pageable)
     {
-        var orderQuery = m_Context.Orders.AsQueryable();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var orderQuery = context.Orders.AsQueryable();
 
         if (filter.Status != OrderStatus.Invalid)
             orderQuery = orderQuery.Where(order => order.Status == filter.Status);
@@ -44,34 +48,42 @@ public class OrderRepository(DatabaseContext context, IAuthorizationService auth
 
     public async Task<Order?> FindById(Guid id)
     {
-        return await m_Context.Orders.FirstOrDefaultAsync(order => order.Id == id);
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.Orders.FirstOrDefaultAsync(order => order.Id == id);
     }
 
     public async Task<Order> Add(Order order)
     {
-        var addedOrder = await m_Context.Orders.AddAsync(order);
+        await using var context = await m_ContextFactory.CreateContext;
 
-        await m_Context.SaveChangesAsync();
+        var addedOrder = await context.Orders.AddAsync(order);
+
+        await context.SaveChangesAsync();
 
         return addedOrder.Entity;
     }
 
     public async Task<Order> Update(Order order)
     {
-        await m_Context.Orders.Where(dbOrder => dbOrder.Id == order.Id)
-                       .ExecuteUpdateAsync(setters => setters.SetProperty(dbOrder => dbOrder.Status, order.Status)
-                                                             .SetProperty(dbOrder => dbOrder.ModifiedAt, order.ModifiedAt));
+        await using var context = await m_ContextFactory.CreateContext;
+
+        await context.Orders.Where(dbOrder => dbOrder.Id == order.Id)
+                     .ExecuteUpdateAsync(setters => setters.SetProperty(dbOrder => dbOrder.Status, order.Status)
+                                                           .SetProperty(dbOrder => dbOrder.ModifiedAt, order.ModifiedAt));
 
         return order;
     }
 
     public async Task<Order> UpdateStatus(Guid id, OrderStatus status)
     {
-        await m_Context.Orders.Where(order => order.Id == id)
-                       .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(order => order.Status, status));
+        await using var context = await m_ContextFactory.CreateContext;
 
-        var order = await m_Context.Orders.AsNoTracking()
-                                   .FirstOrDefaultAsync(order => order.Id == id);
+        await context.Orders.Where(order => order.Id == id)
+                     .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(order => order.Status, status));
+
+        var order = await context.Orders.AsNoTracking()
+                                 .FirstOrDefaultAsync(order => order.Id == id);
 
         return order!;
     }

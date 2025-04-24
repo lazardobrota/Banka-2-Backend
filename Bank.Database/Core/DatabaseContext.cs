@@ -1,13 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.Database.Core;
 
 public class DatabaseContext(DbContextOptions options) : DbContext(options)
 {
-    internal bool   BaseDispose         { get; set; } = true;
-    internal Action DisposeBeforeAction { get; set; } = () => { };
-    internal Action DisposeAfterAction  { get; set; } = () => { };
+    internal bool       BaseDispose              { get; set; } = true;
+    internal Action     DisposeBeforeAction      { get; set; } = () => { };
+    internal Action     DisposeAfterAction       { get; set; } = () => { };
+    internal Func<Task> DisposeBeforeActionAsync { get; set; } = () => Task.CompletedTask;
+    internal Func<Task> DisposeAfterActionAsync  { get; set; } = () => Task.CompletedTask;
 
+    [SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize")]
     public override void Dispose()
     {
         DisposeBeforeAction();
@@ -15,20 +20,17 @@ public class DatabaseContext(DbContextOptions options) : DbContext(options)
         if (BaseDispose)
             base.Dispose();
 
-        GC.SuppressFinalize(this);
-
         DisposeAfterAction();
     }
 
+    [SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize")]
     public override async ValueTask DisposeAsync()
     {
-        DisposeBeforeAction();
+        await DisposeBeforeActionAsync();
 
         if (BaseDispose)
             await base.DisposeAsync();
 
-        GC.SuppressFinalize(this);
-        
-        DisposeAfterAction();
+        await DisposeAfterActionAsync();
     }
 }

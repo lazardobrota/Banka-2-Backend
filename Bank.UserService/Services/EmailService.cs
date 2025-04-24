@@ -17,10 +17,10 @@ public interface IEmailService
     public Task<Result> Send(EmailType type, User user, params object[] formatArgs);
 }
 
-public class EmailService(IEmailRepository emailRepository, IAuthorizationService authorizationService) : IEmailService
+public class EmailService(IEmailRepository emailRepository, IAuthorizationServiceFactory authorizationServiceFactory) : IEmailService
 {
-    private readonly IEmailRepository      m_EmailRepository      = emailRepository;
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly IEmailRepository             m_EmailRepository             = emailRepository;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Result> Send(EmailType type, User user)
     {
@@ -28,16 +28,17 @@ public class EmailService(IEmailRepository emailRepository, IAuthorizationServic
 
         try
         {
-            var client = new SmtpClient(Configuration.Email.Server, Configuration.Email.Port);
+            var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+            var client               = new SmtpClient(Configuration.Email.Server, Configuration.Email.Port);
             client.EnableSsl             = true;
             client.UseDefaultCredentials = false;
             client.Credentials           = new NetworkCredential(Configuration.Email.Address, Configuration.Email.Password);
 
             var body = type == EmailType.UserActivateAccount
                        ? email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.Activate}?token={
-                           m_AuthorizationService.GenerateTokenFor(user.Id, user.Permissions)}")
+                           authorizationService.GenerateTokenFor(user.Id, user.Permissions)}")
                        : email.FormatBody($"{Configuration.Frontend.BaseUrl}{Configuration.Frontend.Route.ResetPassword}?token={
-                           m_AuthorizationService.GenerateTokenFor(user.Id, user.Permissions)}");
+                           authorizationService.GenerateTokenFor(user.Id, user.Permissions)}");
 
             var mailMessage = new MailMessage();
             mailMessage.From       = new MailAddress(Configuration.Email.Address);

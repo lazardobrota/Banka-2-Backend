@@ -23,8 +23,6 @@ public interface ITransactionService
 
     Task<Result<TransactionResponse>> GetOne(Guid id);
 
-    // Task<Result<TransactionResponse>> Create(TransactionCreateRequest transactionCreateRequest);
-    
     Task<Result<Transaction>> Create(TransactionCreateRequest transactionCreateRequest);
 
     Task<Result<TransactionResponse>> Update(TransactionUpdateRequest transactionUpdateRequest, Guid id);
@@ -36,19 +34,19 @@ public interface ITransactionService
 
 public class TransactionService(
     ITransactionRepository                      transactionRepository,
-    IAuthorizationService                       authorizationService,
     IAccountRepository                          accountRepository,
     ICurrencyRepository                         currencyRepository,
     IDatabaseContextFactory<ApplicationContext> contextFactory,
     IExchangeService                            exchangeService,
     Lazy<TransactionBackgroundService>          transactionBackgroundServiceLazy,
-    Lazy<IDataService>                          dataServiceLazy
+    Lazy<IDataService>                          dataServiceLazy,
+    IAuthorizationServiceFactory                authorizationServiceFactory
 ) : ITransactionService
 {
     private readonly ITransactionRepository                      m_TransactionRepository            = transactionRepository;
     private readonly IAccountRepository                          m_AccountRepository                = accountRepository;
     private readonly ICurrencyRepository                         m_CurrencyRepository               = currencyRepository;
-    private readonly IAuthorizationService                       m_AuthorizationService             = authorizationService;
+    private readonly IAuthorizationServiceFactory                m_AuthorizationServiceFactory      = authorizationServiceFactory;
     private readonly IExchangeService                            m_ExchangeService                  = exchangeService;
     private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory                   = contextFactory;
     private readonly Lazy<TransactionBackgroundService>          m_TransactionBackgroundServiceLazy = transactionBackgroundServiceLazy;
@@ -74,8 +72,10 @@ public class TransactionService(
         if (transaction is null)
             return Result.NotFound<TransactionResponse>($"No Transaction found with Id: {id}");
 
-        if (m_AuthorizationService.Permissions == Permission.Client && transaction.FromAccount?.ClientId != m_AuthorizationService.UserId &&
-            transaction.ToAccount?.ClientId    != m_AuthorizationService.UserId)
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+        
+        if (authorizationService.Permissions == Permission.Client && transaction.FromAccount?.ClientId != authorizationService.UserId &&
+            transaction.ToAccount?.ClientId  != authorizationService.UserId)
             return Result.Unauthorized<TransactionResponse>();
 
         return Result.Ok(transaction.ToResponse());
@@ -83,10 +83,12 @@ public class TransactionService(
 
     public async Task<Result<Page<TransactionResponse>>> GetAllByAccountId(Guid accountId, TransactionFilterQuery transactionFilterQuery, Pageable pageable)
     {
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+        
         var page = await m_TransactionRepository.FindAllByAccountId(accountId, transactionFilterQuery, pageable);
 
-        if (m_AuthorizationService.Permissions == Permission.Client &&
-            page.Items.Any(transaction => transaction.FromAccount!.ClientId != m_AuthorizationService.UserId && transaction.ToAccount!.ClientId != m_AuthorizationService.UserId))
+        if (authorizationService.Permissions == Permission.Client &&
+            page.Items.Any(transaction => transaction.FromAccount!.ClientId != authorizationService.UserId && transaction.ToAccount!.ClientId != authorizationService.UserId))
             return Result.Forbidden<Page<TransactionResponse>>();
 
         var transactionResponses = page.Items.Select(transaction => transaction.ToResponse())
@@ -95,7 +97,6 @@ public class TransactionService(
         return Result.Ok(new Page<TransactionResponse>(transactionResponses, page.PageNumber, page.PageSize, page.TotalElements));
     }
 
-    // public async Task<Result<TransactionResponse>> Create(TransactionCreateRequest transactionCreateRequest)
     public async Task<Result<Transaction>> Create(TransactionCreateRequest transactionCreateRequest)
     {
         var transaction = await CreateTransaction(new TempyTransaction
@@ -112,9 +113,7 @@ public class TransactionService(
 
         if (transaction.Value == null)
             return Result.BadRequest<Transaction>("Not going thru.");
-            // return Result.BadRequest<TransactionResponse>("Not going thru.");
 
-        // return Result.Ok(transaction.Value.ToResponse());
         return Result.Ok(transaction.Value);
     }
 
@@ -135,10 +134,16 @@ public class TransactionService(
         if (tempyTransaction.FromAccountNumber == null && tempyTransaction.ToAccountNumber == null)
             return Result.BadRequest<Transaction>("No valid account provided.");
 
-        var fromAccount     = await m_AccountRepository.FindByNumber(tempyTransaction.FromAccountNumber?.Substring(7, 9) ?? "");
-        var toAccount       = await m_AccountRepository.FindByNumber(tempyTransaction.ToAccountNumber?.Substring(7, 9)   ?? "");
-        var exchangeDetails = await m_ExchangeService.CalculateExchangeDetails(tempyTransaction.FromCurrencyId, tempyTransaction.ToCurrencyId);
-
+        var fromAccountTask     = m_AccountRepository.FindByNumber(tempyTransaction.FromAccountNumber?.Substring(7, 9) ?? "");
+        var toAccountTask       = m_AccountRepository.FindByNumber(tempyTransaction.ToAccountNumber?.Substring(7, 9)   ?? "");
+        var exchangeDetailsTask = m_ExchangeService.CalculateExchangeDetails(tempyTransaction.FromCurrencyId, tempyTransaction.ToCurrencyId);
+        
+        await Task.WhenAll(fromAccountTask, toAccountTask, exchangeDetailsTask);
+        
+        var fromAccount     = await fromAccountTask;
+        var toAccount       = await toAccountTask;
+        var exchangeDetails = await exchangeDetailsTask;
+        
         var bankCodeFrom = tempyTransaction.FromAccountNumber?[..3];
         var bankCodeTo   = tempyTransaction.ToAccountNumber?[..3];
 
@@ -234,7 +239,7 @@ public class TransactionService(
             return Result.BadRequest<Transaction>("Some error");
 
         var transaction = internalTransaction.ToTransaction();
-
+        
         await m_TransactionRepository.Add(transaction);
 
         internalTransaction.FromAccount.TryFindAccount(internalTransaction.FromCurrencyId, out var accountId);
@@ -253,6 +258,12 @@ public class TransactionService(
         var processTransaction = internalTransaction.ToProcessTransaction(transaction.Id);
 
         TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
+
+        // transaction.FromAccount = ;
+        // transaction.FromCurrency = ;
+        // transaction.ToAccount = ;
+        // transaction.ToCurrency = ;
+        // transaction.Code = ;
 
         return Result.Ok(transaction);
     }
@@ -395,7 +406,7 @@ public class TransactionService(
 
         await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
         await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
-        
+
         var transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
                                                                           processTransaction.FromBankAmount, databaseContext);
 

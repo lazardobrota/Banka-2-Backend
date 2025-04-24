@@ -2,12 +2,15 @@
 
 using Bank.Application.Domain;
 using Bank.Application.Queries;
+using Bank.Database.Core;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Models;
 using Bank.Permissions.Services;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+
+using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
 
 namespace Bank.ExchangeService.Repositories;
 
@@ -22,15 +25,18 @@ public interface IAssetRepository
     Task<bool> Remove(Asset asset);
 }
 
-public class AssetRepository(DatabaseContext context, IAuthorizationService authorizationService) : IAssetRepository
+public class AssetRepository(IAuthorizationService authorizationService, IDatabaseContextFactory<DatabaseContext> contextFactory) : IAssetRepository
 {
-    private readonly DatabaseContext       m_Context              = context;
+    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory = contextFactory;
+
     private readonly IAuthorizationService m_AuthorizationService = authorizationService;
 
     public async Task<Page<Asset>> FindAll(AssetFilterQuery filter, Pageable pageable)
     {
-        var assetQuery = m_Context.Assets.IncludeAll()
-                                  .AsQueryable();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var assetQuery = context.Assets.IncludeAll()
+                                .AsQueryable();
 
         if (m_AuthorizationService.Permissions == Permission.Client || m_AuthorizationService.Permissions == Permission.Employee)
             assetQuery = assetQuery.Where(asset => asset.ActuaryId == m_AuthorizationService.UserId);
@@ -48,35 +54,40 @@ public class AssetRepository(DatabaseContext context, IAuthorizationService auth
 
     public async Task<Asset?> FindById(Guid id)
     {
-        return await m_Context.Assets.IncludeAll()
-                              .FirstOrDefaultAsync(asset => asset.Id == id);
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.Assets.IncludeAll()
+                            .FirstOrDefaultAsync(asset => asset.Id == id);
     }
 
     public async Task<bool> Add(Asset asset)
     {
-        var result = await m_Context.Assets.Where(dbAsset => dbAsset.ActuaryId == asset.ActuaryId && dbAsset.SecurityId == asset.SecurityId)
-                                    .ExecuteUpdateAsync(setters => setters.SetProperty(dbAsset => dbAsset.ModifiedAt, DateTime.UtcNow)
-                                                                          .SetProperty(dbAsset => dbAsset.Quantity, dbAsset => dbAsset.Quantity + asset.Quantity)
-                                                                          .SetProperty(dbAsset => dbAsset.AveragePrice,
-                                                                                       dbAsset => dbAsset.AveragePrice + asset.Quantity *
-                                                                                                  (asset.AveragePrice - dbAsset.AveragePrice) /
-                                                                                                  (asset.Quantity + dbAsset.Quantity)));
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var result = await context.Assets.Where(dbAsset => dbAsset.ActuaryId == asset.ActuaryId && dbAsset.SecurityId == asset.SecurityId)
+                                  .ExecuteUpdateAsync(setters => setters.SetProperty(dbAsset => dbAsset.ModifiedAt, DateTime.UtcNow)
+                                                                        .SetProperty(dbAsset => dbAsset.Quantity, dbAsset => dbAsset.Quantity + asset.Quantity)
+                                                                        .SetProperty(dbAsset => dbAsset.AveragePrice,
+                                                                                     dbAsset => dbAsset.AveragePrice + asset.Quantity *
+                                                                                                (asset.AveragePrice - dbAsset.AveragePrice) / (asset.Quantity + dbAsset.Quantity)));
 
         if (result == 1)
             return true;
 
-        await m_Context.Assets.AddAsync(asset);
+        await context.Assets.AddAsync(asset);
 
-        await m_Context.SaveChangesAsync();
+        await context.SaveChangesAsync();
 
         return true;
     }
 
     public async Task<bool> Remove(Asset asset)
     {
-        var result = await m_Context.Assets.Where(dbAsset => dbAsset.ActuaryId == asset.ActuaryId && dbAsset.SecurityId == asset.SecurityId)
-                                    .ExecuteUpdateAsync(setters => setters.SetProperty(dbAsset => dbAsset.ModifiedAt, DateTime.UtcNow)
-                                                                          .SetProperty(dbAsset => dbAsset.Quantity, dbAsset => dbAsset.Quantity - asset.Quantity));
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var result = await context.Assets.Where(dbAsset => dbAsset.ActuaryId == asset.ActuaryId && dbAsset.SecurityId == asset.SecurityId)
+                                  .ExecuteUpdateAsync(setters => setters.SetProperty(dbAsset => dbAsset.ModifiedAt, DateTime.UtcNow)
+                                                                        .SetProperty(dbAsset => dbAsset.Quantity, dbAsset => dbAsset.Quantity - asset.Quantity));
 
         return result == 1;
     }
