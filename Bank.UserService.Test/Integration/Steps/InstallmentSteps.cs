@@ -146,7 +146,26 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
         installments.Value!.Items.ShouldNotBeEmpty();
     }
 
-    
+    [When(@"installment is provided by Id")]
+    public async Task WhenInstallmentIsProvidedById()
+    {
+        var installmentId = m_ScenarioContext.Get<Guid>(Constant.InstallmentId);
+
+        var installment = await m_InstallmentService.GetOne(installmentId);
+
+        m_ScenarioContext[Constant.Installment] = installment;
+    }
+
+    [Then(@"installment details should be returned")]
+    public void ThenInstallmentDetailsShouldBeReturned()
+    {
+        var installment = m_ScenarioContext.Get<Result<InstallmentResponse>>(Constant.Installment);
+
+        installment.ActionResult.ShouldBeOfType<OkObjectResult>();
+        installment.ShouldNotBeNull();
+        installment.Value.ShouldNotBeNull();
+        installment.Value!.Id.ShouldBe(Example.Entity.Installment.InstallmentId);
+    }
 }
 
 file static class Constant
@@ -158,4 +177,5 @@ file static class Constant
     public const string InstallmentId            = "InstallmentId";
     public const string LoanId                   = "LoanId";
     public const string Installments             = "Installments";
+    public const string Installment              = "Installment";
 }

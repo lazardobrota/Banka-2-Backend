@@ -21,3 +21,10 @@
         Given loan Id which has installments
         When all installments are fetched for the loan
         Then all installments should be returned for the loan
+
+    Scenario: Get Installment by Id
+        Given installment Id
+        When installment is provided by Id
+        Then installment details should be returned
+
+

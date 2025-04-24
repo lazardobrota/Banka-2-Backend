@@ -134,14 +134,14 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
         cards.Value.ShouldNotBeNull();
         cards.Value.Items.Count.ShouldBeGreaterThan(0);
     }
-    
+
     [When(@"all cards are fetched for the account")]
     public async Task WhenAllCardsAreFetchedForTheAccount()
     {
         var accountId = m_ScenarioContext.Get<Guid>(Constant.AccountId);
-    
+
         var cardResult = await m_CardService.GetAllForAccount(accountId, new CardFilterQuery(), new Pageable());
-    
+
         m_ScenarioContext[Constant.CardsResult] = cardResult;
     }
 
@@ -149,10 +149,10 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     public void ThenAllCardsShouldBeReturnedForTheAccount()
     {
         var cardResult = m_ScenarioContext.Get<Result<Page<CardResponse>>>(Constant.CardsResult);
-    
+
         cardResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         cardResult.Value.ShouldNotBeNull();
-    
+
         cardResult.Value.Items.All(card => card.Account.Id == m_ScenarioContext.Get<Guid>(Constant.AccountId))
                   .ShouldBeTrue();
     }
@@ -162,7 +162,7 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     {
         m_ScenarioContext[Constant.AccountId] = Example.Entity.Account.AccountId;
     }
-    
+
     [Given(@"client Id which has cards")]
     public void GivenClientIdWhichHasCards()
     {
@@ -173,21 +173,23 @@ public class CardSteps(ScenarioContext scenarioContext, ICardService cardService
     public async Task WhenAllCardsAreFetchedFromTheDatabaseForTheClient()
     {
         var id = m_ScenarioContext.Get<Guid>(Constant.Id);
-    
+
         var getCardsResult = await m_CardService.GetAllForClient(id, new CardFilterQuery(), new Pageable());
-    
+
         m_ScenarioContext[Constant.CardsResult] = getCardsResult;
     }
 
     [Then(@"all cards should be returned for that client")]
     public void ThenAllCardsShouldBeReturnedForThatClient()
     {
-        var cardsResult = m_ScenarioContext.Get<Result<List<CardResponse>>>(Constant.CardsResult);
-    
+        var cardsResult = m_ScenarioContext.Get<Result<Page<CardResponse>>>(Constant.CardsResult);
+
         cardsResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         cardsResult.Value.ShouldNotBeNull();
-        cardsResult.Value.ShouldNotBeEmpty();
-        cardsResult.Value.ShouldAllBe(card => card.Account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.Id));
+        cardsResult.Value.Items.ShouldNotBeEmpty();
+
+        cardsResult.Value.Items.All(card => card.Account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.Id))
+                   .ShouldBeTrue();
     }
 }
 
@@ -202,7 +204,7 @@ file static class Constant
     public const string LimitUpdateRequest  = "LimitUpdateRequest";
     public const string LimitUpdateResult   = "LimitUpdateResult";
     public const string GetCards            = "GetCards";
-    public const string AccountId          = "AccountId";
+    public const string AccountId           = "AccountId";
     public const string CardsResult         = "CardsResult";
     public const string Id                  = "Id";
 }

@@ -113,9 +113,6 @@ public class ClientSteps(ScenarioContext scenarioContext, IClientService clientS
         getClientsResult.Value.ShouldNotBeNull();
         getClientsResult.Value.Items.ShouldAllBe(client => client.Role == Role.Client);
     }
-
-
-    
 }
 
 file static class Constant

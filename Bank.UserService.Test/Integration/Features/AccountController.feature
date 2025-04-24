@@ -19,7 +19,7 @@
         Then account details in employee request should match the updated account
 
     Scenario: Get All Acounts
-        When all acounts are fetched
+        When all accounts are fetched
         Then all accounts should be returned
 
     Scenario: Get all Account from Client

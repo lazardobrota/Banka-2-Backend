@@ -37,10 +37,6 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     {
         var accountCreateRequest = m_ScenarioContext.Get<AccountCreateRequest>(Constant.AccountCreateRequest);
 
-        Console.Write(accountCreateRequest.ClientId);
-        Console.Write(accountCreateRequest.AccountTypeId);
-        Console.Write(accountCreateRequest.CurrencyId);
-
         var accountResult = await m_AccountService.Create(accountCreateRequest);
 
         m_ScenarioContext[Constant.AccountCreateResult] = accountResult;
@@ -60,8 +56,6 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     public void ThenAccountDetailsShouldMatchTheCreatedAccount()
     {
         var getAccountResult = m_ScenarioContext.Get<Result<AccountResponse>>(Constant.AccountCreateResult);
-
-        Debug.WriteLine(getAccountResult.ActionResult);
 
         getAccountResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         getAccountResult.Value.ShouldNotBeNull();
@@ -139,10 +133,8 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
         accountUpdateResult.Value.Status.ShouldBe(Example.Entity.Account.UpdateEmployeeRequest.Status);
     }
 
-    
-
-    [When(@"all acounts are fetched")]
-    public async Task WhenAllAcountsAreFetched()
+    [When(@"all accounts are fetched")]
+    public async Task WhenAllAccountsAreFetched()
     {
         var accounts = await m_AccountService.GetAll(new AccountFilterQuery(), new Pageable());
 
@@ -158,7 +150,7 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
         accounts.Value.ShouldNotBeNull();
         accounts.Value.Items.ShouldNotBeEmpty();
     }
-    
+
     [Given(@"client Id")]
     public void GivenClientId()
     {
@@ -170,15 +162,15 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     {
         var id                = m_ScenarioContext.Get<Guid>(Constant.IdForAccount);
         var getAccountsResult = await m_AccountService.GetAllForClient(id, new AccountFilterQuery(), new Pageable());
-    
+
         m_ScenarioContext[Constant.AccountResult] = getAccountsResult;
     }
-    
+
     [Then(@"all accounts should be returned for that client")]
     public void ThenAllAccountsShouldBeReturnedForThatClient()
     {
         var accountResult = m_ScenarioContext.Get<Result<Page<AccountResponse>>>(Constant.AccountResult);
-    
+
         accountResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         accountResult.Value.ShouldNotBeNull();
         accountResult.Value.Items.ShouldNotBeEmpty();
