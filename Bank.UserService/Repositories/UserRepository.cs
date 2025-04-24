@@ -29,7 +29,7 @@ public interface IUserRepository
 
     Task<User> Update(User user);
 
-    Task<User> SetPassword(Guid id, string password);
+    Task<bool> SetPassword(Guid id, string password);
 
     Task<bool> Exists(Guid id);
 
@@ -129,21 +129,22 @@ public class UserRepository(IDatabaseContextFactory<ApplicationContext> contextF
         return user;
     }
 
-    public async Task<User> SetPassword(Guid id, string password)
+    public async Task<bool> SetPassword(Guid id, string password)
     {
         await using var context = await m_ContextFactory.CreateContext;
 
-        var user = await FindById(id);
+        var userEntity = await FindById(id);
 
-        if (user == null)
-            throw new Exception("User not found.");
+        if (userEntity is null)
+            return false;
 
-        user.Password  = HashingUtilities.HashPassword(password, user.Salt);
-        user.Activated = true;
-
-        await context.SaveChangesAsync();
-
-        return user;
+        password = HashingUtilities.HashPassword(password, userEntity.Salt);
+        
+        var result = await context.Users.Where(user => user.Id == id)
+                                  .ExecuteUpdateAsync(setters => setters.SetProperty(dbUser => dbUser.Password, password)
+                                                                        .SetProperty(dbUser => dbUser.Activated, true));
+        
+        return result == 1;
     }
 
     public async Task<bool> Exists(Guid id)
