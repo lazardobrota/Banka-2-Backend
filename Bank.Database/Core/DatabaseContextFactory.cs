@@ -32,7 +32,8 @@ internal class PostgresDefaultContextFactory<TDatabaseContext>(IDatabasePoolInfo
 
         var context = await m_ContextFactory.CreateDbContextAsync();
 
-        context.DisposeAfterAction = () => m_SemaphoreDefault.Release();
+        context.DisposeAfterAction      = () => DisposeAfterAction(context);
+        context.DisposeAfterActionAsync = () => DisposeAfterActionAsync(context);
 
         return context;
     }
@@ -45,13 +46,32 @@ internal class PostgresDefaultContextFactory<TDatabaseContext>(IDatabasePoolInfo
 
         var context = await m_ContextFactory.CreateDbContextAsync();
 
-        context.DisposeAfterAction = () =>
-                                     {
-                                         m_SemaphoreDefault.Release();
-                                         m_SemaphoreDistributed.Release();
-                                     };
+        context.DisposeAfterAction      = () => DisposeDistributedAfterAction(context);
+        context.DisposeAfterActionAsync = () => DisposeDistributedAfterActionAsync(context);
 
         return context;
+    }
+    
+    private async Task DisposeDistributedAfterActionAsync(TDatabaseContext context)
+    {
+        m_SemaphoreDefault.Release();
+        m_SemaphoreDistributed.Release();
+    }
+
+    private void DisposeDistributedAfterAction(TDatabaseContext context)
+    {
+        m_SemaphoreDefault.Release();
+        m_SemaphoreDistributed.Release();
+    }
+
+    private async Task DisposeAfterActionAsync(TDatabaseContext context)
+    {
+        m_SemaphoreDefault.Release();
+    }
+
+    private void DisposeAfterAction(TDatabaseContext context)
+    {
+        m_SemaphoreDefault.Release();
     }
 }
 

@@ -15,8 +15,8 @@ public interface IDatabasePoolInfo
 internal class PostgresDatabasePoolInfo : IDatabasePoolInfo
 {
     public const int ConnectionExcess = 10;
-    public       int MinConnections { private set; get; }
-    public       int MaxConnections { private set; get; }
+    public       int MinConnections { private set; get; } = Configuration.Database.Persistent.MinConnections;
+    public       int MaxConnections { private set; get; } = Configuration.Database.Persistent.MaxConnections;
 
     public PostgresDatabasePoolInfo()
     {
@@ -30,7 +30,7 @@ internal class PostgresDatabasePoolInfo : IDatabasePoolInfo
     {
         if (MaxConnections == 0)
         {
-            await using var connection = new NpgsqlConnection(Configuration.Database.GetConnectionString());
+            await using var connection = new NpgsqlConnection(Configuration.Database.Persistent.GetConnectionString());
             await connection.OpenAsync();
 
             await using var command = new NpgsqlCommand("SHOW max_connections", connection);
