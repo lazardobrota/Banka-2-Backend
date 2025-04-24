@@ -18,8 +18,8 @@ public static partial class Example
                                                                       Direction     = Direction.Buy,
                                                                       SupervisorId  = Guid.Parse("e1f3de40-719e-4b5f-8e4d-d42f06e4a411"),
                                                                       AfterHours    = false,
-                                                                      AccountNumber = "1234567890",
-                                                                      SecurityId    = Guid.Parse("b2c3d4e5-f6a7-8b9c-a0d1-e2f3g4h5i6j7")
+                                                                      AccountNumber = "000000005",
+                                                                      SecurityId    = Guid.Parse("9000bb03-afac-4ab5-80f3-980a0ed898f2")
                                                                   };
 
         public static readonly OrderUpdateRequest UpdateRequest = new()
@@ -29,20 +29,20 @@ public static partial class Example
 
         public static readonly OrderResponse Response = new()
                                                         {
-                                                            Id            = Guid.NewGuid(),
-                                                            Actuary       = null!,
-                                                            OrderType     = CreateRequest.OrderType,
-                                                            Quantity      = CreateRequest.Quantity,
-                                                            ContractCount = CreateRequest.ContractCount,
-                                                            PricePerUnit  = CreateRequest.PricePerUnit,
-                                                            Direction     = CreateRequest.Direction,
-                                                            Status        = UpdateRequest.Status,
-                                                            Supervisor    = null!,
-                                                            Done          = true,
-                                                            Account       = null!,
-                                                            AfterHours    = CreateRequest.AfterHours,
-                                                            CreatedAt     = DateTime.UtcNow,
-                                                            ModifiedAt    = DateTime.UtcNow,
+                                                            Id                = Guid.NewGuid(),
+                                                            Actuary           = null!,
+                                                            OrderType         = CreateRequest.OrderType,
+                                                            Quantity          = CreateRequest.Quantity,
+                                                            ContractCount     = CreateRequest.ContractCount,
+                                                            PricePerUnit      = CreateRequest.PricePerUnit,
+                                                            Direction         = CreateRequest.Direction,
+                                                            Status            = UpdateRequest.Status,
+                                                            Supervisor        = null!,
+                                                            Done              = true,
+                                                            Account           = null!,
+                                                            AfterHours        = CreateRequest.AfterHours,
+                                                            CreatedAt         = DateTime.UtcNow,
+                                                            ModifiedAt        = DateTime.UtcNow,
                                                             RemainingPortions = 0
                                                         };
     }

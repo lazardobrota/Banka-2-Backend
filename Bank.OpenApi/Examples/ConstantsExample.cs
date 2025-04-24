@@ -90,6 +90,7 @@ public static partial class Example
         public static readonly OrderType         OrderType         = OrderType.Limit;
         public static readonly OrderStatus       OrderStatus       = OrderStatus.Pending;
         public static readonly Direction         Direction         = Direction.Buy;
+        public static readonly PermissionType    PermissionType    = PermissionType.Set;
 
         public static readonly Guid Id = Guid.Parse("12345678-1234-1234-1234-123456789abc");
 

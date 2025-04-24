@@ -211,6 +211,7 @@ public static class ServiceCollectionExtensions
         services.AddOpenApiExample(Example.User.ActivationRequest);
         services.AddOpenApiExample(Example.User.PasswordResetRequest);
         services.AddOpenApiExample(Example.User.RequestPasswordResetRequest);
+        services.AddOpenApiExample(Example.User.UpdatePermissionRequest);
         services.AddOpenApiExample(Example.User.Response);
         services.AddOpenApiExample(Example.User.SimpleResponse);
         services.AddOpenApiExample(Example.User.LoginResponse);

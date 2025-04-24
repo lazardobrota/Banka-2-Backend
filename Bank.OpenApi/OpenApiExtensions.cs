@@ -141,6 +141,7 @@ public static class OpenApiExtensions
                 .AddOpenApiDefaultExample(Example.User.DefaultActivationRequest)
                 .AddOpenApiDefaultExample(Example.User.DefaultPasswordResetRequest)
                 .AddOpenApiDefaultExample(Example.User.DefaultRequestPasswordResetRequest)
+                .AddOpenApiDefaultExample(Example.User.DefaultUpdatePermissionRequest)
                 .AddOpenApiDefaultExample(Example.User.DefaultResponse)
                 .AddOpenApiDefaultExample(Example.User.DefaultSimpleResponse)
                 .AddOpenApiDefaultExample(Example.User.DefaultLoginResponse);
@@ -305,6 +306,7 @@ public static class OpenApiExtensions
                                    config.SchemaFilter<SchemaSwagger.User.ActivationRequest>();
                                    config.SchemaFilter<SchemaSwagger.User.PasswordResetRequest>();
                                    config.SchemaFilter<SchemaSwagger.User.RequestPasswordResetRequest>();
+                                   config.SchemaFilter<SchemaSwagger.User.UpdatePermissionRequest>();
                                    config.SchemaFilter<SchemaSwagger.User.Response>();
                                    config.SchemaFilter<SchemaSwagger.User.SimpleResponse>();
                                    config.SchemaFilter<SchemaSwagger.User.LoginResponse>();

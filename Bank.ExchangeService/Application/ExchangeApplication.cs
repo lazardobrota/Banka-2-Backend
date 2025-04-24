@@ -137,6 +137,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddOpenApiExamples(this IServiceCollection services)
     {
+        services.AddOpenApiExample(Example.Account.Response);
         services.AddOpenApiExample(Example.Currency.SimpleResponse);
         services.AddOpenApiExample(Example.Currency.Response);
         services.AddOpenApiExample(Example.StockExchange.CreateRequest);
