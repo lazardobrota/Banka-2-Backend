@@ -21,7 +21,7 @@ public interface IAuthorizationService
     public string GenerateTokenFor(Guid userId, Permissions permissions);
 }
 
-public class AuthorizationService : IAuthorizationService
+internal class AuthorizationService : IAuthorizationService
 {
     public Permissions Permissions { get; }
     public Guid        UserId      { get; }

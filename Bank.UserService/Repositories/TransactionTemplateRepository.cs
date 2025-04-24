@@ -30,20 +30,21 @@ public interface ITransactionTemplateRepository
     Task<bool> IsEmpty();
 }
 
-public class TransactionTemplateRepository(IAuthorizationService authorizationService, IDatabaseContextFactory<ApplicationContext> contextFactory) : ITransactionTemplateRepository
+public class TransactionTemplateRepository(IDatabaseContextFactory<ApplicationContext> contextFactory, IAuthorizationServiceFactory authorizationServiceFactory)
+: ITransactionTemplateRepository
 {
-    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
-
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory              = contextFactory;
+    private readonly IAuthorizationServiceFactory                m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Page<TransactionTemplate>> FindAll(Pageable pageable)
     {
-        await using var context = await m_ContextFactory.CreateContext;
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
         var transactionTemplateQuery = context.TransactionTemplates.IncludeAll()
                                               .AsQueryable();
 
-        transactionTemplateQuery = transactionTemplateQuery.Where(template => template.ClientId == m_AuthorizationService.UserId);
+        transactionTemplateQuery = transactionTemplateQuery.Where(template => template.ClientId == authorizationService.UserId);
 
         var transactionTemplates = await transactionTemplateQuery.Skip((pageable.Page - 1) * pageable.Size)
                                                                  .Take(pageable.Size)

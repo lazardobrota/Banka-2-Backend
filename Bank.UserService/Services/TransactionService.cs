@@ -34,19 +34,19 @@ public interface ITransactionService
 
 public class TransactionService(
     ITransactionRepository                      transactionRepository,
-    IAuthorizationService                       authorizationService,
     IAccountRepository                          accountRepository,
     ICurrencyRepository                         currencyRepository,
     IDatabaseContextFactory<ApplicationContext> contextFactory,
     IExchangeService                            exchangeService,
     Lazy<TransactionBackgroundService>          transactionBackgroundServiceLazy,
-    Lazy<IDataService>                          dataServiceLazy
+    Lazy<IDataService>                          dataServiceLazy,
+    IAuthorizationServiceFactory                authorizationServiceFactory
 ) : ITransactionService
 {
     private readonly ITransactionRepository                      m_TransactionRepository            = transactionRepository;
     private readonly IAccountRepository                          m_AccountRepository                = accountRepository;
     private readonly ICurrencyRepository                         m_CurrencyRepository               = currencyRepository;
-    private readonly IAuthorizationService                       m_AuthorizationService             = authorizationService;
+    private readonly IAuthorizationServiceFactory                m_AuthorizationServiceFactory      = authorizationServiceFactory;
     private readonly IExchangeService                            m_ExchangeService                  = exchangeService;
     private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory                   = contextFactory;
     private readonly Lazy<TransactionBackgroundService>          m_TransactionBackgroundServiceLazy = transactionBackgroundServiceLazy;
@@ -72,8 +72,10 @@ public class TransactionService(
         if (transaction is null)
             return Result.NotFound<TransactionResponse>($"No Transaction found with Id: {id}");
 
-        if (m_AuthorizationService.Permissions == Permission.Client && transaction.FromAccount?.ClientId != m_AuthorizationService.UserId &&
-            transaction.ToAccount?.ClientId    != m_AuthorizationService.UserId)
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+        
+        if (authorizationService.Permissions == Permission.Client && transaction.FromAccount?.ClientId != authorizationService.UserId &&
+            transaction.ToAccount?.ClientId  != authorizationService.UserId)
             return Result.Unauthorized<TransactionResponse>();
 
         return Result.Ok(transaction.ToResponse());
@@ -81,10 +83,12 @@ public class TransactionService(
 
     public async Task<Result<Page<TransactionResponse>>> GetAllByAccountId(Guid accountId, TransactionFilterQuery transactionFilterQuery, Pageable pageable)
     {
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+        
         var page = await m_TransactionRepository.FindAllByAccountId(accountId, transactionFilterQuery, pageable);
 
-        if (m_AuthorizationService.Permissions == Permission.Client &&
-            page.Items.Any(transaction => transaction.FromAccount!.ClientId != m_AuthorizationService.UserId && transaction.ToAccount!.ClientId != m_AuthorizationService.UserId))
+        if (authorizationService.Permissions == Permission.Client &&
+            page.Items.Any(transaction => transaction.FromAccount!.ClientId != authorizationService.UserId && transaction.ToAccount!.ClientId != authorizationService.UserId))
             return Result.Forbidden<Page<TransactionResponse>>();
 
         var transactionResponses = page.Items.Select(transaction => transaction.ToResponse())

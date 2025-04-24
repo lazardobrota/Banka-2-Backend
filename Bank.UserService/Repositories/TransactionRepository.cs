@@ -35,22 +35,22 @@ public interface ITransactionRepository
     Task<bool> IsEmpty();
 }
 
-public class TransactionRepository(IAuthorizationService authorizationService, IDatabaseContextFactory<ApplicationContext> contextFactory) : ITransactionRepository
+public class TransactionRepository(IDatabaseContextFactory<ApplicationContext> contextFactory, IAuthorizationServiceFactory authorizationServiceFactory) : ITransactionRepository
 {
-    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory = contextFactory;
-
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory              = contextFactory;
+    private readonly IAuthorizationServiceFactory                m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Page<Transaction>> FindAll(TransactionFilterQuery filter, Pageable pageable)
     {
-        await using var context = await m_ContextFactory.CreateContext;
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
         var transactionQuery = context.Transactions.IncludeAll()
                                       .AsQueryable();
 
-        if (m_AuthorizationService.Permissions == Permission.Client)
-            transactionQuery = transactionQuery.Where(transaction => transaction.FromAccount!.ClientId == m_AuthorizationService.UserId ||
-                                                                     transaction.ToAccount!.ClientId   == m_AuthorizationService.UserId);
+        if (authorizationService.Permissions == Permission.Client)
+            transactionQuery = transactionQuery.Where(transaction => transaction.FromAccount!.ClientId == authorizationService.UserId ||
+                                                                     transaction.ToAccount!.ClientId   == authorizationService.UserId);
 
         if (filter.Status != TransactionStatus.Invalid)
             transactionQuery = transactionQuery.Where(transaction => transaction.Status == filter.Status);

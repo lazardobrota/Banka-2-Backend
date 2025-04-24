@@ -19,10 +19,10 @@ public interface ITransactionTemplateService
     Task<Result<TransactionTemplateResponse>> Update(TransactionTemplateUpdateRequest transactionTemplateUpdateRequest, Guid id);
 }
 
-public class TransactionTemplateService(ITransactionTemplateRepository transactionTemplateRepository, IAuthorizationService authorizationService) : ITransactionTemplateService
+public class TransactionTemplateService(ITransactionTemplateRepository transactionTemplateRepository, IAuthorizationServiceFactory authorizationServiceFactory) : ITransactionTemplateService
 {
     private readonly ITransactionTemplateRepository m_TransactionTemplateRepository = transactionTemplateRepository;
-    private readonly IAuthorizationService          m_AuthorizationService          = authorizationService;
+    private readonly IAuthorizationServiceFactory   m_AuthorizationServiceFactory   = authorizationServiceFactory;
 
     public async Task<Result<Page<TransactionTemplateResponse>>> GetAll(Pageable pageable)
     {
@@ -41,7 +41,9 @@ public class TransactionTemplateService(ITransactionTemplateRepository transacti
         if (transactionTemplate == null)
             return Result.NotFound<TransactionTemplateResponse>($"No Transaction Template found with Id: {id}");
 
-        if (transactionTemplate.ClientId != m_AuthorizationService.UserId)
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+        
+        if (transactionTemplate.ClientId != authorizationService.UserId)
             return Result.Unauthorized<TransactionTemplateResponse>();
 
         return Result.Ok(transactionTemplate.ToResponse());
@@ -49,7 +51,9 @@ public class TransactionTemplateService(ITransactionTemplateRepository transacti
 
     public async Task<Result<TransactionTemplateResponse>> Create(TransactionTemplateCreateRequest transactionTemplateCreateRequest)
     {
-        var transactionTemplate = await m_TransactionTemplateRepository.Add(transactionTemplateCreateRequest.ToTransactionTemplate(m_AuthorizationService.UserId));
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+        
+        var transactionTemplate = await m_TransactionTemplateRepository.Add(transactionTemplateCreateRequest.ToTransactionTemplate(authorizationService.UserId));
 
         return Result.Ok(transactionTemplate.ToResponse());
     }
