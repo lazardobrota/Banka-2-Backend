@@ -18,7 +18,7 @@ internal class PostgresDefaultContextFactory<TDatabaseContext>(IDatabasePoolInfo
 {
     private readonly IDbContextFactory<TDatabaseContext> m_ContextFactory = contextFactory;
 
-    private readonly IDatabasePoolInfo m_PoolInfo          = poolInfo;
+    private readonly IDatabasePoolInfo m_PoolInfo             = poolInfo;
     private readonly SemaphoreSlim     m_SemaphoreDefault     = new(poolInfo.MaxConnections);
     private readonly SemaphoreSlim     m_SemaphoreDistributed = new(poolInfo.MaxConnections / 10);
 
@@ -51,7 +51,7 @@ internal class PostgresDefaultContextFactory<TDatabaseContext>(IDatabasePoolInfo
 
         return context;
     }
-    
+
     private async Task DisposeDistributedAfterActionAsync(TDatabaseContext context)
     {
         m_SemaphoreDefault.Release();
