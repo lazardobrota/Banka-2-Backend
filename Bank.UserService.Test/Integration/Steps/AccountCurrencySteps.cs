@@ -24,8 +24,9 @@ public class AccountCurrencySteps(ScenarioContext context, IAccountCurrencyServi
     [Given(@"account currency create request")]
     public void GivenAccountCurrencyCreateRequest()
     {
-        typeof(AuthorizationService).GetField("<UserId>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
-                                    ?.SetValue(m_AuthorizationService, Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"));
+        m_AuthorizationService.GetType()
+                              .GetField($"<{nameof(IAuthorizationService.UserId)}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                              .SetValue(m_AuthorizationService, Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"));
 
         m_ScenarioContext[Constant.AccountCurrencyCreateRequest] = Example.Entity.AccountCurrency.CreateRequest;
     }
