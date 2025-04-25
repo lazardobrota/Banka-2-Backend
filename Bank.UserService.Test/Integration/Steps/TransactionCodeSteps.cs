@@ -30,7 +30,7 @@ public class TransactionCodeSteps(ScenarioContext scenarioContext, ITransactionC
     public async Task WhenTransactionCodesAreFecthedFromTheDatabase()
     {
         var pageable = m_ScenarioContext.Get<Pageable>(Constant.Pageable);
-        var result   = await m_TransactionCodeService.GetAll(pageable);
+        var result   = await m_TransactionCodeService.GetAll(new(), pageable);
 
         m_ScenarioContext[Constant.GetAll]       = result;
         m_ScenarioContext[Constant.ActionResult] = result.ActionResult;

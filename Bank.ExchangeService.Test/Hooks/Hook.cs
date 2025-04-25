@@ -1,5 +1,7 @@
 using Bank.Application.Extensions;
+using Bank.Database;
 using Bank.ExchangeService.Application;
+using Bank.ExchangeService.Database;
 
 using DotNetEnv;
 
@@ -30,7 +32,7 @@ public class Hooks
         services.AddServices();
         services.AddBackgroundServices();
         services.AddHttpServices();
-        services.AddDatabase();
+        services.AddDatabaseServices<DatabaseContext>();
         services.AddHostedServices();
         services.AddOpenApiExamples();
 

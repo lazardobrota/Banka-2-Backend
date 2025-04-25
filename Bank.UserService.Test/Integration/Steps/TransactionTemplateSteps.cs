@@ -34,8 +34,9 @@ public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransact
     [Given(@"authorization for transaction template")]
     public void GivenAuthorizationForTransactionTemplate() //TODO What do to with AuthorizationService
     {
-        typeof(AuthorizationService).GetField($"<{nameof(m_AuthorizationService.UserId)}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
-                                    ?.SetValue(m_AuthorizationService, Example.Entity.TransactionTemplate.GetTransactionTemplate.ClientId);
+        m_AuthorizationService.GetType()
+                              .GetField($"<{nameof(IAuthorizationService.UserId)}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                              .SetValue(m_AuthorizationService, Example.Entity.TransactionTemplate.GetTransactionTemplate.ClientId);
     }
 
     [When(@"transactions template are fetched from the database")]
