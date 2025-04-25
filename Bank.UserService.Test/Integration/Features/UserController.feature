@@ -29,3 +29,15 @@
         Given user request password reset request with data
         When they request a password reset
         Then user response should be 202
+
+    Scenario: User update permission
+        Given user update permission request with data
+        And user id
+        When they request to update user permission
+        Then user response should be 200
+
+    Scenario: User password reset
+        Given user password reset request with data
+        And a user has received a valid activation token for password reset
+        When they request to reset user password
+        Then user response should be 202

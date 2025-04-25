@@ -83,8 +83,8 @@ public class LoanSteps(ScenarioContext scenarioContext, ILoanService loanService
         m_ScenarioContext[Constant.LoanUpdateResult] = loan;
     }
 
-    [Then(@"loant details should match the updated loan")]
-    public void ThenLoantDetailsShouldMatchTheUpdatedLoan()
+    [Then(@"loan details should match the updated loan")]
+    public void ThenLoanDetailsShouldMatchTheUpdatedLoan()
     {
         var loanUpdateResult = m_ScenarioContext.Get<Result<LoanResponse>>(Constant.LoanUpdateResult);
 
@@ -93,32 +93,6 @@ public class LoanSteps(ScenarioContext scenarioContext, ILoanService loanService
         loanUpdateResult.Value?.Status.ShouldBe(Example.Entity.Loan.UpdateRequest.Status!.Value);
         //loanUpdateResult.Value?.MaturityDate.ShouldBe(DateOnly.FromDateTime(Example.Entity.Loan.UpdateRequest.MaturityDate!.Value)); Ovo se ne updatuje??
     }
-
-    // [Given(@"loan Id which has installemtns")]
-    // public void GivenLoanIdWhichHasInstallemtns()
-    // {
-    //     m_ScenarioContext[Constant.LoanId] = Example.Entity.Loan.Id;
-    // }
-
-    // [When(@"all installemtns are fetched for the loan")]
-    // public async Task WhenAllInstallemtnsAreFetchedForTheLoan()
-    // {
-    //     var loanId = m_ScenarioContext.Get<Guid>(Constant.LoanId);
-    //
-    //     var installments = await m_LoanService.GetAllInstallments(loanId, new Pageable());
-    //
-    //     m_ScenarioContext[Constant.Installments] = installments;
-    // }
-
-    // [Then(@"all installemtns should be returned for the loan")]
-    // public void ThenAllInstallemtnsShouldBeReturnedForTheLoan()
-    // {
-    //     var installments = m_ScenarioContext.Get<Result<Page<InstallmentResponse>>>(Constant.Installments);
-    //
-    //     installments.ActionResult.ShouldBeOfType<OkObjectResult>();
-    //     installments.ShouldNotBeNull();
-    //     installments.Value!.Items.ShouldNotBeEmpty();
-    // }
 
     [When(@"all loans are fetched")]
     public async Task WhenAllLoansAreFetched()
@@ -137,6 +111,55 @@ public class LoanSteps(ScenarioContext scenarioContext, ILoanService loanService
         loans.ShouldNotBeNull();
         loans.Value!.Items.ShouldNotBeEmpty();
     }
+
+    [When(@"loan is provided by Id")]
+    public async Task WhenLoanIsProvidedById()
+    {
+        var loanId = m_ScenarioContext.Get<Guid>(Constant.LoanId);
+
+        var loan = await m_LoanService.GetOne(loanId);
+
+        m_ScenarioContext[Constant.Loan] = loan;
+    }
+
+    [Then(@"loan details should be returned")]
+    public void ThenLoanDetailsShouldBeReturned()
+    {
+        var loan = m_ScenarioContext.Get<Result<LoanResponse>>(Constant.Loan);
+
+        loan.ActionResult.ShouldBeOfType<OkObjectResult>();
+        loan.ShouldNotBeNull();
+        loan.Value.ShouldNotBeNull();
+        loan.Value!.Id.ShouldBe(Example.Entity.Loan.Id);
+    }
+
+    [Given(@"client Id which has loans")]
+    public void GivenClientIdWhichHasLoans()
+    {
+        m_ScenarioContext[Constant.ClientId] = Example.Entity.Loan.ClientId;
+    }
+
+    [When(@"loans are fetched by client Id")]
+    public async Task WhenLoansAreFetchedByClientId()
+    {
+        var clientId = m_ScenarioContext.Get<Guid>(Constant.ClientId);
+
+        var loans = await m_LoanService.GetByClient(clientId, new Pageable());
+
+        m_ScenarioContext[Constant.Loans] = loans;
+    }
+
+    [Then(@"all loans for the client should be returned")]
+    public void ThenAllLoansForTheClientShouldBeReturned()
+    {
+        var loans = m_ScenarioContext.Get<Result<Page<LoanResponse>>>(Constant.Loans);
+
+        loans.ActionResult.ShouldBeOfType<OkObjectResult>();
+        loans.ShouldNotBeNull();
+        loans.Value.ShouldNotBeNull();
+        loans.Value!.Items.ShouldNotBeEmpty();
+        loans.Value.Items.ShouldAllBe(x => x.Account.Client.Id == Example.Entity.Loan.ClientId);
+    }
 }
 
 file static class Constant
@@ -148,4 +171,6 @@ file static class Constant
     public const string LoanUpdateResult  = "LoanUpdateResult";
     public const string Installments      = "Installements";
     public const string Loans             = "Loans";
+    public const string Loan              = "Loan";
+    public const string ClientId          = "ClientId";
 }

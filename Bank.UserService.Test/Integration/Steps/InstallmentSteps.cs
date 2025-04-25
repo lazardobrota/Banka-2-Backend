@@ -119,6 +119,53 @@ public class InstallmentSteps(ScenarioContext scenarioContext, IInstallmentServi
         installments.Value!.Items.All(i => i.Loan.Id == m_ScenarioContext.Get<Guid>(Constant.LoanId))
                     .ShouldBeTrue();
     }
+
+    [Given(@"loan Id which has installments")]
+    public void GivenLoanIdWhichHasInstallments()
+    {
+        m_ScenarioContext[Constant.LoanId] = Example.Entity.Loan.Id;
+    }
+
+    [When(@"all installments are fetched for the loan")]
+    public async Task WhenAllInstallmentsAreFetchedForTheLoan()
+    {
+        var loanId = m_ScenarioContext.Get<Guid>(Constant.LoanId);
+
+        var installments = await m_InstallmentService.GetAllByLoanId(loanId, new Pageable());
+
+        m_ScenarioContext[Constant.Installments] = installments;
+    }
+
+    [Then(@"all installments should be returned for the loan")]
+    public void ThenAllInstallmentsShouldBeReturnedForTheLoan()
+    {
+        var installments = m_ScenarioContext.Get<Result<Page<InstallmentResponse>>>(Constant.Installments);
+
+        installments.ActionResult.ShouldBeOfType<OkObjectResult>();
+        installments.ShouldNotBeNull();
+        installments.Value!.Items.ShouldNotBeEmpty();
+    }
+
+    [When(@"installment is provided by Id")]
+    public async Task WhenInstallmentIsProvidedById()
+    {
+        var installmentId = m_ScenarioContext.Get<Guid>(Constant.InstallmentId);
+
+        var installment = await m_InstallmentService.GetOne(installmentId);
+
+        m_ScenarioContext[Constant.Installment] = installment;
+    }
+
+    [Then(@"installment details should be returned")]
+    public void ThenInstallmentDetailsShouldBeReturned()
+    {
+        var installment = m_ScenarioContext.Get<Result<InstallmentResponse>>(Constant.Installment);
+
+        installment.ActionResult.ShouldBeOfType<OkObjectResult>();
+        installment.ShouldNotBeNull();
+        installment.Value.ShouldNotBeNull();
+        installment.Value!.Id.ShouldBe(Example.Entity.Installment.InstallmentId);
+    }
 }
 
 file static class Constant
@@ -130,4 +177,5 @@ file static class Constant
     public const string InstallmentId            = "InstallmentId";
     public const string LoanId                   = "LoanId";
     public const string Installments             = "Installments";
+    public const string Installment              = "Installment";
 }

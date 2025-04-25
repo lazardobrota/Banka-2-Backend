@@ -134,30 +134,8 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
         accountUpdateResult.Value.Status.ShouldBe(Example.Entity.Account.UpdateEmployeeRequest.Status);
     }
 
-    // [When(@"all cards are fetched for the account")]
-    // public async Task WhenAllCardsAreFetchedForTheAccount()
-    // {
-    //     var accountId = m_ScenarioContext.Get<Guid>(Constant.AccountId);
-    //
-    //     var cardResult = await m_AccountService.GetAllCards(accountId, new CardFilterQuery(), new Pageable());
-    //
-    //     m_ScenarioContext[Constant.CardsResult] = cardResult;
-    // }
-
-    // [Then(@"all cards should be returned for the account")]
-    // public void ThenAllCardsShouldBeReturnedForTheAccount()
-    // {
-    //     var cardResult = m_ScenarioContext.Get<Result<Page<CardResponse>>>(Constant.CardsResult);
-    //
-    //     cardResult.ActionResult.ShouldBeOfType<OkObjectResult>();
-    //     cardResult.Value.ShouldNotBeNull();
-    //
-    //     cardResult.Value.Items.All(card => card.Account.Id == m_ScenarioContext.Get<Guid>(Constant.AccountId))
-    //               .ShouldBeTrue();
-    // }
-
-    [When(@"all acounts are fetched")]
-    public async Task WhenAllAcountsAreFetched()
+    [When(@"all accounts are fetched")]
+    public async Task WhenAllAccountsAreFetched()
     {
         var accounts = await m_AccountService.GetAll(new AccountFilterQuery(), new Pageable());
 
@@ -173,6 +151,32 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
         accounts.Value.ShouldNotBeNull();
         accounts.Value.Items.ShouldNotBeEmpty();
     }
+
+    [Given(@"client Id")]
+    public void GivenClientId()
+    {
+        m_ScenarioContext[Constant.IdForAccount] = Example.Entity.Client.Id2;
+    }
+
+    [When(@"all accounts are fetched from the database")]
+    public async Task WhenAllAccountsAreFetchedFromTheDatabase()
+    {
+        var id                = m_ScenarioContext.Get<Guid>(Constant.IdForAccount);
+        var getAccountsResult = await m_AccountService.GetAllForClient(id, new AccountFilterQuery(), new Pageable());
+
+        m_ScenarioContext[Constant.AccountResult] = getAccountsResult;
+    }
+
+    [Then(@"all accounts should be returned for that client")]
+    public void ThenAllAccountsShouldBeReturnedForThatClient()
+    {
+        var accountResult = m_ScenarioContext.Get<Result<Page<AccountResponse>>>(Constant.AccountResult);
+
+        accountResult.ActionResult.ShouldBeOfType<OkObjectResult>();
+        accountResult.Value.ShouldNotBeNull();
+        accountResult.Value.Items.ShouldNotBeEmpty();
+        accountResult.Value.Items.ShouldAllBe(account => account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.IdForAccount));
+    }
 }
 
 file static class Constant
@@ -184,6 +188,7 @@ file static class Constant
     public const string AccountUpdateResult          = "AccountUpdateResult";
     public const string AccountUpdateClientRequest   = "AccountUpdateClientRequest";
     public const string AccountUpdateEmployeeRequest = "AccountUpdateEmployeeRequest";
-    public const string CardsResult                  = "CardsResult";
     public const string Accounts                     = "Accounts";
+    public const string AccountResult                = "AccountResult";
+    public const string IdForAccount                 = "ClientIdForAccount";
 }

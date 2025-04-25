@@ -84,6 +84,44 @@ public class CurrencySteps(ScenarioContext scenarioContext, ICurrencyService cur
         result.Value.ShouldNotBeNull();
         result.Value.Id.ShouldBe(m_ScenarioContext.Get<Guid>(Constant.Id));
     }
+
+    [When(@"simple currencies are fetched from the database")]
+    public async Task WhenSimpleCurrenciesAreFetchedFromTheDatabase()
+    {
+        var simpleCurrencies = await m_CurrencyService.FindAllSimple(new CurrencyFilterQuery());
+
+        m_ScenarioContext[Constant.GetResult] = simpleCurrencies;
+    }
+
+    [Then(@"response should contain a list of all simple currencies")]
+    public void ThenResponseShouldContainAListOfAllSimpleCurrencies()
+    {
+        var simpleCurrencies = m_ScenarioContext.Get<Result<List<CurrencySimpleResponse>>>(Constant.GetResult);
+
+        simpleCurrencies.ActionResult.ShouldBeOfType<OkObjectResult>();
+        simpleCurrencies.Value.ShouldNotBeNull();
+        simpleCurrencies.Value.ShouldNotBeEmpty();
+    }
+
+    [When(@"simple currency is fetched by Id from the database")]
+    public async Task WhenSimpleCurrencyIsFetchedByIdFromTheDatabase()
+    {
+        var id = m_ScenarioContext.Get<Guid>(Constant.Id);
+
+        var result = await m_CurrencyService.FindByIdSimple(id);
+
+        m_ScenarioContext[Constant.GetResult] = result;
+    }
+
+    [Then(@"response should contain the simple currency with the given Id")]
+    public void ThenResponseShouldContainTheSimpleCurrencyWithTheGivenId()
+    {
+        var result = m_ScenarioContext.Get<Result<CurrencySimpleResponse>>(Constant.GetResult);
+
+        result.ActionResult.ShouldBeOfType<OkObjectResult>();
+        result.Value.ShouldNotBeNull();
+        result.Value.Id.ShouldBe(m_ScenarioContext.Get<Guid>(Constant.Id));
+    }
 }
 
 file static class Constant

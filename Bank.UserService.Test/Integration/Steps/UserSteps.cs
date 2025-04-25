@@ -191,6 +191,58 @@ public class UserSteps(IUserService userService, ScenarioContext scenarioContext
         m_ScenarioContext[Constant.Result]       = result;
         m_ScenarioContext[Constant.ActionResult] = result.ActionResult;
     }
+
+    [Given(@"user update permission request with data")]
+    public void GivenUserUpdatePermissionRequestWithData()
+    {
+        m_ScenarioContext[Constant.Permission] = Example.Entity.User.UserUpdatePermissionRequest;
+    }
+
+    [Given(@"user id")]
+    public void GivenUserId()
+    {
+        m_ScenarioContext[Constant.Id] = Example.Entity.User.Id;
+    }
+
+    [When(@"they request to update user permission")]
+    public async Task WhenTheyRequestToUpdateUserPermission()
+    {
+        var request = m_ScenarioContext.Get<UserUpdatePermissionRequest>(Constant.Permission);
+
+        var id = m_ScenarioContext.Get<Guid>(Constant.Id);
+
+        var result = await m_UserService.UpdatePermission(id, request);
+
+        m_ScenarioContext[Constant.Result]       = result;
+        m_ScenarioContext[Constant.ActionResult] = result.ActionResult;
+    }
+
+    [Given(@"user password reset request with data")]
+    public void GivenUserPasswordResetRequestWithData()
+    {
+        m_ScenarioContext[Constant.PasswordReset] = Example.Entity.User.UserPasswordResetRequest;
+    }
+
+    [Given(@"a user has received a valid activation token for password reset")]
+    public void GivenAUserHasReceivedAValidActivationTokenForPasswordReset()
+    {
+        string token = m_AuthorizationService.GenerateTokenFor(Example.Entity.User.GetEmployee.Id, Example.Entity.User.GetEmployee.Permissions);
+
+        m_ScenarioContext[Constant.Token] = token;
+    }
+
+    [When(@"they request to reset user password")]
+    public async Task WhenTheyRequestToResetUserPassword()
+    {
+        var request = m_ScenarioContext.Get<UserPasswordResetRequest>(Constant.PasswordReset);
+
+        var token = m_ScenarioContext.Get<string>(Constant.Token);
+
+        var result = await m_UserService.PasswordReset(request, token);
+
+        m_ScenarioContext[Constant.Result]       = result;
+        m_ScenarioContext[Constant.ActionResult] = result.ActionResult;
+    }
 }
 
 file static class Constant
@@ -205,4 +257,5 @@ file static class Constant
     public const string Token             = "UserToken";
     public const string ActivationRequest = "UserActivatioRequest";
     public const string PasswordReset     = "UserPasswordReset";
+    public const string Permission        = "UserPermission";
 }
