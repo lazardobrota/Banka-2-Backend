@@ -26,8 +26,9 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     [Given(@"account create request")]
     public void GivenAccountCreateRequest()
     {
-        typeof(AuthorizationService).GetField("<UserId>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
-                                    ?.SetValue(m_AuthorizationService, Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"));
+        m_AuthorizationService.GetType()
+                              .GetField($"<{nameof(IAuthorizationService.UserId)}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                              .SetValue(m_AuthorizationService, Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"));
 
         m_ScenarioContext[Constant.AccountCreateRequest] = Example.Entity.Account.CreateRequest;
     }
@@ -36,10 +37,6 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     public async Task WhenAccountIsCreatedInTheDatabase()
     {
         var accountCreateRequest = m_ScenarioContext.Get<AccountCreateRequest>(Constant.AccountCreateRequest);
-
-        Console.Write(accountCreateRequest.ClientId);
-        Console.Write(accountCreateRequest.AccountTypeId);
-        Console.Write(accountCreateRequest.CurrencyId);
 
         var accountResult = await m_AccountService.Create(accountCreateRequest);
 
@@ -60,8 +57,6 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     public void ThenAccountDetailsShouldMatchTheCreatedAccount()
     {
         var getAccountResult = m_ScenarioContext.Get<Result<AccountResponse>>(Constant.AccountCreateResult);
-
-        Debug.WriteLine(getAccountResult.ActionResult);
 
         getAccountResult.ActionResult.ShouldBeOfType<OkObjectResult>();
         getAccountResult.Value.ShouldNotBeNull();
