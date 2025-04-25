@@ -6,6 +6,6 @@ public static partial class Configuration
 {
     public static class Database
     {
-        public static readonly bool CreateDrop = DatabaseConfiguration.Database.CreateDrop;
+        public static readonly bool CreateDrop = DatabaseConfiguration.Database.Persistent.CreateDrop;
     }
 }
