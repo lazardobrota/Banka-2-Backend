@@ -9,6 +9,7 @@ using Bank.Application.Responses;
 using Bank.Permissions.Services;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
+using Bank.UserService.Test.Integration.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,18 +18,18 @@ using Shouldly;
 namespace Bank.UserService.Test.Steps;
 
 [Binding]
-public class AccountSteps(ScenarioContext context, IAccountService accountService, IAuthorizationService authorizationService)
+public class AccountSteps(ScenarioContext context, IAccountService accountService, IAuthorizationServiceFactory authorizationServiceFactory)
 {
-    private readonly ScenarioContext       m_ScenarioContext      = context;
-    private readonly IAccountService       m_AccountService       = accountService;
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly ScenarioContext              m_ScenarioContext             = context;
+    private readonly IAccountService              m_AccountService              = accountService;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     [Given(@"account create request")]
     public void GivenAccountCreateRequest()
     {
-        m_AuthorizationService.GetType()
-                              .GetField($"<{nameof(IAuthorizationService.UserId)}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
-                              .SetValue(m_AuthorizationService, Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"));
+        var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
+        
+        instance!.UserId = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9");
 
         m_ScenarioContext[Constant.AccountCreateRequest] = Example.Entity.Account.CreateRequest;
     }
