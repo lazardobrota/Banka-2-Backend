@@ -7,6 +7,7 @@ using Bank.Application.Responses;
 using Bank.Permissions.Services;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
+using Bank.UserService.Test.Integration.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,11 +16,11 @@ using Shouldly;
 namespace Bank.UserService.Test.Steps;
 
 [Binding]
-public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransactionTemplateService transactionTemplateService, IAuthorizationService authorizationService)
+public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransactionTemplateService transactionTemplateService, IAuthorizationServiceFactory authorizationServiceFactory)
 {
-    private readonly ScenarioContext             m_ScenarioContext            = scenarioContext;
-    private readonly ITransactionTemplateService m_TransactionTemplateService = transactionTemplateService;
-    private readonly IAuthorizationService       m_AuthorizationService       = authorizationService;
+    private readonly ScenarioContext              m_ScenarioContext             = scenarioContext;
+    private readonly ITransactionTemplateService  m_TransactionTemplateService  = transactionTemplateService;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     [Given(@"transaction template get request with query pageable")]
     public void GivenTransactionTemplateGetRequestWithQueryPageable()
@@ -34,9 +35,9 @@ public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransact
     [Given(@"authorization for transaction template")]
     public void GivenAuthorizationForTransactionTemplate() //TODO What do to with AuthorizationService
     {
-        m_AuthorizationService.GetType()
-                              .GetField($"<{nameof(IAuthorizationService.UserId)}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
-                              .SetValue(m_AuthorizationService, Example.Entity.TransactionTemplate.GetTransactionTemplate.ClientId);
+        var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
+        
+        instance!.UserId = Example.Entity.TransactionTemplate.GetTransactionTemplate.ClientId;
     }
 
     [When(@"transactions template are fetched from the database")]

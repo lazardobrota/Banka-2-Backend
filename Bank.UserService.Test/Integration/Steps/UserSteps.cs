@@ -6,6 +6,7 @@ using Bank.Application.Responses;
 using Bank.Permissions.Services;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
+using Bank.UserService.Test.Integration.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +15,11 @@ using Shouldly;
 namespace Bank.UserService.Test.Steps;
 
 [Binding]
-public class UserSteps(IUserService userService, ScenarioContext scenarioContext, IAuthorizationService authorizationService)
+public class UserSteps(IUserService userService, ScenarioContext scenarioContext, IAuthorizationServiceFactory authorizationServiceFactory)
 {
-    private readonly IUserService          m_UserService          = userService;
-    private readonly ScenarioContext       m_ScenarioContext      = scenarioContext;
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly IUserService                 m_UserService                 = userService;
+    private readonly ScenarioContext              m_ScenarioContext             = scenarioContext;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     [Given(@"user login request")]
     public void GivenUserLoginRequest()
@@ -151,7 +152,7 @@ public class UserSteps(IUserService userService, ScenarioContext scenarioContext
     [Given(@"a user has received a valid activation token")]
     public void GivenAUserHasReceivedAValidActivationToken()
     {
-        string token = m_AuthorizationService.GenerateTokenFor(Example.Entity.User.GetEmployee.Id, Example.Entity.User.GetEmployee.Permissions);
+        string token = m_AuthorizationServiceFactory.AuthorizationService.GenerateTokenFor(Example.Entity.User.GetEmployee.Id, Example.Entity.User.GetEmployee.Permissions);
 
         m_ScenarioContext[Constant.Token] = token;
     }
@@ -226,7 +227,7 @@ public class UserSteps(IUserService userService, ScenarioContext scenarioContext
     [Given(@"a user has received a valid activation token for password reset")]
     public void GivenAUserHasReceivedAValidActivationTokenForPasswordReset()
     {
-        string token = m_AuthorizationService.GenerateTokenFor(Example.Entity.User.GetEmployee.Id, Example.Entity.User.GetEmployee.Permissions);
+        string token = m_AuthorizationServiceFactory.AuthorizationService.GenerateTokenFor(Example.Entity.User.GetEmployee.Id, Example.Entity.User.GetEmployee.Permissions);
 
         m_ScenarioContext[Constant.Token] = token;
     }
