@@ -109,6 +109,11 @@ public class LoanService(
         if (dbLoan is null)
             return Result.NotFound<LoanResponse>($"No Loan found with Id: {id}");
 
+        if (dbLoan.Status == LoanStatus.Pending && loanRequest.Status == LoanStatus.Active)
+        {
+            await m_LoanHostedService.DisperseFundsAfterLoanActivation(dbLoan);
+        }
+
         var loan        = await m_LoanRepository.Update(dbLoan.Update(loanRequest));
         var amountInRsd = await m_LoanHostedService.ConvertToRsd(loan.Amount, loan.Currency);
 

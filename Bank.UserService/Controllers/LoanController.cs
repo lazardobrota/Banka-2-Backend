@@ -42,7 +42,7 @@ public class LoanController(ILoanService loanService) : ControllerBase
         return result.ActionResult;
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPost(Endpoints.Loan.Create)]
     public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanCreateRequest loanCreateRequest)
     {
@@ -51,7 +51,7 @@ public class LoanController(ILoanService loanService) : ControllerBase
         return result.ActionResult;
     }
 
-    [Authorize(Permission.Admin, Permission.Employee)]
+    //[Authorize(Permission.Admin, Permission.Employee)]
     [HttpPut(Endpoints.Loan.Update)]
     public async Task<ActionResult<LoanResponse>> Update([FromBody] LoanUpdateRequest loanRequest, [FromRoute] Guid id)
     {
