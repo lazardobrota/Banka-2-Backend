@@ -270,6 +270,7 @@ public class TransactionService(
 
     private async Task<Result<Transaction>> AddExternalTransaction(TempyTransaction tempyTransaction) // TODO: external transaction 
     {
+        // TODO write code
         return Result.Forbidden<Transaction>();
     }
 

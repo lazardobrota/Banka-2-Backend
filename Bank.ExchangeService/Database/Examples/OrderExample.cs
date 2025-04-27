@@ -14,36 +14,34 @@ public static partial class Example
                                                                       OrderType     = OrderType.Market,
                                                                       Quantity      = 100,
                                                                       ContractCount = 10,
-                                                                      PricePerUnit  = 250.75m,
+                                                                      StopPrice     = 222.22m,
+                                                                      LimitPrice    = 250.75m,
                                                                       Direction     = Direction.Buy,
                                                                       SupervisorId  = Guid.Parse("e1f3de40-719e-4b5f-8e4d-d42f06e4a411"),
-                                                                      AfterHours    = false,
                                                                       AccountNumber = "000000005",
                                                                       SecurityId    = Guid.Parse("9000bb03-afac-4ab5-80f3-980a0ed898f2")
                                                                   };
 
         public static readonly OrderUpdateRequest UpdateRequest = new()
                                                                   {
-                                                                      Status = OrderStatus.Approved
+                                                                      Status = OrderStatus.NeedsApproval
                                                                   };
 
         public static readonly OrderResponse Response = new()
                                                         {
-                                                            Id                = Guid.NewGuid(),
-                                                            Actuary           = null!,
-                                                            OrderType         = CreateRequest.OrderType,
-                                                            Quantity          = CreateRequest.Quantity,
-                                                            ContractCount     = CreateRequest.ContractCount,
-                                                            PricePerUnit      = CreateRequest.PricePerUnit,
-                                                            Direction         = CreateRequest.Direction,
-                                                            Status            = UpdateRequest.Status,
-                                                            Supervisor        = null!,
-                                                            Done              = true,
-                                                            Account           = null!,
-                                                            AfterHours        = CreateRequest.AfterHours,
-                                                            CreatedAt         = DateTime.UtcNow,
-                                                            ModifiedAt        = DateTime.UtcNow,
-                                                            RemainingPortions = 0
+                                                            Id            = Guid.NewGuid(),
+                                                            Actuary       = null!,
+                                                            OrderType     = CreateRequest.OrderType,
+                                                            Quantity      = CreateRequest.Quantity,
+                                                            ContractCount = CreateRequest.ContractCount,
+                                                            StopPrice     = CreateRequest.StopPrice,
+                                                            LimitPrice    = CreateRequest.LimitPrice,
+                                                            Direction     = CreateRequest.Direction,
+                                                            Status        = UpdateRequest.Status,
+                                                            Supervisor    = null!,
+                                                            Account       = null!,
+                                                            CreatedAt     = DateTime.UtcNow,
+                                                            ModifiedAt    = DateTime.UtcNow,
                                                         };
     }
 }
