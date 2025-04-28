@@ -2,9 +2,9 @@
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
-using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Repositories;
+using Bank.Http.Clients.User;
 
 using Result = Bank.Application.Endpoints.Result;
 
@@ -19,10 +19,10 @@ public interface IFutureContractService
     Task<Result<FutureContractDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class FutureContractService(ISecurityRepository securityRepository, HttpClient httpClient) : IFutureContractService
+public class FutureContractService(ISecurityRepository securityRepository, IUserServiceHttpClient userServiceHttpClient) : IFutureContractService
 {
-    private readonly ISecurityRepository m_SecurityRepository = securityRepository;
-    private readonly HttpClient          m_HttpClient         = httpClient;
+    private readonly ISecurityRepository    m_SecurityRepository    = securityRepository;
+    private readonly IUserServiceHttpClient m_UserServiceHttpClient = userServiceHttpClient;
 
     public async Task<Result<Page<FutureContractSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
@@ -42,7 +42,7 @@ public class FutureContractService(ISecurityRepository securityRepository, HttpC
         if (futureContract is null)
             return Result.NotFound<FutureContractResponse>($"No FutureContract found wih Id: {id}");
 
-        var currencyResponse = await m_HttpClient.GetCurrencyByIdSimple(futureContract.StockExchange!.CurrencyId);
+        var currencyResponse = await m_UserServiceHttpClient.GetOneSimpleCurrency(futureContract.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {futureContract.StockExchange!.CurrencyId}");
@@ -58,7 +58,7 @@ public class FutureContractService(ISecurityRepository securityRepository, HttpC
         if (futureContract is null)
             return Result.NotFound<FutureContractDailyResponse>($"No FutureContract found wih Id: {id}");
 
-        var currencyResponse = await m_HttpClient.GetCurrencyByIdSimple(futureContract.StockExchange!.CurrencyId);
+        var currencyResponse = await m_UserServiceHttpClient.GetOneSimpleCurrency(futureContract.StockExchange!.CurrencyId);
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {futureContract.StockExchange!.CurrencyId}");

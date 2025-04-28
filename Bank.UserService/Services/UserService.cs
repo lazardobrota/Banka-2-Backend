@@ -69,7 +69,7 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
             return Result.BadRequest<UserLoginResponse>("The password is incorrect.");
 
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
-        
+
         var token = authorizationService.GenerateTokenFor(user.Id, user.Permissions);
 
         return Result.Ok(new UserLoginResponse { Token = token, User = user.ToResponse() });

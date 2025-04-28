@@ -1,5 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Web;
 
 using Bank.Application.Domain;

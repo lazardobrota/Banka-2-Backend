@@ -109,10 +109,10 @@ public class DataService(
         DefaultCurrency = await m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode) ?? throw new Exception("Invalid default currency.");
 
         BankAccount = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id) ?? throw new Exception("Invalid bank account.");
-        
+
         return true;
     }
-    
+
     public async Task<(ImmutableArray<AccountCurrency> values, bool upToDate)> GetAccountCurrencies()
     {
         return (Seeder.AccountCurrency.All, await m_AccountCurrencyRepository.IsEmpty() is not true);

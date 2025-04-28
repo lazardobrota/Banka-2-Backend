@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
@@ -28,7 +25,7 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
     public void GivenAccountCreateRequest()
     {
         var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
-        
+
         instance!.UserId = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9");
 
         m_ScenarioContext[Constant.AccountCreateRequest] = Example.Entity.Account.CreateRequest;

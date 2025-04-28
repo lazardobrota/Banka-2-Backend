@@ -113,8 +113,8 @@ public static partial class Endpoints
 {
     public static class Currency
     {
-        public const string Base         = $"{ApiBase}/currencies";
-        
+        public const string Base = $"{ApiBase}/currencies";
+
         public const string GetOne       = $"{Base}/{{id:guid}}";
         public const string GetAll       = $"{Base}";
         public const string GetAllSimple = $"{Base}/simple";
@@ -126,8 +126,8 @@ public static partial class Endpoints
 {
     public static class Country
     {
-        public const string Base   = $"{ApiBase}/countries";
-        
+        public const string Base = $"{ApiBase}/countries";
+
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string GetAll = $"{Base}";
     }
@@ -148,8 +148,8 @@ public static partial class Endpoints
 {
     public static class Account
     {
-        public const string Base            = $"{ApiBase}/accounts";
-        
+        public const string Base = $"{ApiBase}/accounts";
+
         public const string GetAll          = $"{Base}";
         public const string GetAllForClient = $"{Client.Base}/{{clientId:guid}}/accounts";
         public const string GetOne          = $"{Base}/{{id:guid}}";
@@ -163,8 +163,8 @@ public static partial class Endpoints
 {
     public static class AccountCurrency
     {
-        public const string Base         = $"{ApiBase}/accounts/currencies";
-        
+        public const string Base = $"{ApiBase}/accounts/currencies";
+
         public const string GetAll       = $"{Base}";
         public const string GetOne       = $"{Base}/{{id:guid}}";
         public const string Create       = $"{Base}";

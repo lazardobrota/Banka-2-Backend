@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
@@ -16,7 +14,11 @@ using Shouldly;
 namespace Bank.UserService.Test.Steps;
 
 [Binding]
-public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransactionTemplateService transactionTemplateService, IAuthorizationServiceFactory authorizationServiceFactory)
+public class TransactionTemplateSteps(
+    ScenarioContext              scenarioContext,
+    ITransactionTemplateService  transactionTemplateService,
+    IAuthorizationServiceFactory authorizationServiceFactory
+)
 {
     private readonly ScenarioContext              m_ScenarioContext             = scenarioContext;
     private readonly ITransactionTemplateService  m_TransactionTemplateService  = transactionTemplateService;
@@ -36,7 +38,7 @@ public class TransactionTemplateSteps(ScenarioContext scenarioContext, ITransact
     public void GivenAuthorizationForTransactionTemplate() //TODO What do to with AuthorizationService
     {
         var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
-        
+
         instance!.UserId = Example.Entity.TransactionTemplate.GetTransactionTemplate.ClientId;
     }
 

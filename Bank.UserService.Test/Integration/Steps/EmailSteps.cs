@@ -1,5 +1,4 @@
 ﻿using Bank.Application.Endpoints;
-using Bank.UserService.Database.Examples;
 using Bank.UserService.Mappers;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;

@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Requests;
+using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.Test.Examples.Entities;
 
@@ -12,8 +13,7 @@ public static partial class Example
 
             public static readonly AccountCurrencyClientUpdateRequest ClientUpdateRequest = Database.Examples.Example.AccountCurrency.ClientUpdateRequest;
 
-            public static readonly Guid AccountCurrencyId = Database.Seeders.Seeder.AccountCurrency.BankEuro.Id;
-
+            public static readonly Guid AccountCurrencyId = Seeder.AccountCurrency.BankEuro.Id;
         }
     }
 }

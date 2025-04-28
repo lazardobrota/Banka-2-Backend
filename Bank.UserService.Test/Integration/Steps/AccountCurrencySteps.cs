@@ -1,32 +1,20 @@
-﻿using System.Reflection;
-using System.Security.Claims;
-
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.Permissions.Configurations;
 using Bank.Permissions.Services;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
 using Bank.UserService.Test.Integration.Services;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-
-using Moq;
 
 using Shouldly;
 
 namespace Bank.UserService.Test.Integration.Steps;
 
 [Binding]
-public class AccountCurrencySteps(
-    ScenarioContext              context,
-    IAccountCurrencyService      accountCurrencyService,
-    IAuthorizationServiceFactory authorizationServiceFactory
-)
+public class AccountCurrencySteps(ScenarioContext context, IAccountCurrencyService accountCurrencyService, IAuthorizationServiceFactory authorizationServiceFactory)
 {
     private readonly ScenarioContext              m_ScenarioContext             = context;
     private readonly IAccountCurrencyService      m_AccountCurrencyService      = accountCurrencyService;
@@ -36,9 +24,9 @@ public class AccountCurrencySteps(
     public void GivenAccountCurrencyCreateRequest()
     {
         var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
-        
+
         instance!.UserId = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9");
-        
+
         m_ScenarioContext[Constant.AccountCurrencyCreateRequest] = Example.Entity.AccountCurrency.CreateRequest;
     }
 

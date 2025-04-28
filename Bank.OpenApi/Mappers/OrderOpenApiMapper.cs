@@ -38,14 +38,12 @@ internal static class OrderOpenApiMapper
 
         @object[nameof(value.AfterHours)
                 .ToCamelCase()] = new OpenApiBoolean(value.AfterHours);
-        
+
         @object[nameof(value.AccountNumber)
                 .ToCamelCase()] = new OpenApiString(value.AccountNumber);
-        
+
         @object[nameof(value.SecurityId)
                 .ToCamelCase()] = new OpenApiString(value.SecurityId.ToString());
-        
-        
 
         return @object;
     }
@@ -111,7 +109,7 @@ internal static class OrderOpenApiMapper
 
         @object[nameof(value.ModifiedAt)
                 .ToCamelCase()] = new OpenApiDateTime(value.ModifiedAt);
-        
+
         @object[nameof(value.Account)
                 .ToCamelCase()] = value.Account?.ToOpenApiObject();
 
