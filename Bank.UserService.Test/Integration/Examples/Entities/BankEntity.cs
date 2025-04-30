@@ -1,4 +1,6 @@
-﻿namespace Bank.UserService.Test.Examples.Entities;
+﻿using Bank.UserService.Database.Seeders;
+
+namespace Bank.UserService.Test.Examples.Entities;
 
 public static partial class Example
 {
@@ -6,7 +8,7 @@ public static partial class Example
     {
         public static class Bank
         {
-            public static readonly Guid BankId = Database.Seeders.Seeder.Bank.Bank02.Id;
+            public static readonly Guid BankId = Seeder.Bank.Bank02.Id;
         }
     }
 }

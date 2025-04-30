@@ -65,17 +65,17 @@ public class StockExchangeRepository(IDatabaseContextFactory<DatabaseContext> co
         await using var context = await m_ContextFactory.CreateContext;
 
         return await context.StockExchanges.Where(stockExchange => EF.Functions.ILike(stockExchange.Acronym, $"%{acronym}%"))
-                              .FirstAsync();
+                            .FirstAsync();
     }
 
     public async Task<StockExchange> Add(StockExchange stockExchange)
     {
         await using var context = await m_ContextFactory.CreateContext;
-        
+
         var added = await context.StockExchanges.AddAsync(stockExchange);
-        
+
         await context.SaveChangesAsync();
-        
+
         return added.Entity;
     }
 
@@ -86,7 +86,7 @@ public class StockExchangeRepository(IDatabaseContextFactory<DatabaseContext> co
         context.StockExchanges.Update(stockExchange);
 
         await context.SaveChangesAsync();
-        
+
         return stockExchange;
     }
 }

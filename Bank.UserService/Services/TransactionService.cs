@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
@@ -73,7 +71,7 @@ public class TransactionService(
             return Result.NotFound<TransactionResponse>($"No Transaction found with Id: {id}");
 
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
-        
+
         if (authorizationService.Permissions == Permission.Client && transaction.FromAccount?.ClientId != authorizationService.UserId &&
             transaction.ToAccount?.ClientId  != authorizationService.UserId)
             return Result.Unauthorized<TransactionResponse>();
@@ -84,7 +82,7 @@ public class TransactionService(
     public async Task<Result<Page<TransactionResponse>>> GetAllByAccountId(Guid accountId, TransactionFilterQuery transactionFilterQuery, Pageable pageable)
     {
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
-        
+
         var page = await m_TransactionRepository.FindAllByAccountId(accountId, transactionFilterQuery, pageable);
 
         if (authorizationService.Permissions == Permission.Client &&
@@ -137,13 +135,13 @@ public class TransactionService(
         var fromAccountTask     = m_AccountRepository.FindByNumber(tempyTransaction.FromAccountNumber?.Substring(7, 9) ?? "");
         var toAccountTask       = m_AccountRepository.FindByNumber(tempyTransaction.ToAccountNumber?.Substring(7, 9)   ?? "");
         var exchangeDetailsTask = m_ExchangeService.CalculateExchangeDetails(tempyTransaction.FromCurrencyId, tempyTransaction.ToCurrencyId);
-        
+
         await Task.WhenAll(fromAccountTask, toAccountTask, exchangeDetailsTask);
-        
+
         var fromAccount     = await fromAccountTask;
         var toAccount       = await toAccountTask;
         var exchangeDetails = await exchangeDetailsTask;
-        
+
         var bankCodeFrom = tempyTransaction.FromAccountNumber?[..3];
         var bankCodeTo   = tempyTransaction.ToAccountNumber?[..3];
 
@@ -239,7 +237,7 @@ public class TransactionService(
             return Result.BadRequest<Transaction>("Some error");
 
         var transaction = internalTransaction.ToTransaction();
-        
+
         await m_TransactionRepository.Add(transaction);
 
         internalTransaction.FromAccount.TryFindAccount(internalTransaction.FromCurrencyId, out var accountId);

@@ -50,10 +50,11 @@ public static partial class Example
                                                                                    Password        = "M4rk0Petrovic@2025",
                                                                                    ConfirmPassword = "M4rk0Petrovic@2025"
                                                                                };
+
         public static readonly UserUpdatePermissionRequest UpdatePermissionRequest = new()
                                                                                      {
-                                                                                         Permission     = Permission.Employee,
-                                                                                         Type = PermissionType.Set
+                                                                                         Permission = Permission.Employee,
+                                                                                         Type       = PermissionType.Set
                                                                                      };
 
         public static readonly UserResponse Response = new()

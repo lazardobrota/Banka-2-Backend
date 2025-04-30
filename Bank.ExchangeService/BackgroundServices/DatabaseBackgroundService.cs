@@ -4,18 +4,25 @@ using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Seeders;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Repositories;
+using Bank.Http.Clients.User;
 
 using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.BackgroundServices;
 
-public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IHubContext<SecurityHub, ISecurityClient> securityHub)
+public class DatabaseBackgroundService(
+    IServiceProvider                          serviceProvider,
+    IHttpClientFactory                        httpClientFactory,
+    IUserServiceHttpClient                    userServiceHttpClient,
+    IHubContext<SecurityHub, ISecurityClient> securityHub
+)
 {
-    private readonly IServiceProvider                          m_ServiceProvider    = serviceProvider;
-    private readonly IHttpClientFactory                        m_HttpClientFactory  = httpClientFactory;
-    private readonly IHubContext<SecurityHub, ISecurityClient> m_SecurityHub        = securityHub;
-    private          ISecurityRepository                       m_SecurityRepository = null!;
-    private          IQuoteRepository                          m_QuoteRepository    = null!;
+    private readonly IServiceProvider                          m_ServiceProvider       = serviceProvider;
+    private readonly IHttpClientFactory                        m_HttpClientFactory     = httpClientFactory;
+    private readonly IUserServiceHttpClient                    m_UserServiceHttpClient = userServiceHttpClient;
+    private readonly IHubContext<SecurityHub, ISecurityClient> m_SecurityHub           = securityHub;
+    private          ISecurityRepository                       m_SecurityRepository    = null!;
+    private          IQuoteRepository                          m_QuoteRepository       = null!;
     private          Timer?                                    m_SecurityTimer;
     private          bool                                      m_IsProcessRunning = false;
     private          int                                       m_IterationCount   = 0;
@@ -60,7 +67,7 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
 
             return;
         }
-        
+
         Console.WriteLine("Wait for 'Seeding Completed' message");
 
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
@@ -69,16 +76,16 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         Context.SeedStock(client)
                .Wait();
 
-        Context.SeedForexPair(client, m_SecurityRepository)
+        Context.SeedForexPair(client, m_UserServiceHttpClient, m_SecurityRepository)
                .Wait();
 
         Context.SeedOptionsAndQuotes(client, m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
-        Context.SeedForexPairQuotes(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
+        Context.SeedForexPairQuotes(client, m_UserServiceHttpClient, m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
-        Context.SeedStockQuotes(m_HttpClientFactory.CreateClient(), m_SecurityRepository, m_QuoteRepository)
+        Context.SeedStockQuotes(client, m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
         Console.WriteLine("Seeding Completed");
@@ -137,7 +144,7 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
         var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
 
-        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository, m_SecurityHub);
+        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), m_UserServiceHttpClient, securityRepository, quoteRepository, m_SecurityHub);
     }
 
     private async Task FetchOptionLatest()

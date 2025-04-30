@@ -11,5 +11,4 @@ public class AccountFilterQuery
     public string?    AccountTypeName { set; get; }
     public bool?      Status          { set; get; }
     public List<Guid> Ids             { set; get; } = [];
-
 }

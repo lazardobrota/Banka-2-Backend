@@ -2,13 +2,14 @@
 using System.Text.Json;
 
 using Bank.Application.Domain;
+using Bank.Application.Queries;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database.WebSockets;
-using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
+using Bank.Http.Clients.User;
 
 using Microsoft.AspNetCore.SignalR;
 
@@ -96,14 +97,15 @@ public static class ForexPairSeederExtension
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedForexPair(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository)
+    public static async Task SeedForexPair(this DatabaseContext context, HttpClient httpClient, IUserServiceHttpClient userServiceHttpClient,
+                                           ISecurityRepository  securityRepository)
     {
         if (context.Securities.Any(security => security.SecurityType == SecurityType.ForexPair))
             return;
 
-        var currencies = await httpClient.GetAllCurrenciesSimple();
+        var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
 
-        if (currencies is null)
+        if (currencies.Count == 0)
             return;
 
         var apiKey     = Configuration.Security.Keys.ApiKeyForex;
@@ -161,12 +163,12 @@ public static class ForexPairSeederExtension
         await securityRepository.CreateSecurities(securities);
     }
 
-    public static async Task SeedForexPairLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository,
-                                                 IHubContext<SecurityHub, ISecurityClient> securityHub)
+    public static async Task SeedForexPairLatest(this DatabaseContext context,            HttpClient       httpClient,      IUserServiceHttpClient userServiceHttpClient,
+                                                 ISecurityRepository  securityRepository, IQuoteRepository quoteRepository, IHubContext<SecurityHub, ISecurityClient> securityHub)
     {
-        var currencies = await httpClient.GetAllCurrenciesSimple();
+        var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
 
-        if (currencies is null)
+        if (currencies.Count == 0)
             return;
 
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
@@ -222,7 +224,8 @@ public static class ForexPairSeederExtension
         await quoteRepository.CreateQuotes(quotes);
     }
 
-    public static async Task SeedForexPairQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
+    public static async Task SeedForexPairQuotes(this DatabaseContext context,            HttpClient       httpClient, IUserServiceHttpClient userServiceHttpClient,
+                                                 ISecurityRepository  securityRepository, IQuoteRepository quoteRepository)
     {
         if (context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.ForexPair))
             return;
@@ -230,9 +233,9 @@ public static class ForexPairSeederExtension
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
 
-        var currencies = await httpClient.GetAllCurrenciesSimple();
+        var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
 
-        if (currencies is null)
+        if (currencies.Count == 0)
             return;
 
         var apiKey = Configuration.Security.Keys.ApiKeyForex;

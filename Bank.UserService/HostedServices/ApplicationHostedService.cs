@@ -28,7 +28,7 @@ public class ApplicationHostedService(
         await m_DatabaseBackgroundService.OnApplicationStopped(cancellationToken);
         await m_CurrencyExchangeBackgroundService.OnApplicationStopped(cancellationToken);
         await m_TransactionBackgroundService.OnApplicationStopped();
-        
+
         m_LoanHostedService.OnApplicationStopped();
     }
 }

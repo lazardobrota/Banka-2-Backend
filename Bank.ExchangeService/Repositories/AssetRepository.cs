@@ -3,7 +3,6 @@
 using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.Database.Core;
-using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Models;
 using Bank.Permissions.Services;
 

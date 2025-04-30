@@ -25,7 +25,7 @@ internal partial class UserServiceHttpClient
         return await response.Content.ReadFromJsonAsync<List<CurrencyResponse>>() ?? [];
     }
 
-    public async Task<List<CurrencyResponse>> GetAllSimpleCurrencies(CurrencyFilterQuery filter)
+    public async Task<List<CurrencySimpleResponse>> GetAllSimpleCurrencies(CurrencyFilterQuery filter)
     {
         using var httpClient = m_HttpClientFactory.CreateClient(Configuration.Client.Name.UserService);
 
@@ -37,7 +37,7 @@ internal partial class UserServiceHttpClient
         if (!response.IsSuccessStatusCode)
             return [];
 
-        return await response.Content.ReadFromJsonAsync<List<CurrencyResponse>>() ?? [];
+        return await response.Content.ReadFromJsonAsync<List<CurrencySimpleResponse>>() ?? [];
     }
 
     public async Task<CurrencyResponse?> GetOneCurrency(Guid currencyId)
@@ -54,7 +54,7 @@ internal partial class UserServiceHttpClient
         return await response.Content.ReadFromJsonAsync<CurrencyResponse>();
     }
 
-    public async Task<CurrencyResponse?> GetOneSimpleCurrency(Guid currencyId)
+    public async Task<CurrencySimpleResponse?> GetOneSimpleCurrency(Guid currencyId)
     {
         using var httpClient = m_HttpClientFactory.CreateClient(Configuration.Client.Name.UserService);
 
@@ -65,6 +65,6 @@ internal partial class UserServiceHttpClient
         if (!response.IsSuccessStatusCode)
             return null;
 
-        return await response.Content.ReadFromJsonAsync<CurrencyResponse>();
+        return await response.Content.ReadFromJsonAsync<CurrencySimpleResponse>();
     }
 }
