@@ -6,7 +6,6 @@ using Bank.Application.Responses;
 using Bank.Permissions.Services;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
-using Bank.UserService.Test.Integration.Services;
 
 using Microsoft.AspNetCore.Mvc;
 

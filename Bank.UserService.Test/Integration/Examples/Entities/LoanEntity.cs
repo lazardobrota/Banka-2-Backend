@@ -15,7 +15,7 @@ public static partial class Example
 
             public static readonly Guid Id = Seeder.Loan.PersonalLoan1.Id;
 
-            public static readonly Guid ClientId = Database.Seeders.Seeder.Client.Client01.Id;
+            public static readonly Guid ClientId = Seeder.Client.Client01.Id;
         }
     }
 }

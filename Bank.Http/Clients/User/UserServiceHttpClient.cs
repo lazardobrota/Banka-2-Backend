@@ -105,11 +105,11 @@ public interface IUserServiceHttpClient
 
     Task<List<CurrencyResponse>> GetAllCurrencies(CurrencyFilterQuery filter);
 
-    Task<List<CurrencyResponse>> GetAllSimpleCurrencies(CurrencyFilterQuery filter);
+    Task<List<CurrencySimpleResponse>> GetAllSimpleCurrencies(CurrencyFilterQuery filter);
 
     Task<CurrencyResponse?> GetOneCurrency(Guid currencyId);
 
-    Task<CurrencyResponse?> GetOneSimpleCurrency(Guid currencyId);
+    Task<CurrencySimpleResponse?> GetOneSimpleCurrency(Guid currencyId);
 
     #endregion
 

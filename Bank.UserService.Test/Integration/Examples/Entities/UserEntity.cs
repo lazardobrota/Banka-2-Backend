@@ -63,9 +63,9 @@ public static partial class Example
                                                               };
 
             public static readonly UserActivationRequest UserActivationRequest = Database.Examples.Example.User.ActivationRequest;
-            
+
             public static readonly UserUpdatePermissionRequest UserUpdatePermissionRequest = Database.Examples.Example.User.UpdatePermissionRequest;
-            
+
             public static readonly UserPasswordResetRequest UserPasswordResetRequest = Database.Examples.Example.User.PasswordResetRequest;
 
             public static readonly Guid Id = Seeder.Client.Client01.Id;
