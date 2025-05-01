@@ -1,16 +1,7 @@
 ﻿namespace Bank.Link.Core;
 
-public interface IBankExchangeData
-{
-    
-}
+public interface IBankExchangeData { }
 
-internal interface IBankExchangeDataLink
-{
-    
-}
+internal interface IBankExchangeDataLink { }
 
-internal class BankExchangeData : IBankExchangeData
-{
-    
-}
+internal class BankExchangeData : IBankExchangeData { }

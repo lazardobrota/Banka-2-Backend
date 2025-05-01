@@ -2,8 +2,5 @@
 
 internal static partial class Request
 {
-    internal static class B3 // TODO: Account Query Parameters
-    {
-
-    }
+    internal static class B3 { }
 }

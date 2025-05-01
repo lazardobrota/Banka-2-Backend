@@ -1,6 +1,6 @@
-﻿using Bank.Link.B3;
-using Bank.Link.Configurations;
+﻿using Bank.Link.Configurations;
 using Bank.Link.Core;
+using Bank.Link.Core.B3;
 
 using Microsoft.Extensions.DependencyInjection;
 

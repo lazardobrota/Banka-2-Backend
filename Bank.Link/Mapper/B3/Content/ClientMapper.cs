@@ -27,7 +27,7 @@ public static class ClientMapper
                    Activated                  = false
                };
     }
-    
+
     internal static ClientSimpleResponse ToSimpleNative(this Response.B3.ClientResponse response)
     {
         return new ClientSimpleResponse
