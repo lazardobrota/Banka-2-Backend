@@ -43,8 +43,7 @@ public class OrderService(IOrderRepository orderRepository, ISecurityRepository 
                          };
 
         var accountIds = orders.Items.Select(order => order.AccountId)
-                               .Where(accountId => accountId != null)
-                               .Select(accountId => accountId!.Value)
+                               .Select(accountId => accountId)
                                .Distinct()
                                .ToList();
 
@@ -65,7 +64,7 @@ public class OrderService(IOrderRepository orderRepository, ISecurityRepository 
         var accountDictionary = accountPage.Items.ToDictionary(accountResponse => accountResponse.Id, accountResponse => accountResponse);
 
         var result = orders.Items.Select(order => order.ToResponse(userDictionary[order.ActuaryId], order.SupervisorId == null ? null : userDictionary[order.SupervisorId.Value],
-                                                                   accountDictionary[order.AccountId!.Value]))
+                                                                   accountDictionary[order.AccountId]))
                            .ToList();
 
         return Result.Ok(new Page<OrderResponse>(result, orders.PageNumber, orders.PageSize, orders.TotalElements));
@@ -84,7 +83,7 @@ public class OrderService(IOrderRepository orderRepository, ISecurityRepository 
                          };
 
         var userPageTask        = m_UserServiceHttpClient.GetAllUsers(userFilter, Pageable.Create(1, 2));
-        var accountResponseTask = m_UserServiceHttpClient.GetOneAccount(order.AccountId ?? Guid.Empty);
+        var accountResponseTask = m_UserServiceHttpClient.GetOneAccount(order.AccountId);
 
         await Task.WhenAll(userPageTask, accountResponseTask);
 
@@ -126,14 +125,14 @@ public class OrderService(IOrderRepository orderRepository, ISecurityRepository 
         // if (security is null) TODO: Uncomment
         // return Result.BadRequest<OrderResponse>("Could not find Security");
 
-        if (security.SettlementDate < DateOnly.FromDateTime(DateTime.Now)) //TODO should decline, check if present
+        if (security.SettlementDate != DateOnly.MinValue && security.SettlementDate < DateOnly.FromDateTime(DateTime.Now)) //TODO should decline, check if present
             return Result.BadRequest<OrderResponse>("Security settlement date has passed");
 
         var userResponses = userPage.Items.ToDictionary(userResponse => userResponse.Id, userResponse => userResponse);
 
         var order = await m_OrderRepository.Add(request.ToOrder(accountPage.Items[0].Id));
 
-        return Result.Ok(order.ToResponse(userResponses![order.ActuaryId], order.SupervisorId == null ? null : userResponses[order.SupervisorId.Value], accountPage.Items[0]));
+        return Result.Ok(order.ToResponse(userResponses[order.ActuaryId], order.SupervisorId == null ? null : userResponses[order.SupervisorId.Value], accountPage.Items[0]));
     }
 
     public async Task<Result<OrderResponse>> Update(OrderUpdateRequest request, Guid id)
@@ -151,7 +150,7 @@ public class OrderService(IOrderRepository orderRepository, ISecurityRepository 
                          };
 
         var userPageTask        = m_UserServiceHttpClient.GetAllUsers(userFilter, Pageable.Create(1, 2));
-        var accountResponseTask = m_UserServiceHttpClient.GetOneAccount(order.AccountId ?? Guid.Empty);
+        var accountResponseTask = m_UserServiceHttpClient.GetOneAccount(order.AccountId);
 
         await Task.WhenAll(userPageTask, accountResponseTask);
 

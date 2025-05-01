@@ -77,8 +77,8 @@ public enum Direction
 public enum OrderStatus
 {
     Invalid,
-    Pending,
-    Approved,
+    NeedsApproval,
+    Active,
     Declined,
     Completed,
     Canceled,

@@ -12,7 +12,7 @@ namespace Bank.ExchangeService.Repositories;
 
 public interface IOrderRepository
 {
-    Task<Page<Order>> FindAll(OrderFilterQuery orderFilterQuery, Pageable pageable); // filter
+    Task<Page<Order>> FindAll(OrderFilterQuery orderFilterQuery, Pageable pageable);
 
     Task<Order?> FindById(Guid id);
 
@@ -21,6 +21,8 @@ public interface IOrderRepository
     Task<Order> Update(Order order);
 
     Task<Order> UpdateStatus(Guid id, OrderStatus status);
+
+    Task<bool> UpdateStatus(List<Guid> ids, OrderStatus status);
 }
 
 public class OrderRepository(IAuthorizationService authorizationService, IDatabaseContextFactory<DatabaseContext> contextFactory) : IOrderRepository
@@ -86,5 +88,16 @@ public class OrderRepository(IAuthorizationService authorizationService, IDataba
                                  .FirstOrDefaultAsync(order => order.Id == id);
 
         return order!;
+    }
+
+    public async Task<bool> UpdateStatus(List<Guid> ids, OrderStatus status)
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var result = await context.Orders.Where(order => ids.Contains(order.Id))
+                                  .ExecuteUpdateAsync(setters => setters.SetProperty(order => order.Status, status)
+                                                                        .SetProperty(order => order.ModifiedAt, DateTime.UtcNow));
+
+        return result == ids.Count;
     }
 }
