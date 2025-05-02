@@ -2,7 +2,7 @@
 using Bank.Application.Responses;
 using Bank.Link.Responses;
 
-namespace Bank.Link.Mapper.B3;
+namespace Bank.Link.Mapper.B3.Content;
 
 public static class ClientMapper
 {

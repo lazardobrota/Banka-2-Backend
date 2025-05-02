@@ -3,16 +3,18 @@
 using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.Link.Endpoints;
-using Bank.Link.Mapper.B3;
+using Bank.Link.Mapper.B3.Content;
 using Bank.Link.Mapper.B3.Query;
 using Bank.Link.Queries;
 using Bank.Link.Responses;
+using Bank.Link.Service;
 
 namespace Bank.Link.Core.B3;
 
-internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFactory) : IBankUserDataLink
+internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFactory, IDataService dataService) : IBankUserDataLink
 {
     private readonly IHttpClientFactory m_HttpClientFactory = httpClientFactory;
+    private readonly IDataService       m_DataService       = dataService;
 
     public BankData BankData { get; } = bankData;
 
@@ -35,7 +37,12 @@ internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFa
 
         var responseList = await response.Content.ReadFromJsonAsync<List<Response.B3.AccountResponse>>();
 
-        return responseList?.FirstOrDefault()
-                           ?.ToNative();
+        if (responseList is null || responseList.Count == 0)
+            return null;
+
+        var accountResponse  = responseList.First();
+        var currencyResponse = m_DataService.GetCurrencyByCode(accountResponse.CurrencyCode);
+
+        return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse);
     }
 }
