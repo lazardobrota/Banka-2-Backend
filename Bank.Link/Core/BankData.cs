@@ -1,7 +1,7 @@
 ﻿namespace Bank.Link.Core;
 
-public class BankData
+public class BankData(string code = "", string baseUrl = "")
 {
-    public required string Code    { set; get; }
-    public required string BaseUrl { set; get; }
+    public string Code    { set; get; } = code;
+    public string BaseUrl { set; get; } = baseUrl;
 }
