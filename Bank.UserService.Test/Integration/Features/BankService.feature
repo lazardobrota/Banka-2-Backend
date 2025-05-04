@@ -1,4 +1,4 @@
-﻿Feature: Bank Controller testing
+﻿Feature: Bank service testing
 
     Scenario: Get all Banks
         When all banks are fetched

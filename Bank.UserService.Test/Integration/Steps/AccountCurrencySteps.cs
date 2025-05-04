@@ -1,21 +1,14 @@
-﻿using System.Reflection;
-using System.Security.Claims;
-
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.Permissions.Configurations;
 using Bank.Permissions.Services;
+using Bank.UserService.Controllers;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
 using Bank.UserService.Test.Integration.Services;
 
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-
-using Moq;
 
 using Shouldly;
 
@@ -25,20 +18,22 @@ namespace Bank.UserService.Test.Integration.Steps;
 public class AccountCurrencySteps(
     ScenarioContext              context,
     IAccountCurrencyService      accountCurrencyService,
-    IAuthorizationServiceFactory authorizationServiceFactory
+    IAuthorizationServiceFactory authorizationServiceFactory,
+    AccountCurrencyController    accountCurrencyController
 )
 {
     private readonly ScenarioContext              m_ScenarioContext             = context;
     private readonly IAccountCurrencyService      m_AccountCurrencyService      = accountCurrencyService;
     private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
+    private readonly AccountCurrencyController    m_AccountCurrencyController   = accountCurrencyController;
 
     [Given(@"account currency create request")]
     public void GivenAccountCurrencyCreateRequest()
     {
         var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
-        
-        instance!.UserId = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9");
-        
+
+        instance!.UserId = Example.Entity.AccountCurrency.EmployeeId;
+
         m_ScenarioContext[Constant.AccountCurrencyCreateRequest] = Example.Entity.AccountCurrency.CreateRequest;
     }
 
@@ -129,6 +124,105 @@ public class AccountCurrencySteps(
         accountCurrenciesResult.Value.ShouldNotBeNull();
         accountCurrenciesResult.Value!.Items.ShouldNotBeEmpty();
     }
+
+    [Given(@"a valid account currency create request")]
+    public void GivenAValidAccountCurrencyCreateRequest()
+    {
+        var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
+
+        instance!.UserId = Example.Entity.AccountCurrency.EmployeeId;
+
+        m_ScenarioContext[Constant.AccountCurrencyCreateRequest] = Example.Entity.AccountCurrency.CreateRequest;
+    }
+
+    [When(@"a POST request is sent to the account currency creation endpoint")]
+    public async Task WhenAPostRequestIsSentToTheAccountCurrencyCreationEndpoint()
+    {
+        var createRequest = m_ScenarioContext.Get<AccountCurrencyCreateRequest>(Constant.AccountCurrencyCreateRequest);
+
+        var createResult = await m_AccountCurrencyController.Create(createRequest);
+
+        m_ScenarioContext[Constant.AccountCurrencyCreateResult] = createResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful account currency creation")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulAccountCurrencyCreation()
+    {
+        var createResult = m_ScenarioContext.Get<ActionResult<AccountCurrencyResponse>>(Constant.AccountCurrencyCreateResult);
+
+        createResult.Result.ShouldBeOfType<OkObjectResult>();
+        createResult.ShouldNotBeNull();
+    }
+
+    [Given(@"a valid account currency update request and account currency Id")]
+    public void GivenAValidAccountCurrencyUpdateRequestAndAccountCurrencyId()
+    {
+        m_ScenarioContext[Constant.AccountCurrencyId]            = Example.Entity.AccountCurrency.AccountCurrencyId;
+        m_ScenarioContext[Constant.AccountCurrencyUpdateRequest] = Example.Entity.AccountCurrency.ClientUpdateRequest;
+    }
+
+    [When(@"a PUT request is sent to the account currency update endpoint")]
+    public async Task WhenAPutRequestIsSentToTheAccountCurrencyUpdateEndpoint()
+    {
+        var accountCurrencyId = m_ScenarioContext.Get<Guid>(Constant.AccountCurrencyId);
+
+        var updateRequest = m_ScenarioContext.Get<AccountCurrencyClientUpdateRequest>(Constant.AccountCurrencyUpdateRequest);
+
+        var updateResult = await m_AccountCurrencyController.Update(updateRequest, accountCurrencyId);
+
+        m_ScenarioContext[Constant.AccountCurrencyUpdateResult] = updateResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful account currency update")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulAccountCurrencyUpdate()
+    {
+        var updateResult = m_ScenarioContext.Get<ActionResult<AccountCurrencyResponse>>(Constant.AccountCurrencyUpdateResult);
+
+        updateResult.Result.ShouldBeOfType<OkObjectResult>();
+        updateResult.ShouldNotBeNull();
+    }
+
+    [When(@"a GET request is sent to fetch all account currencies")]
+    public async Task WhenAGetRequestIsSentToFetchAllAccountCurrencies()
+    {
+        var getCurrenciesResult = await m_AccountCurrencyController.GetAll(new Pageable());
+
+        m_ScenarioContext[Constant.GetAccountCurrencies] = getCurrenciesResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful retrieval of all account currencies")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulRetrievalOfAllAccountCurrencies()
+    {
+        var getCurrenciesResult = m_ScenarioContext.Get<ActionResult<Page<AccountCurrencyResponse>>>(Constant.GetAccountCurrencies);
+
+        getCurrenciesResult.Result.ShouldBeOfType<OkObjectResult>();
+        getCurrenciesResult.ShouldNotBeNull();
+    }
+
+    [Given(@"an account currency Id to fetch")]
+    public void GivenAnAccountCurrencyIdToFetch()
+    {
+        m_ScenarioContext[Constant.AccountCurrencyId] = Example.Entity.AccountCurrency.AccountCurrencyId;
+    }
+
+    [When(@"a GET request is sent to fetch the account currency by Id")]
+    public async Task WhenAGetRequestIsSentToFetchTheAccountCurrencyById()
+    {
+        var accountCurrencyId = m_ScenarioContext.Get<Guid>(Constant.AccountCurrencyId);
+
+        var getCurrencyResult = await m_AccountCurrencyController.GetOne(accountCurrencyId);
+
+        m_ScenarioContext[Constant.AccountCurrencyGetResult] = getCurrencyResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful retrieval of the account currency")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulRetrievalOfTheAccountCurrency()
+    {
+        var getCurrencyResult = m_ScenarioContext.Get<ActionResult<AccountCurrencyResponse>>(Constant.AccountCurrencyGetResult);
+
+        getCurrencyResult.Result.ShouldBeOfType<OkObjectResult>();
+        getCurrencyResult.ShouldNotBeNull();
+    }
 }
 
 file static class Constant
@@ -139,4 +233,6 @@ file static class Constant
     public const string AccountCurrencyId            = "AccountCurrencyId";
     public const string AccountCurrencyUpdateResult  = "AccountCurrencyUpdateResult";
     public const string AccountCurrencies            = "AccountCurrencies";
+    public const string GetAccountCurrencies         = "GetAccountCurrencies";
+    public const string AccountCurrencyGetResult     = "AccountCurrencyGetResult";
 }
