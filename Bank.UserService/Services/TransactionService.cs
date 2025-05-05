@@ -186,7 +186,8 @@ public class TransactionService(
             return await PrepareInternalTransaction(createTransaction.ToPrepareInternalTransaction(transactionCode, fromAccount, fromCurrency, toAccount, toCurrency,
                                                                                                    exchangeDetails));
 
-        return Result.BadRequest<Transaction>("Not implemented yet.");
+        return await PrepareExternalTransaction(createTransaction.ToPrepareExternalTransaction(transactionCode, fromAccount, fromCurrency, toAccount, toCurrency,
+                                                                                               exchangeDetails)); // External Transfer
     }
 
     #region Prepare Transactions
@@ -330,6 +331,87 @@ public class TransactionService(
         TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
 
         return Result.Ok(transaction);
+    }
+
+    private async Task<Result<Transaction>> PrepareExternalTransaction(PrepareExternalTransaction prepareTransaction)
+    {
+        var result = await CreateExternalAccounts(prepareTransaction);
+
+        var transaction = prepareTransaction.ToTransaction();
+
+        await m_TransactionRepository.Add(transaction);
+
+        if (result is false)
+        {
+            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
+
+            return Result.BadRequest<Transaction>("Some error");
+        }
+
+        if (prepareTransaction.FromCurrency is null || prepareTransaction.ToCurrency is null || prepareTransaction.ExchangeDetails is null || prepareTransaction.Amount <= 0)
+            return Result.BadRequest<Transaction>("Invalid data.");
+
+        var bankCodeFrom = prepareTransaction.FromAccountNumber![..3];
+        var bankCodeTo   = prepareTransaction.ToAccountNumber![..3];
+
+        if (bankCodeFrom == Data.Bank.Code)
+        {
+            if (!prepareTransaction.FromAccount!.TryFindAccount(prepareTransaction.FromCurrency.Id, out var accountId))
+            {
+                await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
+
+                return Result.BadRequest<Transaction>("Account does not have currency.");
+            }
+
+            result = await m_AccountRepository.DecreaseAvailableBalance(accountId, prepareTransaction.FromCurrency.Id, prepareTransaction.Amount,
+                                                                        prepareTransaction.ExchangeDetails.ExchangeRate * prepareTransaction.ExchangeDetails.AverageRate *
+                                                                        prepareTransaction.Amount);
+
+            if (result is not true)
+            {
+                await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
+
+                return Result.BadRequest<Transaction>("Some error");
+            }
+        }
+
+        if (bankCodeTo == Data.Bank.Code)
+            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Affirm);
+
+        var processTransaction = prepareTransaction.ToProcessTransaction(transaction.Id);
+
+        TransactionBackgroundService.ExternalTransactions.Enqueue(processTransaction);
+
+        return Result.Ok(transaction);
+    }
+
+    private async Task<bool> CreateExternalAccounts(PrepareExternalTransaction prepareTransaction)
+    {
+        if (prepareTransaction.FromAccount is null)
+        {
+            var accountData = await m_BankUserData.GetAccount(prepareTransaction.FromAccountNumber!);
+
+            prepareTransaction.FromAccount = await CreateExternalAccount(accountData);
+        }
+
+        if (prepareTransaction.ToAccount is null)
+        {
+            var accountData = await m_BankUserData.GetAccount(prepareTransaction.ToAccountNumber!);
+
+            prepareTransaction.ToAccount = await CreateExternalAccount(accountData);
+        }
+
+        return prepareTransaction.FromAccount is not null && prepareTransaction.ToAccount is not null;
+    }
+
+    private async Task<Account?> CreateExternalAccount(AccountResponse? accountResponse)
+    {
+        if (accountResponse is null)
+            return null;
+
+        var user = await m_UserRepository.Add(accountResponse.ToUser());
+
+        return await m_AccountRepository.Add(accountResponse.ToAccount(user.Id));
     }
 
     #endregion

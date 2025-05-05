@@ -102,6 +102,26 @@ public static class TransactionMapper
                };
     }
 
+    public static PrepareExternalTransaction ToPrepareExternalTransaction(this TransactionCreateRequest createRequest, TransactionCode transactionCode, Account? fromAccount,
+                                                                          Currency? fromCurrency, Account? toAccount, Currency? toCurrency, ExchangeDetails? exchangeDetails)
+    {
+        return new PrepareExternalTransaction
+               {
+                   FromAccountNumber     = createRequest.FromAccountNumber ?? string.Empty,
+                   FromAccount           = fromAccount,
+                   FromCurrency          = fromCurrency,
+                   ToAccountNumber       = createRequest.ToAccountNumber ?? string.Empty,
+                   ToAccount             = toAccount,
+                   ToCurrency            = toCurrency,
+                   Amount                = createRequest.Amount,
+                   TransactionCode       = transactionCode,
+                   ExchangeDetails       = exchangeDetails,
+                   ReferenceNumber       = createRequest.ReferenceNumber,
+                   Purpose               = createRequest.Purpose,
+                   ExternalTransactionId = createRequest.ExternalTransactionId
+               };
+    }
+
     #endregion
 
     #region To Transaction
@@ -181,6 +201,28 @@ public static class TransactionMapper
                    Status          = TransactionStatus.Pending,
                    Purpose         = internalTransaction.Purpose,
                    ReferenceNumber = internalTransaction.ReferenceNumber,
+                   CreatedAt       = DateTime.UtcNow,
+                   ModifiedAt      = DateTime.UtcNow
+               };
+    }
+
+    public static Transaction ToTransaction(this PrepareExternalTransaction externalTransaction) //TODO Check amounts and status
+    {
+        var isIncoming = externalTransaction.FromAccount!.AccountNumber[..3] == Seeder.Bank.Bank02.Code;
+
+        return new Transaction
+               {
+                   Id              = Guid.NewGuid(),
+                   FromAccountId   = externalTransaction.FromAccount!.Id,
+                   FromCurrencyId  = externalTransaction.FromCurrency!.Id,
+                   FromAmount      = externalTransaction.Amount,
+                   ToAccountId     = externalTransaction.ToAccount!.Id,
+                   ToCurrencyId    = externalTransaction.ToCurrency!.Id,
+                   ToAmount        = externalTransaction.Amount * (isIncoming ? 1 : externalTransaction.ExchangeDetails!.ExchangeRate),
+                   CodeId          = externalTransaction.TransactionCode.Id,
+                   Status          = isIncoming ? TransactionStatus.Affirm : TransactionStatus.Pending,
+                   Purpose         = externalTransaction.Purpose,
+                   ReferenceNumber = externalTransaction.ReferenceNumber,
                    CreatedAt       = DateTime.UtcNow,
                    ModifiedAt      = DateTime.UtcNow
                };
@@ -267,6 +309,23 @@ public static class TransactionMapper
                    ToAmount       = internalTransaction.ExchangeDetails!.ExchangeRate * internalTransaction.Amount,
                    FromBankAmount = internalTransaction.ExchangeDetails.ExchangeRate * internalTransaction.ExchangeDetails.AverageRate *
                                     internalTransaction.Amount,
+                   IsDirect = false
+               };
+    }
+
+    public static ProcessTransaction ToProcessTransaction(this PrepareExternalTransaction externalTransaction, Guid transactionId)
+    {
+        return new ProcessTransaction
+               {
+                   TransactionId  = transactionId,
+                   FromAccountId  = externalTransaction.FromAccount!.Id,
+                   FromCurrencyId = externalTransaction.FromCurrency!.Id,
+                   FromAmount     = externalTransaction.Amount,
+                   ToAccountId    = externalTransaction.ToAccount!.Id,
+                   ToCurrencyId   = externalTransaction.ToCurrency!.Id,
+                   ToAmount       = externalTransaction.ExchangeDetails!.ExchangeRate * externalTransaction.Amount,
+                   FromBankAmount = externalTransaction.ExchangeDetails.ExchangeRate * externalTransaction.ExchangeDetails.AverageRate *
+                                    externalTransaction.Amount,
                    IsDirect = false
                };
     }
