@@ -24,46 +24,50 @@ public class Transaction
     public required DateTime          ModifiedAt      { set; get; }
 }
 
-public class TempyTransaction
+public class PrepareToAccountTransaction
 {
-    public          string? FromAccountNumber { set; get; }
-    public          Guid    FromCurrencyId    { set; get; }
-    public          string? ToAccountNumber   { set; get; }
-    public          Guid    ToCurrencyId      { set; get; }
-    public required decimal Amount            { set; get; }
-    public required Guid    CodeId            { set; get; }
-    public          string? ReferenceNumber   { set; get; }
-    public          string? Purpose           { set; get; }
+    public required Account?        Account         { set; get; }
+    public required Currency?       Currency        { set; get; }
+    public required TransactionCode TransactionCode { set; get; }
+    public required decimal         Amount          { set; get; }
 }
 
-public class PrepareDepositTransaction
+public class PrepareDirectToAccountTransaction
 {
-    public required Account Account    { set; get; }
-    public required Guid    CurrencyId { set; get; }
-    public required decimal Amount     { set; get; }
+    public required Account?        Account         { set; get; }
+    public required Currency?       Currency        { set; get; }
+    public required TransactionCode TransactionCode { set; get; }
+    public required decimal         Amount          { set; get; }
 }
 
-public class PrepareWithdrawTransaction
+public class PrepareFromAccountTransaction
 {
-    public required Account Account    { set; get; }
-    public required Guid    CurrencyId { set; get; }
-    public required decimal Amount     { set; get; }
+    public required Account?        Account         { set; get; }
+    public required Currency?       Currency        { set; get; }
+    public required TransactionCode TransactionCode { set; get; }
+    public required decimal         Amount          { set; get; }
+}
+
+public class PrepareDirectFromAccountTransaction
+{
+    public required Account?        Account         { set; get; }
+    public required Currency?       Currency        { set; get; }
+    public required TransactionCode TransactionCode { set; get; }
+    public required decimal         Amount          { set; get; }
 }
 
 public class PrepareInternalTransaction
 {
-    public required Account         FromAccount       { set; get; }
-    public required Guid            FromCurrencyId    { set; get; }
-    public required Account         ToAccount         { set; get; }
-    public required Guid            ToCurrencyId      { set; get; }
-    public required decimal         Amount            { set; get; }
-    public required ExchangeDetails ExchangeDetails   { set; get; } = null!;
-    public required Guid            TransactionCodeId { set; get; }
-    public          string?         ReferenceNumber   { set; get; }
-    public          string?         Purpose           { set; get; }
+    public required Account?         FromAccount     { set; get; }
+    public required Currency?        FromCurrency    { set; get; }
+    public required Account?         ToAccount       { set; get; }
+    public required Currency?        ToCurrency      { set; get; }
+    public required decimal          Amount          { set; get; }
+    public required TransactionCode  TransactionCode { set; get; }
+    public required ExchangeDetails? ExchangeDetails { set; get; }
+    public          string?          ReferenceNumber { set; get; }
+    public          string?          Purpose         { set; get; }
 }
-
-public class PrepareExternalTransaction { }
 
 public class ProcessTransaction
 {
@@ -75,4 +79,5 @@ public class ProcessTransaction
     public required Guid    ToCurrencyId   { set; get; }
     public required decimal ToAmount       { set; get; }
     public required decimal FromBankAmount { set; get; }
+    public required bool    IsDirect       { set; get; }
 }
