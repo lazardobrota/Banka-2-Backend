@@ -457,23 +457,11 @@ public class TransactionService(
             return false;
         }
 
-        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
-        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
+        var transferSucceeded = await m_AccountRepository.IncreaseBalances(accountId, processTransaction.ToCurrencyId, processTransaction.ToAmount);
 
-        var transferSucceeded = await m_AccountRepository.IncreaseBalances(accountId, processTransaction.ToCurrencyId, processTransaction.ToAmount, databaseContext);
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
 
-        if (!transferSucceeded)
-        {
-            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
-            await databaseTransaction.RollbackAsync();
-
-            return false;
-        }
-
-        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
-        await databaseTransaction.CommitAsync();
-
-        return true;
+        return transferSucceeded;
     }
 
     private async Task<bool> ProcessDirectToAccountTransaction(ProcessTransaction processTransaction)
@@ -496,30 +484,15 @@ public class TransactionService(
             return false;
         }
 
-        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
-        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
+        var transferSucceeded = await m_AccountRepository.IncreaseBalance(accountId, processTransaction.ToAmount);
 
-        var transferSucceeded = await m_AccountRepository.IncreaseBalance(accountId, processTransaction.ToAmount, databaseContext);
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
 
-        if (!transferSucceeded)
-        {
-            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
-            await databaseTransaction.RollbackAsync();
-
-            return false;
-        }
-
-        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
-        await databaseTransaction.CommitAsync();
-
-        return true;
+        return transferSucceeded;
     }
 
     private async Task<bool> ProcessFromAccountTransaction(ProcessTransaction processTransaction)
     {
-        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
-        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
-
         var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
         var fromAccountTask = m_AccountRepository.FindById(processTransaction.FromAccountId);
 
@@ -531,30 +504,19 @@ public class TransactionService(
         if (transaction?.Status == TransactionStatus.Canceled)
             return true;
 
-        if (fromAccount == null)
+        if (fromAccount == null || !fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var accountId))
         {
             await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
 
             return false;
         }
-
-        fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var accountId);
 
         var transferSucceeded = await m_AccountRepository.DecreaseBalance(accountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
-                                                                          processTransaction.FromAmount, databaseContext);
+                                                                          processTransaction.FromAmount);
 
-        if (!transferSucceeded)
-        {
-            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
-            await databaseTransaction.RollbackAsync();
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
 
-            return false;
-        }
-
-        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
-        await databaseTransaction.CommitAsync();
-
-        return true;
+        return transferSucceeded;
     }
 
     private async Task<bool> ProcessDirectFromAccountTransaction(ProcessTransaction processTransaction)
@@ -577,23 +539,11 @@ public class TransactionService(
             return false;
         }
 
-        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
-        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
+        var transferSucceeded = await m_AccountRepository.DecreaseBalance(accountId, processTransaction.FromAmount);
 
-        var transferSucceeded = await m_AccountRepository.DecreaseBalance(accountId, processTransaction.FromAmount, databaseContext);
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
 
-        if (!transferSucceeded)
-        {
-            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
-            await databaseTransaction.RollbackAsync();
-
-            return false;
-        }
-
-        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
-        await databaseTransaction.CommitAsync();
-
-        return true;
+        return transferSucceeded;
     }
 
     private async Task<bool> ProcessTransaction(ProcessTransaction processTransaction)
@@ -611,47 +561,24 @@ public class TransactionService(
         if (transaction?.Status == TransactionStatus.Canceled)
             return true;
 
-        if (fromAccount == null || toAccount == null)
+        if (fromAccount == null || toAccount == null || !fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var fromAccountId) ||
+            !toAccount.TryFindAccount(processTransaction.ToCurrencyId, out var toAccountId))
         {
             await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
 
             return false;
         }
-
-        fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var fromAccountId);
-
-        await using var databaseContext     = await m_ContextFactory.CreateDistributedContext;
-        await using var databaseTransaction = await databaseContext.Database.BeginTransactionAsync();
 
         var transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
-                                                                          processTransaction.FromBankAmount, databaseContext);
+                                                                          processTransaction.FromBankAmount);
 
-        if (!transferSucceeded)
-        {
-            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
-            await databaseTransaction.RollbackAsync();
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Affirm : TransactionStatus.Failed);
 
-            return false;
-        }
+        transferSucceeded = await m_AccountRepository.IncreaseBalances(toAccountId, processTransaction.ToCurrencyId, processTransaction.ToAmount);
 
-        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Affirm);
+        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
 
-        toAccount.TryFindAccount(processTransaction.ToCurrencyId, out var toAccountId);
-
-        transferSucceeded = await m_AccountRepository.IncreaseBalances(toAccountId, processTransaction.ToCurrencyId, processTransaction.ToAmount, databaseContext);
-
-        if (!transferSucceeded)
-        {
-            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
-            await databaseTransaction.RollbackAsync();
-
-            return false;
-        }
-
-        await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Completed);
-        await databaseTransaction.CommitAsync();
-
-        return true;
+        return transferSucceeded;
     }
 
     #endregion
