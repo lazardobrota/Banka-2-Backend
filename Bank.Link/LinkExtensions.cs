@@ -3,6 +3,7 @@ using Bank.Http;
 using Bank.Link.Configurations;
 using Bank.Link.Core;
 using Bank.Link.Core.B3;
+using Bank.Link.Core.Test;
 using Bank.Link.Service;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,7 @@ public static class LinkExtensions
     public static IServiceCollection AddLinkServices(this IServiceCollection services, DefaultData? defaultData = null)
     {
         services.AddSingleton<IDataService, DataService>();
-        services.AddSingleton<IBankUserData, BankUserData>();
+        services.AddSingleton<IExternalUserData, ExternalUserData>();
         services.AddSingleton<IBankExchangeData, BankExchangeData>();
         services.AddUserServiceHttpClient();
 
@@ -27,11 +28,20 @@ public static class LinkExtensions
         return services;
     }
 
+    public static IServiceCollection AddTestLink(this IServiceCollection services, List<BankData> bankData)
+    {
+        foreach (var data in bankData)
+            services.AddSingleton<IExternalUserDataLink>(serviceProvider => new TestExternalUserDataLink(data, serviceProvider.GetRequiredService<IDataService>()))
+                    .AddSingleton<IBankExchangeDataLink>(_ => new TestBankExchangeDataLink());
+
+        return services;
+    }
+
     public static IServiceCollection AddB3Link(this IServiceCollection services, BankData bankData)
     {
-        return services.AddSingleton<IBankUserDataLink>(serviceProvider =>
-                                                        new B3UserDataLink(bankData, serviceProvider.GetRequiredService<IHttpClientFactory>(),
-                                                                           serviceProvider.GetRequiredService<IDataService>()))
+        return services.AddSingleton<IExternalUserDataLink>(serviceProvider =>
+                                                            new B3UserDataLink(bankData, serviceProvider.GetRequiredService<IHttpClientFactory>(),
+                                                                               serviceProvider.GetRequiredService<IDataService>()))
                        .AddSingleton<IBankExchangeDataLink>(serviceProvider => new B3ExchangeDataLink(bankData, serviceProvider.GetRequiredService<IHttpClientFactory>()))
                        .CreateHttpClient(bankData);
     }
