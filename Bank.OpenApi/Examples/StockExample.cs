@@ -21,7 +21,13 @@ public static partial class Example
                                                                    CreatedAt                    = Constant.CreatedAt,
                                                                    ModifiedAt                   = Constant.ModifiedAt,
                                                                    StockExchange                = StockExchange.DefaultResponse,
-                                                                   Quotes                       = [Quote.DefaultSimpleResponse]
+                                                                   Quotes =
+                                                                   [
+                                                                       Quote.DefaultSimpleResponse
+                                                                   ],
+                                                                   AskSize       = 15,
+                                                                   BidSize       = 10,
+                                                                   ContractCount = Constant.ContractCount
                                                                };
 
         public static readonly StockSimpleResponse DefaultSimpleResponse = new()
@@ -37,7 +43,10 @@ public static partial class Example
                                                                                PriceChangeInInterval        = Constant.PriceChangeInInterval,
                                                                                PriceChangePercentInInterval = Constant.PriceChangePercentInInterval,
                                                                                CreatedAt                    = Constant.CreatedAt,
-                                                                               ModifiedAt                   = Constant.ModifiedAt
+                                                                               ModifiedAt                   = Constant.ModifiedAt,
+                                                                               AskSize                      = 25,
+                                                                               BidSize                      = 18,
+                                                                               ContractCount                = Constant.ContractCount
                                                                            };
 
         public static readonly StockDailyResponse DefaultDailyResponse = new()

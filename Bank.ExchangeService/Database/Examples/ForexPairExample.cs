@@ -28,7 +28,10 @@ public static partial class Example
                                                                 CreatedAt                    = DateTime.UtcNow,
                                                                 ModifiedAt                   = DateTime.UtcNow,
                                                                 StockExchange                = null!,
-                                                                Quotes                       = []
+                                                                Quotes                       = [],
+                                                                AskSize                      = 20,
+                                                                BidSize                      = 12,
+                                                                ContractCount                = 1
                                                             };
 
         public static readonly ForexPairSimpleResponse SimpleResponse = new()
@@ -50,7 +53,10 @@ public static partial class Example
                                                                             PriceChangePercentInInterval = Seeder.ForexPair.GbpAud.PriceChangePercent,
                                                                             Price                        = Seeder.ForexPair.GbpAud.AskPrice,
                                                                             CreatedAt                    = DateTime.UtcNow,
-                                                                            ModifiedAt                   = DateTime.UtcNow
+                                                                            ModifiedAt                   = DateTime.UtcNow,
+                                                                            AskSize                      = 45,
+                                                                            BidSize                      = 40,
+                                                                            ContractCount                = 1
                                                                         };
 
         public static readonly ForexPairDailyResponse DailyResponse = new()

@@ -21,11 +21,17 @@ public static partial class Example
                                                                     PriceChangeInInterval        = Constant.PriceChangeInInterval,
                                                                     PriceChangePercentInInterval = Constant.PriceChangePercentInInterval,
                                                                     AskPrice                     = Constant.AskPrice,
+                                                                    AskSize                      = Constant.AskSize,
                                                                     BidPrice                     = Constant.BidPrice,
+                                                                    BidSize                      = Constant.BidSize,
                                                                     CreatedAt                    = Constant.CreatedAt,
                                                                     ModifiedAt                   = Constant.ModifiedAt,
                                                                     StockExchange                = StockExchange.DefaultResponse,
-                                                                    Quotes                       = [Quote.DefaultSimpleResponse]
+                                                                    Quotes =
+                                                                    [
+                                                                        Quote.DefaultSimpleResponse
+                                                                    ],
+                                                                    ContractCount = Constant.ContractCount
                                                                 };
 
         public static readonly OptionSimpleResponse DefaultSimpleResponse = new()
@@ -44,9 +50,12 @@ public static partial class Example
                                                                                 PriceChangeInInterval        = Constant.PriceChangeInInterval,
                                                                                 PriceChangePercentInInterval = Constant.PriceChangePercentInInterval,
                                                                                 AskPrice                     = Constant.AskPrice,
+                                                                                AskSize                      = Constant.AskSize,
                                                                                 BidPrice                     = Constant.BidPrice,
+                                                                                BidSize                      = Constant.BidSize,
                                                                                 CreatedAt                    = Constant.CreatedAt,
-                                                                                ModifiedAt                   = Constant.ModifiedAt
+                                                                                ModifiedAt                   = Constant.ModifiedAt,
+                                                                                ContractCount                = Constant.ContractCount
                                                                             };
 
         public static readonly OptionDailyResponse DefaultDailyResponse = new()

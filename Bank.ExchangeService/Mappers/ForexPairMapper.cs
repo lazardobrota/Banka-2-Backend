@@ -9,7 +9,7 @@ public static class ForexPairMapper
     public static ForexPairResponse ToResponse(this ForexPair         forexPair, CurrencySimpleResponse currencyResponse, CurrencySimpleResponse currencyBaseResponse,
                                                CurrencySimpleResponse currencyQuoteResponse)
     {
-        return new ForexPairResponse()
+        return new ForexPairResponse
                {
                    Id                           = forexPair.Id,
                    Liquidity                    = forexPair.Liquidity,
@@ -30,6 +30,9 @@ public static class ForexPairMapper
                    ModifiedAt                   = forexPair.ModifiedAt,
                    Quotes = forexPair.Quotes.Select(quote => quote.ToSimpleResponse())
                                      .ToList(),
+                   AskSize       = forexPair.AskSize,
+                   BidSize       = forexPair.BidSize,
+                   ContractCount = forexPair.ContractCount
                };
     }
 
@@ -81,6 +84,9 @@ public static class ForexPairMapper
                    Price                        = forexPair.AskPrice,
                    CreatedAt                    = forexPair.CreatedAt,
                    ModifiedAt                   = forexPair.ModifiedAt,
+                   AskSize                      = forexPair.AskSize,
+                   BidSize                      = forexPair.BidSize,
+                   ContractCount                = forexPair.ContractCount
                };
     }
 
@@ -93,7 +99,6 @@ public static class ForexPairMapper
                    BaseCurrencyId  = currencyFrom.Id,
                    QuoteCurrencyId = currencyTo.Id,
                    ExchangeRate    = fetchForexPair.ExchangeRate,
-                   ContractSize    = 1000,
                    Name            = $"{currencyFrom.Code}/{currencyTo.Code}",
                    Ticker          = $"{currencyFrom.Code}{currencyTo.Code}",
                    Liquidity       = liquidity,

@@ -7,17 +7,15 @@ public static class FutureContractMapper
 {
     public static FutureContractResponse ToResponse(this FutureContract futureContract, CurrencySimpleResponse currencyResponse)
     {
-        return new FutureContractResponse()
+        return new FutureContractResponse
                {
-                   Id             = futureContract.Id,
-                   ContractSize   = futureContract.ContractSize,
-                   ContractUnit   = futureContract.ContractUnit,
-                   SettlementDate = futureContract.SettlementDate,
-                   Name           = futureContract.Name,
-                   Ticker         = futureContract.Ticker,
-                   StockExchange  = futureContract.StockExchange!.ToResponse(currencyResponse),
-                   Quotes = futureContract.Quotes.Select(quote => quote.ToSimpleResponse())
-                                          .ToList(),
+                   Id                           = futureContract.Id,
+                   ContractSize                 = futureContract.ContractSize,
+                   ContractUnit                 = futureContract.ContractUnit,
+                   SettlementDate               = futureContract.SettlementDate,
+                   Name                         = futureContract.Name,
+                   Ticker                       = futureContract.Ticker,
+                   StockExchange                = futureContract.StockExchange!.ToResponse(currencyResponse),
                    HighPrice                    = futureContract.HighPrice,
                    LowPrice                     = futureContract.LowPrice,
                    Volume                       = futureContract.Volume,
@@ -25,8 +23,13 @@ public static class FutureContractMapper
                    PriceChangePercentInInterval = futureContract.PriceChangePercent,
                    AskPrice                     = futureContract.AskPrice,
                    BidPrice                     = futureContract.BidPrice,
+                   AskSize                      = futureContract.AskSize,
+                   BidSize                      = futureContract.BidSize,
                    CreatedAt                    = futureContract.CreatedAt,
-                   ModifiedAt                   = futureContract.ModifiedAt
+                   ModifiedAt                   = futureContract.ModifiedAt,
+                   Quotes = futureContract.Quotes.Select(quote => quote.ToSimpleResponse())
+                                          .ToList(),
+                   ContractCount = 0,
                };
     }
 
@@ -43,11 +46,15 @@ public static class FutureContractMapper
                    HighPrice                    = futureContract.HighPrice,
                    LowPrice                     = futureContract.LowPrice,
                    Volume                       = futureContract.Volume,
-                   Price                        = futureContract.AskPrice,
+                   AskPrice                     = futureContract.AskPrice,
+                   BidPrice                     = futureContract.BidPrice,
+                   AskSize                      = futureContract.AskSize,
+                   BidSize                      = futureContract.BidSize,
                    CreatedAt                    = futureContract.CreatedAt,
                    ModifiedAt                   = futureContract.ModifiedAt,
                    PriceChangeInInterval        = futureContract.PriceChange,
-                   PriceChangePercentInInterval = futureContract.PriceChangePercent
+                   PriceChangePercentInInterval = futureContract.PriceChangePercent,
+                   ContractCount                = 0
                };
     }
 
@@ -55,15 +62,13 @@ public static class FutureContractMapper
     {
         return new FutureContractDailyResponse
                {
-                   Id             = futureContract.Id,
-                   ContractSize   = futureContract.ContractSize,
-                   ContractUnit   = futureContract.ContractUnit,
-                   SettlementDate = futureContract.SettlementDate,
-                   Name           = futureContract.Name,
-                   Ticker         = futureContract.Ticker,
-                   StockExchange  = futureContract.StockExchange!.ToResponse(currencyResponse),
-                   Quotes = futureContract.DailyQuotes.Select(quote => quote.ToDailySimpleResponse())
-                                          .ToList(),
+                   Id                           = futureContract.Id,
+                   ContractSize                 = futureContract.ContractSize,
+                   ContractUnit                 = futureContract.ContractUnit,
+                   SettlementDate               = futureContract.SettlementDate,
+                   Name                         = futureContract.Name,
+                   Ticker                       = futureContract.Ticker,
+                   StockExchange                = futureContract.StockExchange!.ToResponse(currencyResponse),
                    HighPrice                    = futureContract.HighPrice,
                    LowPrice                     = futureContract.LowPrice,
                    Volume                       = futureContract.Volume,
@@ -73,6 +78,8 @@ public static class FutureContractMapper
                    ClosePrice                   = futureContract.ClosePrice,
                    CreatedAt                    = futureContract.CreatedAt,
                    ModifiedAt                   = futureContract.ModifiedAt,
+                   Quotes = futureContract.DailyQuotes.Select(quote => quote.ToDailySimpleResponse())
+                                          .ToList(),
                };
     }
 }

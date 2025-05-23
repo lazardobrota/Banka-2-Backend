@@ -20,7 +20,10 @@ public static partial class Example
                                                                         PriceChangeInInterval        = Seeder.Stock.Amazon.PriceChange,
                                                                         PriceChangePercentInInterval = Seeder.Stock.Amazon.PriceChangePercent,
                                                                         CreatedAt                    = DateTime.UtcNow,
-                                                                        ModifiedAt                   = DateTime.UtcNow
+                                                                        ModifiedAt                   = DateTime.UtcNow,
+                                                                        AskSize                      = 15,
+                                                                        BidSize                      = 14,
+                                                                        ContractCount                = 1
                                                                     };
 
         public static readonly StockResponse Response = new()
@@ -38,7 +41,11 @@ public static partial class Example
                                                             CreatedAt                    = DateTime.UtcNow,
                                                             ModifiedAt                   = DateTime.UtcNow,
                                                             StockExchange                = null!,
-                                                            Quotes                       = []
+                                                            Quotes                       = [],
+                                                            AskSize                      = 24,
+                                                            BidSize                      = 13,
+                                                            ContractCount                = 1
+
                                                         };
 
         public static readonly StockDailyResponse DailyResponse = new()
