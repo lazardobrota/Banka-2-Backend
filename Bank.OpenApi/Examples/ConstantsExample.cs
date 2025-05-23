@@ -90,7 +90,7 @@ public static partial class Example
         public static readonly ContractUnit      ContractUnit      = ContractUnit.Barrel;
         public static readonly OptionType        OptionType        = OptionType.Call;
         public static readonly OrderType         OrderType         = OrderType.Limit;
-        public static readonly OrderStatus       OrderStatus       = OrderStatus.Pending;
+        public static readonly OrderStatus       OrderStatus       = OrderStatus.NeedsApproval;
         public static readonly Direction         Direction         = Direction.Buy;
         public static readonly PermissionType    PermissionType    = PermissionType.Set;
 

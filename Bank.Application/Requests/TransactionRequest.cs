@@ -4,13 +4,13 @@ namespace Bank.Application.Requests;
 
 public class TransactionCreateRequest
 {
-    public required string  FromAccountNumber { set; get; }
-    public required Guid    FromCurrencyId    { set; get; }
-    public required string  ToAccountNumber   { set; get; }
-    public required Guid    ToCurrencyId      { set; get; }
+    public          string? FromAccountNumber { set; get; }
+    public          Guid    FromCurrencyId    { set; get; }
+    public          string? ToAccountNumber   { set; get; }
+    public          Guid    ToCurrencyId      { set; get; }
     public required decimal Amount            { set; get; }
     public required Guid    CodeId            { set; get; }
-    public required string? ReferenceNumber   { set; get; }
+    public          string? ReferenceNumber   { set; get; }
     public required string  Purpose           { set; get; }
 }
 

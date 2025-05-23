@@ -17,16 +17,29 @@ public static class OrderMapper
                    OrderType         = order.OrderType,
                    Quantity          = order.Quantity,
                    ContractCount     = order.ContractCount,
-                   PricePerUnit      = order.PricePerUnit,
+                   LimitPrice        = order.LimitPrice,
+                   StopPrice         = order.StopPrice,
                    Direction         = order.Direction,
                    Status            = order.Status,
                    Supervisor        = supervisor,
-                   Done              = order.Done,
-                   RemainingPortions = order.RemainingPortions,
-                   AfterHours        = order.AfterHours,
                    CreatedAt         = order.CreatedAt,
                    ModifiedAt        = order.ModifiedAt,
                    Account           = account
+               };
+    }
+
+    public static RedisOrder ToRedis(this Order order)
+    {
+        return new RedisOrder
+               {
+                   Id                = order.Id,
+                   Ticker            = order.Security!.Ticker, //TODO: make sure its not null
+                   OrderType         = order.OrderType,
+                   RemainingPortions = order.Quantity,
+                   LimitPrice        = order.LimitPrice,
+                   StopPrice         = order.StopPrice,
+                   Direction         = order.Direction,
+                   AccountId         = order.AccountId
                };
     }
 
@@ -40,12 +53,10 @@ public static class OrderMapper
                    OrderType         = createRequest.OrderType,
                    Quantity          = createRequest.Quantity,
                    ContractCount     = createRequest.ContractCount,
-                   PricePerUnit      = createRequest.PricePerUnit,
+                   LimitPrice        = createRequest.LimitPrice,
+                   StopPrice         = createRequest.StopPrice,
                    Direction         = createRequest.Direction,
-                   Status            = OrderStatus.Pending,
-                   Done              = false,
-                   RemainingPortions = createRequest.Quantity,
-                   AfterHours        = createRequest.AfterHours,
+                   Status            = OrderStatus.Active,
                    CreatedAt         = DateTime.UtcNow,
                    ModifiedAt        = DateTime.UtcNow,
                    AccountId         = accountId,
