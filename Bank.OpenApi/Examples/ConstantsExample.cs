@@ -59,7 +59,9 @@ public static partial class Example
         public const decimal HighPrice                    = 100.00m;
         public const decimal LowPrice                     = 100.00m;
         public const decimal AskPrice                     = 100.00m;
+        public const int     AskSize                      = 1000;
         public const decimal BidPrice                     = 100.00m;
+        public const int     BidSize                      = 1000;
         public const decimal StrikePrice                  = 100.00m;
         public const decimal MaintenanceDecimal           = 0.01m;
         public const decimal PricePerUnit                 = 100.00m;
@@ -71,7 +73,7 @@ public static partial class Example
         public const int Volume            = 1000;
         public const int ContractSize      = 1000;
         public const int Quantity          = 1000;
-        public const int ContractCount     = 1000;
+        public const int ContractCount     = 1;
         public const int RemainingPortions = 1000;
 
         public const long Permissions = 0;

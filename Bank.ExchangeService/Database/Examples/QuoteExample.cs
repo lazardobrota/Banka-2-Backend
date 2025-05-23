@@ -32,14 +32,15 @@ public static partial class Example
 
         public static readonly QuoteSimpleResponse SimpleResponse = new()
                                                                     {
-                                                                        Id         = Seeder.Quote.StockAmazonQuote.Id,
-                                                                        HighPrice  = Seeder.Quote.StockAmazonQuote.AskPrice,
-                                                                        LowPrice   = Seeder.Quote.StockAmazonQuote.BidPrice,
-                                                                        AskPrice   = Seeder.Quote.StockAmazonQuote.HighPrice,
-                                                                        BidPrice   = Seeder.Quote.StockAmazonQuote.LowPrice,
-                                                                        Volume     = Seeder.Quote.StockAmazonQuote.Volume,
-                                                                        CreatedAt  = DateTime.UtcNow,
-                                                                        ModifiedAt = DateTime.UtcNow
+                                                                        Id            = Seeder.Quote.StockAmazonQuote.Id,
+                                                                        HighPrice     = Seeder.Quote.StockAmazonQuote.AskPrice,
+                                                                        LowPrice      = Seeder.Quote.StockAmazonQuote.BidPrice,
+                                                                        AskPrice      = Seeder.Quote.StockAmazonQuote.HighPrice,
+                                                                        BidPrice      = Seeder.Quote.StockAmazonQuote.LowPrice,
+                                                                        Volume        = Seeder.Quote.StockAmazonQuote.Volume,
+                                                                        CreatedAt     = DateTime.UtcNow,
+                                                                        ModifiedAt    = DateTime.UtcNow,
+                                                                        ContractCount = 1
                                                                     };
     }
 }

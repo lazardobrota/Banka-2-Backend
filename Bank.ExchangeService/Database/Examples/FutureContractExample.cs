@@ -21,9 +21,14 @@ public static partial class Example
                                                                                  Volume                       = Seeder.FutureContract.GoldFuture.Volume,
                                                                                  PriceChangeInInterval        = Seeder.FutureContract.GoldFuture.PriceChange,
                                                                                  PriceChangePercentInInterval = Seeder.FutureContract.GoldFuture.PriceChangePercent,
-                                                                                 Price                        = Seeder.FutureContract.GoldFuture.AskPrice,
+                                                                                 AskPrice                     = Seeder.FutureContract.GoldFuture.AskPrice,
                                                                                  CreatedAt                    = DateTime.UtcNow,
-                                                                                 ModifiedAt                   = DateTime.UtcNow
+                                                                                 ModifiedAt                   = DateTime.UtcNow,
+                                                                                 BidPrice                     = 60,
+                                                                                 AskSize                      = 40,
+                                                                                 BidSize                      = 80,
+                                                                                 ContractCount                = 1
+
                                                                              };
 
         public static readonly FutureContractResponse Response = new()
@@ -44,7 +49,11 @@ public static partial class Example
                                                                      CreatedAt                    = DateTime.UtcNow,
                                                                      ModifiedAt                   = DateTime.UtcNow,
                                                                      StockExchange                = null!,
-                                                                     Quotes                       = []
+                                                                     Quotes                       = [],
+                                                                     AskSize                      = 40,
+                                                                     BidSize                      = 80,
+                                                                     ContractCount                = 1
+
                                                                  };
 
         public static readonly FutureContractDailyResponse DailyResponse = new()

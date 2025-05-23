@@ -27,7 +27,10 @@ public static partial class Example
                                                              CreatedAt                    = DateTime.UtcNow,
                                                              ModifiedAt                   = DateTime.UtcNow,
                                                              StockExchange                = null!,
-                                                             Quotes                       = []
+                                                             Quotes = [],
+                                                             AskSize = 50,
+                                                             BidSize = 150,
+                                                             ContractCount                = 1
                                                          };
 
         public static readonly OptionSimpleResponse SimpleResponse = new()
@@ -48,7 +51,10 @@ public static partial class Example
                                                                          AskPrice                     = Seeder.Option.MicrosoftCallOption.AskPrice,
                                                                          BidPrice                     = Seeder.Option.MicrosoftCallOption.BidPrice,
                                                                          CreatedAt                    = DateTime.UtcNow,
-                                                                         ModifiedAt                   = DateTime.UtcNow
+                                                                         ModifiedAt                   = DateTime.UtcNow,
+                                                                         AskSize                      = 40,
+                                                                         BidSize                      = 90,
+                                                                         ContractCount                = 1
                                                                      };
 
         public static readonly OptionDailyResponse DailyResponse = new()
@@ -70,7 +76,8 @@ public static partial class Example
                                                                        CreatedAt                    = DateTime.UtcNow,
                                                                        ModifiedAt                   = DateTime.UtcNow,
                                                                        StockExchange                = null!,
-                                                                       Quotes                       = []
+                                                                       Quotes                       = [],
+                                                                       
                                                                    };
     }
 }

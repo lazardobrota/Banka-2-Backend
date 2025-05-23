@@ -41,6 +41,9 @@ public class Security
     public decimal          PriceChangePercent => SecurityUtils.GetPriceChangePercent(Quotes, DailyQuotes);
     public decimal          AskPrice           => Quotes.Count      > 0 ? Quotes[0].AskPrice : 0;
     public decimal          BidPrice           => Quotes.Count      > 0 ? Quotes[0].BidPrice : 0;
+    public int              AskSize            => Quotes.Count      > 0 ? Quotes[0].AskSize : 0;
+    public int              BidSize            => Quotes.Count      > 0 ? Quotes[0].BidSize : 0;
+    public int              ContractCount      => Quotes.Count      > 0 ? Quotes[0].ContractCount : 1;
     public decimal          ClosePrice         => DailyQuotes.Count > 0 ? DailyQuotes[0].ClosePrice : 0;
     public decimal          OpeningPrice       => SecurityUtils.GetOpeningPrice(Quotes, DailyQuotes);
     public DateTime         CreatedAt          => SecurityUtils.GetCreatedAtDate(Quotes, DailyQuotes);
@@ -64,6 +67,9 @@ public class Stock
     public decimal          PriceChangePercent => SecurityUtils.GetPriceChangePercent(Quotes, DailyQuotes);
     public decimal          AskPrice           => Quotes.Count      > 0 ? Quotes[0].AskPrice : 0;
     public decimal          BidPrice           => Quotes.Count      > 0 ? Quotes[0].BidPrice : 0;
+    public int              AskSize            => Quotes.Count      > 0 ? Quotes[0].AskSize : 0;
+    public int              BidSize            => Quotes.Count      > 0 ? Quotes[0].BidSize : 0;
+    public int              ContractCount      => Quotes.Count      > 0 ? Quotes[0].ContractCount : 1;
     public decimal          ClosePrice         => DailyQuotes.Count > 0 ? DailyQuotes[0].ClosePrice : 0;
     public decimal          OpeningPrice       => SecurityUtils.GetOpeningPrice(Quotes, DailyQuotes);
     public DateTime         CreatedAt          => SecurityUtils.GetCreatedAtDate(Quotes, DailyQuotes);
@@ -90,6 +96,9 @@ public class FutureContract
     public decimal          PriceChangePercent => SecurityUtils.GetPriceChangePercent(Quotes, DailyQuotes);
     public decimal          AskPrice           => Quotes.Count      > 0 ? Quotes[0].AskPrice : 0;
     public decimal          BidPrice           => Quotes.Count      > 0 ? Quotes[0].BidPrice : 0;
+    public int              AskSize            => Quotes.Count      > 0 ? Quotes[0].AskSize : 0;
+    public int              BidSize            => Quotes.Count      > 0 ? Quotes[0].BidSize : 0;
+    public int              ContractCount      => Quotes.Count      > 0 ? Quotes[0].ContractCount : 1;
     public decimal          ClosePrice         => DailyQuotes.Count > 0 ? DailyQuotes[0].ClosePrice : 0;
     public decimal          OpeningPrice       => SecurityUtils.GetOpeningPrice(Quotes, DailyQuotes);
     public DateTime         CreatedAt          => SecurityUtils.GetCreatedAtDate(Quotes, DailyQuotes);
@@ -118,6 +127,9 @@ public class Option
     public decimal  PriceChangePercent => SecurityUtils.GetPriceChangePercent(Quotes, DailyQuotes);
     public decimal  AskPrice           => Quotes.Count      > 0 ? Quotes[0].AskPrice : 0;
     public decimal  BidPrice           => Quotes.Count      > 0 ? Quotes[0].BidPrice : 0;
+    public int      AskSize            => Quotes.Count      > 0 ? Quotes[0].AskSize : 0;
+    public int      BidSize            => Quotes.Count      > 0 ? Quotes[0].BidSize : 0;
+    public int      ContractCount      => Quotes.Count      > 0 ? Quotes[0].ContractCount : 1;
     public decimal  ClosePrice         => DailyQuotes.Count > 0 ? DailyQuotes[0].ClosePrice : 0;
     public decimal  OpeningPrice       => SecurityUtils.GetOpeningPrice(Quotes, DailyQuotes);
     public DateTime CreatedAt          => SecurityUtils.GetCreatedAtDate(Quotes, DailyQuotes);
@@ -131,7 +143,6 @@ public class ForexPair
     public required Guid           QuoteCurrencyId { get; set; }
     public required decimal        ExchangeRate    { get; set; }
     public required Liquidity      Liquidity       { get; set; }
-    public required int            ContractSize    { get; set; } = 1000;
     public required string         Name            { get; set; }
     public required string         Ticker          { get; set; }
     public required Guid           StockExchangeId { get; set; }
@@ -139,13 +150,16 @@ public class ForexPair
     public          List<Quote>    Quotes          { get; set; } = [];
 
     public List<DailyQuote> DailyQuotes = [];
-    public decimal          MaintenanceDecimal => (decimal)0.1 * ContractSize * ExchangeRate;
+    public decimal          MaintenanceDecimal => (decimal)0.1 * ContractCount * ExchangeRate;
     public decimal          HighPrice          => SecurityUtils.GetHighPrice(Quotes, DailyQuotes);
     public decimal          LowPrice           => SecurityUtils.GetLowPrice(Quotes, DailyQuotes);
     public decimal          PriceChange        => SecurityUtils.GetPriceChange(Quotes, DailyQuotes);
     public decimal          PriceChangePercent => SecurityUtils.GetPriceChangePercent(Quotes, DailyQuotes);
     public decimal          AskPrice           => Quotes.Count      > 0 ? Quotes[0].AskPrice : 0;
     public decimal          BidPrice           => Quotes.Count      > 0 ? Quotes[0].BidPrice : 0;
+    public int              AskSize            => Quotes.Count      > 0 ? Quotes[0].AskSize : 0;
+    public int              BidSize            => Quotes.Count      > 0 ? Quotes[0].BidSize : 0;
+    public int              ContractCount      => Quotes.Count      > 0 ? Quotes[0].ContractCount : 1;
     public decimal          ClosePrice         => DailyQuotes.Count > 0 ? DailyQuotes[0].ClosePrice : 0;
     public decimal          OpeningPrice       => SecurityUtils.GetOpeningPrice(Quotes, DailyQuotes);
     public DateTime         CreatedAt          => SecurityUtils.GetCreatedAtDate(Quotes, DailyQuotes);

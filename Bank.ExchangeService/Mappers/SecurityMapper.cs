@@ -32,7 +32,6 @@ public static class SecurityMapper
                    Ticker          = security.Ticker,
                    StockExchange   = security.StockExchange,
                    Quotes          = security.Quotes,
-                   ContractSize    = security.ContractSize,
                    StockExchangeId = security.StockExchangeId,
                    DailyQuotes     = security.DailyQuotes
                };
@@ -85,7 +84,6 @@ public static class SecurityMapper
                    Ticker          = forexPair.Ticker,
                    StockExchange   = forexPair.StockExchange,
                    Quotes          = forexPair.Quotes,
-                   ContractSize    = forexPair.ContractSize,
                    StockExchangeId = forexPair.StockExchangeId,
                    SecurityType    = SecurityType.ForexPair,
                };

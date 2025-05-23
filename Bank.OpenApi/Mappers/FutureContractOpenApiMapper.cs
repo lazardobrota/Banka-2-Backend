@@ -110,8 +110,8 @@ internal static class FutureContractOpenApiMapper
         @object[nameof(value.PriceChangePercentInInterval)
                 .ToCamelCase()] = new OpenApiDouble((double)value.PriceChangePercentInInterval);
 
-        @object[nameof(value.Price)
-                .ToCamelCase()] = new OpenApiDouble((double)value.Price);
+        @object[nameof(value.AskPrice)
+                .ToCamelCase()] = new OpenApiDouble((double)value.AskPrice);
 
         @object[nameof(value.CreatedAt)
                 .ToCamelCase()] = new OpenApiDateTime(value.CreatedAt);
