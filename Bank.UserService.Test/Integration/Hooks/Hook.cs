@@ -1,6 +1,5 @@
 using Bank.Application.Extensions;
 using Bank.Database;
-using Bank.Permissions;
 using Bank.Permissions.Services;
 using Bank.UserService.Application;
 using Bank.UserService.BackgroundServices;
@@ -10,8 +9,6 @@ using Bank.UserService.Test.Integration.Services;
 using DotNetEnv;
 
 using Microsoft.Extensions.DependencyInjection;
-
-using Moq;
 
 using Reqnroll.BoDi;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;

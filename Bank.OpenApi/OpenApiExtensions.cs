@@ -1,6 +1,5 @@
 ﻿using Bank.OpenApi.Core;
 using Bank.OpenApi.Examples;
-using Bank.OpenApi.Schemas.OpenApi;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +8,6 @@ using Microsoft.OpenApi.Models;
 
 using Scalar.AspNetCore;
 
-using Schema = Bank.OpenApi.Schemas.Swagger.Schema;
 using SchemaOpenApi = Bank.OpenApi.Schemas.OpenApi.Schema.OpenApi;
 using SchemaSwagger = Bank.OpenApi.Schemas.Swagger.Schema.Swagger;
 
@@ -227,6 +225,8 @@ public static class OpenApiExtensions
         services.AddSwaggerGen(config =>
                                {
                                    config.SwaggerDoc("v1", new OpenApiInfo { Title = "Bank Service", Version = "v1" });
+
+                                   config.SchemaFilter<SchemaSwagger.Enums>();
 
                                    config.SchemaFilter<SchemaSwagger.AccountCurrency.CreateRequest>();
                                    config.SchemaFilter<SchemaSwagger.AccountCurrency.ClientUpdateRequest>();

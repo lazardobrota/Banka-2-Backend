@@ -10,7 +10,7 @@ public class TestAuthorizationServiceFactory(IServiceScopeFactory serviceScopeFa
 {
     public Guid                           UserId      { set; get; }
     public Permissions.Domain.Permissions Permissions { set; get; }
-    
+
     public IAuthorizationService AuthorizationService => CreateAuthorizationService();
 
     private IAuthorizationService CreateAuthorizationService()
@@ -19,7 +19,7 @@ public class TestAuthorizationServiceFactory(IServiceScopeFactory serviceScopeFa
 
         mockAuthorizationService.SetupGet(authorizationService => authorizationService.UserId)
                                 .Returns(UserId);
-        
+
         mockAuthorizationService.SetupGet(authorizationService => authorizationService.Permissions)
                                 .Returns(Permissions);
 
