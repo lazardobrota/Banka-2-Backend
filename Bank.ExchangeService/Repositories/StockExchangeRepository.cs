@@ -1,9 +1,11 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Queries;
-using Bank.ExchangeService.Database;
+using Bank.Database.Core;
 using Bank.ExchangeService.Model;
 
 using Microsoft.EntityFrameworkCore;
+
+using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
 
 namespace Bank.ExchangeService.Repositories;
 
@@ -20,13 +22,15 @@ public interface IStockExchangeRepository
     Task<Page<StockExchange>> FindAll(StockExchangeFilterQuery filter, Pageable pageable);
 }
 
-public class StockExchangeRepository(DatabaseContext context) : IStockExchangeRepository
+public class StockExchangeRepository(IDatabaseContextFactory<DatabaseContext> contextFactory) : IStockExchangeRepository
 {
-    private readonly DatabaseContext m_Context = context;
+    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory = contextFactory;
 
     public async Task<Page<StockExchange>> FindAll(StockExchangeFilterQuery filter, Pageable pageable)
     {
-        var query = m_Context.StockExchanges.AsQueryable();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var query = context.StockExchanges.AsQueryable();
 
         if (!string.IsNullOrEmpty(filter.Name))
             query = query.Where(e => EF.Functions.ILike(e.Name, $"%{filter.Name}%"));
@@ -51,26 +55,38 @@ public class StockExchangeRepository(DatabaseContext context) : IStockExchangeRe
 
     public async Task<StockExchange?> FindById(Guid id)
     {
-        return await m_Context.StockExchanges.FindAsync(id);
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.StockExchanges.FindAsync(id);
     }
 
     public async Task<StockExchange?> FindByAcronym(string acronym)
     {
-        return await m_Context.StockExchanges.Where(stockExchange => EF.Functions.ILike(stockExchange.Acronym, $"%{acronym}%"))
-                              .FirstAsync();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.StockExchanges.Where(stockExchange => EF.Functions.ILike(stockExchange.Acronym, $"%{acronym}%"))
+                            .FirstAsync();
     }
 
     public async Task<StockExchange> Add(StockExchange stockExchange)
     {
-        var added = await m_Context.StockExchanges.AddAsync(stockExchange);
-        await m_Context.SaveChangesAsync();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var added = await context.StockExchanges.AddAsync(stockExchange);
+
+        await context.SaveChangesAsync();
+
         return added.Entity;
     }
 
     public async Task<StockExchange> Update(StockExchange stockExchange)
     {
-        m_Context.StockExchanges.Update(stockExchange);
-        await m_Context.SaveChangesAsync();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        context.StockExchanges.Update(stockExchange);
+
+        await context.SaveChangesAsync();
+
         return stockExchange;
     }
 }

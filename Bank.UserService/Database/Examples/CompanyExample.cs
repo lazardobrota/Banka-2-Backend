@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.Database.Examples;
@@ -24,5 +25,26 @@ public static partial class Example
                                                                         Address         = "456 Updated Street, New City",
                                                                         MajorityOwnerId = Seeder.Client.Client01.Id
                                                                     };
+
+        public static readonly CompanyResponse Response = new()
+                                                          {
+                                                              Id                      = Guid.Parse("8a7b9f2d-4c8a-4b1d-b1cd-987654321abc"),
+                                                              Name                    = CreateRequest.Name,
+                                                              RegistrationNumber      = CreateRequest.RegistrationNumber,
+                                                              TaxIdentificationNumber = CreateRequest.TaxIdentificationNumber,
+                                                              ActivityCode            = CreateRequest.ActivityCode,
+                                                              Address                 = CreateRequest.Address,
+                                                              MajorityOwner           = null!
+                                                          };
+
+        public static readonly CompanySimpleResponse SimpleResponse = new()
+                                                                      {
+                                                                          Id                      = Guid.Parse("8a7b9f2d-4c8a-4b1d-b1cd-987654321abc"),
+                                                                          Name                    = CreateRequest.Name,
+                                                                          RegistrationNumber      = CreateRequest.RegistrationNumber,
+                                                                          TaxIdentificationNumber = CreateRequest.TaxIdentificationNumber,
+                                                                          ActivityCode            = CreateRequest.ActivityCode,
+                                                                          Address                 = CreateRequest.Address
+                                                                      };
     }
 }

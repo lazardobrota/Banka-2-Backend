@@ -19,7 +19,10 @@ public class OptionResponse
     public required decimal                   PriceChangeInInterval        { get; set; }
     public required decimal                   PriceChangePercentInInterval { get; set; }
     public required decimal                   AskPrice                     { get; set; }
+    public required int                       AskSize                      { get; set; }
     public required decimal                   BidPrice                     { get; set; }
+    public required int                       BidSize                      { get; set; }
+    public required int                       ContractCount                { get; set; }
     public required DateTime                  CreatedAt                    { get; set; }
     public required DateTime                  ModifiedAt                   { get; set; }
     public required StockExchangeResponse     StockExchange                { get; set; }
@@ -64,7 +67,10 @@ public class OptionSimpleResponse
     public required decimal    PriceChangeInInterval        { get; set; }
     public required decimal    PriceChangePercentInInterval { get; set; }
     public required decimal    AskPrice                     { get; set; }
+    public required int        AskSize                      { get; set; }
     public required decimal    BidPrice                     { get; set; }
+    public required int        BidSize                      { get; set; }
+    public required int        ContractCount                { get; set; }
     public required DateTime   CreatedAt                    { get; set; }
     public required DateTime   ModifiedAt                   { get; set; }
 }

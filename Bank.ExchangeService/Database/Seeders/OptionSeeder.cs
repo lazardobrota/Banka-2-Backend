@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Globalization;
+using System.Web;
 
 using Bank.Application.Domain;
 using Bank.Application.Responses;
@@ -191,12 +192,16 @@ public static class OptionSeederExtension
                                                                            .Select(security => security.ToStock())
                                                                            .ToList();
 
+        var     toDate     = Configuration.Security.Option.ToDateTime;
         string? nextPage   = null;
         var     securities = new List<SecurityModel>();
         var     quotes     = new List<Quote>();
         var     query      = HttpUtility.ParseQueryString(string.Empty);
         query["feed"]  = "indicative";
         query["limit"] = "1000";
+
+        if (toDate != DateTime.MaxValue.ToString(CultureInfo.InvariantCulture))
+            query["expiration_date_lte"] = toDate;
 
         foreach (var stock in stocks)
         {

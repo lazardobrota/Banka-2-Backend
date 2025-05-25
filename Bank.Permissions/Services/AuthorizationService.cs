@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
+using OtpNet;
+
 namespace Bank.Permissions.Services;
 
 using Permissions = Domain.Permissions;
@@ -17,11 +19,13 @@ public interface IAuthorizationService
     public Permissions Permissions { get; }
 
     public string RegenerateToken();
+    public string GenerateTokenFor(Guid           userId, Permissions permissions);
+    
+    public bool   IsConfirmationCodeValid(string? confirmationCode);
 
-    public string GenerateTokenFor(Guid userId, Permissions permissions);
 }
 
-public class AuthorizationService : IAuthorizationService
+internal class AuthorizationService : IAuthorizationService
 {
     public Permissions Permissions { get; }
     public Guid        UserId      { get; }
@@ -65,5 +69,15 @@ public class AuthorizationService : IAuthorizationService
                               };
 
         return new JsonWebTokenHandler().CreateToken(tokenDescriptor);
+    }
+    
+    public bool IsConfirmationCodeValid(string? confirmationCode)
+    {
+        if (confirmationCode is null)
+            return false;
+        
+        var totp = new Totp(UserId.ToByteArray(), mode: OtpHashMode.Sha256, timeCorrection: TimeCorrection.UncorrectedInstance);
+        
+        return totp.VerifyTotp(DateTime.UtcNow, confirmationCode, out _);
     }
 }

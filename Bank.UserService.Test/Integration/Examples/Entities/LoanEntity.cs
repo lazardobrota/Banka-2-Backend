@@ -14,6 +14,8 @@ public static partial class Example
             public static readonly LoanUpdateRequest UpdateRequest = Database.Examples.Example.Loan.UpdateRequest;
 
             public static readonly Guid Id = Seeder.Loan.PersonalLoan1.Id;
+
+            public static readonly Guid ClientId = Seeder.Client.Client01.Id;
         }
     }
 }

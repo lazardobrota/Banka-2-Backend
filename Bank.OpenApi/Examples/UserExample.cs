@@ -31,6 +31,12 @@ public static partial class Example
                                                                                           ConfirmPassword = Constant.Password,
                                                                                       };
 
+        public static readonly UserUpdatePermissionRequest DefaultUpdatePermissionRequest = new()
+                                                                                            {
+                                                                                                Permission = Constant.Permissions,
+                                                                                                Type       = Constant.PermissionType,
+                                                                                            };
+
         public static readonly UserResponse DefaultResponse = new()
                                                               {
                                                                   Id                         = Constant.Id,

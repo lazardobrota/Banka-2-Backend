@@ -29,11 +29,11 @@ public interface IUserService
     Task<Result> UpdatePermission(Guid userId, UserUpdatePermissionRequest request);
 }
 
-public class UserService(IUserRepository userRepository, IEmailService emailService, IAuthorizationService authorizationService) : IUserService
+public class UserService(IUserRepository userRepository, IEmailService emailService, IAuthorizationServiceFactory authorizationServiceFactory) : IUserService
 {
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
-    private readonly IEmailService         m_EmailService         = emailService;
-    private readonly IUserRepository       m_UserRepository       = userRepository;
+    private readonly IEmailService                m_EmailService                = emailService;
+    private readonly IUserRepository              m_UserRepository              = userRepository;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Result<Page<UserResponse>>> GetAll(UserFilterQuery userFilterQuery, Pageable pageable)
     {
@@ -68,7 +68,9 @@ public class UserService(IUserRepository userRepository, IEmailService emailServ
         if (user.Password != HashingUtilities.HashPassword(userLoginRequest.Password, user.Salt))
             return Result.BadRequest<UserLoginResponse>("The password is incorrect.");
 
-        var token = m_AuthorizationService.GenerateTokenFor(user.Id, user.Permissions);
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
+        var token = authorizationService.GenerateTokenFor(user.Id, user.Permissions);
 
         return Result.Ok(new UserLoginResponse { Token = token, User = user.ToResponse() });
     }

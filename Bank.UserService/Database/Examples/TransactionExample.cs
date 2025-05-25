@@ -1,8 +1,16 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Requests;
+using Bank.Application.Responses;
 using Bank.UserService.Database.Seeders;
 
 namespace Bank.UserService.Database.Examples;
+
+file static class Values
+{
+    public static readonly Guid    Id         = Guid.Parse("ddee4d61-3fef-44a9-b186-6e81a87c63a1");
+    public const           decimal FromAmount = 1000.00m;
+    public const           decimal ToAmount   = 950.00m;
+}
 
 public static partial class Example
 {
@@ -24,5 +32,34 @@ public static partial class Example
                                                                         {
                                                                             Status = TransactionStatus.Failed
                                                                         };
+
+        public static readonly TransactionResponse Response = new()
+                                                              {
+                                                                  Id              = Values.Id,
+                                                                  FromAccount     = null!,
+                                                                  ToAccount       = null!,
+                                                                  FromAmount      = Values.FromAmount,
+                                                                  ToAmount        = Values.ToAmount,
+                                                                  Code            = null!,
+                                                                  ReferenceNumber = CreateRequest.ReferenceNumber!,
+                                                                  Purpose         = CreateRequest.Purpose,
+                                                                  Status          = UpdateRequest.Status,
+                                                                  CreatedAt       = DateTime.UtcNow,
+                                                                  ModifiedAt      = DateTime.UtcNow,
+                                                                  FromCurrency    = null!,
+                                                                  ToCurrency      = null!
+                                                              };
+
+        public static readonly TransactionCreateResponse CreateResponse = new()
+                                                                          {
+                                                                              Id              = Values.Id,
+                                                                              FromAmount      = Values.FromAmount,
+                                                                              Code            = null!,
+                                                                              ReferenceNumber = CreateRequest.ReferenceNumber!,
+                                                                              Purpose         = CreateRequest.Purpose,
+                                                                              Status          = UpdateRequest.Status,
+                                                                              CreatedAt       = DateTime.UtcNow,
+                                                                              ModifiedAt      = DateTime.UtcNow
+                                                                          };
     }
 }

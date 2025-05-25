@@ -4,17 +4,16 @@ namespace Bank.Application.Requests;
 
 public class OrderCreateRequest
 {
-    public required Guid ActuaryId { set; get; }
-    
-    public required string    AccountNumber     { set; get; }
-    public required OrderType OrderType         { set; get; }
-    public required int       Quantity          { set; get; }
-    public required int       ContractCount     { set; get; }
-    public required decimal   PricePerUnit      { set; get; }
-    public required Direction Direction         { set; get; }
-    public required Guid      SupervisorId      { set; get; }
-    public required Guid      SecurityId        { set; get; }
-    public required bool      AfterHours        { set; get; }
+    public required Guid      ActuaryId     { set; get; }
+    public required string    AccountNumber { set; get; }
+    public required OrderType OrderType     { set; get; }
+    public required int       Quantity      { set; get; }
+    public required int       ContractCount { set; get; }
+    public required decimal   LimitPrice    { set; get; }
+    public required decimal   StopPrice     { set; get; }
+    public required Direction Direction     { set; get; }
+    public required Guid      SupervisorId  { set; get; }
+    public required Guid      SecurityId    { set; get; }
 }
 
 public class OrderUpdateRequest

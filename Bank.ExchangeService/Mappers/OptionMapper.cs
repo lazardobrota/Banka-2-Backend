@@ -27,8 +27,11 @@ public static class OptionMapper
                    BidPrice                     = option.BidPrice,
                    CreatedAt                    = option.CreatedAt,
                    ModifiedAt                   = option.ModifiedAt,
+                   AskSize                      = option.AskSize,
+                   BidSize                      = option.BidSize,
                    Quotes = option.Quotes.Select(quote => quote.ToChartSimpleResponse())
                                   .ToList(),
+                   ContractCount = option.ContractCount,
                };
     }
 
@@ -51,10 +54,10 @@ public static class OptionMapper
                    PriceChangePercentInInterval = option.PriceChangePercent,
                    CreatedAt                    = option.CreatedAt,
                    ModifiedAt                   = option.ModifiedAt,
+                   OpeningPrice                 = option.OpeningPrice,
+                   ClosePrice                   = option.ClosePrice,
                    Quotes = option.DailyQuotes.Select(quote => quote.ToDailySimpleResponse())
                                   .ToList(),
-                   OpeningPrice = option.OpeningPrice,
-                   ClosePrice   = option.ClosePrice,
                };
     }
 
@@ -79,6 +82,9 @@ public static class OptionMapper
                    ModifiedAt                   = option.ModifiedAt,
                    PriceChangeInInterval        = option.PriceChange,
                    PriceChangePercentInInterval = option.PriceChangePercent,
+                   AskSize                      = option.AskSize,
+                   BidSize                      = option.BidSize,
+                   ContractCount                = option.ContractCount,
                };
     }
 

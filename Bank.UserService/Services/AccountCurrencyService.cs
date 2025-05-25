@@ -20,18 +20,18 @@ public interface IAccountCurrencyService
 }
 
 public class AccountCurrencyService(
-    IAccountCurrencyRepository accountCurrencyRepository,
-    IAccountRepository         accountRepository,
-    ICurrencyRepository        currencyRepository,
-    IUserRepository            userRepository,
-    IAuthorizationService      authorizationService
+    IAccountCurrencyRepository   accountCurrencyRepository,
+    IAccountRepository           accountRepository,
+    ICurrencyRepository          currencyRepository,
+    IUserRepository              userRepository,
+    IAuthorizationServiceFactory authorizationServiceFactory
 ) : IAccountCurrencyService
 {
-    private readonly IAccountCurrencyRepository m_AccountCurrencyRepository = accountCurrencyRepository;
-    private readonly IAccountRepository         m_AccountRepository         = accountRepository;
-    private readonly ICurrencyRepository        m_CurrencyRepository        = currencyRepository;
-    private readonly IAuthorizationService      m_AuthorizationService      = authorizationService;
-    private readonly IUserRepository            m_UserRepository            = userRepository;
+    private readonly IAccountCurrencyRepository   m_AccountCurrencyRepository   = accountCurrencyRepository;
+    private readonly IAccountRepository           m_AccountRepository           = accountRepository;
+    private readonly ICurrencyRepository          m_CurrencyRepository          = currencyRepository;
+    private readonly IUserRepository              m_UserRepository              = userRepository;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Result<AccountCurrencyResponse>> GetOne(Guid id)
     {
@@ -55,9 +55,11 @@ public class AccountCurrencyService(
 
     public async Task<Result<AccountCurrencyResponse>> Create(AccountCurrencyCreateRequest createRequest)
     {
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
         var account  = await m_AccountRepository.FindById(createRequest.AccountId);
         var currency = await m_CurrencyRepository.FindById(createRequest.CurrencyId);
-        var employee = await m_UserRepository.FindById(m_AuthorizationService.UserId);
+        var employee = await m_UserRepository.FindById(authorizationService.UserId);
 
         if (account == null || currency == null || employee == null)
             return Result.BadRequest<AccountCurrencyResponse>("Invalid data.");

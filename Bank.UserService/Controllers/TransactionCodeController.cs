@@ -1,5 +1,6 @@
 ﻿using Bank.Application.Domain;
 using Bank.Application.Endpoints;
+using Bank.Application.Queries;
 using Bank.Application.Responses;
 using Bank.Permissions.Core;
 using Bank.UserService.Services;
@@ -15,9 +16,9 @@ public class TransactionCodeController(ITransactionCodeService transactionCodeSe
 
     [Authorize]
     [HttpGet(Endpoints.TransactionCode.GetAll)]
-    public async Task<ActionResult<Page<TransactionCodeResponse>>> GetAll([FromQuery] Pageable pageable)
+    public async Task<ActionResult<Page<TransactionCodeResponse>>> GetAll([FromQuery] TransactionCodeFilterQuery filter, [FromQuery] Pageable pageable)
     {
-        var result = await m_TransactionCodeService.GetAll(pageable);
+        var result = await m_TransactionCodeService.GetAll(filter, pageable);
 
         return result.ActionResult;
     }

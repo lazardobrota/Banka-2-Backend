@@ -47,6 +47,14 @@ internal static partial class Schema
                 }
             }
 
+            internal class UpdatePermissionRequest(OpenApiSchemaContext openApiContext) : AbstractSwaggerSchema<UserUpdatePermissionRequest>(openApiContext)
+            {
+                protected override IOpenApiAny CreateExample()
+                {
+                    return Example.ToOpenApiObject();
+                }
+            }
+
             internal class Response(OpenApiSchemaContext openApiContext) : AbstractSwaggerSchema<UserResponse>(openApiContext)
             {
                 protected override IOpenApiAny CreateExample()

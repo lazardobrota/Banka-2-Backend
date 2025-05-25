@@ -1,9 +1,15 @@
-﻿using Bank.Application.Domain;
+﻿using System.Linq.Expressions;
+
+using Bank.Application.Domain;
 using Bank.Application.Queries;
-using Bank.ExchangeService.Database;
+using Bank.Database.Core;
+using Bank.ExchangeService.Model;
 using Bank.ExchangeService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+
+using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
 
 namespace Bank.ExchangeService.Repositories;
 
@@ -22,24 +28,25 @@ public interface ISecurityRepository
     Task<bool> CreateSecurities(List<Security> securities);
 }
 
-public class SecurityRepository(DatabaseContext context, IDbContextFactory<DatabaseContext> contextFactory) : ISecurityRepository
+public class SecurityRepository(IDatabaseContextFactory<DatabaseContext> contextFactory) : ISecurityRepository
 {
-    private readonly DatabaseContext                    m_Context        = context;
-    private readonly IDbContextFactory<DatabaseContext> m_ContextFactory = contextFactory;
-
-    private Task<DatabaseContext> CreateContext => m_ContextFactory.CreateDbContextAsync();
+    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory = contextFactory;
 
     public async Task<List<Security>> FindAll(SecurityType securityType)
     {
-        return await m_Context.Securities.Include(security => security.StockExchange)
-                              .Where(security => security.SecurityType == securityType)
-                              .ToListAsync();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.Securities.Include(security => security.StockExchange)
+                            .Where(security => security.SecurityType == securityType)
+                            .ToListAsync();
     }
 
     public async Task<Page<Security>> FindAll(QuoteFilterQuery quoteFilterQuery, SecurityType securityType, Pageable pageable, bool inPast)
     {
-        var query = m_Context.Securities.Include(stock => stock.StockExchange)
-                             .AsQueryable();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var query = context.Securities.Include(stock => stock.StockExchange)
+                           .AsQueryable();
 
         query = query.Where(security => security.SecurityType == securityType && security.Quotes.Any());
 
@@ -77,6 +84,8 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
 
     public async Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter, bool inPast)
     {
+        await using var context = await m_ContextFactory.CreateContext;
+
         var date = DateOnly.FromDateTime(filter.Interval switch
                                          {
                                              QuoteIntervalType.Week        => DateTime.Today.AddDays(-7),
@@ -90,10 +99,10 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
         var fromDate = inPast ? date : DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
         var toDate   = inPast ? DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)) : date;
 
-        var query = m_Context.Securities.Include(stock => stock.StockExchange)
-                             .AsNoTracking()
-                             .Where(stock => stock.Id == id)
-                             .AsQueryable();
+        var query = context.Securities.Include(stock => stock.StockExchange)
+                           .AsNoTracking()
+                           .Where(stock => stock.Id == id)
+                           .AsQueryable();
 
         if (inPast)
             query = query.Include(security => security.Quotes.Where(quote => fromDate <= DateOnly.FromDateTime(quote.CreatedAt) && DateOnly.FromDateTime(quote.CreatedAt) <= toDate)
@@ -104,6 +113,8 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
 
     public async Task<Security?> FindByIdDaily(Guid id, QuoteFilterIntervalQuery filter)
     {
+        await using var context = await m_ContextFactory.CreateContext;
+
         var fromDate = DateOnly.FromDateTime(filter.Interval switch
                                              {
                                                  QuoteIntervalType.Week        => DateTime.Today.AddDays(-7),
@@ -114,32 +125,32 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
                                                  _                             => DateTime.Today
                                              });
 
-        var security = await m_Context.Securities.Include(security => security.StockExchange)
-                                      .FirstOrDefaultAsync(security => security.Id == id);
+        var security = await context.Securities.Include(security => security.StockExchange)
+                                    .FirstOrDefaultAsync(security => security.Id == id);
 
         if (security is null)
             return null;
 
-        var quotes = await m_Context.Quotes.AsNoTracking()
-                                    .Where(quote => quote.SecurityId == id)
-                                    .Where(quote => fromDate                               <= DateOnly.FromDateTime(quote.CreatedAt) &&
-                                                    DateOnly.FromDateTime(quote.CreatedAt) <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)))
-                                    .GroupBy(quote => quote.CreatedAt.Date)
-                                    .Select(group => new DailyQuote
-                                                     {
-                                                         HighPrice = group.Max(quote => quote.HighPrice),
-                                                         LowPrice  = group.Min(quote => quote.LowPrice),
-                                                         ClosePrice = group.OrderBy(quote => quote.CreatedAt)
-                                                                           .Last()
-                                                                           .ClosePrice,
-                                                         OpeningPrice = group.OrderBy(quote => quote.CreatedAt)
-                                                                             .First()
-                                                                             .OpeningPrice,
-                                                         Volume = group.Sum(quote => quote.Volume),
-                                                         Date   = group.Key.Date
-                                                     })
-                                    .OrderByDescending(candle => candle.Date)
-                                    .ToListAsync();
+        var quotes = await context.Quotes.AsNoTracking()
+                                  .Where(quote => quote.SecurityId == id)
+                                  .Where(quote => fromDate                               <= DateOnly.FromDateTime(quote.CreatedAt) &&
+                                                  DateOnly.FromDateTime(quote.CreatedAt) <= DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)))
+                                  .GroupBy(quote => quote.CreatedAt.Date)
+                                  .Select(group => new DailyQuote
+                                                   {
+                                                       HighPrice = group.Max(quote => quote.HighPrice),
+                                                       LowPrice  = group.Min(quote => quote.LowPrice),
+                                                       ClosePrice = group.OrderBy(quote => quote.CreatedAt)
+                                                                         .Last()
+                                                                         .ClosePrice,
+                                                       OpeningPrice = group.OrderBy(quote => quote.CreatedAt)
+                                                                           .First()
+                                                                           .OpeningPrice,
+                                                       Volume = group.Sum(quote => quote.Volume),
+                                                       Date   = group.Key.Date
+                                                   })
+                                  .OrderByDescending(candle => candle.Date)
+                                  .ToListAsync();
 
         security.DailyQuotes = quotes;
         return security;
@@ -147,14 +158,16 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
 
     public async Task<Security?> Create(Security security)
     {
-        var added = await m_Context.Securities.AddAsync(security);
-        await m_Context.SaveChangesAsync();
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var added = await context.Securities.AddAsync(security);
+        await context.SaveChangesAsync();
         return added.Entity;
     }
 
     public async Task<bool> CreateSecurities(List<Security> securities)
     {
-        await using var context = await CreateContext;
+        await using var context = await m_ContextFactory.CreateContext;
 
         await context.Securities.AddRangeAsync(securities);
 
@@ -177,3 +190,39 @@ public class SecurityRepository(DatabaseContext context, IDbContextFactory<Datab
                                      });
     }
 }
+
+// public static partial class RepositoryExtensions
+// {
+//     public static IIncludableQueryable<Security, object?> IncludeAll(this DbSet<Security> set)
+//     {
+//         return set.Include(security =>  security.Quotes)
+//                   .ThenIncludeAll(security => security.Quotes, nameof(Quote.Security))
+//                   .Include(security => security.StockExchange);
+//     }
+//
+//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Security?> value,
+//                                                                                  Expression<Func<TEntity, Security?>> navigationExpression, params string[] excludeProperties)
+//     where TEntity : class
+//     {
+//         IIncludableQueryable<TEntity, object?> query = value;
+//     
+//         if (!excludeProperties.Contains(nameof(Security.Quotes)))
+//             query = query.Include(navigationExpression)
+//                          .ThenInclude(security =>  security!.Quotes);
+//     
+//         return query;
+//     }
+//
+//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Security>>value,
+//                                                                                  Expression<Func<TEntity, List<Security>>> navigationExpression, params string[] excludeProperties)
+//     where TEntity : class
+//     {
+//         IIncludableQueryable<TEntity, object?> query = value;
+//
+//         if (!excludeProperties.Contains(nameof(Security.Quotes)))
+//             query = query.Include(navigationExpression)
+//                          .ThenInclude(security =>  security.Quotes);
+//
+//         return query;
+//     }
+// }

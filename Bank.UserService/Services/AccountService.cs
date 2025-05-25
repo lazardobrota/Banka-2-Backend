@@ -25,18 +25,18 @@ public interface IAccountService
 }
 
 public class AccountService(
-    IAccountRepository     accountRepository,
-    IAccountTypeRepository accountTypeRepository,
-    ICurrencyRepository    currencyRepository,
-    IUserRepository        userRepository,
-    IAuthorizationService  authorizationService
+    IAccountRepository           accountRepository,
+    IAccountTypeRepository       accountTypeRepository,
+    ICurrencyRepository          currencyRepository,
+    IUserRepository              userRepository,
+    IAuthorizationServiceFactory authorizationServiceFactory
 ) : IAccountService
 {
-    private readonly IAccountRepository     m_AccountRepository     = accountRepository;
-    private readonly IAccountTypeRepository m_AccountTypeRepository = accountTypeRepository;
-    private readonly IUserRepository        m_UserRepository        = userRepository;
-    private readonly ICurrencyRepository    m_CurrencyRepository    = currencyRepository;
-    private readonly IAuthorizationService  m_AuthorizationService  = authorizationService;
+    private readonly IAccountRepository           m_AccountRepository           = accountRepository;
+    private readonly IAccountTypeRepository       m_AccountTypeRepository       = accountTypeRepository;
+    private readonly IUserRepository              m_UserRepository              = userRepository;
+    private readonly ICurrencyRepository          m_CurrencyRepository          = currencyRepository;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Result<Page<AccountResponse>>> GetAll(AccountFilterQuery accountFilterQuery, Pageable pageable)
     {
@@ -70,15 +70,17 @@ public class AccountService(
 
     public async Task<Result<AccountResponse>> Create(AccountCreateRequest accountCreateRequest)
     {
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
         var accountType = await m_AccountTypeRepository.FindById(accountCreateRequest.AccountTypeId);
         var client      = await m_UserRepository.FindById(accountCreateRequest.ClientId);
         var currency    = await m_CurrencyRepository.FindById(accountCreateRequest.CurrencyId);
-        var employee    = await m_UserRepository.FindById(m_AuthorizationService.UserId);
+        var employee    = await m_UserRepository.FindById(authorizationService.UserId);
 
         if (accountType == null || client == null || currency == null || employee == null)
             return Result.BadRequest<AccountResponse>("Invalid data.");
 
-        var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(m_AuthorizationService.UserId));
+        var account = await m_AccountRepository.Add(accountCreateRequest.ToAccount(authorizationService.UserId));
 
         account.Type     = accountType;
         account.Client   = client;

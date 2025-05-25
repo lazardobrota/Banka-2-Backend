@@ -1,9 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
 using Bank.Application;
+using Bank.Database;
 using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
+using Bank.ExchangeService.Database.Examples;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.Repositories;
@@ -16,8 +18,6 @@ using DotNetEnv;
 
 using FluentValidation;
 using FluentValidation.AspNetCore;
-
-using Microsoft.EntityFrameworkCore;
 
 namespace Bank.ExchangeService.Application;
 
@@ -34,7 +34,8 @@ public class ExchangeApplication
         builder.Services.AddSignalR();
         builder.Services.AddValidation();
         builder.Services.AddServices();
-        builder.Services.AddDatabase();
+        builder.Services.AddDatabaseServices<DatabaseContext>();
+        builder.Services.AddInMemoryDatabaseServices();
         builder.Services.AddHostedServices();
         builder.Services.AddBackgroundServices();
         builder.Services.AddHttpServices();
@@ -42,14 +43,14 @@ public class ExchangeApplication
         builder.Services.AddCors();
         builder.Services.AddAuthenticationServices();
         builder.Services.AddAuthorizationServices();
-        
+
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddOpenApiServices();
         builder.Services.AddOpenApiExamples();
 
         var app = builder.Build();
-        
+
         app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.MapHub<SecurityHub>("security-hub");
@@ -67,17 +68,17 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IAuthorizationService, AuthorizationService>();
-        services.AddScoped<IStockExchangeRepository, StockExchangeRepository>();
-        services.AddScoped<IStockExchangeService, StockExchangeService>();
-        services.AddScoped<IStockService, StockService>();
-        services.AddScoped<IOptionService, OptionService>();
-        services.AddScoped<IForexPairService, ForexPairService>();
-        services.AddScoped<IFutureContractService, FutureContractService>();
-        services.AddScoped<IQuoteRepository, QuoteRepository>();
-        services.AddScoped<ISecurityRepository, SecurityRepository>();
-        services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<IOrderService, OrderService>();
+        services.AddSingleton<IStockExchangeRepository, StockExchangeRepository>();
+        services.AddSingleton<IStockExchangeService, StockExchangeService>();
+        services.AddSingleton<IStockService, StockService>();
+        services.AddSingleton<IOptionService, OptionService>();
+        services.AddSingleton<IForexPairService, ForexPairService>();
+        services.AddSingleton<IFutureContractService, FutureContractService>();
+        services.AddSingleton<IQuoteRepository, QuoteRepository>();
+        services.AddSingleton<ISecurityRepository, SecurityRepository>();
+        services.AddSingleton<IOrderRepository, OrderRepository>();
+        services.AddSingleton<IOrderService, OrderService>();
+        services.AddSingleton<IRedisRepository, RedisRepository>();
 
         return services;
     }
@@ -85,21 +86,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<DatabaseBackgroundService>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddDatabase(this IServiceCollection services)
-    {
-        services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()), ServiceLifetime.Scoped, ServiceLifetime.Singleton);
-        services.AddDbContextFactory<DatabaseContext>(options => options.UseNpgsql(Configuration.Database.GetConnectionString()));
+        services.AddSingleton<OrderBackgroundService>();
 
         return services;
     }
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
-        services.AddHostedService<ApplicationHostedService>();
+        //services.AddHostedService<ApplicationHostedService>();
 
         return services;
     }
@@ -136,6 +130,37 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddOpenApiExamples(this IServiceCollection services)
     {
+        services.AddOpenApiExample(Example.Account.Response);
+        services.AddOpenApiExample(Example.Account.SimpleResponse);
+        services.AddOpenApiExample(Example.AccountCurrency.Response);
+        services.AddOpenApiExample(Example.AccountType.Response);
+        services.AddOpenApiExample(Example.Client.SimpleResponse);
+        services.AddOpenApiExample(Example.Country.SimpleResponse);
+        services.AddOpenApiExample(Example.Currency.SimpleResponse);
+        services.AddOpenApiExample(Example.Currency.Response);
+        services.AddOpenApiExample(Example.Employee.SimpleResponse);
+        services.AddOpenApiExample(Example.StockExchange.CreateRequest);
+        services.AddOpenApiExample(Example.StockExchange.Response);
+        services.AddOpenApiExample(Example.ForexPair.Response);
+        services.AddOpenApiExample(Example.ForexPair.SimpleResponse);
+        services.AddOpenApiExample(Example.ForexPair.DailyResponse);
+        services.AddOpenApiExample(Example.FutureContract.Response);
+        services.AddOpenApiExample(Example.FutureContract.SimpleResponse);
+        services.AddOpenApiExample(Example.FutureContract.DailyResponse);
+        services.AddOpenApiExample(Example.Option.Response);
+        services.AddOpenApiExample(Example.Option.SimpleResponse);
+        services.AddOpenApiExample(Example.Option.DailyResponse);
+        services.AddOpenApiExample(Example.Order.CreateRequest);
+        services.AddOpenApiExample(Example.Order.UpdateRequest);
+        services.AddOpenApiExample(Example.Order.Response);
+        services.AddOpenApiExample(Example.Quote.SimpleResponse);
+        services.AddOpenApiExample(Example.Quote.DailySimpleResponse);
+        services.AddOpenApiExample(Example.Quote.LatestSimpleResponse);
+        services.AddOpenApiExample(Example.Stock.Response);
+        services.AddOpenApiExample(Example.Stock.SimpleResponse);
+        services.AddOpenApiExample(Example.Stock.DailyResponse);
+        services.AddOpenApiExample(Example.User.Response);
+
         return services;
     }
 }

@@ -10,7 +10,10 @@ public class StockResponse
     public required decimal                   HighPrice                    { get; set; }
     public required decimal                   LowPrice                     { get; set; }
     public required decimal                   AskPrice                     { get; set; }
+    public required int                       AskSize                      { get; set; }
     public required decimal                   BidPrice                     { get; set; }
+    public required int                       BidSize                      { get; set; }
+    public required int                       ContractCount                { get; set; }
     public required long                      Volume                       { get; set; }
     public required decimal                   PriceChangeInInterval        { get; set; }
     public required decimal                   PriceChangePercentInInterval { get; set; }
@@ -46,7 +49,10 @@ public class StockSimpleResponse
     public required decimal  HighPrice                    { get; set; }
     public required decimal  LowPrice                     { get; set; }
     public required decimal  AskPrice                     { get; set; }
+    public required int      AskSize                      { get; set; }
     public required decimal  BidPrice                     { get; set; }
+    public required int      BidSize                      { get; set; }
+    public required int      ContractCount                { get; set; }
     public required long     Volume                       { get; set; }
     public required decimal  PriceChangeInInterval        { get; set; }
     public required decimal  PriceChangePercentInInterval { get; set; }

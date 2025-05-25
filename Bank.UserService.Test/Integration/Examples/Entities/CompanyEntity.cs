@@ -52,6 +52,8 @@ public static partial class Example
                                                            Page = 1,
                                                            Size = 10
                                                        };
+
+            public static readonly Guid Id = Seeder.Company.Company02.Id;
         }
     }
 }

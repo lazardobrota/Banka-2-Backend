@@ -1,4 +1,5 @@
-﻿using Bank.UserService.Database.EntityConfigurations;
+﻿using Bank.Database.Core;
+using Bank.UserService.Database.EntityConfigurations;
 using Bank.UserService.Models;
 
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ namespace Bank.UserService.Database;
 
 using BankModel = Models.Bank;
 
-public class ApplicationContext(DbContextOptions options) : DbContext(options)
+public class ApplicationContext(DbContextOptions options) : DatabaseContext(options)
 {
     public DbSet<BankModel>           Banks                { init; get; }
     public DbSet<User>                Users                { init; get; }

@@ -4,8 +4,6 @@ using Bank.Permissions.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
-using IAuthorizationService = Bank.Permissions.Services.IAuthorizationService;
-
 namespace Bank.Permissions;
 
 public static class AuthorizationExtensions
@@ -19,7 +17,7 @@ public static class AuthorizationExtensions
                                                                   .Build());
 
         services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
-        services.AddSingleton<IAuthorizationService, AuthorizationService>();
+        services.AddSingleton<IAuthorizationServiceFactory, AuthorizationServiceFactory>();
         services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
         return services;
