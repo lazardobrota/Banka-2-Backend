@@ -138,6 +138,11 @@ public class TransactionService(
 
     public async Task<Result<Transaction>> CreateTransaction(TransactionCreateRequest createTransaction)
     {
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
+        if (authorizationService.Permissions != Permission.Bank && authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode))
+            return Result.BadRequest<Transaction>("Invalid confirmation code");
+        
         if (createTransaction.FromAccountNumber == null && createTransaction.ToAccountNumber == null)
             return Result.BadRequest<Transaction>("No valid account provided.");
 

@@ -12,6 +12,7 @@ public class TransactionCreateRequest
     public required Guid    CodeId                { set; get; }
     public          string? ReferenceNumber       { set; get; }
     public required string  Purpose               { set; get; }
+    public          string? ConfirmationCode      { set; get; }
     public          object? ExternalTransactionId { set; get; }
 }
 
