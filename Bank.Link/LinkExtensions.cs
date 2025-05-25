@@ -24,6 +24,7 @@ public static class LinkExtensions
 
         services.AddSingleton<IEnumerable<CurrencyResponse>>(defaultData.Currencies);
         services.AddSingleton<IEnumerable<TransactionCodeResponse>>(defaultData.TransactionCodes);
+        services.AddSingleton<IEnumerable<AccountTypeResponse>>(defaultData.AccountTypes);
 
         return services;
     }

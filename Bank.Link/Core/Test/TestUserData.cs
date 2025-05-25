@@ -21,7 +21,7 @@ internal class TestExternalUserDataLink(BankData bankData, IDataService dataServ
                         LastName  = "LastName",
                         Email     = "email@email.com",
                         Address   = "address",
-                        Phone     = "+38160123456789",
+                        Phone     = "+381601234567",
                         Gender    = "Male",
                         BirthDate = default,
                         Jmbg      = "0000000000000",
@@ -30,8 +30,8 @@ internal class TestExternalUserDataLink(BankData bankData, IDataService dataServ
 
         return Task.FromResult(new Response.B3.AccountResponse
                                {
-                                   Name                = "Zaza",
-                                   AccountNumber       = "333000015648723341",
+                                   Name                = "Zazer",
+                                   AccountNumber       = accountNumber,
                                    ClientId            = 0,
                                    CompanyId           = 0,
                                    CreatedByEmployeeId = 0,
@@ -48,7 +48,8 @@ internal class TestExternalUserDataLink(BankData bankData, IDataService dataServ
                                    OwnershipType       = null!,
                                    Owner               = owner,
                                    AccountCategory     = null!
-                               }.ToNative(m_DataService.GetCurrencyByCode("EUR")!))!;
+                               }.ToNative(m_DataService.GetCurrencies()
+                                                       .First(), m_DataService.GetAccountType(accountNumber)!))!;
     }
 
     public Task<object?> CreateTransaction(TransactionCreateRequest createRequest)

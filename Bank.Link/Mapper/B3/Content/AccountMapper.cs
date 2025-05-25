@@ -5,7 +5,7 @@ namespace Bank.Link.Mapper.B3.Content;
 
 internal static class AccountMapper
 {
-    internal static AccountResponse ToNative(this Response.B3.AccountResponse response, CurrencyResponse currencyResponse)
+    internal static AccountResponse ToNative(this Response.B3.AccountResponse response, CurrencyResponse currencyResponse, AccountTypeResponse accountTypeResponse)
     {
         return new AccountResponse
                {
@@ -17,7 +17,7 @@ internal static class AccountMapper
                    AvailableBalance  = response.AvailableBalance,
                    Employee          = null!,
                    Currency          = currencyResponse,
-                   Type              = null!,
+                   Type              = accountTypeResponse,
                    AccountCurrencies = [],
                    DailyLimit        = response.DailyLimit,
                    MonthlyLimit      = response.MonthlyLimit,

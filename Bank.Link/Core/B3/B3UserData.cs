@@ -44,7 +44,7 @@ internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFa
         var accountResponse  = responseList.First();
         var currencyResponse = m_DataService.GetCurrencyByCode(accountResponse.CurrencyCode);
 
-        return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse);
+        return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse, m_DataService.GetAccountType(accountNumber)!);
     }
 
     public async Task<object?> CreateTransaction(TransactionCreateRequest createRequest)

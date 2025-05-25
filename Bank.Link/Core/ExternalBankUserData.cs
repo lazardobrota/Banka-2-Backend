@@ -6,9 +6,9 @@ namespace Bank.Link.Core;
 public interface IExternalUserData
 {
     Task<AccountResponse?> GetAccount(string accountNumber);
-    
+
     Task<object?> CreateTransaction(TransactionCreateRequest createRequest);
-    
+
     Task<bool> NotifyTransactionStatus(TransactionNotifyStatusRequest notifyStatusRequest);
 }
 
@@ -44,7 +44,7 @@ internal class ExternalUserData(IEnumerable<IExternalUserDataLink> userDataLinks
     public async Task<bool> NotifyTransactionStatus(TransactionNotifyStatusRequest notifyStatusRequest)
     {
         var bankCode = notifyStatusRequest.AccountNumber![..3];
-        
+
         if (!m_DataLinkDictionary.TryGetValue(bankCode, out var dataLink))
             return false;
 
