@@ -40,6 +40,7 @@ public class Hooks
         services.AddDatabaseServices<ApplicationContext>();
         services.AddHostedServices();
         services.AddOpenApiExamples();
+        services.AddBankLinkServices();
         services.AddTransient<AccountController>();
         services.AddTransient<AccountCurrencyController>();
         services.AddTransient<AccountTypeController>();
