@@ -22,7 +22,7 @@ public class TransactionBackgroundService(ITransactionService transactionService
     {
         if (Configuration.Application.Profile == Profile.Testing)
             return;
-
+        
         m_InternalTimer = new Timer(service => ProcessInternalTransactions(service)
                                     .Wait(), this, TimeSpan.Zero, TimeSpan.FromSeconds(15));
 
@@ -31,6 +31,7 @@ public class TransactionBackgroundService(ITransactionService transactionService
     }
 
     private bool m_ProcessingInternalTransaction = false;
+    private bool m_ProcessingExternalTransaction = false;
 
     public async Task ProcessInternalTransactions(object? _)
     {
@@ -50,9 +51,22 @@ public class TransactionBackgroundService(ITransactionService transactionService
         m_ProcessingInternalTransaction = false;
     }
 
-    public async Task ProcessExternalTransactions(object? @object)
+    public async Task ProcessExternalTransactions(object? _)
     {
-        var transactionBackgroundService = @object as TransactionBackgroundService;
+        if (m_ProcessingExternalTransaction || ExternalTransactions.IsEmpty)
+            return;
+
+        m_ProcessingExternalTransaction = true;
+
+        var processTransactions = new List<ProcessTransaction>();
+
+        while (ExternalTransactions.TryDequeue(out var processTransaction))
+            processTransactions.Add(processTransaction);
+
+        await Task.WhenAll(processTransactions.Select(m_TransactionService.ProcessExternalTransaction)
+                                              .ToList());
+
+        m_ProcessingExternalTransaction = false;
     }
 
     public Task OnApplicationStopped()

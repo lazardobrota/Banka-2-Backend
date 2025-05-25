@@ -45,6 +45,15 @@ public class TransactionController(ITransactionService transactionService, Trans
         return result.ActionResult;
     }
 
+    [Authorize(Permission.Bank)]
+    [HttpPut(Endpoints.Transaction.PutStatus)]
+    public async Task<ActionResult<bool>> PutStatus([FromRoute] Guid id)
+    {
+        var result = await m_TransactionService.PutStatus(id);
+
+        return result.ActionResult;
+    }
+
     [Authorize]
     [HttpPost(Endpoints.Transaction.Create)]
     public async Task<ActionResult<TransactionCreateResponse>> Create([FromBody] TransactionCreateRequest transactionCreateRequest)
@@ -62,22 +71,22 @@ public class TransactionController(ITransactionService transactionService, Trans
 
         return result.ActionResult;
     }
-    
+
     [Authorize]
     [HttpGet(Endpoints.Transaction.ProcessInternal)]
     public async Task<ActionResult<Page<TransactionResponse>>> ProcessInternal()
     {
         await m_TransactionBackgroundService.ProcessInternalTransactions(m_TransactionBackgroundService);
-        
+
         return Ok();
     }
-    
+
     [Authorize]
     [HttpGet(Endpoints.Transaction.ProcessExternal)]
     public async Task<ActionResult<Page<TransactionResponse>>> ProcessExternal()
     {
         await m_TransactionBackgroundService.ProcessExternalTransactions(m_TransactionBackgroundService);
-        
+
         return Ok();
     }
 }

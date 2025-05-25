@@ -206,9 +206,9 @@ public static class TransactionMapper
                };
     }
 
-    public static Transaction ToTransaction(this PrepareExternalTransaction externalTransaction) //TODO Check amounts and status
+    public static Transaction ToTransaction(this PrepareExternalTransaction externalTransaction)
     {
-        var isIncoming = externalTransaction.FromAccount!.AccountNumber[..3] == Seeder.Bank.Bank02.Code;
+        var isIncoming = externalTransaction.ToAccount!.AccountNumber[..3] == Seeder.Bank.Bank02.Code;
 
         return new Transaction
                {
@@ -326,7 +326,8 @@ public static class TransactionMapper
                    ToAmount       = externalTransaction.ExchangeDetails!.ExchangeRate * externalTransaction.Amount,
                    FromBankAmount = externalTransaction.ExchangeDetails.ExchangeRate * externalTransaction.ExchangeDetails.AverageRate *
                                     externalTransaction.Amount,
-                   IsDirect = false
+                   ExternalTransactionId = externalTransaction.ExternalTransactionId,
+                   IsDirect              = false
                };
     }
 

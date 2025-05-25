@@ -246,6 +246,7 @@ public static partial class Endpoints
         public const string GetAll           = $"{Base}";
         public const string GetAllForAccount = $"{Account.Base}/{{accountId:guid}}/transactions";
         public const string GetOne           = $"{Base}/{{id:guid}}";
+        public const string PutStatus        = $"{Base}/{{id:guid}}/status";
         public const string Create           = $"{Base}";
         public const string ProcessInternal  = $"{Base}/internal";
         public const string ProcessExternal  = $"{Base}/external";

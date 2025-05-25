@@ -19,3 +19,10 @@ public class TransactionUpdateRequest
 {
     public required TransactionStatus Status { set; get; }
 }
+
+public class TransactionNotifyStatusRequest
+{
+    public required object? TransactionId     { set; get; }
+    public required bool    TransferSucceeded { set; get; }
+    public required string? AccountNumber     { set; get; }
+}

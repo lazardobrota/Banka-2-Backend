@@ -365,7 +365,7 @@ public static class UserMapper
                    BankId                     = Seeder.Bank.All.First(bank => bank.Code == response.AccountNumber[..3]).Id,
                    CreatedAt                  = DateTime.UtcNow,
                    ModifiedAt                 = DateTime.UtcNow,
-                   Employed                   = false,
+                   Employed                   = null,
                    Activated                  = false
                };
     }

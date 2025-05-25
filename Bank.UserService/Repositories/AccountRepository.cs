@@ -11,7 +11,6 @@ using EFCore.BulkExtensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Bank.UserService.Repositories;
 
@@ -22,8 +21,6 @@ public interface IAccountRepository
     Task<Page<Account>> FindAllByClientId(Guid clientId, Pageable pageable);
 
     Task<Account?> FindById(Guid id);
-
-    Task<Account?> FindByNumber(string number);
 
     Task<Account?> FindByAccountNumber(string? accountNumber);
 
@@ -146,14 +143,6 @@ public class AccountRepository(IDatabaseContextFactory<ApplicationContext> conte
         return await context.Accounts.AnyAsync() is not true;
     }
 
-    public async Task<Account?> FindByNumber(string number)
-    {
-        await using var context = await m_ContextFactory.CreateContext;
-
-        return await context.Accounts.IncludeAll()
-                            .FirstOrDefaultAsync(account => account.Number == number);
-    }
-
     public async Task<Account?> FindByAccountNumber(string? accountNumber)
     {
         if (accountNumber is null)
@@ -167,7 +156,7 @@ public class AccountRepository(IDatabaseContextFactory<ApplicationContext> conte
         var type   = accountNumber[16..];
 
         return await context.Accounts.IncludeAll()
-                            .FirstOrDefaultAsync(account => account.Client!.Bank!.Code == code && account.Number == number && account.Type!.Code == type);
+                            .FirstOrDefaultAsync(account => account.Client!.Bank!.Code == code && account.Number == number);
     }
 
     public async Task<Account> Add(Account account)

@@ -140,8 +140,11 @@ public static class ServiceCollectionExtensions
     {
         services.AddLinkServices(new DefaultData(Seeder.Currency.All.Select(currency => currency.ToResponse())
                                                        .ToList(), Seeder.TransactionCode.All.Select(transactionCode => transactionCode.ToResponse())
-                                                                        .ToList()))
-                .AddB3Link(new BankData(Seeder.Bank.Bank03.Code, Seeder.Bank.Bank03.BaseUrl));
+                                                                        .ToList(), Seeder.AccountType.All.Select(accountType => accountType.ToResponse())
+                                                                                         .ToList()))
+                .AddTestLink(Seeder.Bank.All.Select(bank => new BankData(bank.Code, bank.BaseUrl))
+                                   .ToList());
+        // .AddB3Link(new BankData(Seeder.Bank.Bank03.Code, Seeder.Bank.Bank03.BaseUrl));
 
         return services;
     }

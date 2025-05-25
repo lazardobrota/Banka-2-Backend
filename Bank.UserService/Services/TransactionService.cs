@@ -25,6 +25,8 @@ public interface ITransactionService
 
     Task<Result<TransactionResponse>> GetOne(Guid id);
 
+    Task<Result<bool>> PutStatus(Guid id);
+
     Task<Result<Transaction>> Create(TransactionCreateRequest transactionCreateRequest);
 
     Task<Result<TransactionResponse>> Update(TransactionUpdateRequest transactionUpdateRequest, Guid id);
@@ -32,6 +34,8 @@ public interface ITransactionService
     Task<Result<Transaction>> PrepareInternalTransaction(PrepareInternalTransaction prepareTransaction);
 
     Task ProcessInternalTransaction(ProcessTransaction processTransaction);
+
+    Task ProcessExternalTransaction(ProcessTransaction processTransaction);
 }
 
 public class TransactionService(
@@ -44,7 +48,7 @@ public class TransactionService(
     Lazy<IDataService>                          dataServiceLazy,
     IAuthorizationServiceFactory                authorizationServiceFactory,
     ITransactionCodeRepository                  transactionCodeRepository,
-    IBankUserData                               bankUserData,
+    IExternalUserData                           externalUserData,
     IUserRepository                             userRepository
 ) : ITransactionService
 {
@@ -56,7 +60,7 @@ public class TransactionService(
     private readonly IExchangeService                            m_ExchangeService                  = exchangeService;
     private readonly IUserRepository                             m_UserRepository                   = userRepository;
     private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory                   = contextFactory;
-    private readonly IBankUserData                               m_BankUserData                     = bankUserData;
+    private readonly IExternalUserData                           m_ExternalUserData                 = externalUserData;
     private readonly Lazy<TransactionBackgroundService>          m_TransactionBackgroundServiceLazy = transactionBackgroundServiceLazy;
     private readonly Lazy<IDataService>                          m_DataServiceLazy                  = dataServiceLazy;
 
@@ -87,6 +91,11 @@ public class TransactionService(
             return Result.Unauthorized<TransactionResponse>();
 
         return Result.Ok(transaction.ToResponse());
+    }
+
+    public async Task<Result<bool>> PutStatus(Guid id)
+    {
+        return Result.Ok(await m_TransactionRepository.UpdateStatus(id, TransactionStatus.Completed));
     }
 
     public async Task<Result<Page<TransactionResponse>>> GetAllByAccountId(Guid accountId, TransactionFilterQuery transactionFilterQuery, Pageable pageable)
@@ -145,7 +154,7 @@ public class TransactionService(
         var fromCurrency    = await fromCurrencyTask;
         var toAccount       = await toAccountTask;
         var toCurrency      = await toCurrencyTask;
-        var transactionCode = await transactionCodeTask;
+        var transactionCode = await transactionCodeTask; 
         var exchangeDetails = await exchangeDetailsTask;
 
         var bankCodeFrom = createTransaction.FromAccountNumber?[..3];
@@ -311,7 +320,7 @@ public class TransactionService(
         if (!prepareTransaction.FromAccount.TryFindAccount(prepareTransaction.FromCurrency.Id, out var accountId))
         {
             await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
-
+            
             return Result.BadRequest<Transaction>("Account does not have currency.");
         }
 
@@ -352,7 +361,6 @@ public class TransactionService(
             return Result.BadRequest<Transaction>("Invalid data.");
 
         var bankCodeFrom = prepareTransaction.FromAccountNumber![..3];
-        var bankCodeTo   = prepareTransaction.ToAccountNumber![..3];
 
         if (bankCodeFrom == Data.Bank.Code)
         {
@@ -375,9 +383,6 @@ public class TransactionService(
             }
         }
 
-        if (bankCodeTo == Data.Bank.Code)
-            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Affirm);
-
         var processTransaction = prepareTransaction.ToProcessTransaction(transaction.Id);
 
         TransactionBackgroundService.ExternalTransactions.Enqueue(processTransaction);
@@ -389,14 +394,14 @@ public class TransactionService(
     {
         if (prepareTransaction.FromAccount is null)
         {
-            var accountData = await m_BankUserData.GetAccount(prepareTransaction.FromAccountNumber!);
+            var accountData = await m_ExternalUserData.GetAccount(prepareTransaction.FromAccountNumber!);
 
             prepareTransaction.FromAccount = await CreateExternalAccount(accountData);
         }
 
         if (prepareTransaction.ToAccount is null)
         {
-            var accountData = await m_BankUserData.GetAccount(prepareTransaction.ToAccountNumber!);
+            var accountData = await m_ExternalUserData.GetAccount(prepareTransaction.ToAccountNumber!);
 
             prepareTransaction.ToAccount = await CreateExternalAccount(accountData);
         }
@@ -578,6 +583,88 @@ public class TransactionService(
 
         await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
 
+        return transferSucceeded;
+    }
+
+    public async Task ProcessExternalTransaction(ProcessTransaction processTransaction)
+    {
+        var isToAccountOnly   = processTransaction.FromAccountId == Guid.Empty;
+        var isFromAccountOnly = processTransaction.ToAccountId   == Guid.Empty;
+        var isDirect          = processTransaction.IsDirect;
+
+        var task = (isToAccountOnly, isFromAccountOnly, isDirect) switch
+                   {
+                       (false, false, _) => ProcessExternalTransactionHelper(processTransaction),
+                       _                 => Task.CompletedTask
+                   };
+
+        await task;
+    }
+
+    public async Task<bool> ProcessExternalTransactionHelper(ProcessTransaction processTransaction)
+    {
+        var transactionTask = m_TransactionRepository.FindById(processTransaction.TransactionId);
+        var fromAccountTask = m_AccountRepository.FindById(processTransaction.FromAccountId);
+        var toAccountTask   = m_AccountRepository.FindById(processTransaction.ToAccountId);
+
+        await Task.WhenAll(transactionTask, fromAccountTask, toAccountTask);
+
+        var transaction = await transactionTask;
+        var fromAccount = await fromAccountTask;
+        var toAccount   = await toAccountTask;
+
+        if (transaction is null)
+            return false;
+        
+        if (transaction.Status == TransactionStatus.Canceled)
+            return true;
+
+        if (fromAccount == null || toAccount == null || !fromAccount.TryFindAccount(processTransaction.FromCurrencyId, out var fromAccountId) ||
+            !toAccount.TryFindAccount(processTransaction.ToCurrencyId, out var toAccountId))
+        {
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, TransactionStatus.Failed);
+
+            return false;
+        }
+
+        bool transferSucceeded = false;
+
+        if (fromAccount.Client!.Bank!.IsExternal)
+        {
+            transferSucceeded = await m_AccountRepository.IncreaseBalances(toAccountId, processTransaction.ToCurrencyId, processTransaction.ToAmount);
+
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
+        }
+
+        if (toAccount.Client!.Bank!.IsExternal)
+        {
+            transferSucceeded = await m_AccountRepository.DecreaseBalance(fromAccountId, processTransaction.FromCurrencyId, processTransaction.FromAmount, processTransaction.FromBankAmount);
+
+            await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Affirm : TransactionStatus.Failed);
+        }
+
+        if (fromAccount.Client!.Bank!.IsExternal)
+            await m_ExternalUserData.NotifyTransactionStatus(new TransactionNotifyStatusRequest 
+                                                             {
+                                                                 TransactionId     = processTransaction.ExternalTransactionId,
+                                                                 TransferSucceeded = transferSucceeded,
+                                                                 AccountNumber     = fromAccount.AccountNumber
+                                                             });
+
+        if (toAccount.Client!.Bank!.IsExternal && transferSucceeded)
+            await m_ExternalUserData.CreateTransaction(new TransactionCreateRequest
+                                                       {
+                                                           FromAccountNumber     = fromAccount.AccountNumber,
+                                                           FromCurrencyId        = fromAccount.CurrencyId,
+                                                           ToAccountNumber       = toAccount.AccountNumber,
+                                                           ToCurrencyId          = toAccount.CurrencyId,
+                                                           Amount                = processTransaction.ToAmount,
+                                                           CodeId                = transaction.CodeId,
+                                                           ReferenceNumber       = transaction.ReferenceNumber,
+                                                           Purpose               = transaction.Purpose ?? string.Empty,
+                                                           ExternalTransactionId = processTransaction.ExternalTransactionId,
+                                                       });
+        
         return transferSucceeded;
     }
 
