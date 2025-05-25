@@ -9,14 +9,15 @@ public static class QuoteMapper
     {
         return new QuoteSimpleResponse
                {
-                   Id         = quote.Id,
-                   HighPrice  = quote.HighPrice,
-                   LowPrice   = quote.LowPrice,
-                   Volume     = quote.Volume,
-                   CreatedAt  = quote.CreatedAt,
-                   ModifiedAt = quote.ModifiedAt,
-                   AskPrice   = quote.AskPrice,
-                   BidPrice   = quote.BidPrice,
+                   Id            = quote.Id,
+                   HighPrice     = quote.HighPrice,
+                   LowPrice      = quote.LowPrice,
+                   Volume        = quote.Volume,
+                   CreatedAt     = quote.CreatedAt,
+                   ModifiedAt    = quote.ModifiedAt,
+                   AskPrice      = quote.AskPrice,
+                   BidPrice      = quote.BidPrice,
+                   ContractCount = quote.ContractCount,
                };
     }
 
@@ -51,34 +52,38 @@ public static class QuoteMapper
 
     public static QuoteSimpleResponse ToChartSimpleResponse(this Quote quote)
     {
-        return new QuoteSimpleResponse()
+        return new QuoteSimpleResponse
                {
-                   Id         = quote.Id,
-                   HighPrice  = quote.HighPrice,
-                   LowPrice   = quote.LowPrice,
-                   Volume     = quote.Volume,
-                   CreatedAt  = quote.CreatedAt,
-                   ModifiedAt = quote.ModifiedAt,
-                   AskPrice   = quote.AskPrice,
-                   BidPrice   = quote.BidPrice,
+                   Id            = quote.Id,
+                   HighPrice     = quote.HighPrice,
+                   LowPrice      = quote.LowPrice,
+                   Volume        = quote.Volume,
+                   CreatedAt     = quote.CreatedAt,
+                   ModifiedAt    = quote.ModifiedAt,
+                   AskPrice      = quote.AskPrice,
+                   BidPrice      = quote.BidPrice,
+                   ContractCount = quote.ContractCount,
                };
     }
 
-    public static Quote ToQuote(this FetchStockBarOneResponse stockBarOneResponse, Guid stockId)
+    public static Quote ToQuote(this FetchStockBarOneResponse stockBarOneResponse, Guid stockId, int askSize, int bidSize)
     {
         return new Quote
                {
-                   Id           = Guid.NewGuid(),
-                   AskPrice     = stockBarOneResponse.ClosePrice,
-                   BidPrice     = 0,
-                   SecurityId   = stockId,
-                   HighPrice    = stockBarOneResponse.HighPrice,
-                   LowPrice     = stockBarOneResponse.LowPrice,
-                   Volume       = stockBarOneResponse.NumberOfTradesInInterval,
-                   CreatedAt    = stockBarOneResponse.Date,
-                   ModifiedAt   = stockBarOneResponse.Date,
-                   ClosePrice   = stockBarOneResponse.ClosePrice,
-                   OpeningPrice = stockBarOneResponse.OpeningPrice
+                   Id            = Guid.NewGuid(),
+                   AskPrice      = stockBarOneResponse.ClosePrice,
+                   BidPrice      = 0,
+                   SecurityId    = stockId,
+                   HighPrice     = stockBarOneResponse.HighPrice,
+                   LowPrice      = stockBarOneResponse.LowPrice,
+                   Volume        = stockBarOneResponse.NumberOfTradesInInterval,
+                   CreatedAt     = stockBarOneResponse.Date,
+                   ModifiedAt    = stockBarOneResponse.Date,
+                   ClosePrice    = stockBarOneResponse.ClosePrice,
+                   OpeningPrice  = stockBarOneResponse.OpeningPrice,
+                   AskSize       = askSize,
+                   BidSize       = bidSize,
+                   ContractCount = 1
                };
     }
 
@@ -86,53 +91,66 @@ public static class QuoteMapper
     {
         return new Quote
                {
-                   Id           = Guid.NewGuid(),
-                   SecurityId   = stockId,
-                   AskPrice     = stockSnapshotResponse.LatestQuote!.AskPrice,
-                   BidPrice     = stockSnapshotResponse.LatestQuote!.BidPrice,
-                   HighPrice    = stockSnapshotResponse.DailyBar!.HighPrice,
-                   LowPrice     = stockSnapshotResponse.DailyBar!.LowPrice,
-                   Volume       = stockSnapshotResponse.MinuteBar!.NumberOfSharesInInterval,
-                   CreatedAt    = stockSnapshotResponse.LatestQuote!.Date,
-                   ModifiedAt   = stockSnapshotResponse.LatestQuote!.Date,
-                   ClosePrice   = stockSnapshotResponse.DailyBar!.ClosePrice,
-                   OpeningPrice = stockSnapshotResponse.DailyBar!.OpeningPrice,
+                   Id            = Guid.NewGuid(),
+                   SecurityId    = stockId,
+                   AskPrice      = stockSnapshotResponse.LatestQuote!.AskPrice,
+                   BidPrice      = stockSnapshotResponse.LatestQuote!.BidPrice,
+                   HighPrice     = stockSnapshotResponse.DailyBar!.HighPrice,
+                   LowPrice      = stockSnapshotResponse.DailyBar!.LowPrice,
+                   Volume        = stockSnapshotResponse.MinuteBar!.NumberOfSharesInInterval,
+                   CreatedAt     = stockSnapshotResponse.LatestQuote!.Date,
+                   ModifiedAt    = stockSnapshotResponse.LatestQuote!.Date,
+                   ClosePrice    = stockSnapshotResponse.DailyBar!.ClosePrice,
+                   OpeningPrice  = stockSnapshotResponse.DailyBar!.OpeningPrice,
+                   AskSize       = stockSnapshotResponse.LatestQuote.AskSize,
+                   BidSize       = stockSnapshotResponse.LatestQuote.BidSize,
+                   ContractCount = 1
                };
     }
 
     public static Quote ToQuote(this FetchForexPairQuoteResponse fetchForexPairQuote, Guid forexPairId, DateTime date)
     {
+        var random = new Random();
+        
         return new Quote
                {
-                   Id           = Guid.NewGuid(),
-                   SecurityId   = forexPairId,
-                   AskPrice     = fetchForexPairQuote.Close,
-                   BidPrice     = 0,
-                   HighPrice    = fetchForexPairQuote.High,
-                   LowPrice     = fetchForexPairQuote.Low,
-                   Volume       = 0,
-                   CreatedAt    = date.ToUniversalTime(),
-                   ModifiedAt   = date.ToUniversalTime(),
-                   ClosePrice   = fetchForexPairQuote.Close,
-                   OpeningPrice = fetchForexPairQuote.Open
+                   Id            = Guid.NewGuid(),
+                   SecurityId    = forexPairId,
+                   AskPrice      = fetchForexPairQuote.Close,
+                   BidPrice      = 0,
+                   HighPrice     = fetchForexPairQuote.High,
+                   LowPrice      = fetchForexPairQuote.Low,
+                   Volume        = 0,
+                   CreatedAt     = date.ToUniversalTime(),
+                   ModifiedAt    = date.ToUniversalTime(),
+                   ClosePrice    = fetchForexPairQuote.Close,
+                   OpeningPrice  = fetchForexPairQuote.Open,
+                   AskSize       = random.Next(0, 100),
+                   BidSize       = 0,
+                   ContractCount = 1
                };
     }
 
     public static Quote ToQuote(this FetchForexPairLatestResponse fetchForexPairLatest, Guid forexPairId)
     {
+        var random = new Random();
+        
         return new Quote
                {
-                   Id           = Guid.NewGuid(),
-                   SecurityId   = forexPairId,
-                   AskPrice     = fetchForexPairLatest.AskPrice,
-                   BidPrice     = fetchForexPairLatest.BidPrice,
-                   HighPrice    = 0,
-                   LowPrice     = 0,
-                   Volume       = 0,
-                   CreatedAt    = fetchForexPairLatest.Date.ToUniversalTime(),
-                   ModifiedAt   = fetchForexPairLatest.Date.ToUniversalTime(),
-                   ClosePrice   = 0,
-                   OpeningPrice = 0
+                   Id            = Guid.NewGuid(),
+                   SecurityId    = forexPairId,
+                   AskPrice      = fetchForexPairLatest.AskPrice,
+                   BidPrice      = fetchForexPairLatest.BidPrice,
+                   HighPrice     = 0,
+                   LowPrice      = 0,
+                   Volume        = 0,
+                   CreatedAt     = fetchForexPairLatest.Date.ToUniversalTime(),
+                   ModifiedAt    = fetchForexPairLatest.Date.ToUniversalTime(),
+                   ClosePrice    = 0,
+                   OpeningPrice  = 0,
+                   AskSize       = random.Next(0, 100),
+                   BidSize       = 0,
+                   ContractCount = 1
                };
     }
 
@@ -151,7 +169,10 @@ public static class QuoteMapper
                    ModifiedAt        = optionResponse.DailyBar!.TimeStamp,
                    ImpliedVolatility = optionResponse.ImpliedVolatility,
                    OpeningPrice      = optionResponse.DailyBar.OpeningPrice,
-                   ClosePrice        = optionResponse.DailyBar.ClosingPrice
+                   ClosePrice        = optionResponse.DailyBar.ClosingPrice,
+                   AskSize           = optionResponse.LatestQuote.AskSize,
+                   BidSize           = optionResponse.LatestQuote.BidSize,
+                   ContractCount     = 1
                };
     }
 }

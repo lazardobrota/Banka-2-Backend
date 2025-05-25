@@ -1,14 +1,16 @@
 ﻿using System.Globalization;
 using System.Text.Json;
+using System.Web;
 
 using Bank.Application.Domain;
+using Bank.Application.Queries;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database.WebSockets;
-using Bank.ExchangeService.Extensions;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
+using Bank.Http.Clients.User;
 
 using Microsoft.AspNetCore.SignalR;
 
@@ -96,14 +98,15 @@ public static class ForexPairSeederExtension
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedForexPair(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository)
+    public static async Task SeedForexPair(this DatabaseContext context, HttpClient httpClient, IUserServiceHttpClient userServiceHttpClient,
+                                           ISecurityRepository  securityRepository)
     {
         if (context.Securities.Any(security => security.SecurityType == SecurityType.ForexPair))
             return;
 
-        var currencies = await httpClient.GetAllCurrenciesSimple();
+        var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
 
-        if (currencies is null)
+        if (currencies.Count == 0)
             return;
 
         var apiKey     = Configuration.Security.Keys.ApiKeyForex;
@@ -161,12 +164,12 @@ public static class ForexPairSeederExtension
         await securityRepository.CreateSecurities(securities);
     }
 
-    public static async Task SeedForexPairLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository,
-                                                 IHubContext<SecurityHub, ISecurityClient> securityHub)
+    public static async Task SeedForexPairLatest(this DatabaseContext context,            HttpClient       httpClient,      IUserServiceHttpClient userServiceHttpClient,
+                                                 ISecurityRepository  securityRepository, IQuoteRepository quoteRepository, IHubContext<SecurityHub, ISecurityClient> securityHub)
     {
-        var currencies = await httpClient.GetAllCurrenciesSimple();
+        var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
 
-        if (currencies is null)
+        if (currencies.Count == 0)
             return;
 
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
@@ -222,22 +225,33 @@ public static class ForexPairSeederExtension
         await quoteRepository.CreateQuotes(quotes);
     }
 
-    public static async Task SeedForexPairQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
+    public static async Task SeedForexPairQuotes(this DatabaseContext context,            HttpClient       httpClient, IUserServiceHttpClient userServiceHttpClient,
+                                                 ISecurityRepository  securityRepository, IQuoteRepository quoteRepository)
     {
+        var hasSeededBefore = context.Quotes.Any(q => q.Security != null && q.Security.SecurityType == SecurityType.ForexPair);
+
         if (context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.ForexPair))
             return;
 
-        var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
+        var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair()).ToList();
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
 
-        var currencies = await httpClient.GetAllCurrenciesSimple();
+        var fromDate = hasSeededBefore ? forexPairs.First()
+                                 .CreatedAt : DateTime.MinValue;
+        
+        var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
 
-        if (currencies is null)
+        if (currencies.Count == 0)
             return;
 
         var apiKey = Configuration.Security.Keys.ApiKeyForex;
         var quotes = new List<Quote>();
 
+        var     query    = HttpUtility.ParseQueryString(string.Empty);
+        query["function"]   = "FX_DAILY";
+        query["outputsize"] = hasSeededBefore ? "compact" : "full";
+        query["apikey"]     = apiKey;
+        
         foreach (var currencyFrom in currencies)
         {
             foreach (var currencyTo in currencies)
@@ -245,11 +259,13 @@ public static class ForexPairSeederExtension
                 if (currencyFrom.Id == currencyTo.Id)
                     continue;
 
+                query["from_symbol"] = $"{currencyFrom.Code}";
+                query["to_symbol"] = $"{currencyTo.Code}";
+                
                 var request = new HttpRequestMessage
                               {
                                   Method = HttpMethod.Get,
-                                  RequestUri = new Uri($"{Configuration.Security.ForexPair.GetDataApi}?function=FX_DAILY&from_symbol={currencyFrom.Code
-                                  }&to_symbol={currencyTo.Code}&apikey={apiKey}"),
+                                  RequestUri = new Uri($"{Configuration.Security.ForexPair.GetDataApi}?{query}"),
                                   Headers =
                                   {
                                       { "accept", "application/json" },
@@ -272,15 +288,18 @@ public static class ForexPairSeederExtension
 
                 if (!tickerAndForexPair.TryGetValue($"{currencyFrom.Code}{currencyTo.Code}", out var forexPair))
                     continue;
+                
+                foreach (var pair in body.Quotes)
+                {
+                    var date = DateTime.ParseExact(pair.Key, "yyyy-MM-dd", CultureInfo.InvariantCulture)
+                                       .ToUniversalTime()
+                                       .AddHours(2);
+                    
+                    if (hasSeededBefore && date < fromDate)
+                        continue;
 
-                quotes.AddRange(body.Quotes.Select(pair =>
-                                                   {
-                                                       var date = DateTime.ParseExact(pair.Key, "yyyy-MM-dd", CultureInfo.InvariantCulture)
-                                                                          .ToUniversalTime()
-                                                                          .AddHours(2);
-
-                                                       return pair.Value.ToQuote(forexPair.Id, date);
-                                                   }));
+                    quotes.Add(pair.Value.ToQuote(forexPair.Id, date));
+                }
             }
         }
 

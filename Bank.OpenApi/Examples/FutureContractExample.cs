@@ -24,7 +24,13 @@ public static partial class Example
                                                                             CreatedAt                    = Constant.CreatedAt,
                                                                             ModifiedAt                   = Constant.ModifiedAt,
                                                                             StockExchange                = StockExchange.DefaultResponse,
-                                                                            Quotes                       = [Quote.DefaultSimpleResponse]
+                                                                            Quotes =
+                                                                            [
+                                                                                Quote.DefaultSimpleResponse
+                                                                            ],
+                                                                            AskSize       = Constant.AskSize,
+                                                                            BidSize       = Constant.BidSize,
+                                                                            ContractCount = Constant.ContractCount
                                                                         };
 
         public static readonly FutureContractSimpleResponse DefaultSimpleResponse = new()
@@ -40,9 +46,13 @@ public static partial class Example
                                                                                         Volume                       = Constant.Volume,
                                                                                         PriceChangeInInterval        = Constant.PriceChangeInInterval,
                                                                                         PriceChangePercentInInterval = Constant.PriceChangePercentInInterval,
-                                                                                        Price                        = Constant.Price,
+                                                                                        AskPrice                     = Constant.Price,
                                                                                         CreatedAt                    = Constant.CreatedAt,
-                                                                                        ModifiedAt                   = Constant.ModifiedAt
+                                                                                        ModifiedAt                   = Constant.ModifiedAt,
+                                                                                        BidPrice                     = Constant.BidPrice,
+                                                                                        AskSize                      = Constant.AskSize,
+                                                                                        BidSize                      = Constant.BidSize,
+                                                                                        ContractCount                = Constant.ContractCount
                                                                                     };
 
         public static readonly FutureContractDailyResponse DefaultDailyResponse = new()

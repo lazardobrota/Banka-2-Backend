@@ -1,8 +1,4 @@
-﻿using Bank.UserService.Models;
-
-namespace Bank.UserService.Services;
-
-using BankModel = Models.Bank;
+﻿namespace Bank.UserService.Services;
 
 // public interface IDefaultService
 // {

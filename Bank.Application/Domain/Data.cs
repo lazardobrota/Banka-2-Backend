@@ -77,8 +77,8 @@ public enum Direction
 public enum OrderStatus
 {
     Invalid,
-    Pending,
-    Approved,
+    NeedsApproval,
+    Active,
     Declined,
     Completed,
     Canceled,
@@ -94,12 +94,13 @@ public enum PermissionType
 
 public enum Permission : long
 {
-    Invalid      = 0,
-    Client       = 1 << 0,
-    Employee     = 1 << 1,
-    Admin        = 1 << 2,
-    Trade        = 1 << 3,
-    ApproveTrade = 1 << 4,
+    Invalid      = 0L,
+    Client       = 1L << 0,
+    Employee     = 1L << 1,
+    Admin        = 1L << 2,
+    Trade        = 1L << 3,
+    ApproveTrade = 1L << 4,
+    Bank         = 1L << 62,
 
     Agent      = Employee | Trade,
     Supervisor = Employee | Trade | ApproveTrade,

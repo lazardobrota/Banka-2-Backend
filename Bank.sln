@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Permissions", "Bank.Pe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Http", "Bank.Http\Bank.Http.csproj", "{983DE7DE-258A-43DF-993C-2AE94BE1C5B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bank.Link", "Bank.Link\Bank.Link.csproj", "{F4937F18-83E4-405C-B80D-054969393F59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{983DE7DE-258A-43DF-993C-2AE94BE1C5B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{983DE7DE-258A-43DF-993C-2AE94BE1C5B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{983DE7DE-258A-43DF-993C-2AE94BE1C5B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4937F18-83E4-405C-B80D-054969393F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4937F18-83E4-405C-B80D-054969393F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4937F18-83E4-405C-B80D-054969393F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4937F18-83E4-405C-B80D-054969393F59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C328B3D2-9265-42A4-81F5-CF9D941F8234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

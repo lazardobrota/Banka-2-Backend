@@ -1,7 +1,10 @@
-﻿using Bank.Database.Core;
+﻿using System.Linq.Expressions;
+
+using Bank.Database.Core;
 using Bank.ExchangeService.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
 
@@ -15,7 +18,7 @@ public interface IQuoteRepository
 public class QuoteRepository(IDatabaseContextFactory<DatabaseContext> contextFactory) : IQuoteRepository
 {
     private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory = contextFactory;
-    
+
     public async Task<bool> CreateQuotes(List<Quote> quotes)
     {
         await using var context = await m_ContextFactory.CreateContext;
@@ -25,3 +28,38 @@ public class QuoteRepository(IDatabaseContextFactory<DatabaseContext> contextFac
         return await context.SaveChangesAsync() == quotes.Count;
     }
 }
+
+// public static partial class RepositoryExtensions
+// {
+//     public static IIncludableQueryable<Quote, object?> IncludeAll(this DbSet<Quote> set)
+//     {
+//         return set.Include(quote => quote.Security)
+//                   .ThenIncludeAll(quote => quote.Security, nameof(Security.Quotes));
+//     }
+//
+//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Quote?> value,
+//                                                                                  Expression<Func<TEntity, Quote?>> navigationExpression, params string[] excludeProperties)
+//     where TEntity : class
+//     {
+//         IIncludableQueryable<TEntity, object?> query = value;
+//     
+//         if (!excludeProperties.Contains(nameof(Quote.Security)))
+//             query = query.Include(navigationExpression)
+//                          .ThenInclude(quote =>    quote!.Security);
+//     
+//         return query;
+//     }
+//
+//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Quote>>value,
+//                                                                                  Expression<Func<TEntity, List<Quote>>> navigationExpression, params string[] excludeProperties)
+//     where TEntity : class
+//     {
+//         IIncludableQueryable<TEntity, object?> query = value;
+//
+//         if (!excludeProperties.Contains(nameof(Quote.Security)))
+//             query = query.Include(navigationExpression)
+//                          .ThenInclude(quote =>    quote.Security);
+//
+//         return query;
+//     }
+// }

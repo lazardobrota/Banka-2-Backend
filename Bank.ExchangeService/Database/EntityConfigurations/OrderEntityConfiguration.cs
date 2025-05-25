@@ -17,6 +17,9 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.ActuaryId)
                .IsRequired();
 
+        builder.Property(order => order.AccountId)
+               .IsRequired();
+
         builder.Property(order => order.OrderType)
                .IsRequired();
 
@@ -26,7 +29,11 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(order => order.ContractCount)
                .IsRequired();
 
-        builder.Property(order => order.PricePerUnit)
+        builder.Property(order => order.LimitPrice)
+               .HasPrecision(28, 12)
+               .IsRequired();
+
+        builder.Property(order => order.StopPrice)
                .HasPrecision(28, 12)
                .IsRequired();
 
@@ -38,15 +45,6 @@ public class OrderEntityConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(order => order.SupervisorId)
                .IsRequired(false);
-
-        builder.Property(order => order.Done)
-               .IsRequired();
-
-        builder.Property(order => order.RemainingPortions)
-               .IsRequired();
-
-        builder.Property(order => order.AfterHours)
-               .IsRequired();
 
         builder.Property(order => order.CreatedAt)
                .IsRequired();

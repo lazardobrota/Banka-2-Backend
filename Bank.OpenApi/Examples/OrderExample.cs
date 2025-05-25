@@ -13,12 +13,12 @@ public static partial class Example
                                                                              OrderType     = Constant.OrderType,
                                                                              Quantity      = Constant.Quantity,
                                                                              ContractCount = Constant.ContractCount,
-                                                                             PricePerUnit  = Constant.PricePerUnit,
                                                                              Direction     = Constant.Direction,
                                                                              SupervisorId  = Constant.Id,
-                                                                             AfterHours    = Constant.Boolean,
                                                                              AccountNumber = Constant.AccountNumber,
-                                                                             SecurityId    = Constant.Id
+                                                                             SecurityId    = Constant.Id,
+                                                                             LimitPrice    = Constant.PricePerUnit,
+                                                                             StopPrice     = Constant.PricePerUnit,
                                                                          };
 
         public static readonly OrderUpdateRequest DefaultUpdateRequest = new()
@@ -28,21 +28,19 @@ public static partial class Example
 
         public static readonly OrderResponse DefaultResponse = new()
                                                                {
-                                                                   Id                = Constant.Id,
-                                                                   Actuary           = User.DefaultResponse,
-                                                                   OrderType         = Constant.OrderType,
-                                                                   Quantity          = Constant.Quantity,
-                                                                   ContractCount     = Constant.ContractCount,
-                                                                   PricePerUnit      = Constant.PricePerUnit,
-                                                                   Direction         = Constant.Direction,
-                                                                   Supervisor        = User.DefaultResponse,
-                                                                   RemainingPortions = Constant.RemainingPortions,
-                                                                   Done              = Constant.Boolean,
-                                                                   AfterHours        = Constant.Boolean,
-                                                                   Status            = Constant.OrderStatus,
-                                                                   CreatedAt         = DateTime.Now,
-                                                                   ModifiedAt        = DateTime.Now,
-                                                                   Account           = Account.DefaultResponse,
+                                                                   Id            = Constant.Id,
+                                                                   Actuary       = User.DefaultResponse,
+                                                                   OrderType     = Constant.OrderType,
+                                                                   Quantity      = Constant.Quantity,
+                                                                   ContractCount = Constant.ContractCount,
+                                                                   Direction     = Constant.Direction,
+                                                                   Supervisor    = User.DefaultResponse,
+                                                                   LimitPrice    = Constant.PricePerUnit,
+                                                                   StopPrice     = Constant.PricePerUnit,
+                                                                   Status        = Constant.OrderStatus,
+                                                                   CreatedAt     = DateTime.Now,
+                                                                   ModifiedAt    = DateTime.Now,
+                                                                   Account       = Account.DefaultResponse,
                                                                };
     }
 }

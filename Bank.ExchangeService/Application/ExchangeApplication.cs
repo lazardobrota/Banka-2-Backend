@@ -35,6 +35,7 @@ public class ExchangeApplication
         builder.Services.AddValidation();
         builder.Services.AddServices();
         builder.Services.AddDatabaseServices<DatabaseContext>();
+        builder.Services.AddInMemoryDatabaseServices();
         builder.Services.AddHostedServices();
         builder.Services.AddBackgroundServices();
         builder.Services.AddHttpServices();
@@ -77,6 +78,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISecurityRepository, SecurityRepository>();
         services.AddSingleton<IOrderRepository, OrderRepository>();
         services.AddSingleton<IOrderService, OrderService>();
+        services.AddSingleton<IRedisRepository, RedisRepository>();
 
         return services;
     }
@@ -84,6 +86,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<DatabaseBackgroundService>();
+        services.AddSingleton<OrderBackgroundService>();
 
         return services;
     }

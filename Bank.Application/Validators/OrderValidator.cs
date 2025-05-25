@@ -31,11 +31,13 @@ public static class OrderValidator
             .GreaterThan(0)
             .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Contract Count"));
 
-            RuleFor(request => request.PricePerUnit)
-            .NotEmpty()
-            .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Price Per Unit"))
-            .GreaterThan(0)
-            .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Price Per Unit"));
+            RuleFor(request => request.LimitPrice)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Limit Price"));
+
+            RuleFor(request => request.StopPrice)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage(ValidationErrorMessage.Global.FieldIsInvalid("Stop Price"));
 
             RuleFor(request => request.Direction)
             .NotEqual(Direction.Invalid)

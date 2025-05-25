@@ -27,8 +27,11 @@ internal static class OrderOpenApiMapper
         @object[nameof(value.ContractCount)
                 .ToCamelCase()] = new OpenApiInteger(value.ContractCount);
 
-        @object[nameof(value.PricePerUnit)
-                .ToCamelCase()] = new OpenApiDouble((double)value.PricePerUnit);
+        @object[nameof(value.LimitPrice)
+                .ToCamelCase()] = new OpenApiDouble((double)value.LimitPrice);
+
+        @object[nameof(value.StopPrice)
+                .ToCamelCase()] = new OpenApiDouble((double)value.StopPrice);
 
         @object[nameof(value.Direction)
                 .ToCamelCase()] = new OpenApiString(value.Direction.ToString());
@@ -36,16 +39,11 @@ internal static class OrderOpenApiMapper
         @object[nameof(value.SupervisorId)
                 .ToCamelCase()] = new OpenApiString(value.SupervisorId.ToString());
 
-        @object[nameof(value.AfterHours)
-                .ToCamelCase()] = new OpenApiBoolean(value.AfterHours);
-        
         @object[nameof(value.AccountNumber)
                 .ToCamelCase()] = new OpenApiString(value.AccountNumber);
-        
+
         @object[nameof(value.SecurityId)
                 .ToCamelCase()] = new OpenApiString(value.SecurityId.ToString());
-        
-        
 
         return @object;
     }
@@ -85,23 +83,17 @@ internal static class OrderOpenApiMapper
         @object[nameof(value.ContractCount)
                 .ToCamelCase()] = new OpenApiInteger(value.ContractCount);
 
-        @object[nameof(value.PricePerUnit)
-                .ToCamelCase()] = new OpenApiDouble((double)value.PricePerUnit);
+        @object[nameof(value.LimitPrice)
+                .ToCamelCase()] = new OpenApiDouble((double)value.LimitPrice);
+
+        @object[nameof(value.StopPrice)
+                .ToCamelCase()] = new OpenApiDouble((double)value.StopPrice);
 
         @object[nameof(value.Direction)
                 .ToCamelCase()] = new OpenApiString(value.Direction.ToString());
 
         @object[nameof(value.Supervisor)
                 .ToCamelCase()] = value.Supervisor?.ToOpenApiObject();
-
-        @object[nameof(value.RemainingPortions)
-                .ToCamelCase()] = new OpenApiInteger(value.RemainingPortions);
-
-        @object[nameof(value.Done)
-                .ToCamelCase()] = new OpenApiBoolean(value.Done);
-
-        @object[nameof(value.AfterHours)
-                .ToCamelCase()] = new OpenApiBoolean(value.AfterHours);
 
         @object[nameof(value.Status)
                 .ToCamelCase()] = new OpenApiString(value.Status.ToString());
@@ -111,7 +103,7 @@ internal static class OrderOpenApiMapper
 
         @object[nameof(value.ModifiedAt)
                 .ToCamelCase()] = new OpenApiDateTime(value.ModifiedAt);
-        
+
         @object[nameof(value.Account)
                 .ToCamelCase()] = value.Account?.ToOpenApiObject();
 

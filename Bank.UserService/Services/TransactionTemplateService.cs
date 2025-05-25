@@ -19,7 +19,8 @@ public interface ITransactionTemplateService
     Task<Result<TransactionTemplateResponse>> Update(TransactionTemplateUpdateRequest transactionTemplateUpdateRequest, Guid id);
 }
 
-public class TransactionTemplateService(ITransactionTemplateRepository transactionTemplateRepository, IAuthorizationServiceFactory authorizationServiceFactory) : ITransactionTemplateService
+public class TransactionTemplateService(ITransactionTemplateRepository transactionTemplateRepository, IAuthorizationServiceFactory authorizationServiceFactory)
+: ITransactionTemplateService
 {
     private readonly ITransactionTemplateRepository m_TransactionTemplateRepository = transactionTemplateRepository;
     private readonly IAuthorizationServiceFactory   m_AuthorizationServiceFactory   = authorizationServiceFactory;
@@ -42,7 +43,7 @@ public class TransactionTemplateService(ITransactionTemplateRepository transacti
             return Result.NotFound<TransactionTemplateResponse>($"No Transaction Template found with Id: {id}");
 
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
-        
+
         if (transactionTemplate.ClientId != authorizationService.UserId)
             return Result.Unauthorized<TransactionTemplateResponse>();
 
@@ -52,7 +53,7 @@ public class TransactionTemplateService(ITransactionTemplateRepository transacti
     public async Task<Result<TransactionTemplateResponse>> Create(TransactionTemplateCreateRequest transactionTemplateCreateRequest)
     {
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
-        
+
         var transactionTemplate = await m_TransactionTemplateRepository.Add(transactionTemplateCreateRequest.ToTransactionTemplate(authorizationService.UserId));
 
         return Result.Ok(transactionTemplate.ToResponse());

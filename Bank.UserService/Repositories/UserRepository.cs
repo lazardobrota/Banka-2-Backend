@@ -139,11 +139,11 @@ public class UserRepository(IDatabaseContextFactory<ApplicationContext> contextF
             return false;
 
         password = HashingUtilities.HashPassword(password, userEntity.Salt);
-        
+
         var result = await context.Users.Where(user => user.Id == id)
                                   .ExecuteUpdateAsync(setters => setters.SetProperty(dbUser => dbUser.Password, password)
                                                                         .SetProperty(dbUser => dbUser.Activated, true));
-        
+
         return result == 1;
     }
 

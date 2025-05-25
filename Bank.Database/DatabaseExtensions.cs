@@ -20,11 +20,11 @@ public static class DatabaseExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddInMemoryDatabaseServices(this IServiceCollection services)
     {
         services.AddDistributedMemoryCache();
-        
+
         services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(Configuration.Database.InMemory.GetConnectionString()));
 
         services.AddStackExchangeRedisCache(options =>
