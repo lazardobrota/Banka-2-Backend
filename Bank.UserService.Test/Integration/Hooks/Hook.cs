@@ -3,6 +3,7 @@ using Bank.Database;
 using Bank.Permissions.Services;
 using Bank.UserService.Application;
 using Bank.UserService.BackgroundServices;
+using Bank.UserService.Controllers;
 using Bank.UserService.Database;
 using Bank.UserService.Test.Integration.Services;
 
@@ -39,6 +40,24 @@ public class Hooks
         services.AddDatabaseServices<ApplicationContext>();
         services.AddHostedServices();
         services.AddOpenApiExamples();
+        services.AddTransient<AccountController>();
+        services.AddTransient<AccountCurrencyController>();
+        services.AddTransient<AccountTypeController>();
+        services.AddTransient<CardController>();
+        services.AddTransient<CardTypeController>();
+        services.AddTransient<ClientController>();
+        services.AddTransient<CompanyController>();
+        services.AddTransient<CurrencyController>();
+        services.AddTransient<CountryController>();
+        services.AddTransient<EmployeeController>();
+        services.AddTransient<ExchangeController>();
+        services.AddTransient<InstallmentController>();
+        services.AddTransient<LoanController>();
+        services.AddTransient<LoanTypeController>();
+        services.AddTransient<TransactionController>();
+        services.AddTransient<TransactionCodeController>();
+        services.AddTransient<TransactionTemplateController>();
+        services.AddTransient<UserController>();
 
         var serviceProvider = services.BuildServiceProvider();
 
