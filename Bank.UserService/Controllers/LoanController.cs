@@ -42,7 +42,7 @@ public class LoanController(ILoanService loanService) : ControllerBase
         return result.ActionResult;
     }
 
-    //[Authorize]
+    [Authorize]
     [HttpPost(Endpoints.Loan.Create)]
     public async Task<ActionResult<LoanResponse>> Create([FromBody] LoanCreateRequest loanCreateRequest)
     {
