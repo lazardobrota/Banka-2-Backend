@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 
 using Bank.Application.Domain;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.Link.Endpoints;
 using Bank.Link.Mapper.B3.Content;
@@ -11,7 +12,7 @@ using Bank.Link.Service;
 
 namespace Bank.Link.Core.B3;
 
-internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFactory, IDataService dataService) : IBankUserDataLink
+internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFactory, IDataService dataService) : IExternalUserDataLink
 {
     private readonly IHttpClientFactory m_HttpClientFactory = httpClientFactory;
     private readonly IDataService       m_DataService       = dataService;
@@ -43,6 +44,24 @@ internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFa
         var accountResponse  = responseList.First();
         var currencyResponse = m_DataService.GetCurrencyByCode(accountResponse.CurrencyCode);
 
-        return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse);
+        return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse, m_DataService.GetAccountType(accountNumber)!);
+    }
+
+    public async Task<object?> CreateTransaction(TransactionCreateRequest createRequest)
+    {
+        var httpClient = m_HttpClientFactory.CreateClient(BankData.Code);
+
+        //TODO: Implementation Missing
+
+        return null;
+    }
+
+    public async Task<bool> NotifyTransactionStatus(TransactionNotifyStatusRequest notifyStatusRequest)
+    {
+        var httpClient = m_HttpClientFactory.CreateClient(BankData.Code);
+
+        //TODO: Implementation Missing
+
+        return false;
     }
 }

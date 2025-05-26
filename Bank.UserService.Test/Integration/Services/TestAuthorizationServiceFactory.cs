@@ -23,6 +23,18 @@ public class TestAuthorizationServiceFactory(IServiceScopeFactory serviceScopeFa
         mockAuthorizationService.SetupGet(authorizationService => authorizationService.Permissions)
                                 .Returns(Permissions);
 
+        mockAuthorizationService.As<ITokenGeneratorTestOnly>()
+                                .Setup(x => x.GenerateToken(It.IsAny<Guid>()))
+                                .Returns<Guid>(id => JwtTestHelper.GenerateMockJwtToken(id, Permissions));
+
+        mockAuthorizationService.Setup(x => x.GenerateTokenFor(It.IsAny<Guid>(), It.IsAny<Permissions.Domain.Permissions>()))
+                                .Returns<Guid, Permissions.Domain.Permissions>((id, perms) => JwtTestHelper.GenerateMockJwtToken(id, perms));
+
         return mockAuthorizationService.Object;
     }
+}
+
+public interface ITokenGeneratorTestOnly
+{
+    string GenerateToken(Guid userId);
 }

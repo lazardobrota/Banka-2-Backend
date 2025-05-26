@@ -4,6 +4,7 @@ using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.Permissions.Services;
+using Bank.UserService.Controllers;
 using Bank.UserService.Services;
 using Bank.UserService.Test.Examples.Entities;
 using Bank.UserService.Test.Integration.Services;
@@ -15,11 +16,12 @@ using Shouldly;
 namespace Bank.UserService.Test.Steps;
 
 [Binding]
-public class AccountSteps(ScenarioContext context, IAccountService accountService, IAuthorizationServiceFactory authorizationServiceFactory)
+public class AccountSteps(ScenarioContext context, IAccountService accountService, IAuthorizationServiceFactory authorizationServiceFactory, AccountController accountController)
 {
     private readonly ScenarioContext              m_ScenarioContext             = context;
     private readonly IAccountService              m_AccountService              = accountService;
     private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationServiceFactory;
+    private readonly AccountController            m_AccountController           = accountController;
 
     [Given(@"account create request")]
     public void GivenAccountCreateRequest()
@@ -175,6 +177,158 @@ public class AccountSteps(ScenarioContext context, IAccountService accountServic
         accountResult.Value.Items.ShouldNotBeEmpty();
         accountResult.Value.Items.ShouldAllBe(account => account.Client.Id == m_ScenarioContext.Get<Guid>(Constant.IdForAccount));
     }
+
+    [Given(@"a valid account create request")]
+    public void GivenAValidAccountCreateRequest()
+    {
+        var instance = m_AuthorizationServiceFactory as TestAuthorizationServiceFactory;
+
+        instance!.UserId = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9");
+
+        m_ScenarioContext[Constant.AccountCreateRequest] = Example.Entity.Account.CreateRequest;
+    }
+
+    [When(@"a POST request is sent to the account creation endpoint")]
+    public async Task WhenAPostRequestIsSentToTheAccountCreationEndpoint()
+    {
+        var accountCreateRequest = m_ScenarioContext.Get<AccountCreateRequest>(Constant.AccountCreateRequest);
+
+        var createAccountResult = await m_AccountController.Create(accountCreateRequest);
+
+        m_ScenarioContext[Constant.AccountCreateResult] = createAccountResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful account creation")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulAccountCreation()
+    {
+        var createAccountResult = m_ScenarioContext.Get<ActionResult<AccountResponse>>(Constant.AccountCreateResult);
+
+        createAccountResult.Result.ShouldBeOfType<OkObjectResult>();
+        createAccountResult.ShouldNotBeNull();
+    }
+
+    [Given(@"a valid account client update request and account Id")]
+    public void GivenAValidAccountClientUpdateRequestAndAccountId()
+    {
+        m_ScenarioContext[Constant.AccountId]            = Example.Entity.Account.AccountId;
+        m_ScenarioContext[Constant.AccountClientRequest] = Example.Entity.Account.UpdateClientRequest;
+    }
+
+    [When(@"a PUT request is sent to the account client update endpoint")]
+    public async Task WhenAPutRequestIsSentToTheAccountClientUpdateEndpoint()
+    {
+        var accountId = m_ScenarioContext.Get<Guid>(Constant.AccountId);
+
+        var updateClientRequest = m_ScenarioContext.Get<AccountUpdateClientRequest>(Constant.AccountClientRequest);
+
+        var updateAccountResult = await m_AccountController.Update(updateClientRequest, accountId);
+
+        m_ScenarioContext[Constant.AccountUpdateResult] = updateAccountResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful account client update")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulAccountClientUpdate()
+    {
+        var updateAccountResult = m_ScenarioContext.Get<ActionResult<AccountResponse>>(Constant.AccountUpdateResult);
+
+        updateAccountResult.Result.ShouldBeOfType<OkObjectResult>();
+        updateAccountResult.ShouldNotBeNull();
+    }
+
+    [Given(@"a valid account employee update request and account Id")]
+    public void GivenAValidAccountEmployeeUpdateRequestAndAccountId()
+    {
+        m_ScenarioContext[Constant.AccountId]              = Example.Entity.Account.AccountId;
+        m_ScenarioContext[Constant.AccountEmployeeRequest] = Example.Entity.Account.UpdateEmployeeRequest;
+    }
+
+    [When(@"a PUT request is sent to the account employee update endpoint")]
+    public async Task WhenAPutRequestIsSentToTheAccountEmployeeUpdateEndpoint()
+    {
+        var accountId = m_ScenarioContext.Get<Guid>(Constant.AccountId);
+
+        var updateEmployeeRequest = m_ScenarioContext.Get<AccountUpdateEmployeeRequest>(Constant.AccountEmployeeRequest);
+
+        var updateAccountResult = await m_AccountController.Update(updateEmployeeRequest, accountId);
+
+        m_ScenarioContext[Constant.AccountUpdateResult] = updateAccountResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful account employee update")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulAccountEmployeeUpdate()
+    {
+        var updateAccountResult = m_ScenarioContext.Get<ActionResult<AccountResponse>>(Constant.AccountUpdateResult);
+
+        updateAccountResult.Result.ShouldBeOfType<OkObjectResult>();
+        updateAccountResult.ShouldNotBeNull();
+    }
+
+    [When(@"a GET request is sent to fetch all accounts")]
+    public async Task WhenAGetRequestIsSentToFetchAllAccounts()
+    {
+        var getAccountsResult = await m_AccountController.GetAll(new AccountFilterQuery(), new Pageable());
+
+        m_ScenarioContext[Constant.GetAccounts] = getAccountsResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful retrieval of all accounts")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulRetrievalOfAllAccounts()
+    {
+        var getAccountsResult = m_ScenarioContext.Get<ActionResult<Page<AccountResponse>>>(Constant.GetAccounts);
+
+        getAccountsResult.Result.ShouldBeOfType<OkObjectResult>();
+        getAccountsResult.ShouldNotBeNull();
+    }
+
+    [Given(@"a client Id to fetch related accounts")]
+    public void GivenAClientIdToFetchRelatedAccounts()
+    {
+        m_ScenarioContext[Constant.Id] = Example.Entity.Client.Id2;
+    }
+
+    [When(@"a GET request is sent to fetch accounts for the client")]
+    public async Task WhenAGetRequestIsSentToFetchAccountsForTheClient()
+    {
+        var clientId = m_ScenarioContext.Get<Guid>(Constant.Id);
+
+        var getAccountsResult = await m_AccountController.GetAllAccounts(clientId, new AccountFilterQuery(), new Pageable());
+
+        m_ScenarioContext[Constant.AccountsResult] = getAccountsResult;
+    }
+
+    [Then(@"the response should return all accounts for the client")]
+    public void ThenTheResponseShouldReturnAllAccountsForTheClient()
+    {
+        var getAccountsResult = m_ScenarioContext.Get<ActionResult<Page<AccountResponse>>>(Constant.AccountsResult);
+
+        getAccountsResult.Result.ShouldBeOfType<OkObjectResult>();
+        getAccountsResult.ShouldNotBeNull();
+    }
+
+    [Given(@"an account Id to fetch")]
+    public void GivenAnAccountIdToFetch()
+    {
+        m_ScenarioContext[Constant.Id] = Example.Entity.Account.AccountId;
+    }
+
+    [When(@"a GET request is sent to fetch the account by Id")]
+    public async Task WhenAgetRequestIsSentToFetchTheAccountById()
+    {
+        var accountId = m_ScenarioContext.Get<Guid>(Constant.Id);
+
+        var getAccountResult = await m_AccountController.GetOne(accountId);
+
+        m_ScenarioContext[Constant.GetAccountResult] = getAccountResult;
+    }
+
+    [Then(@"the response ActionResult should indicate successful retrieval of the account")]
+    public void ThenTheResponseActionResultShouldIndicateSuccessfulRetrievalOfTheAccount()
+    {
+        var getAccountResult = m_ScenarioContext.Get<ActionResult<AccountResponse>>(Constant.GetAccountResult);
+
+        getAccountResult.Result.ShouldBeOfType<OkObjectResult>();
+        getAccountResult.ShouldNotBeNull();
+    }
 }
 
 file static class Constant
@@ -189,4 +343,9 @@ file static class Constant
     public const string Accounts                     = "Accounts";
     public const string AccountResult                = "AccountResult";
     public const string IdForAccount                 = "ClientIdForAccount";
+    public const string Id                           = "ClientId";
+    public const string AccountClientRequest         = "AccountClientRequest";
+    public const string AccountEmployeeRequest       = "AccountEmployeeRequest";
+    public const string GetAccounts                  = "GetAccounts";
+    public const string AccountsResult               = "AccountsResult";
 }

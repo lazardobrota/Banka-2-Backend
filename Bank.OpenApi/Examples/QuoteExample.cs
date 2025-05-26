@@ -8,14 +8,15 @@ public static partial class Example
     {
         public static readonly QuoteSimpleResponse DefaultSimpleResponse = new()
                                                                            {
-                                                                               Id         = Constant.Id,
-                                                                               HighPrice  = Constant.HighPrice,
-                                                                               LowPrice   = Constant.LowPrice,
-                                                                               AskPrice   = Constant.AskPrice,
-                                                                               BidPrice   = Constant.BidPrice,
-                                                                               Volume     = Constant.Volume,
-                                                                               CreatedAt  = Constant.CreatedAt,
-                                                                               ModifiedAt = Constant.ModifiedAt
+                                                                               Id            = Constant.Id,
+                                                                               HighPrice     = Constant.HighPrice,
+                                                                               LowPrice      = Constant.LowPrice,
+                                                                               AskPrice      = Constant.AskPrice,
+                                                                               BidPrice      = Constant.BidPrice,
+                                                                               Volume        = Constant.Volume,
+                                                                               CreatedAt     = Constant.CreatedAt,
+                                                                               ModifiedAt    = Constant.ModifiedAt,
+                                                                               ContractCount = Constant.ContractCount
                                                                            };
 
         public static readonly QuoteLatestSimpleResponse DefaultLatestSimpleResponse = new()

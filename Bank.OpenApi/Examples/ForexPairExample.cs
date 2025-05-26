@@ -25,7 +25,13 @@ public static partial class Example
                                                                        CreatedAt                    = Constant.CreatedAt,
                                                                        ModifiedAt                   = Constant.ModifiedAt,
                                                                        StockExchange                = StockExchange.DefaultResponse,
-                                                                       Quotes                       = [Quote.DefaultSimpleResponse]
+                                                                       Quotes =
+                                                                       [
+                                                                           Quote.DefaultSimpleResponse
+                                                                       ],
+                                                                       AskSize       = 24,
+                                                                       BidSize       = 12,
+                                                                       ContractCount = Constant.ContractCount,
                                                                    };
 
         public static readonly ForexPairSimpleResponse DefaultSimpleResponse = new()
@@ -46,7 +52,10 @@ public static partial class Example
                                                                                    PriceChangeInInterval        = Constant.PriceChangeInInterval,
                                                                                    PriceChangePercentInInterval = Constant.PriceChangePercentInInterval,
                                                                                    CreatedAt                    = Constant.CreatedAt,
-                                                                                   ModifiedAt                   = Constant.ModifiedAt
+                                                                                   ModifiedAt                   = Constant.ModifiedAt,
+                                                                                   AskSize                      = 45,
+                                                                                   BidSize                      = 40,
+                                                                                   ContractCount                = Constant.ContractCount
                                                                                };
 
         public static readonly ForexPairDailyResponse DefaultDailyResponse = new()

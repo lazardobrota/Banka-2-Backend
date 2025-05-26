@@ -167,7 +167,10 @@ public static class FutureContractSeederExtension
                                 CreatedAt = DateTime.Parse(parts[9])
                                                     .ToUniversalTime(),
                                 ModifiedAt = DateTime.Parse(parts[10])
-                                                     .ToUniversalTime()
+                                                     .ToUniversalTime(),
+                                AskSize       = int.Parse(parts[11]),
+                                BidSize       = int.Parse(parts[12]),
+                                ContractCount = 1,
                             };
 
                 quotes.Add(quote);

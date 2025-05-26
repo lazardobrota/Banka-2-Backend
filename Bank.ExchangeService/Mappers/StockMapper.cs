@@ -23,7 +23,10 @@ public static class StockMapper
                    CreatedAt                    = stock.CreatedAt,
                    ModifiedAt                   = stock.ModifiedAt,
                    AskPrice                     = stock.AskPrice,
-                   BidPrice                     = stock.BidPrice
+                   BidPrice                     = stock.BidPrice,
+                   AskSize                      = stock.AskSize,
+                   BidSize                      = stock.BidSize,
+                   ContractCount                = stock.ContractCount,
                };
     }
 
@@ -42,7 +45,10 @@ public static class StockMapper
                    CreatedAt                    = stock.CreatedAt,
                    ModifiedAt                   = stock.ModifiedAt,
                    AskPrice                     = stock.AskPrice,
-                   BidPrice                     = stock.BidPrice
+                   BidPrice                     = stock.BidPrice,
+                   AskSize                      = stock.AskSize,
+                   BidSize                      = stock.BidSize,
+                   ContractCount                = stock.ContractCount,
                };
     }
 
