@@ -15,6 +15,7 @@ public class Transaction
     public          Currency?         ToCurrency      { set; get; }
     public          Guid?             ToCurrencyId    { set; get; }
     public          decimal           ToAmount        { set; get; }
+    public          decimal           TaxAmount       { set; get; }
     public required Guid              CodeId          { set; get; }
     public          TransactionCode?  Code            { set; get; }
     public          string?           ReferenceNumber { set; get; }
@@ -30,6 +31,8 @@ public class PrepareToAccountTransaction
     public required Currency?       Currency        { set; get; }
     public required TransactionCode TransactionCode { set; get; }
     public required decimal         Amount          { set; get; }
+    public required decimal         Profit          { set; get; }
+    public          string?         Purpose         { set; get; }
 }
 
 public class PrepareDirectToAccountTransaction
@@ -38,6 +41,7 @@ public class PrepareDirectToAccountTransaction
     public required Currency?       Currency        { set; get; }
     public required TransactionCode TransactionCode { set; get; }
     public required decimal         Amount          { set; get; }
+    public          string?         Purpose         { set; get; }
 }
 
 public class PrepareFromAccountTransaction
@@ -46,6 +50,7 @@ public class PrepareFromAccountTransaction
     public required Currency?       Currency        { set; get; }
     public required TransactionCode TransactionCode { set; get; }
     public required decimal         Amount          { set; get; }
+    public          string?         Purpose         { set; get; }
 }
 
 public class PrepareDirectFromAccountTransaction
@@ -54,6 +59,7 @@ public class PrepareDirectFromAccountTransaction
     public required Currency?       Currency        { set; get; }
     public required TransactionCode TransactionCode { set; get; }
     public required decimal         Amount          { set; get; }
+    public          string?         Purpose         { set; get; }
 }
 
 public class PrepareInternalTransaction
@@ -96,5 +102,6 @@ public class ProcessTransaction
     public required Guid    ToCurrencyId          { set; get; }
     public required decimal ToAmount              { set; get; }
     public required decimal FromBankAmount        { set; get; }
+    public          decimal Profit                { set; get; } = 0;
     public required bool    IsDirect              { set; get; }
 }

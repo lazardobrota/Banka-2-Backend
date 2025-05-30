@@ -19,6 +19,7 @@ public interface IDataService
     public BankModel Bank            { get; }
     public Currency  DefaultCurrency { get; }
     public Account   BankAccount     { get; }
+    public Account   CountryAccount  { get; }
 
     Task<bool> Instantiate();
 
@@ -101,6 +102,7 @@ public class DataService(
     public BankModel Bank            { private set; get; } = null!;
     public Currency  DefaultCurrency { private set; get; } = null!;
     public Account   BankAccount     { private set; get; } = null!;
+    public Account   CountryAccount  { private set; get; } = null!;
 
     public async Task<bool> Instantiate()
     {
@@ -108,7 +110,9 @@ public class DataService(
 
         DefaultCurrency = await m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode) ?? throw new Exception("Invalid default currency.");
 
-        BankAccount = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id) ?? throw new Exception("Invalid bank account.");
+        BankAccount    = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id) ?? throw new Exception("Invalid bank account.");
+        
+        CountryAccount = await m_AccountRepository.FindById(Seeder.Account.CountryAccount.Id) ?? throw new Exception("Invalid country account.");
 
         return true;
     }
