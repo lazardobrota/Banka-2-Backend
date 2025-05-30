@@ -18,6 +18,7 @@ using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
+using LinkConfiguration = Bank.Link.Configurations.Configuration;
 using Example = Bank.UserService.Database.Examples.Example;
 
 namespace Bank.UserService.Application;
@@ -142,9 +143,7 @@ public static class ServiceCollectionExtensions
                                                        .ToList(), Seeder.TransactionCode.All.Select(transactionCode => transactionCode.ToResponse())
                                                                         .ToList(), Seeder.AccountType.All.Select(accountType => accountType.ToResponse())
                                                                                          .ToList()))
-                .AddTestLink(Seeder.Bank.All.Select(bank => new BankData(bank.Code, bank.BaseUrl))
-                                   .ToList());
-        // .AddB3Link(new BankData(Seeder.Bank.Bank03.Code, Seeder.Bank.Bank03.BaseUrl));
+                .AddB3Link(new BankData(Seeder.Bank.Bank03.Code, LinkConfiguration.ExternalBank.Bank3.BankServiceBaseUrl));
 
         return services;
     }

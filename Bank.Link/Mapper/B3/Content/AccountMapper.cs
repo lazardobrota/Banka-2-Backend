@@ -1,4 +1,5 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Domain;
+using Bank.Application.Responses;
 using Bank.Link.Responses;
 
 namespace Bank.Link.Mapper.B3.Content;
@@ -24,8 +25,51 @@ internal static class AccountMapper
                    CreationDate      = default,
                    ExpirationDate    = default,
                    Status            = false,
-                   CreatedAt         = default,
-                   ModifiedAt        = default
+                   CreatedAt         = DateTime.UtcNow,
+                   ModifiedAt        = DateTime.UtcNow
+               };
+    }
+    
+    internal static ClientResponse ToNative(this Response.B3.AccountClientResponse response)
+    {
+        return new ClientResponse
+               {
+                   Id                         = Guid.Empty,
+                   FirstName                  = response.FirstName,
+                   LastName                   = response.LastName,
+                   DateOfBirth                = default,
+                   Gender                     = Gender.Invalid,
+                   UniqueIdentificationNumber = "0000000000000",
+                   Email                      = response.Email,
+                   PhoneNumber                = "",
+                   Address                    = "",
+                   Accounts                   = [],
+                   Role                       = Role.Invalid,
+                   Permissions                = 0,
+                   CreatedAt                  = DateTime.UtcNow,
+                   ModifiedAt                 = DateTime.UtcNow,
+                   Activated                  = false
+               };
+    }
+    
+    internal static ClientSimpleResponse ToSimpleNative(this Response.B3.AccountClientResponse response)
+    {
+        return new ClientSimpleResponse
+               {
+                   Id                         = Guid.Empty,
+                   FirstName                  = response.FirstName,
+                   LastName                   = response.LastName,
+                   DateOfBirth                = default,
+                   Gender                     = Gender.Invalid,
+                   UniqueIdentificationNumber = "0000000000000",
+                   Email                      = response.Email,
+                   PhoneNumber                = "",
+                   Address                    = "",
+                   Role                       = Role.Invalid,
+                   Permissions                = 0,
+                   CreatedAt                  = DateTime.UtcNow,
+                   ModifiedAt                 = DateTime.UtcNow,
+                   Activated                  = false
                };
     }
 }

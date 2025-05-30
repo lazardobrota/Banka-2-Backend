@@ -14,6 +14,8 @@ internal interface IDataService
 
     CurrencyResponse? GetCurrencyByCode(string code);
 
+    TransactionCodeResponse? GetTransactionCodeById(Guid id);
+    
     TransactionCodeResponse? GetTransactionCodeByCode(string code);
 
     AccountTypeResponse? GetAccountType(string accountNumber);
@@ -62,6 +64,8 @@ internal class DataService : IDataService
     public List<AccountTypeResponse> GetAccountTypes() => m_AccountTypes;
 
     public CurrencyResponse? GetCurrencyByCode(string code) => m_Currencies.FirstOrDefault(currency => currency.Code == code);
+
+    public TransactionCodeResponse? GetTransactionCodeById(Guid id) => m_TransactionCodes.FirstOrDefault(transactionCode => transactionCode.Id == id);
 
     public TransactionCodeResponse? GetTransactionCodeByCode(string code) => m_TransactionCodes.FirstOrDefault(transactionCode => transactionCode.Code == code);
 
