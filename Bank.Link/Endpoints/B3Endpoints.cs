@@ -12,5 +12,13 @@ public static partial class Endpoint
 
             public const string GetAll = $"{Base}";
         }
+
+        public static class Transaction
+        {
+            public const string Base = $"{ApiBase}/payment";
+
+            public const string Create    = $"{Base}/external";
+            public const string PutStatus = $"{Base}/{{id:long}}/status";
+        }
     }
 }
