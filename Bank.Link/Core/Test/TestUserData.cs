@@ -14,18 +14,12 @@ internal class TestExternalUserDataLink(BankData bankData, IDataService dataServ
 
     public Task<AccountResponse?> GetAccount(string accountNumber)
     {
-        var owner = new Response.B3.ClientResponse
+        var owner = new Response.B3.AccountClientResponse()
                     {
                         Id        = 0,
                         FirstName = "FirstName",
                         LastName  = "LastName",
                         Email     = "email@email.com",
-                        Address   = "address",
-                        Phone     = "+381601234567",
-                        Gender    = "Male",
-                        BirthDate = default,
-                        Jmbg      = "0000000000000",
-                        Username  = string.Empty
                     };
 
         return Task.FromResult(new Response.B3.AccountResponse

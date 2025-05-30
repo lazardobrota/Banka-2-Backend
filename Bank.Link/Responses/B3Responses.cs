@@ -18,26 +18,34 @@ internal static partial class Response
             public required string   Username  { set; get; }
         }
 
+        internal class AccountClientResponse
+        {
+            public required long   Id        { set; get; }
+            public required string FirstName { set; get; }
+            public required string LastName  { set; get; }
+            public required string Email     { set; get; }
+        }
+
         internal class AccountResponse
         {
-            public required string         Name                { set; get; }
-            public required string         AccountNumber       { set; get; }
-            public required long           ClientId            { set; get; }
-            public required long           CompanyId           { set; get; }
-            public required long           CreatedByEmployeeId { set; get; }
-            public required string         CreationDate        { set; get; }
-            public required string         ExpirationDate      { set; get; }
-            public required string         CurrencyCode        { set; get; }
-            public required string         Status              { set; get; }
-            public required decimal        Balance             { set; get; }
-            public required decimal        AvailableBalance    { set; get; }
-            public required decimal        DailyLimit          { set; get; }
-            public required decimal        MonthlyLimit        { set; get; }
-            public required decimal        DailySpending       { set; get; }
-            public required decimal        MonthlySpending     { set; get; }
-            public required string         OwnershipType       { set; get; }
-            public required ClientResponse Owner               { set; get; }
-            public required string         AccountCategory     { set; get; }
+            public required string                Name                { set; get; }
+            public required string                AccountNumber       { set; get; }
+            public required long                  ClientId            { set; get; }
+            public required long                  CompanyId           { set; get; }
+            public required long                  CreatedByEmployeeId { set; get; }
+            public required string                CreationDate        { set; get; }
+            public required string                ExpirationDate      { set; get; }
+            public required string                CurrencyCode        { set; get; }
+            public required string                Status              { set; get; }
+            public required decimal               Balance             { set; get; }
+            public required decimal               AvailableBalance    { set; get; }
+            public required decimal               DailyLimit          { set; get; }
+            public required decimal               MonthlyLimit        { set; get; }
+            public required decimal               DailySpending       { set; get; }
+            public required decimal               MonthlySpending     { set; get; }
+            public required string                OwnershipType       { set; get; }
+            public required AccountClientResponse Owner               { set; get; }
+            public required string                AccountCategory     { set; get; }
         }
     }
 }
