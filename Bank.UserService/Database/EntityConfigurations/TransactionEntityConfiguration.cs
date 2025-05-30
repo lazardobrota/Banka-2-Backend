@@ -33,6 +33,10 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
         builder.Property(transaction => transaction.ToAmount)
                .HasPrecision(28, 12)
                .IsRequired();
+        
+        builder.Property(transaction => transaction.TaxAmount)
+               .HasPrecision(28, 12)
+               .IsRequired();
 
         builder.Property(transaction => transaction.ReferenceNumber)
                .HasMaxLength(20)

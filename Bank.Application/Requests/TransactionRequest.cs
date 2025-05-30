@@ -9,6 +9,7 @@ public class TransactionCreateRequest
     public          string? ToAccountNumber       { set; get; }
     public          Guid    ToCurrencyId          { set; get; }
     public required decimal Amount                { set; get; }
+    public          decimal Profit                { set; get; }
     public required Guid    CodeId                { set; get; }
     public          string? ReferenceNumber       { set; get; }
     public required string  Purpose               { set; get; }

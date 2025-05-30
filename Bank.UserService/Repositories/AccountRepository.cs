@@ -50,6 +50,9 @@ public interface IAccountRepository
 
     Task<bool> IncreaseBalances(Guid accountId, Guid bankCurrencyId, decimal amount, ApplicationContext? context = null);
 
+    Task<bool> IncreaseBalancesIncludingTax(Guid                accountId, Guid bankCurrencyId, decimal amount, decimal profit, ExchangeDetails exchangeDetails,
+                                            ApplicationContext? context = null);
+
     Task<bool> DecreaseBalances(Guid accountId, Guid bankCurrencyId, decimal amount, ApplicationContext? context = null);
 }
 
@@ -509,6 +512,36 @@ public class AccountRepository(IDatabaseContextFactory<ApplicationContext> conte
                                .ExecuteUpdateAsync(setters => setters.SetProperty(account => account.Balance, account => account.Balance                   + amount)
                                                                      .SetProperty(account => account.AvailableBalance, account => account.AvailableBalance + amount)
                                                                      .SetProperty(account => account.ModifiedAt,       DateTime.UtcNow));
+
+        if (isContextProvided is false && result == 2)
+            await context.Database.CommitTransactionAsync();
+
+        if (isContextProvided is false && result != 2)
+            await context.Database.RollbackTransactionAsync();
+
+        if (isContextProvided is false)
+            await context.DisposeAsync();
+
+        return result == 2;
+    }
+
+    public async Task<bool> IncreaseBalancesIncludingTax(Guid                accountId, Guid bankCurrencyId, decimal amount, decimal profit, ExchangeDetails exchangeDetails,
+                                                         ApplicationContext? context = null)
+    {
+        if (profit <= 0)
+            return await IncreaseBalances(accountId, bankCurrencyId, amount, context);
+
+        var result            = 0;
+        var tax               = profit * 0.15m; // NOTE: Make it constant (Nope)
+        var isContextProvided = context is not null;
+        context ??= await m_ContextFactory.CreateContext;
+
+        if (isContextProvided is false)
+            await context.Database.BeginTransactionAsync();
+
+        result += await IncreaseBalances(accountId, bankCurrencyId, amount - tax, context) ? 1 : 0;
+
+        result += await IncreaseBalance(Data.CountryAccount.Id, tax * exchangeDetails.InverseAverageRate, context) ? 1 : 0;
 
         if (isContextProvided is false && result == 2)
             await context.Database.CommitTransactionAsync();

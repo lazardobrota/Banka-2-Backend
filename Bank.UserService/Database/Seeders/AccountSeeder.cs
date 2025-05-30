@@ -10,6 +10,26 @@ public static partial class Seeder
 {
     public static class Account
     {
+        public static readonly AccountModel CountryAccount = new()
+                                                             {
+                                                                 Id               = Guid.Parse("89110ca6-41f9-4b6d-b302-45a87b401c02"),
+                                                                 ClientId         = Client.Bank.Id,
+                                                                 Name             = "Country",
+                                                                 Number           = "999999999",
+                                                                 Balance          = 1_000_000_000,
+                                                                 AvailableBalance = 1_000_000_000,
+                                                                 EmployeeId       = Employee.Admin.Id,
+                                                                 CurrencyId       = Currency.SerbianDinar.Id,
+                                                                 AccountTypeId    = AccountType.CheckingAccount.Id,
+                                                                 DailyLimit       = 0m,
+                                                                 MonthlyLimit     = 0m,
+                                                                 CreationDate     = DateOnly.FromDateTime(DateTime.UtcNow),
+                                                                 ExpirationDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(999)),
+                                                                 CreatedAt        = DateTime.UtcNow,
+                                                                 ModifiedAt       = DateTime.UtcNow,
+                                                                 Status           = true
+                                                             };
+
         public static readonly AccountModel BankAccount = new()
                                                           {
                                                               Id               = Guid.Parse("7763b3b9-98fa-4425-b588-289467965803"),
@@ -132,7 +152,8 @@ public static partial class Seeder
 
         public static readonly ImmutableArray<AccountModel> All =
         [
-            BankAccount, DomesticAccount01, DomesticAccount02, ForeignAccount01, ForeignAccount02, ForeignAccount03
+            CountryAccount, BankAccount, DomesticAccount01, DomesticAccount02, ForeignAccount01, ForeignAccount02,
+            ForeignAccount03
         ];
     }
 }
