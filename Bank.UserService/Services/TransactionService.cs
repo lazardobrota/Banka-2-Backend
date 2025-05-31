@@ -351,16 +351,12 @@ public class TransactionService(
     {
         var result = await CreateExternalAccounts(prepareTransaction);
 
+        if (result is false)
+            return Result.BadRequest<Transaction>("External bank account does not exist.");
+        
         var transaction = prepareTransaction.ToTransaction();
 
         await m_TransactionRepository.Add(transaction);
-
-        if (result is false)
-        {
-            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
-
-            return Result.BadRequest<Transaction>("Some error");
-        }
 
         if (prepareTransaction.FromCurrency is null || prepareTransaction.ToCurrency is null || prepareTransaction.ExchangeDetails is null || prepareTransaction.Amount <= 0)
             return Result.BadRequest<Transaction>("Invalid data.");
@@ -670,7 +666,7 @@ public class TransactionService(
                                                            CodeId                = transaction.CodeId,
                                                            ReferenceNumber       = transaction.ReferenceNumber,
                                                            Purpose               = transaction.Purpose ?? string.Empty,
-                                                           ExternalTransactionId = processTransaction.ExternalTransactionId,
+                                                           ExternalTransactionId = transaction.Id,
                                                        });
 
         return transferSucceeded;

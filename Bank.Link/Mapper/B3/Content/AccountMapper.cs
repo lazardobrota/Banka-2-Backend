@@ -12,6 +12,7 @@ internal static class AccountMapper
                {
                    Id                = Guid.Empty,
                    AccountNumber     = response.AccountNumber,
+                   Office            = response.AccountNumber[3..7],
                    Name              = response.Name,
                    Client            = response.Owner.ToSimpleNative(),
                    Balance           = response.Balance,

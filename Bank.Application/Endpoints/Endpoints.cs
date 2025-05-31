@@ -153,6 +153,7 @@ public static partial class Endpoints
         public const string GetAll          = $"{Base}";
         public const string GetAllForClient = $"{Client.Base}/{{clientId:guid}}/accounts";
         public const string GetOne          = $"{Base}/{{id:guid}}";
+        public const string GetOneByNumber  = $"{Base}/{{number}}/number";
         public const string Create          = $"{Base}";
         public const string UpdateEmployee  = $"{Base}/employee/{{id:guid}}";
         public const string UpdateClient    = $"{Base}/client/{{id:guid}}";

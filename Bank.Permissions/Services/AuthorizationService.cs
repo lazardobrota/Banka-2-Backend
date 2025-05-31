@@ -19,10 +19,10 @@ public interface IAuthorizationService
     public Permissions Permissions { get; }
 
     public string RegenerateToken();
-    public string GenerateTokenFor(Guid           userId, Permissions permissions);
-    
-    public bool   IsConfirmationCodeValid(string? confirmationCode);
 
+    public string GenerateTokenFor(Guid userId, Permissions permissions);
+
+    public bool IsConfirmationCodeValid(string? confirmationCode);
 }
 
 internal class AuthorizationService : IAuthorizationService
@@ -70,14 +70,14 @@ internal class AuthorizationService : IAuthorizationService
 
         return new JsonWebTokenHandler().CreateToken(tokenDescriptor);
     }
-    
+
     public bool IsConfirmationCodeValid(string? confirmationCode)
     {
         if (confirmationCode is null)
             return false;
-        
+
         var totp = new Totp(UserId.ToByteArray(), mode: OtpHashMode.Sha256, timeCorrection: TimeCorrection.UncorrectedInstance);
-        
+
         return totp.VerifyTotp(DateTime.UtcNow, confirmationCode, out _);
     }
 }

@@ -16,6 +16,7 @@ public static partial class Example
                                                           {
                                                               Id                = Values.Id,
                                                               AccountNumber     = Values.AccountNumber,
+                                                              Office            = "0000",
                                                               Name              = "Savings Account",
                                                               Balance           = 5000.00m,
                                                               AvailableBalance  = 4500.50m,
