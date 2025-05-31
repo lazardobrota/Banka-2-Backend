@@ -670,7 +670,7 @@ public class TransactionService(
                                                            CodeId                = transaction.CodeId,
                                                            ReferenceNumber       = transaction.ReferenceNumber,
                                                            Purpose               = transaction.Purpose ?? string.Empty,
-                                                           ExternalTransactionId = processTransaction.ExternalTransactionId,
+                                                           ExternalTransactionId = transaction.Id,
                                                        });
 
         return transferSucceeded;
