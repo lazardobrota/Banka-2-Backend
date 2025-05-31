@@ -17,6 +17,8 @@ public interface IAccountService
 
     Task<Result<AccountResponse>> GetOne(Guid id);
 
+    Task<Result<AccountResponse>> GetOneByAccountNumber(string number);
+
     Task<Result<AccountResponse>> Create(AccountCreateRequest accountCreateRequest);
 
     Task<Result<AccountResponse>> Update(AccountUpdateClientRequest accountUpdateRequest, Guid id);
@@ -64,6 +66,16 @@ public class AccountService(
 
         if (account is null)
             return Result.NotFound<AccountResponse>($"No Account found with Id: {id}");
+
+        return Result.Ok(account.ToResponse());
+    }
+
+    public async Task<Result<AccountResponse>> GetOneByAccountNumber(string number)
+    {
+        var account = await m_AccountRepository.FindByAccountNumber(number);
+
+        if (account is null)
+            return Result.NotFound<AccountResponse>($"No Account found with Number: {number}");
 
         return Result.Ok(account.ToResponse());
     }

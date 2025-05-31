@@ -73,6 +73,8 @@ public class TransactionBackgroundService(ITransactionService transactionService
 
     public Task OnApplicationStopped()
     {
+        return Task.CompletedTask;
+        
         m_InternalTimer.Cancel();
         m_ExternalTimer.Cancel();
 

@@ -7,8 +7,6 @@ using Bank.UserService.Models;
 using Bank.UserService.Repositories;
 using Bank.UserService.Services;
 
-using Microsoft.AspNetCore.Mvc;
-
 using Transaction = Bank.UserService.Models.Transaction;
 using TransactionStatus = Bank.Application.Domain.TransactionStatus;
 
@@ -26,16 +24,10 @@ public class LoanHostedService
     private readonly IExchangeService           m_ExchangeService;
     private readonly ITransactionService        m_transactionService;
     private          Timer?                     m_Timer;
-    
-    public LoanHostedService(
-        ILoanRepository            loanRepository,
-        IAccountRepository         accountRepository,
-        IInstallmentRepository     installmentRepository,
-        IEmailService              emailService,
-        ITransactionRepository     transactionRepository,
-        ITransactionCodeRepository transactionCodeRepository,
-        IExchangeService           exchangeService,
-        ITransactionService        transactionService)
+
+    public LoanHostedService(ILoanRepository        loanRepository, IAccountRepository accountRepository, IInstallmentRepository installmentRepository, IEmailService emailService,
+                             ITransactionRepository transactionRepository, ITransactionCodeRepository transactionCodeRepository, IExchangeService exchangeService,
+                             ITransactionService    transactionService)
     {
         m_LoanRepository            = loanRepository;
         m_AccountRepository         = accountRepository;
@@ -44,7 +36,7 @@ public class LoanHostedService
         m_TransactionRepository     = transactionRepository;
         m_TransactionCodeRepository = transactionCodeRepository;
         m_ExchangeService           = exchangeService;
-        m_transactionService         = transactionService;
+        m_transactionService        = transactionService;
     }
 
     public void OnApplicationStarted()
@@ -69,7 +61,6 @@ public class LoanHostedService
     {
         try
         {
-
             var today = DateTime.UtcNow.Date;
 
             var activeLoans = await m_LoanRepository.GetLoansWithDueInstallmentsAsync(today);
@@ -124,7 +115,6 @@ public class LoanHostedService
                         var remainingBalance  = await GetRemainingPrincipal(loan, installmentRepository);
                         var installmentAmount = await CalculateInstallmentAmount(loan);
                         await m_EmailService.Send(EmailType.LoanInstallmentPaid, client, client.FirstName, installmentAmount, loan.Currency.Code, remainingBalance);
-                        
                     }
 
                     await CreateNextInstallmentIfNeededAsync(loan, installmentRepository);
@@ -190,6 +180,7 @@ public class LoanHostedService
                                          ClientId          = account.ClientId,
                                          Name              = account.Name,
                                          Number            = account.Number,
+                                         Office            = account.Office,
                                          Balance           = account.Balance          - paymentAmount,
                                          AvailableBalance  = account.AvailableBalance - paymentAmount,
                                          EmployeeId        = account.EmployeeId,
@@ -202,7 +193,7 @@ public class LoanHostedService
                                          ExpirationDate    = account.ExpirationDate,
                                          Status            = account.Status,
                                          CreatedAt         = account.CreatedAt,
-                                         ModifiedAt        = DateTime.UtcNow
+                                         ModifiedAt        = DateTime.UtcNow,
                                      };
 
                 await accountRepository.Update(updatedAccount);
@@ -374,7 +365,6 @@ public class LoanHostedService
     {
         if (currency.Code == "RSD")
             return amount;
-        
 
         var exchangeBetweenQuery = new ExchangeBetweenQuery
                                    {
@@ -394,17 +384,19 @@ public class LoanHostedService
         var account = await accountRepository.FindById(loan.AccountId);
         return account?.Client;
     }
-    
+
     public async Task<bool> DisperseFundsAfterLoanActivation(Loan loan)
     {
-        try {
+        try
+        {
             // Get the client's account
             var account = await m_AccountRepository.FindById(loan.AccountId);
-        
-            if (account == null) {
+
+            if (account == null)
+            {
                 return false;
             }
-        
+
             // Create a transaction request for loan disbursement
             var transactionRequest = new TransactionCreateRequest
                                      {
@@ -417,13 +409,14 @@ public class LoanHostedService
                                          ReferenceNumber   = "12345",
                                          Purpose           = "Loan disbursement"
                                      };
-        
+
             // Use TransactionService to create the transaction
             await m_transactionService.Create(transactionRequest);
 
             return true;
         }
-        catch (Exception) {
+        catch (Exception)
+        {
             return false;
         }
     }
