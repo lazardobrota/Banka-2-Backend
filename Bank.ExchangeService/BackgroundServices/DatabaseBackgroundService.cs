@@ -15,7 +15,7 @@ public class DatabaseBackgroundService(
     IHttpClientFactory                        httpClientFactory,
     IUserServiceHttpClient                    userServiceHttpClient,
     IHubContext<SecurityHub, ISecurityClient> securityHub
-)
+) : IHostedService
 {
     private readonly IServiceProvider                          m_ServiceProvider       = serviceProvider;
     private readonly IHttpClientFactory                        m_HttpClientFactory     = httpClientFactory;
@@ -63,6 +63,9 @@ public class DatabaseBackgroundService(
                    .Wait();
 
             Context.SeedOptionHardcoded()
+                   .Wait();
+
+            Context.SeedHardcodedStockExchanges()
                    .Wait();
 
             return;
@@ -155,5 +158,17 @@ public class DatabaseBackgroundService(
         var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
 
         await context.SeedOptionsLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository, m_SecurityHub);
+    }
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        OnApplicationStarted();
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        OnApplicationStopped();
+        return Task.CompletedTask;
     }
 }
