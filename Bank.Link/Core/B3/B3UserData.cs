@@ -36,12 +36,12 @@ internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFa
         if (!response.IsSuccessStatusCode)
             return null;
 
-        var responseList = await response.Content.ReadFromJsonAsync<List<Response.B3.AccountResponse>>();
+        var responseList = await response.Content.ReadFromJsonAsync<Response.B3.Page<Response.B3.AccountResponse>>();
 
-        if (responseList is null || responseList.Count == 0)
+        if (responseList is null || responseList.Content.Count == 0)
             return null;
 
-        var accountResponse  = responseList.First();
+        var accountResponse  = responseList.Content.First();
         var currencyResponse = m_DataService.GetCurrencyByCode(accountResponse.CurrencyCode);
 
         return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse, m_DataService.GetAccountType(accountNumber)!);
@@ -51,17 +51,28 @@ internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFa
     {
         var httpClient = m_HttpClientFactory.CreateClient(BankData.Code);
 
-        //TODO: Implementation Missing
+        var domain      = Endpoint.B3.Transaction.Create;
+        var requestData = createRequest.ToB3(m_DataService.GetTransactionCodeById(createRequest.CodeId)!.Code);
 
-        return null;
+        var response = await httpClient.PostAsync(domain, requestData.ToContent());
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var responseData = await response.Content.ReadFromJsonAsync<Response.B3.TransactionResponse>();
+
+        return responseData?.Id;
     }
 
     public async Task<bool> NotifyTransactionStatus(TransactionNotifyStatusRequest notifyStatusRequest)
     {
         var httpClient = m_HttpClientFactory.CreateClient(BankData.Code);
 
-        //TODO: Implementation Missing
+        var domain      = Endpoint.B3.Transaction.PutStatus.Replace("{id:long}", notifyStatusRequest.TransactionId?.ToString());
+        var requestData = notifyStatusRequest.ToB3();
 
-        return false;
+        var response = await httpClient.PutAsync(domain, requestData.ToContent());
+        
+        return response.IsSuccessStatusCode;
     }
 }

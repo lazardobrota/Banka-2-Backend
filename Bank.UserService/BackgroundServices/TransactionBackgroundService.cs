@@ -23,6 +23,8 @@ public class TransactionBackgroundService(ITransactionService transactionService
         if (Configuration.Application.Profile == Profile.Testing)
             return;
         
+        return;
+        
         m_InternalTimer = new Timer(service => ProcessInternalTransactions(service)
                                     .Wait(), this, TimeSpan.Zero, TimeSpan.FromSeconds(15));
 
@@ -71,6 +73,8 @@ public class TransactionBackgroundService(ITransactionService transactionService
 
     public Task OnApplicationStopped()
     {
+        return Task.CompletedTask;
+        
         m_InternalTimer.Cancel();
         m_ExternalTimer.Cancel();
 

@@ -45,7 +45,8 @@ public static class TransactionMapper
                    Account         = account,
                    Currency        = currency,
                    TransactionCode = transactionCode,
-                   Amount          = createRequest.Amount
+                   Amount          = createRequest.Amount,
+                   Purpose         = createRequest.Purpose
                };
     }
 
@@ -57,7 +58,8 @@ public static class TransactionMapper
                    Account         = account,
                    Currency        = currency,
                    TransactionCode = transactionCode,
-                   Amount          = createRequest.Amount
+                   Amount          = createRequest.Amount,
+                   Purpose         = createRequest.Purpose
                };
     }
 
@@ -69,7 +71,9 @@ public static class TransactionMapper
                    Account         = account,
                    Currency        = currency,
                    TransactionCode = transactionCode,
-                   Amount          = createRequest.Amount
+                   Amount          = createRequest.Amount,
+                   Profit          = createRequest.Profit,
+                   Purpose         = createRequest.Purpose
                };
     }
 
@@ -81,7 +85,8 @@ public static class TransactionMapper
                    Account         = account,
                    Currency        = currency,
                    TransactionCode = transactionCode,
-                   Amount          = createRequest.Amount
+                   Amount          = createRequest.Amount,
+                   Purpose         = createRequest.Purpose
                };
     }
 
@@ -134,8 +139,9 @@ public static class TransactionMapper
                    FromAccountId  = fromAccountTransaction.Account!.Id,
                    FromCurrencyId = fromAccountTransaction.Currency!.Id,
                    FromAmount     = fromAccountTransaction.Amount,
-                   CodeId         = Seeder.TransactionCode.TransactionCode266.Id,
+                   CodeId         = fromAccountTransaction.TransactionCode.Id,
                    Status         = TransactionStatus.Pending,
+                   Purpose        = fromAccountTransaction.Purpose,
                    CreatedAt      = DateTime.UtcNow,
                    ModifiedAt     = DateTime.UtcNow
                };
@@ -149,8 +155,9 @@ public static class TransactionMapper
                    FromAccountId  = fromAccountTransaction.Account!.Id,
                    FromCurrencyId = fromAccountTransaction.Currency!.Id,
                    FromAmount     = fromAccountTransaction.Amount,
-                   CodeId         = Seeder.TransactionCode.TransactionCode266.Id,
+                   CodeId         = fromAccountTransaction.TransactionCode.Id,
                    Status         = TransactionStatus.Pending,
+                   Purpose        = fromAccountTransaction.Purpose,
                    CreatedAt      = DateTime.UtcNow,
                    ModifiedAt     = DateTime.UtcNow
                };
@@ -164,8 +171,10 @@ public static class TransactionMapper
                    ToAccountId  = toAccountTransaction.Account!.Id,
                    ToCurrencyId = toAccountTransaction.Currency!.Id,
                    ToAmount     = toAccountTransaction.Amount,
-                   CodeId       = Seeder.TransactionCode.TransactionCode289.Id,
+                   TaxAmount    = Math.Max(toAccountTransaction.Profit * 0.15m, 0),
                    Status       = TransactionStatus.Pending,
+                   Purpose      = toAccountTransaction.Purpose,
+                   CodeId       = toAccountTransaction.TransactionCode.Id,
                    CreatedAt    = DateTime.UtcNow,
                    ModifiedAt   = DateTime.UtcNow
                };
@@ -179,8 +188,9 @@ public static class TransactionMapper
                    ToAccountId  = toAccountTransaction.Account!.Id,
                    ToCurrencyId = toAccountTransaction.Currency!.Id,
                    ToAmount     = toAccountTransaction.Amount,
-                   CodeId       = Seeder.TransactionCode.TransactionCode289.Id,
+                   CodeId       = toAccountTransaction.TransactionCode.Id,
                    Status       = TransactionStatus.Pending,
+                   Purpose      = toAccountTransaction.Purpose,
                    CreatedAt    = DateTime.UtcNow,
                    ModifiedAt   = DateTime.UtcNow
                };
@@ -272,6 +282,7 @@ public static class TransactionMapper
                    FromAccountId  = Guid.Empty,
                    FromCurrencyId = Guid.Empty,
                    FromAmount     = 0,
+                   Profit         = toAccountTransaction.Profit,
                    ToAccountId    = toAccountTransaction.Account!.Id,
                    ToCurrencyId   = toAccountTransaction.Currency!.Id,
                    ToAmount       = toAccountTransaction.Amount,
