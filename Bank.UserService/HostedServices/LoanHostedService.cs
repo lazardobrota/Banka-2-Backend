@@ -19,21 +19,18 @@ public class LoanHostedService
     private readonly IAccountRepository         m_AccountRepository;
     private readonly IInstallmentRepository     m_InstallmentRepository;
     private readonly IEmailService              m_EmailService;
-    private readonly ITransactionRepository     m_TransactionRepository;
     private readonly ITransactionCodeRepository m_TransactionCodeRepository;
     private readonly IExchangeService           m_ExchangeService;
     private readonly ITransactionService        m_transactionService;
     private          Timer?                     m_Timer;
 
-    public LoanHostedService(ILoanRepository        loanRepository, IAccountRepository accountRepository, IInstallmentRepository installmentRepository, IEmailService emailService,
-                             ITransactionRepository transactionRepository, ITransactionCodeRepository transactionCodeRepository, IExchangeService exchangeService,
-                             ITransactionService    transactionService)
+    public LoanHostedService(ILoanRepository loanRepository, IAccountRepository accountRepository, IInstallmentRepository installmentRepository, IEmailService emailService,
+                             ITransactionCodeRepository transactionCodeRepository, IExchangeService exchangeService, ITransactionService transactionService)
     {
         m_LoanRepository            = loanRepository;
         m_AccountRepository         = accountRepository;
         m_InstallmentRepository     = installmentRepository;
         m_EmailService              = emailService;
-        m_TransactionRepository     = transactionRepository;
         m_TransactionCodeRepository = transactionCodeRepository;
         m_ExchangeService           = exchangeService;
         m_transactionService        = transactionService;
@@ -89,7 +86,7 @@ public class LoanHostedService
                 var paymentAmount = await CalculateInstallmentAmount(loan);
 
                 // Process payment
-                var paymentSuccessful = await ProcessPaymentAsync(loan, installment, paymentAmount, accountRepository);
+                var paymentSuccessful = await ProcessPaymentAsync(loan, paymentAmount, accountRepository);
 
                 if (paymentSuccessful)
                 {
@@ -129,18 +126,13 @@ public class LoanHostedService
         }
     }
 
-    public async Task<bool> ProcessPaymentAsync(Loan loan, Installment installment, decimal paymentAmount, IAccountRepository accountRepository)
+    public async Task<bool> ProcessPaymentAsync(Loan loan, decimal paymentAmount, IAccountRepository accountRepository)
     {
         try
         {
             var account = await accountRepository.FindById(loan.AccountId);
 
             if (account == null)
-            {
-                return false;
-            }
-
-            if (account.AvailableBalance < paymentAmount)
             {
                 return false;
             }
@@ -153,61 +145,21 @@ public class LoanHostedService
                 return false;
             }
 
-            var transaction = new Transaction
-                              {
-                                  Id              = Guid.NewGuid(),
-                                  FromAccountId   = account.Id,
-                                  ToAccountId     = null,
-                                  FromAmount      = paymentAmount,
-                                  ToAmount        = paymentAmount,
-                                  FromCurrencyId  = loan.CurrencyId,
-                                  ToCurrencyId    = loan.CurrencyId,
-                                  CodeId          = loanPaymentCode.Id,
-                                  ReferenceNumber = "loan payment",
-                                  Purpose         = "loan payment purpose",
-                                  Status          = TransactionStatus.Completed,
-                                  CreatedAt       = DateTime.UtcNow,
-                                  ModifiedAt      = DateTime.UtcNow
-                              };
-
-            using var transactionScope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-
-            try
-            {
-                var updatedAccount = new Account
+            // Create a transaction request for loan payment
+            var transactionRequest = new TransactionCreateRequest
                                      {
-                                         Id                = account.Id,
-                                         ClientId          = account.ClientId,
-                                         Name              = account.Name,
-                                         Number            = account.Number,
-                                         Office            = account.Office,
-                                         Balance           = account.Balance          - paymentAmount,
-                                         AvailableBalance  = account.AvailableBalance - paymentAmount,
-                                         EmployeeId        = account.EmployeeId,
-                                         CurrencyId        = account.CurrencyId,
-                                         AccountTypeId     = account.AccountTypeId,
-                                         AccountCurrencies = account.AccountCurrencies,
-                                         DailyLimit        = account.DailyLimit,
-                                         MonthlyLimit      = account.MonthlyLimit,
-                                         CreationDate      = account.CreationDate,
-                                         ExpirationDate    = account.ExpirationDate,
-                                         Status            = account.Status,
-                                         CreatedAt         = account.CreatedAt,
-                                         ModifiedAt        = DateTime.UtcNow,
+                                         FromAccountNumber = account.Number,
+                                         FromCurrencyId    = loan.CurrencyId,
+                                         ToAccountNumber   = null,
+                                         ToCurrencyId      = loan.CurrencyId,
+                                         Amount            = paymentAmount,
+                                         CodeId            = loanPaymentCode.Id,
+                                         Purpose           = "loan payment"
                                      };
 
-                await accountRepository.Update(updatedAccount);
+            var result = await m_transactionService.Create(transactionRequest);
 
-                await m_TransactionRepository.Add(transaction);
-
-                transactionScope.Complete();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+            return result.Value != null;
         }
         catch (Exception ex)
         {
@@ -267,7 +219,7 @@ public class LoanHostedService
 
     public async Task<decimal> CalculateInstallmentAmount(Loan loan)
     {
-        var loanAmountInRsd = await ConvertToRsd(loan.Amount, loan.Currency);
+        var loanAmountInRsd = await ConvertToRsd(loan.Amount, loan.Currency!);
 
         var monthlyPayment = CalculateMonthlyPayment(loanAmountInRsd, loan.Period, await GetEffectiveInterestRate(loan));
 
@@ -276,12 +228,12 @@ public class LoanHostedService
 
     public async Task<decimal> GetEffectiveInterestRate(Loan loan)
     {
-        var amountInRsd   = await ConvertToRsd(loan.Amount, loan.Currency);
+        var amountInRsd   = await ConvertToRsd(loan.Amount, loan.Currency!);
         var effectiveRate = GetBaseInterestRate(amountInRsd);
 
         if (loan.InterestType == InterestType.Variable)
         {
-            effectiveRate += loan.LoanType.Margin;
+            effectiveRate += loan.LoanType!.Margin;
 
             effectiveRate += GetCurrentEuriborRate();
 
@@ -314,7 +266,7 @@ public class LoanHostedService
 
             if (loan.InterestType == InterestType.Variable)
             {
-                effectiveRate += loan.LoanType.Margin;
+                effectiveRate += loan.LoanType!.Margin;
 
                 if (loan.Currency.Code != "RSD")
                     effectiveRate += GetCurrentEuriborRate();

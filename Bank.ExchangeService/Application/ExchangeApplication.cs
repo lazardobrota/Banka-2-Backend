@@ -85,7 +85,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
-        services.AddSingleton<DatabaseBackgroundService>();
+        services.AddHostedService<DatabaseBackgroundService>();
         services.AddSingleton<OrderBackgroundService>();
 
         return services;

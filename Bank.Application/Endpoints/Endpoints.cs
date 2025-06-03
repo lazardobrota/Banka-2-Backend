@@ -299,7 +299,7 @@ public static partial class Endpoints
 {
     public static class StockExchange
     {
-        public const string Base   = $"{ApiBase}/exchanges";
+        public const string Base   = $"{ApiBase}/stock-exchanges";
         public const string GetAll = $"{Base}";
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string Create = $"{Base}";
