@@ -12,7 +12,7 @@ public class OrderCreateRequest
     public required decimal   LimitPrice    { set; get; }
     public required decimal   StopPrice     { set; get; }
     public required Direction Direction     { set; get; }
-    public required Guid      SupervisorId  { set; get; }
+    public          Guid      SupervisorId  { set; get; }
     public required Guid      SecurityId    { set; get; }
 }
 

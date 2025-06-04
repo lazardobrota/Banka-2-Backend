@@ -11,20 +11,19 @@ public static class OrderMapper
     {
         return new OrderResponse
                {
-                   Id = order.Id,
-                   //TODO security no response quite yet, will (not) be
-                   Actuary           = actuary,
-                   OrderType         = order.OrderType,
-                   Quantity          = order.Quantity,
-                   ContractCount     = order.ContractCount,
-                   LimitPrice        = order.LimitPrice,
-                   StopPrice         = order.StopPrice,
-                   Direction         = order.Direction,
-                   Status            = order.Status,
-                   Supervisor        = supervisor,
-                   CreatedAt         = order.CreatedAt,
-                   ModifiedAt        = order.ModifiedAt,
-                   Account           = account
+                   Id            = order.Id,
+                   Actuary       = actuary,
+                   OrderType     = order.OrderType,
+                   Quantity      = order.Quantity,
+                   ContractCount = order.ContractCount,
+                   LimitPrice    = order.LimitPrice,
+                   StopPrice     = order.StopPrice,
+                   Direction     = order.Direction,
+                   Status        = order.Status,
+                   Supervisor    = supervisor,
+                   CreatedAt     = order.CreatedAt,
+                   ModifiedAt    = order.ModifiedAt,
+                   Account       = account
                };
     }
 
@@ -39,7 +38,8 @@ public static class OrderMapper
                    LimitPrice        = order.LimitPrice,
                    StopPrice         = order.StopPrice,
                    Direction         = order.Direction,
-                   AccountId         = order.AccountId
+                   AccountId         = order.AccountId,
+                   AllOrNone         = order.AllOrNone
                };
     }
 
@@ -47,20 +47,21 @@ public static class OrderMapper
     {
         return new Order
                {
-                   Id                = Guid.NewGuid(),
-                   ActuaryId         = createRequest.ActuaryId,
-                   SupervisorId      = createRequest.SupervisorId == Guid.Empty ? null : createRequest.SupervisorId,
-                   OrderType         = createRequest.OrderType,
-                   Quantity          = createRequest.Quantity,
-                   ContractCount     = createRequest.ContractCount,
-                   LimitPrice        = createRequest.LimitPrice,
-                   StopPrice         = createRequest.StopPrice,
-                   Direction         = createRequest.Direction,
-                   Status            = OrderStatus.Active,
-                   CreatedAt         = DateTime.UtcNow,
-                   ModifiedAt        = DateTime.UtcNow,
-                   AccountId         = accountId,
-                   SecurityId        = createRequest.SecurityId
+                   Id            = Guid.NewGuid(),
+                   ActuaryId     = createRequest.ActuaryId,
+                   SupervisorId  = createRequest.SupervisorId == Guid.Empty ? null : createRequest.SupervisorId,
+                   OrderType     = createRequest.OrderType,
+                   Quantity      = createRequest.Quantity,
+                   ContractCount = createRequest.ContractCount,
+                   LimitPrice    = createRequest.LimitPrice,
+                   StopPrice     = createRequest.StopPrice,
+                   Direction     = createRequest.Direction,
+                   Status        = OrderStatus.Active,
+                   CreatedAt     = DateTime.UtcNow,
+                   ModifiedAt    = DateTime.UtcNow,
+                   AccountId     = accountId,
+                   SecurityId    = createRequest.SecurityId,
+                   AllOrNone     = true
                };
     }
 
@@ -68,6 +69,16 @@ public static class OrderMapper
     {
         order.Status     = updateRequest.Status;
         order.ModifiedAt = DateTime.UtcNow;
+        return order;
+    }
+
+    public static RedisOrder MapKey(this RedisOrder order, string? key)
+    {
+        if (key is null)
+            return order;
+
+        order.Id = new Guid(Convert.FromBase64String(key.Split(":")[2]));
+
         return order;
     }
 }

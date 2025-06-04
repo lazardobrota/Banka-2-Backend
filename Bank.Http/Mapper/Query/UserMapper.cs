@@ -33,11 +33,11 @@ public static class UserMapper
                            .ToCamelCase(), query.LastName);
 
         collection.Add(nameof(query.Role)
-                       .ToCamelCase(), query.Role.ToString());
+                       .ToCamelCase(), ((int)query.Role).ToString());
 
         if (query.Ids.Count > 0)
-            collection.Add(nameof(query.Ids)
-                           .ToCamelCase(), string.Join(",", query.Ids));
+            foreach (var id in query.Ids)
+                collection.Add(nameof(query.Ids).ToCamelCase(), id.ToString());
 
         return collection;
     }
