@@ -1,30 +1,24 @@
 ﻿using Bank.ExchangeService.BackgroundServices;
+using Bank.ExchangeService.Database.Processors;
 
 namespace Bank.ExchangeService.HostedServices;
 
-public class ApplicationHostedService(
-    IHostApplicationLifetime  applicationLifetime,
-    DatabaseBackgroundService databaseBackgroundService,
-    OrderBackgroundService    orderBackgroundService
-) : IHostedService
+public class ApplicationHostedService(DatabaseBackgroundService databaseBackgroundService, IEnumerable<IRealtimeProcessor> realtimeProcessors) : IHostedService
 {
-    private readonly IHostApplicationLifetime  m_ApplicationLifetime       = applicationLifetime;
-    private readonly DatabaseBackgroundService m_DatabaseBackgroundService = databaseBackgroundService;
-    private readonly OrderBackgroundService    m_OrderBackgroundService    = orderBackgroundService;
+    private readonly DatabaseBackgroundService       m_DatabaseBackgroundService = databaseBackgroundService;
+    private readonly IEnumerable<IRealtimeProcessor> m_RealtimeProcessors        = realtimeProcessors;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await m_OrderBackgroundService.OnApplicationStarted();
+        m_DatabaseBackgroundService.OnApplicationStarted();
 
-        m_ApplicationLifetime.ApplicationStarted.Register(() => { m_DatabaseBackgroundService.OnApplicationStarted(); });
-
-        m_ApplicationLifetime.ApplicationStopped.Register(() => { m_DatabaseBackgroundService.OnApplicationStopped(); });
-
-        // return Task.CompletedTask;
+        await Task.WhenAll(m_RealtimeProcessors.Select(realtimeProcessor => realtimeProcessor.OnApplicationStarted(cancellationToken)));
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        m_DatabaseBackgroundService.OnApplicationStopped();
+
+        await Task.WhenAll(m_RealtimeProcessors.Select(realtimeProcessor => realtimeProcessor.OnApplicationStopped(cancellationToken)));
     }
 }

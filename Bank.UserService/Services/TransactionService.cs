@@ -140,7 +140,7 @@ public class TransactionService(
     {
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
-        // if (authorizationService.Permissions != Permission.Bank && authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode))
+        // if (authorizationService.Permissions != Permission.Bank && !authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode))
             // return Result.BadRequest<Transaction>("Invalid confirmation code");
 
         if (createTransaction.FromAccountNumber == null && createTransaction.ToAccountNumber == null)

@@ -6,6 +6,7 @@ using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Examples;
+using Bank.ExchangeService.Database.Processors;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.Repositories;
@@ -86,14 +87,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<DatabaseBackgroundService>();
-        services.AddSingleton<OrderBackgroundService>();
+        services.AddSingleton<OrderRealtimeProcessor>();
 
         return services;
     }
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
-        //services.AddHostedService<ApplicationHostedService>();
+        services.AddHostedService<ApplicationHostedService>();
 
         return services;
     }
