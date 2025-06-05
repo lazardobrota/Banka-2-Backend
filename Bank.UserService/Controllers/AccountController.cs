@@ -41,6 +41,15 @@ public class AccountController(IAccountService accountService) : ControllerBase
 
         return result.ActionResult;
     }
+    
+    [Authorize]
+    [HttpGet(Endpoints.Account.GetOneByNumber)]
+    public async Task<ActionResult<AccountResponse>> GetOneByAccountNumber([FromRoute] string number)
+    {
+        var result = await m_AccountService.GetOneByAccountNumber(number);
+
+        return result.ActionResult;
+    }
 
     [Authorize(Permission.Admin, Permission.Employee)]
     [HttpPost(Endpoints.Account.Create)]

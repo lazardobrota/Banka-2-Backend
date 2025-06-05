@@ -56,7 +56,6 @@ public class ExchangeApplication
 
         var app = builder.Build();
 
-        
         app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.MapHub<SecurityHub>("security-hub");
@@ -93,7 +92,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<DatabaseBackgroundService>();
-        services.AddSingleton<OrderBackgroundService>();
+        services.AddSingleton<OrderRealtimeProcessor>();
         // services.AddSingleton<ForexPairBackgroundService>();
         // services.AddSingleton<OptionBackgroundService>();
         // services.AddSingleton<StockBackgroundService>();
@@ -159,8 +158,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddOpenApiExamples(this IServiceCollection services)
     {
         services.AddOpenApiExample(Example.Account.Response);
+        services.AddOpenApiExample(Example.Account.SimpleResponse);
+        services.AddOpenApiExample(Example.AccountCurrency.Response);
+        services.AddOpenApiExample(Example.AccountType.Response);
+        services.AddOpenApiExample(Example.Client.SimpleResponse);
+        services.AddOpenApiExample(Example.Country.SimpleResponse);
         services.AddOpenApiExample(Example.Currency.SimpleResponse);
         services.AddOpenApiExample(Example.Currency.Response);
+        services.AddOpenApiExample(Example.Employee.SimpleResponse);
         services.AddOpenApiExample(Example.StockExchange.CreateRequest);
         services.AddOpenApiExample(Example.StockExchange.Response);
         services.AddOpenApiExample(Example.ForexPair.Response);

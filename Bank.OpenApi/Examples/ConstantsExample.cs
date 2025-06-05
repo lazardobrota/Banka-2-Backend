@@ -34,6 +34,8 @@ public static partial class Example
         public const string Phone                      = "+38160000000000";
         public const string Department                 = "Department";
         public const string AccountNumber              = "2220000XXXXXXXXXXX";
+        public const string Office                     = "XXXX";
+        public const string ConfirmationCode           = "XXXXXX";
         public const string UniqueIdentificationNumber = "XXXXXXXXXXXXX";
         public const string Description                = "Description";
         public const string TemplateName               = "Template Name";

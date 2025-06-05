@@ -14,6 +14,10 @@ public static partial class Example
             public static readonly AccountCurrencyClientUpdateRequest ClientUpdateRequest = Database.Examples.Example.AccountCurrency.ClientUpdateRequest;
 
             public static readonly Guid AccountCurrencyId = Seeder.AccountCurrency.BankEuro.Id;
+
+            public static readonly Guid EmployeeId = Seeder.Employee.Employee01.Id;
+
+            public static readonly Permissions.Domain.Permissions Permissions = Seeder.Employee.Employee01.Permissions;
         }
     }
 }

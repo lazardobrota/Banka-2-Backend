@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 
 using Bank.Application.Domain;
+using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.Link.Endpoints;
 using Bank.Link.Mapper.B3.Content;
@@ -11,7 +12,7 @@ using Bank.Link.Service;
 
 namespace Bank.Link.Core.B3;
 
-internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFactory, IDataService dataService) : IBankUserDataLink
+internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFactory, IDataService dataService) : IExternalUserDataLink
 {
     private readonly IHttpClientFactory m_HttpClientFactory = httpClientFactory;
     private readonly IDataService       m_DataService       = dataService;
@@ -35,14 +36,43 @@ internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFa
         if (!response.IsSuccessStatusCode)
             return null;
 
-        var responseList = await response.Content.ReadFromJsonAsync<List<Response.B3.AccountResponse>>();
+        var responseList = await response.Content.ReadFromJsonAsync<Response.B3.Page<Response.B3.AccountResponse>>();
 
-        if (responseList is null || responseList.Count == 0)
+        if (responseList is null || responseList.Content.Count == 0)
             return null;
 
-        var accountResponse  = responseList.First();
+        var accountResponse  = responseList.Content.First();
         var currencyResponse = m_DataService.GetCurrencyByCode(accountResponse.CurrencyCode);
 
-        return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse);
+        return currencyResponse is null ? null : accountResponse.ToNative(currencyResponse, m_DataService.GetAccountType(accountNumber)!);
+    }
+
+    public async Task<object?> CreateTransaction(TransactionCreateRequest createRequest)
+    {
+        var httpClient = m_HttpClientFactory.CreateClient(BankData.Code);
+
+        var domain      = Endpoint.B3.Transaction.Create;
+        var requestData = createRequest.ToB3(m_DataService.GetTransactionCodeById(createRequest.CodeId)!.Code);
+
+        var response = await httpClient.PostAsync(domain, requestData.ToContent());
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var responseData = await response.Content.ReadFromJsonAsync<Response.B3.TransactionResponse>();
+
+        return responseData?.Id;
+    }
+
+    public async Task<bool> NotifyTransactionStatus(TransactionNotifyStatusRequest notifyStatusRequest)
+    {
+        var httpClient = m_HttpClientFactory.CreateClient(BankData.Code);
+
+        var domain      = Endpoint.B3.Transaction.PutStatus.Replace("{id:long}", notifyStatusRequest.TransactionId?.ToString());
+        var requestData = notifyStatusRequest.ToB3();
+
+        var response = await httpClient.PutAsync(domain, requestData.ToContent());
+        
+        return response.IsSuccessStatusCode;
     }
 }

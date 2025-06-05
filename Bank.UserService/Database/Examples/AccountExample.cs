@@ -42,6 +42,7 @@ public static partial class Example
                                                           {
                                                               Id                = Values.Id,
                                                               AccountNumber     = Values.AccountNumber,
+                                                              Office            = "0000",
                                                               Name              = CreateRequest.Name,
                                                               Balance           = CreateRequest.Balance,
                                                               AvailableBalance  = 4500.50m,
@@ -56,7 +57,7 @@ public static partial class Example
                                                               ExpirationDate    = new(2033, 5, 15),
                                                               Status            = true,
                                                               CreatedAt         = DateTime.UtcNow,
-                                                              ModifiedAt        = DateTime.UtcNow
+                                                              ModifiedAt        = DateTime.UtcNow,
                                                           };
 
         public static readonly AccountSimpleResponse SimpleResponse = new()

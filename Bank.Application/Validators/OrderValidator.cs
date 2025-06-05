@@ -42,10 +42,6 @@ public static class OrderValidator
             RuleFor(request => request.Direction)
             .NotEqual(Direction.Invalid)
             .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("Direction"));
-
-            RuleFor(request => request.SupervisorId)
-            .NotEmpty()
-            .WithMessage(ValidationErrorMessage.Global.FieldIsRequired("SupervisorId"));
         }
     }
 
