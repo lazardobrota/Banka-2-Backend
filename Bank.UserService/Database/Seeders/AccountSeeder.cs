@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 
+using Bank.UserService.Mappers;
 using Bank.UserService.Models;
 
 namespace Bank.UserService.Database.Seeders;

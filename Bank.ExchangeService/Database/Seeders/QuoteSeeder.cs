@@ -10,6 +10,7 @@ using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
 
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
@@ -347,77 +348,26 @@ public static class QuoteSeederExtension
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedQuoteStocksLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository,
-                                                   IHubContext<SecurityHub, ISecurityClient> securityHub)
-    {
-        var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
-
-        var symbols = string.Join(",", stocks.Values.Select(stock => stock.Ticker)
-                                             .ToList());
-
-        var query = HttpUtility.ParseQueryString(string.Empty);
-        query["symbols"] = symbols;
-
-        var quotes = new List<QuoteModel>();
-        var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
-
-        var request = new HttpRequestMessage
-                      {
-                          Method     = HttpMethod.Get,
-                          RequestUri = new Uri($"{Configuration.Security.Stock.GetLatest}?{query}"),
-                          Headers =
-                          {
-                              { "accept", "application/json" },
-                              { "APCA-API-KEY-ID", apiKey },
-                              { "APCA-API-SECRET-KEY", apiSecret },
-                          }
-                      };
-
-        var response = await httpClient.SendAsync(request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
-            return;
-        }
-
-        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, FetchStockSnapshotResponse>>();
-
-        if (body is null)
-        {
-            Console.WriteLine($"RESULT IS NULL");
-            return;
-        }
-
-        foreach (var pair in body)
-        {
-            if (pair.Value is not { DailyBar: not null, LatestQuote: not null, MinuteBar: not null })
-                continue;
-
-            var quote                     = pair.Value.ToQuote(stocks[pair.Key].Id);
-            var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse(pair.Key);
-            quotes.Add(quote);
-
-            await securityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
-                             .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
-        }
-
-        await quoteRepository.CreateQuotes(quotes);
-    }
-
     public static async Task SeedStockQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
         bool hasSeededBefore = context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.Stock);
+        
+        var lastQuote = context.Quotes.Include(quote => quote.Security)
+                               .Where(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.Stock)
+                               .OrderByDescending(quote => quote.CreatedAt)
+                               .First();
 
         var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
+
+        
 
         var symbols = string.Join(",", stocks.Values.Select(stock => stock.Ticker)
                                              .ToList());
 
         string? nextPage = null;
-        
-        var     query    = HttpUtility.ParseQueryString(string.Empty);
-        query["symbols"] = symbols;
+
+        var query = HttpUtility.ParseQueryString(string.Empty);
+        query["symbols"]        = symbols;
         var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
 
         var request = new HttpRequestMessage
@@ -431,6 +381,7 @@ public static class QuoteSeederExtension
                               { "APCA-API-SECRET-KEY", apiSecret },
                           }
                       };
+
         var response = await httpClient.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
@@ -450,10 +401,9 @@ public static class QuoteSeederExtension
         query            = HttpUtility.ParseQueryString(string.Empty);
         query["symbols"] = symbols;
 
-        query["start"] = hasSeededBefore
-                         ? stocks.First()
-                                 .Value.CreatedAt.ToString(CultureInfo.InvariantCulture)
-                         : Configuration.Security.Stock.FromDateTime;
+        query["start"] = hasSeededBefore ? lastQuote!.CreatedAt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") : Configuration.Security.Stock.FromDateTime;
+
+        // query["end"] = Configuration.Security.Stock.ToDateTime;
 
         query["limit"]     = "10000";
         query["timeframe"] = $"{Configuration.Security.Global.HistoryTimeFrameInMinutes}Min";
@@ -470,18 +420,16 @@ public static class QuoteSeederExtension
             (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
 
             request = new HttpRequestMessage
+                      {
+                          Method     = HttpMethod.Get,
+                          RequestUri = new Uri($"{Configuration.Security.Stock.GetHistoryApi}?{query}"),
+                          Headers =
                           {
-                              Method     = HttpMethod.Get,
-                              RequestUri = new Uri($"{Configuration.Security.Stock.GetHistoryApi}?{query}"),
-                              Headers =
-                              {
-                                  { "accept", "application/json" },
-                                  { "APCA-API-KEY-ID", apiKey },
-                                  { "APCA-API-SECRET-KEY", apiSecret },
-                              }
-                          };
-            
-            
+                              { "accept", "application/json" },
+                              { "APCA-API-KEY-ID", apiKey },
+                              { "APCA-API-SECRET-KEY", apiSecret },
+                          }
+                      };
 
             response = await httpClient.SendAsync(request);
 
@@ -493,11 +441,11 @@ public static class QuoteSeederExtension
             if (body is null)
                 break;
 
-            foreach (var pair in body.Bars) 
+            foreach (var pair in body.Bars)
             {
                 if (!bodyLatest.TryGetValue(pair.Key, out var fetchStockSnapshotResponse) || fetchStockSnapshotResponse.LatestQuote is null)
                     continue;
-                
+
                 var stockId     = stocks[pair.Key].Id;
                 var latestQuote = fetchStockSnapshotResponse.LatestQuote!;
                 quotes.AddRange(pair.Value.Select(bar => bar.ToQuote(stockId, latestQuote.AskSize, latestQuote.BidSize)));

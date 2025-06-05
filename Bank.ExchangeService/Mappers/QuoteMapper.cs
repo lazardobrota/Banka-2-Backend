@@ -1,4 +1,6 @@
-﻿using Bank.Application.Responses;
+﻿using Bank.Application.Domain;
+using Bank.Application.Extensions;
+using Bank.Application.Responses;
 using Bank.ExchangeService.Models;
 
 namespace Bank.ExchangeService.Mappers;
@@ -21,11 +23,11 @@ public static class QuoteMapper
                };
     }
 
-    public static QuoteLatestSimpleResponse ToLatestSimpleResponse(this Quote quote, string securityTicker)
+    public static QuoteLatestSimpleResponse ToLatestSimpleResponse(this Quote quote)
     {
         return new QuoteLatestSimpleResponse
                {
-                   SecurityTicker = securityTicker,
+                   SecurityTicker = quote.Security!.Ticker,
                    AskPrice       = quote.AskPrice,
                    BidPrice       = quote.BidPrice,
                    HighPrice      = quote.HighPrice,
@@ -33,6 +35,27 @@ public static class QuoteMapper
                    Volume         = quote.Volume,
                    CreatedAt      = quote.CreatedAt,
                    ModifiedAt     = quote.ModifiedAt,
+               };
+    }
+
+    public static Quote ToQuote(this RedisQuote redisQuote, Guid securityId)
+    {
+        return new Quote
+               {
+                   Id            = redisQuote.Id,
+                   SecurityId    = securityId,
+                   AskPrice      = redisQuote.AskPrice,
+                   BidPrice      = redisQuote.BidPrice,
+                   AskSize       = redisQuote.AskSize,
+                   BidSize       = redisQuote.BidSize,
+                   HighPrice     = redisQuote.HighPrice,
+                   LowPrice      = redisQuote.LowPrice,
+                   ClosePrice    = redisQuote.ClosePrice,
+                   OpeningPrice  = redisQuote.OpeningPrice,
+                   Volume        = redisQuote.Volume,
+                   ContractCount = redisQuote.ContractCount,
+                   CreatedAt     = redisQuote.Time,
+                   ModifiedAt    = redisQuote.Time
                };
     }
 
@@ -87,12 +110,14 @@ public static class QuoteMapper
                };
     }
 
-    public static Quote ToQuote(this FetchStockSnapshotResponse stockSnapshotResponse, Guid stockId)
+    //TODO add Security property for each type of latestQuote
+    public static Quote ToQuote(this FetchStockSnapshotResponse stockSnapshotResponse, Security stock)
     {
         return new Quote
                {
                    Id            = Guid.NewGuid(),
-                   SecurityId    = stockId,
+                   SecurityId    = stock.Id,
+                   Security      = stock,
                    AskPrice      = stockSnapshotResponse.LatestQuote!.AskPrice,
                    BidPrice      = stockSnapshotResponse.LatestQuote!.BidPrice,
                    HighPrice     = stockSnapshotResponse.DailyBar!.HighPrice,
@@ -108,14 +133,15 @@ public static class QuoteMapper
                };
     }
 
-    public static Quote ToQuote(this FetchForexPairQuoteResponse fetchForexPairQuote, Guid forexPairId, DateTime date)
+    public static Quote ToQuote(this FetchForexPairQuoteResponse fetchForexPairQuote, Security forexPair, DateTime date)
     {
         var random = new Random();
-        
+
         return new Quote
                {
                    Id            = Guid.NewGuid(),
-                   SecurityId    = forexPairId,
+                   SecurityId    = forexPair.Id,
+                   Security      = forexPair,
                    AskPrice      = fetchForexPairQuote.Close,
                    BidPrice      = 0,
                    HighPrice     = fetchForexPairQuote.High,
@@ -125,20 +151,21 @@ public static class QuoteMapper
                    ModifiedAt    = date.ToUniversalTime(),
                    ClosePrice    = fetchForexPairQuote.Close,
                    OpeningPrice  = fetchForexPairQuote.Open,
-                   AskSize       = random.Next(0, 100),
-                   BidSize       = 0,
+                   AskSize       = random.Next(1, 100),
+                   BidSize       = random.Next(1, 100),
                    ContractCount = 1
                };
     }
 
-    public static Quote ToQuote(this FetchForexPairLatestResponse fetchForexPairLatest, Guid forexPairId)
+    public static Quote ToQuote(this FetchForexPairLatestResponse fetchForexPairLatest, Security forexPair)
     {
         var random = new Random();
-        
+
         return new Quote
                {
                    Id            = Guid.NewGuid(),
-                   SecurityId    = forexPairId,
+                   SecurityId    = forexPair.Id,
+                   Security      = forexPair,
                    AskPrice      = fetchForexPairLatest.AskPrice,
                    BidPrice      = fetchForexPairLatest.BidPrice,
                    HighPrice     = 0,
@@ -148,18 +175,19 @@ public static class QuoteMapper
                    ModifiedAt    = fetchForexPairLatest.Date.ToUniversalTime(),
                    ClosePrice    = 0,
                    OpeningPrice  = 0,
-                   AskSize       = random.Next(0, 100),
-                   BidSize       = 0,
+                   AskSize       = random.Next(1, 100),
+                   BidSize       = random.Next(1, 100),
                    ContractCount = 1
                };
     }
 
-    public static Quote ToQuote(this FetchOptionOneResponse optionResponse, Guid optionId)
+    public static Quote ToQuote(this FetchOptionOneResponse optionResponse, Security option)
     {
         return new Quote
                {
                    Id                = Guid.NewGuid(),
-                   SecurityId        = optionId,
+                   SecurityId        = option.Id,
+                   Security          = option,
                    AskPrice          = optionResponse.LatestQuote!.AskPrice,
                    BidPrice          = optionResponse.LatestQuote!.BidPrice,
                    HighPrice         = optionResponse.DailyBar!.HighPrice,
@@ -174,5 +202,47 @@ public static class QuoteMapper
                    BidSize           = optionResponse.LatestQuote.BidSize,
                    ContractCount     = 1
                };
+    }
+
+    public static RedisQuote ToRedis(this Quote quote)
+    {
+        return new RedisQuote
+               {
+                   Id                = quote.Id,
+                   SecurityType      = quote.Security!.SecurityType,
+                   Ticker            = quote.Security.Ticker,
+                   AskPrice          = quote.AskPrice,
+                   BidPrice          = quote.BidPrice,
+                   AskSize           = quote.AskSize,
+                   BidSize           = quote.BidSize,
+                   HighPrice         = quote.HighPrice,
+                   LowPrice          = quote.LowPrice,
+                   ClosePrice        = quote.ClosePrice,
+                   OpeningPrice      = quote.OpeningPrice,
+                   ImpliedVolatility = quote.ImpliedVolatility,
+                   Volume            = quote.Volume,
+                   ContractCount     = quote.ContractCount
+               };
+    }
+    
+    public static RedisQuote MapKey(this RedisQuote quote, string? key)
+    {
+        if (key is null)
+            return quote;
+
+        string[] keySplit = key.Split(":");
+
+        quote.SecurityType = keySplit[0] switch
+                             {
+                                 "f" => SecurityType.ForexPair,
+                                 "o" => SecurityType.Option,
+                                 "s" => SecurityType.Stock,
+                                 _   => throw new ArgumentOutOfRangeException()
+                             };
+        
+        quote.Ticker = key[1].ToString();
+        quote.Time   = DateTime.UtcNow.Date.AddSeconds(keySplit[2].DecodeBase64ToInt());
+
+        return quote;
     }
 }

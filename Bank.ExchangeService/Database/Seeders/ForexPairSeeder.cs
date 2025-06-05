@@ -164,67 +164,6 @@ public static class ForexPairSeederExtension
         await securityRepository.CreateSecurities(securities);
     }
 
-    public static async Task SeedForexPairLatest(this DatabaseContext context,            HttpClient       httpClient,      IUserServiceHttpClient userServiceHttpClient,
-                                                 ISecurityRepository  securityRepository, IQuoteRepository quoteRepository, IHubContext<SecurityHub, ISecurityClient> securityHub)
-    {
-        var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
-
-        if (currencies.Count == 0)
-            return;
-
-        var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair());
-        var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
-
-        var apiKey = Configuration.Security.Keys.ApiKeyForex;
-        var quotes = new List<Quote>();
-
-        foreach (var currencyFrom in currencies)
-        {
-            foreach (var currencyTo in currencies)
-            {
-                if (currencyFrom.Id == currencyTo.Id)
-                    continue;
-
-                var request = new HttpRequestMessage
-                              {
-                                  Method = HttpMethod.Get,
-                                  RequestUri = new Uri($"{Configuration.Security.ForexPair.GetDataApi}?function=CURRENCY_EXCHANGE_RATE&from_currency={
-                                      currencyFrom.Code}&to_currency={currencyTo.Code}&apikey={apiKey}"),
-                                  Headers =
-                                  {
-                                      { "accept", "application/json" },
-                                  }
-                              };
-
-                var response = await httpClient.SendAsync(request);
-
-                if (!response.IsSuccessStatusCode)
-                    return;
-
-                var parsed = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-
-                if (!parsed.RootElement.TryGetProperty("Realtime Currency Exchange Rate", out var forexPairElement))
-                    continue;
-
-                var body = JsonSerializer.Deserialize<FetchForexPairLatestResponse>(forexPairElement.GetRawText());
-
-                if (body is null)
-                    return;
-
-                var ticker                    = $"{currencyFrom.Code}{currencyTo.Code}";
-                var forexPairId               = tickerAndForexPair[ticker].Id;
-                var quote                     = body.ToQuote(forexPairId);
-                var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse(ticker);
-                quotes.Add(quote);
-
-                await securityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
-                                 .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
-            }
-        }
-
-        await quoteRepository.CreateQuotes(quotes);
-    }
-
     public static async Task SeedForexPairQuotes(this DatabaseContext context,            HttpClient       httpClient, IUserServiceHttpClient userServiceHttpClient,
                                                  ISecurityRepository  securityRepository, IQuoteRepository quoteRepository)
     {
@@ -233,7 +172,7 @@ public static class ForexPairSeederExtension
         if (context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.ForexPair))
             return;
 
-        var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).Select(security => security.ToForexPair()).ToList();
+        var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).ToList();
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
 
         var fromDate = hasSeededBefore ? forexPairs.First()
@@ -298,7 +237,7 @@ public static class ForexPairSeederExtension
                     if (hasSeededBefore && date < fromDate)
                         continue;
 
-                    quotes.Add(pair.Value.ToQuote(forexPair.Id, date));
+                    quotes.Add(pair.Value.ToQuote(forexPair, date));
                 }
             }
         }

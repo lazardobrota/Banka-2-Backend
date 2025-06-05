@@ -19,10 +19,11 @@ public interface IStockService
     Task<Result<StockDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class StockService(ISecurityRepository securityRepository, IUserServiceHttpClient userServiceHttpClient) : IStockService
+public class StockService(ISecurityRepository securityRepository, IUserServiceHttpClient userServiceHttpClient, IRedisRepository redisRepository) : IStockService
 {
     private readonly ISecurityRepository    m_SecurityRepository    = securityRepository;
     private readonly IUserServiceHttpClient m_UserServiceHttpClient = userServiceHttpClient;
+    private readonly IRedisRepository       m_RedisRepository       = redisRepository;
 
     public async Task<Result<Page<StockSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
@@ -46,6 +47,16 @@ public class StockService(ISecurityRepository securityRepository, IUserServiceHt
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
+
+        if (filter.Interval == QuoteIntervalType.Day)
+        {
+            var redisQuotes = (await m_RedisRepository.FindAllStockQuotes(security.Ticker)).Select(redisQuote => redisQuote.ToQuote(security.Id))
+                                                                                           .OrderByDescending(quote => quote.CreatedAt)
+                                                                                           .ToList();
+            
+            redisQuotes.AddRange( security.Quotes.SkipWhile(quote => quote.CreatedAt >= redisQuotes.Last().CreatedAt));
+            security.Quotes = redisQuotes;
+        }
 
         return Result.Ok(security.ToStock()
                                  .ToResponse(currencyResponse));

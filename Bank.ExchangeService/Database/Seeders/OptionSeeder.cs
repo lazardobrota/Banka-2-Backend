@@ -99,88 +99,6 @@ public static class OptionSeederExtension
         await context.SaveChangesAsync();
     }
 
-    public static async Task SeedOptionsLatest(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository,
-                                               IHubContext<SecurityHub, ISecurityClient> securityHub)
-    {
-        var options = (await securityRepository.FindAll(SecurityType.Option)).Select(security => security.ToOption())
-                                                                             .ToList();
-
-        const int readAmount = 100;
-        string?   nextPage   = null;
-        var       quotes     = new List<Quote>();
-        var       query      = HttpUtility.ParseQueryString(string.Empty);
-        query["feed"]  = "indicative";
-        query["limit"] = "1000";
-
-        for (int i = 1; i * readAmount < options.Count + readAmount; i++)
-        {
-            var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
-
-            var currOptionsDictionary = options.Skip((i - 1) * readAmount)
-                                               .Take(readAmount)
-                                               .ToDictionary(option => option.Ticker, option => option);
-
-            var symbols = string.Join(",", currOptionsDictionary.Values.Select(option => option.Ticker)
-                                                                .ToList());
-
-            query["symbols"] = symbols;
-
-            do
-            {
-                if (!string.IsNullOrEmpty(nextPage))
-                    query["page_token"] = nextPage;
-                else
-                    query.Remove("page_token");
-
-                var request = new HttpRequestMessage
-                              {
-                                  Method     = HttpMethod.Get,
-                                  RequestUri = new Uri($"{Configuration.Security.Option.OptionChainApi}?{query}"),
-                                  Headers =
-                                  {
-                                      { "accept", "application/json" },
-                                      { "APCA-API-KEY-ID", apiKey },
-                                      { "APCA-API-SECRET-KEY", apiSecret },
-                                  },
-                              };
-
-                using var response = await httpClient.SendAsync(request);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"Failed to fetch options chain: {response.StatusCode}");
-                    continue;
-                }
-
-                var body = await response.Content.ReadFromJsonAsync<FetchOptionsResponse>();
-
-                if (body == null)
-                    continue;
-
-                foreach (var pair in body.Snapshots)
-                {
-                    if (pair.Value is not { DailyBar: not null, LatestQuote: not null })
-                        continue;
-
-                    var quote                     = pair.Value.ToQuote(currOptionsDictionary[pair.Key].Id);
-                    var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse(pair.Key);
-                    quotes.Add(quote);
-
-                    await securityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
-                                     .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
-                }
-
-                quotes.AddRange(body.Snapshots.Where(pair => pair.Value is { DailyBar: not null, LatestQuote: not null })
-                                    .Select(pair => pair.Value.ToQuote(currOptionsDictionary[pair.Key].Id))
-                                    .ToList());
-
-                nextPage = body.NextPage;
-            } while (!string.IsNullOrEmpty(nextPage));
-        }
-
-        await quoteRepository.CreateQuotes(quotes);
-    }
-
     public static async Task SeedOptionsAndQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
         if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
@@ -191,7 +109,7 @@ public static class OptionSeederExtension
         var stocks = (await securityRepository.FindAll(SecurityType.Stock)).Where(stock => s_StockOptions.Contains(stock.Ticker))
                                                                            .Select(security => security.ToStock())
                                                                            .ToList();
-
+        
         var     toDate     = Configuration.Security.Option.ToDateTime;
         string? nextPage   = null;
         var     securities = new List<SecurityModel>();
@@ -223,7 +141,6 @@ public static class OptionSeederExtension
                                       { "APCA-API-SECRET-KEY", apiSecret },
                                   },
                               };
-
                 using var response = await httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
@@ -245,7 +162,7 @@ public static class OptionSeederExtension
                                        .ToSecurity();
 
                     securities.Add(security);
-                    quotes.Add(pair.Value.ToQuote(security.Id));
+                    quotes.Add(pair.Value.ToQuote(security));
                 }
 
                 nextPage = body.NextPage;
