@@ -127,9 +127,32 @@ public static partial class Seeder
                                                               Permissions                = new Permissions(Permission.Employee)
                                                           };
 
+        public static readonly EmployeeModel Supervisor01 = new()
+                                                            {
+                                                                Id                         = Guid.Parse("f38ac169-0865-4baa-afb7-56e422b5cf82"),
+                                                                FirstName                  = "Sanja",
+                                                                LastName                   = "Sanjić",
+                                                                DateOfBirth                = new DateOnly(1993, 9, 2),
+                                                                Gender                     = Gender.Female,
+                                                                UniqueIdentificationNumber = "1508991785013",
+                                                                Email                      = "supervisor01@gmail.com",
+                                                                Username                   = "Supervisor01",
+                                                                PhoneNumber                = "+38165234567",
+                                                                Address                    = "Bulevar Kralja Aleksandra 125",
+                                                                Password                   = "supervisor01",
+                                                                Salt                       = Guid.NewGuid(),
+                                                                Role                       = Role.Employee,
+                                                                Department                 = "Human Resources",
+                                                                CreatedAt                  = DateTime.UtcNow,
+                                                                ModifiedAt                 = DateTime.UtcNow,
+                                                                Employed                   = true,
+                                                                Activated                  = true,
+                                                                Permissions                = new Permissions(Permission.Supervisor)
+                                                            };
+
         public static readonly ImmutableArray<EmployeeModel> All =
         [
-            Admin, Employee01, Employee02, Employee03, Employee04
+            Admin, Employee01, Employee02, Employee03, Employee04, Supervisor01
         ];
     }
 }
