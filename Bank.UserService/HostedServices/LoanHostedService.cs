@@ -3,6 +3,7 @@
 using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
+using Bank.UserService.Database.Seeders;
 using Bank.UserService.Models;
 using Bank.UserService.Repositories;
 using Bank.UserService.Services;
@@ -137,23 +138,17 @@ public class LoanHostedService
                 return false;
             }
 
-            var allCodes        = await m_TransactionCodeRepository.FindAll(new TransactionCodeFilterQuery(), new Pageable());
-            var loanPaymentCode = allCodes.Items.FirstOrDefault(c => c.Code == "289");
-
-            if (loanPaymentCode == null)
-            {
-                return false;
-            }
-
             // Create a transaction request for loan payment
+            var bankAccount = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id);
+
             var transactionRequest = new TransactionCreateRequest
                                      {
                                          FromAccountNumber = account.AccountNumber,
-                                         FromCurrencyId    = loan.CurrencyId,
-                                         ToAccountNumber   = null,
+                                         ToAccountNumber   = bankAccount!.AccountNumber,
+                                         FromCurrencyId    = account.CurrencyId,
                                          ToCurrencyId      = loan.CurrencyId,
                                          Amount            = paymentAmount,
-                                         CodeId            = loanPaymentCode.Id,
+                                         CodeId            = Seeder.TransactionCode.TransactionCode276.Id,
                                          Purpose           = "loan payment"
                                      };
 
@@ -349,15 +344,16 @@ public class LoanHostedService
                 return false;
             }
 
+            var bankAccount = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id);
+
             // Create a transaction request for loan disbursement
             var transactionRequest = new TransactionCreateRequest
                                      {
-                                         FromAccountNumber = null, // Bank is the source, can be empty for deposits
-                                         FromCurrencyId    = loan.CurrencyId,
+                                         FromAccountNumber = bankAccount!.AccountNumber, // Bank is the source, can be empty for deposits
                                          ToAccountNumber   = account.AccountNumber,
                                          ToCurrencyId      = loan.CurrencyId,
                                          Amount            = loan.Amount,
-                                         CodeId            = new Guid("38259d40-8fc1-4f3d-bc4d-02b8a0283400"), // Loan disbursement code
+                                         CodeId            = Seeder.TransactionCode.TransactionCode270.Id, // Loan disbursement code
                                          ReferenceNumber   = "12345",
                                          Purpose           = "Loan disbursement"
                                      };
