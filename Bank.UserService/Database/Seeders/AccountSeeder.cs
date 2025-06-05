@@ -52,6 +52,7 @@ public static partial class Seeder
                                                               Status           = true
                                                           };
 
+        // INCREASED: For PersonalLoan1 and MortgageLoan1 (RSD account)
         public static readonly AccountModel DomesticAccount01 = new()
                                                                 {
                                                                     Id               = Guid.Parse("5d5fa996-9533-421c-a319-cd43ff41d86f"),
@@ -59,13 +60,13 @@ public static partial class Seeder
                                                                     Name             = "",
                                                                     Number           = "000000001",
                                                                     Office           = "0000",
-                                                                    Balance          = 10_000,
-                                                                    AvailableBalance = 10_000,
+                                                                    Balance          = 10_000_000, // MASSIVELY INCREASED
+                                                                    AvailableBalance = 10_000_000, // MASSIVELY INCREASED
                                                                     EmployeeId       = Employee.Employee01.Id,
                                                                     CurrencyId       = Currency.SerbianDinar.Id,
                                                                     AccountTypeId    = AccountType.CheckingAccount.Id,
-                                                                    DailyLimit       = 100_000,
-                                                                    MonthlyLimit     = 100_000,
+                                                                    DailyLimit       = 10_000_000,
+                                                                    MonthlyLimit     = 10_000_000,
                                                                     CreationDate     = DateOnly.FromDateTime(DateTime.UtcNow),
                                                                     ExpirationDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(10)),
                                                                     CreatedAt        = DateTime.UtcNow,
@@ -73,6 +74,7 @@ public static partial class Seeder
                                                                     Status           = true
                                                                 };
 
+        // INCREASED: For AutoLoan1 (RSD account)
         public static readonly AccountModel DomesticAccount02 = new()
                                                                 {
                                                                     Id               = Guid.Parse("b5f4b482-3e93-482f-9687-4d58c473fc4d"),
@@ -80,13 +82,13 @@ public static partial class Seeder
                                                                     Name             = "",
                                                                     Number           = "000000002",
                                                                     Office           = "0000",
-                                                                    Balance          = 200_000,
-                                                                    AvailableBalance = 200_000,
+                                                                    Balance          = 5_000_000, // MASSIVELY INCREASED
+                                                                    AvailableBalance = 5_000_000, // MASSIVELY INCREASED
                                                                     EmployeeId       = Employee.Employee01.Id,
                                                                     CurrencyId       = Currency.SerbianDinar.Id,
                                                                     AccountTypeId    = AccountType.CheckingAccount.Id,
-                                                                    DailyLimit       = 100_000,
-                                                                    MonthlyLimit     = 100_000,
+                                                                    DailyLimit       = 5_000_000,
+                                                                    MonthlyLimit     = 5_000_000,
                                                                     CreationDate     = DateOnly.FromDateTime(DateTime.UtcNow),
                                                                     ExpirationDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(10)),
                                                                     CreatedAt        = DateTime.UtcNow,
@@ -94,6 +96,7 @@ public static partial class Seeder
                                                                     Status           = true
                                                                 };
 
+        // MASSIVELY INCREASED: For StudentLoan1 (EUR account) 
         public static readonly AccountModel ForeignAccount01 = new()
                                                                {
                                                                    Id               = Guid.Parse("6a376abc-eaa3-4438-b159-c06f29d04e68"),
@@ -101,13 +104,13 @@ public static partial class Seeder
                                                                    Name             = "",
                                                                    Number           = "000000003",
                                                                    Office           = "0000",
-                                                                   Balance          = 3031,
-                                                                   AvailableBalance = 3031,
+                                                                   Balance          = 500_000, // MASSIVELY INCREASED
+                                                                   AvailableBalance = 500_000, // MASSIVELY INCREASED
                                                                    EmployeeId       = Employee.Employee01.Id,
                                                                    CurrencyId       = Currency.Euro.Id,
                                                                    AccountTypeId    = AccountType.ForeignCurrencyAccount.Id,
-                                                                   DailyLimit       = 1000,
-                                                                   MonthlyLimit     = 1000,
+                                                                   DailyLimit       = 500_000,
+                                                                   MonthlyLimit     = 500_000,
                                                                    CreationDate     = DateOnly.FromDateTime(DateTime.UtcNow),
                                                                    ExpirationDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(10)),
                                                                    CreatedAt        = DateTime.UtcNow,
@@ -115,6 +118,7 @@ public static partial class Seeder
                                                                    Status           = true
                                                                };
 
+        // MASSIVELY INCREASED: For BusinessLoan1 (USD account)
         public static readonly AccountModel ForeignAccount02 = new()
                                                                {
                                                                    Id               = Guid.Parse("1befdb51-989a-4e1f-b7bd-333cf29421b3"),
@@ -122,13 +126,13 @@ public static partial class Seeder
                                                                    Name             = "",
                                                                    Number           = "000000004",
                                                                    Office           = "0000",
-                                                                   Balance          = 1000,
-                                                                   AvailableBalance = 1000,
+                                                                   Balance          = 1_000_000, // MASSIVELY INCREASED
+                                                                   AvailableBalance = 1_000_000, // MASSIVELY INCREASED
                                                                    EmployeeId       = Employee.Employee01.Id,
                                                                    CurrencyId       = Currency.USDollar.Id,
                                                                    AccountTypeId    = AccountType.BusinessForeignCurrencyAccount.Id,
-                                                                   DailyLimit       = 1000,
-                                                                   MonthlyLimit     = 1000,
+                                                                   DailyLimit       = 1_000_000,
+                                                                   MonthlyLimit     = 1_000_000,
                                                                    CreationDate     = DateOnly.FromDateTime(DateTime.UtcNow),
                                                                    ExpirationDate   = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(10)),
                                                                    CreatedAt        = DateTime.UtcNow,
