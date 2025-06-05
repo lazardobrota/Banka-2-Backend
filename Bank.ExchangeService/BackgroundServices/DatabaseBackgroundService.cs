@@ -65,6 +65,12 @@ public class DatabaseBackgroundService(
             Context.SeedOptionHardcoded()
                    .Wait();
 
+            Context.SeedOrdersHardcoded()
+                    .Wait();
+
+            Context.SeedAssetsHardcoded()
+                   .Wait();
+
             return;
         }
 
