@@ -55,6 +55,14 @@ public static partial class Endpoints
         public const string GetOne      = $"{Base}/{{id:guid}}";
         public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
     }
+
+    public static class Quote
+    {
+        public const string Base      = $"{ApiBase}/quotes";
+
+        public const string Create        = $"{Base}";
+        public const string ProcessQuotes = $"{Base}/process";
+    }
 }
 
 #endregion
@@ -323,6 +331,8 @@ public static partial class Endpoints
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string Create = $"{Base}";
         public const string Update = $"{Base}/{{id:guid}}";
+        public const string Approve = $"{Base}/{{id:guid}}/approve";
+        public const string Decline = $"{Base}/{{id:guid}}/decline";
     }
 }
 

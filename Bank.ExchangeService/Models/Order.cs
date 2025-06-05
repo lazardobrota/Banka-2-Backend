@@ -30,27 +30,33 @@ public class RedisOrder
     [IgnoreMember]
     public Guid Id { set; get; }
 
+    [IgnoreMember]
+    public SecurityType SecurityType { set; get; }
+
     [Key(0)]
-    public required string Ticker { set; get; }
+    public required Guid SecurityId { set; get; }
 
     [Key(1)]
-    public OrderType OrderType { set; get; }
+    public required string Ticker { set; get; }
 
     [Key(2)]
-    public required Guid AccountId { get; set; }
+    public required OrderType Type { set; get; }
 
     [Key(3)]
-    public required int RemainingPortions { set; get; }
+    public required Guid AccountId { get; set; }
 
     [Key(4)]
-    public required decimal LimitPrice { set; get; }
+    public required int RemainingPortions { set; get; }
 
     [Key(5)]
-    public required decimal StopPrice { set; get; }
+    public required decimal LimitPrice { set; get; }
 
     [Key(6)]
-    public required Direction Direction { set; get; }
-    
+    public required decimal StopPrice { set; get; }
+
     [Key(7)]
+    public required Direction Direction { set; get; }
+
+    [Key(8)]
     public required bool AllOrNone { set; get; }
 }

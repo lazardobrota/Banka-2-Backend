@@ -53,6 +53,18 @@ public class PrepareFromAccountTransaction
     public          string?         Purpose         { set; get; }
 }
 
+public class PrepareSecurityAccountTransaction
+{
+    public required Account?         Account         { set; get; }
+    public required Currency?        FromCurrency    { set; get; }
+    public required Currency?        ToCurrency      { set; get; }
+    public required TransactionCode  TransactionCode { set; get; }
+    public required ExchangeDetails? ExchangeDetails { set; get; }
+    public required decimal          Amount          { set; get; }
+    public required decimal          Profit          { set; get; }
+    public          string?          Purpose         { set; get; }
+}
+
 public class PrepareDirectFromAccountTransaction
 {
     public required Account?        Account         { set; get; }

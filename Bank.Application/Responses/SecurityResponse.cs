@@ -7,7 +7,7 @@ public class SecurityResponse { }
 public class SecuritySimpleResponse
 {
     public required Guid                    Id             { get; set; }
-    public required string                  SecurityType   { get; set; }
+    public required SecurityType            SecurityType   { get; set; }
     public required string                  Name           { get; set; }
     public required string                  Ticker         { get; set; }
     public required StockExchangeResponse?  StockExchange  { get; set; }
