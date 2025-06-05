@@ -1,4 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Net.Mime;
 
 using Bank.Application;
 using Bank.Database;
@@ -6,8 +8,10 @@ using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Examples;
+using Bank.ExchangeService.Database.Processors;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
+using Bank.ExchangeService.Http;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 using Bank.Http;
@@ -38,6 +42,7 @@ public class ExchangeApplication
         builder.Services.AddInMemoryDatabaseServices();
         builder.Services.AddHostedServices();
         builder.Services.AddBackgroundServices();
+        builder.Services.AddRealtimeProcessors();
         builder.Services.AddHttpServices();
 
         builder.Services.AddCors();
@@ -51,6 +56,7 @@ public class ExchangeApplication
 
         var app = builder.Build();
 
+        
         app.UseCors(Configuration.Policy.FrontendApplication);
 
         app.MapHub<SecurityHub>("security-hub");
@@ -79,6 +85,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IOrderRepository, OrderRepository>();
         services.AddSingleton<IOrderService, OrderService>();
         services.AddSingleton<IRedisRepository, RedisRepository>();
+        services.AddSingleton<ISecurityService, SecurityService>();
 
         return services;
     }
@@ -87,6 +94,18 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<DatabaseBackgroundService>();
         services.AddSingleton<OrderBackgroundService>();
+        // services.AddSingleton<ForexPairBackgroundService>();
+        // services.AddSingleton<OptionBackgroundService>();
+        // services.AddSingleton<StockBackgroundService>();
+
+        return services;
+    }
+    
+    public static IServiceCollection AddRealtimeProcessors(this IServiceCollection services)
+    {
+        // services.AddSingleton<IRealtimeProcessor, InMemoryRealtimeProcessor>();
+        // services.AddSingleton<IRealtimeProcessor, PersistentRealtimeProcessor>();
+        // services.AddSingleton<IRealtimeProcessor, WebSocketRealtimeProcessor>();
 
         return services;
     }
@@ -103,6 +122,15 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient();
         services.AddHttpContextAccessor();
         services.AddUserServiceHttpClient();
+
+        services.AddHttpClient(Configuration.HttpClient.GetLatestStocks, httpClient =>
+                                                                         {
+                                                                             httpClient.BaseAddress = new Uri(Configuration.Security.Stock.GetLatest);
+
+                                                                             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames
+                                                                                                                                                             .Application.Json));
+                                                                         })
+                .AddHttpMessageHandler<AlpacaKeyMessageHandler>();
 
         return services;
     }

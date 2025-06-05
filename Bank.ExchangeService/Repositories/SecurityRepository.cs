@@ -21,6 +21,8 @@ public interface ISecurityRepository
 
     Task<Security?> FindById(Guid id, QuoteFilterIntervalQuery filter, bool inPast = true);
 
+    Task<Security?> FindByIdSimple(Guid id);
+
     Task<Security?> FindByIdDaily(Guid id, QuoteFilterIntervalQuery filter);
 
     Task<Security?> Create(Security security);
@@ -111,6 +113,15 @@ public class SecurityRepository(IDatabaseContextFactory<DatabaseContext> context
         return await query.FirstOrDefaultAsync(stock => stock.Id == id);
     }
 
+    public async Task<Security?> FindByIdSimple(Guid id)
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        return await context.Securities.Include(stock => stock.StockExchange)
+                            .AsNoTracking()
+                            .FirstOrDefaultAsync(stock => stock.Id == id);
+    }
+
     public async Task<Security?> FindByIdDaily(Guid id, QuoteFilterIntervalQuery filter)
     {
         await using var context = await m_ContextFactory.CreateContext;
@@ -169,6 +180,7 @@ public class SecurityRepository(IDatabaseContextFactory<DatabaseContext> context
     {
         await using var context = await m_ContextFactory.CreateContext;
 
+        Console.WriteLine($"--- Security | Count: {securities.Count}");
         await context.Securities.AddRangeAsync(securities);
 
         return await context.SaveChangesAsync() == securities.Count;

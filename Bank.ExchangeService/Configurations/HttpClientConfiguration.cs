@@ -18,5 +18,7 @@ public static partial class Configuration
             public const string GetOneClient   = nameof(GetOneClient);
             public const string GetOneEmployee = nameof(GetOneEmployee);
         }
+        
+        public const string GetLatestStocks = nameof(GetLatestStocks);
     }
 }
