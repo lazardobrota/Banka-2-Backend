@@ -24,7 +24,8 @@ public static class OrderMapper
                    Supervisor    = supervisor,
                    CreatedAt     = order.CreatedAt,
                    ModifiedAt    = order.ModifiedAt,
-                   Account       = account
+                   Account       = account,
+                   Security      = order.Security!.ToSecuritySimpleResponse()
                };
     }
 

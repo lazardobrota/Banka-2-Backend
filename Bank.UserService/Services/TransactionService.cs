@@ -5,12 +5,10 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.Database.Core;
 using Bank.Link.Core;
 using Bank.Permissions.Services;
 using Bank.UserService.BackgroundServices;
 using Bank.UserService.Configurations;
-using Bank.UserService.Database;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Mappers;
 using Bank.UserService.Models;
@@ -139,7 +137,8 @@ public class TransactionService(
     {
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
-        if (Configuration.Application.Profile == Profile.Production && authorizationService.Permissions != Permission.Bank && !authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode)) 
+        if (Configuration.Application.Profile == Profile.Production && authorizationService.Permissions != Permission.Bank &&
+            !authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode))
             return Result.BadRequest<Transaction>("Invalid confirmation code");
 
         if (createTransaction.FromAccountNumber == null && createTransaction.ToAccountNumber == null)
@@ -344,7 +343,8 @@ public class TransactionService(
 
     private async Task<Result<Transaction>> PrepareSecurityToAccountTransaction(PrepareSecurityAccountTransaction prepareTransaction)
     {
-        if (prepareTransaction.Account is null || prepareTransaction.FromCurrency is null || prepareTransaction.ToCurrency is null || prepareTransaction.ExchangeDetails is null || prepareTransaction.Amount <= 0)
+        if (prepareTransaction.Account is null || prepareTransaction.FromCurrency is null || prepareTransaction.ToCurrency is null || prepareTransaction.ExchangeDetails is null ||
+            prepareTransaction.Amount <= 0)
             return Result.BadRequest<Transaction>("Invalid data.");
 
         var transaction = prepareTransaction.ToTransaction(false);

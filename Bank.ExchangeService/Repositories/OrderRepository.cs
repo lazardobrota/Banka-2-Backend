@@ -38,7 +38,7 @@ public class OrderRepository(IDatabaseContextFactory<DatabaseContext> contextFac
     {
         await using var context = await m_ContextFactory.CreateContext;
 
-        var orderQuery = context.Orders.AsQueryable();
+        var orderQuery = context.Orders.Include(order => order.Security).AsQueryable();
 
         if (filter.Status != OrderStatus.Invalid)
             orderQuery = orderQuery.Where(order => order.Status == filter.Status);
@@ -56,7 +56,8 @@ public class OrderRepository(IDatabaseContextFactory<DatabaseContext> contextFac
     {
         await using var context = await m_ContextFactory.CreateContext;
 
-        return await context.Orders.FirstOrDefaultAsync(order => order.Id == id);
+        return await context.Orders.Include(order => order.Security)
+                            .FirstOrDefaultAsync(order => order.Id == id);
     }
 
     public async Task<Order> Add(Order order)

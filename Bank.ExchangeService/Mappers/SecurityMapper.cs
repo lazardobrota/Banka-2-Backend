@@ -143,7 +143,7 @@ public static class SecurityMapper
         return new SecuritySimpleResponse
                {
                    Id             = security.Id,
-                   SecurityType   = security.SecurityType.ToString(),
+                   SecurityType   = security.SecurityType,
                    Name           = security.Name,
                    Ticker         = security.Ticker,
                    StockExchange  = stockExchangeCurrency == null ? null : security.StockExchange!.ToResponse(stockExchangeCurrency),
