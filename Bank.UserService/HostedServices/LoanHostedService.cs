@@ -51,37 +51,22 @@ public class LoanHostedService
         var midnight          = DateTime.Today.AddDays(1);
         var timeLeftUntilNext = midnight.Subtract(DateTime.UtcNow);
 
-        m_Timer = new Timer(async _ => await ProcessLoanPayments(), null, TimeSpan.Zero, TimeSpan.FromMinutes(2));
+        m_Timer = new Timer(async _ => await ProcessLoanPayments(), null, timeLeftUntilNext, TimeSpan.FromDays(1));
     }
 
     public async Task ProcessLoanPayments()
     {
         try
         {
-            Console.WriteLine($"\n=== LOAN PAYMENT PROCESSING START - {DateTime.UtcNow} ===");
             var today = DateTime.UtcNow.Date;
-            Console.WriteLine($"Processing date: {today}");
 
             var activeLoans = await m_LoanRepository.GetLoansWithDueInstallmentsAsync(today);
-            Console.WriteLine($"Found {activeLoans.Count} active loans with due installments");
-
-            if (activeLoans.Count == 0)
-            {
-                Console.WriteLine("No loans found - exiting");
-                return;
-            }
 
             foreach (var loan in activeLoans)
-            {
-                Console.WriteLine($"\nProcessing loan ID: {loan.Id}, Amount: {loan.Amount}");
                 await ProcessLoanInstallmentsAsync(loan, today, m_LoanRepository, m_AccountRepository, m_InstallmentRepository);
-            }
-            
-            Console.WriteLine("=== LOAN PAYMENT PROCESSING END ===\n");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR in ProcessLoanPayments: {ex.Message}");
             throw new Exception(ex.Message);
         }
     }
@@ -91,26 +76,20 @@ public class LoanHostedService
     {
         try
         {
-            Console.WriteLine($"Processing installments for loan {loan.Id}");
             var dueInstallments = await installmentRepository.GetDueInstallmentsForLoanAsync(loan.Id, currentDate);
-            Console.WriteLine($"Found {dueInstallments.Count} due installments");
 
             if (dueInstallments.Count == 0)
                 return;
 
             foreach (var installment in dueInstallments)
             {
-                Console.WriteLine($"Processing installment {installment.Id}, Due: {installment.ExpectedDueDate}");
                 var paymentAmount = await CalculateInstallmentAmount(loan);
-                Console.WriteLine($"Calculated payment amount: {paymentAmount}");
 
                 // Process payment
                 var paymentSuccessful = await ProcessPaymentAsync(loan, paymentAmount, accountRepository);
-                Console.WriteLine($"Payment successful: {paymentSuccessful}");
 
                 if (paymentSuccessful)
                 {
-                    Console.WriteLine("Updating installment to Paid...");
                     var updatedInstallment = new Installment
                                              {
                                                  Id              = installment.Id,
@@ -124,29 +103,18 @@ public class LoanHostedService
                                              };
 
                     await installmentRepository.Update(installment, updatedInstallment);
-                    Console.WriteLine("Installment updated successfully");
 
                     var client = await GetClientByLoan(loan, accountRepository);
 
                     if (client != null)
                     {
-                        Console.WriteLine($"Sending email to client: {client.FirstName}");
                         // Izračunaj preostali dug
                         var remainingBalance  = await GetRemainingPrincipal(loan, installmentRepository);
                         var installmentAmount = await CalculateInstallmentAmount(loan);
                         await m_EmailService.Send(EmailType.LoanInstallmentPaid, client, client.FirstName, installmentAmount, loan.Currency.Code, remainingBalance);
-                        Console.WriteLine("Email sent successfully");
-                    }
-                    else
-                    {
-                        Console.WriteLine("No client found for loan");
                     }
 
                     await CreateNextInstallmentIfNeededAsync(loan, installmentRepository);
-                }
-                else
-                {
-                    Console.WriteLine("Payment failed - installment not updated");
                 }
             }
 
@@ -154,7 +122,6 @@ public class LoanHostedService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR in ProcessLoanInstallmentsAsync: {ex.Message}");
             throw new Exception(ex.Message);
         }
     }
@@ -163,77 +130,49 @@ public class LoanHostedService
     {
         try
         {
-            Console.WriteLine($"Starting payment process for loan {loan.Id}, amount: {paymentAmount}");
             var account = await accountRepository.FindById(loan.AccountId);
 
             if (account == null)
             {
-                Console.WriteLine($"Account not found for loan {loan.Id}");
                 return false;
             }
 
-            Console.WriteLine($"Found account: {account.Number}, Balance: {account.AvailableBalance}");
-
-            var allCodes = await m_TransactionCodeRepository.FindAll(new TransactionCodeFilterQuery(), new Pageable(1, 100));
-            Console.WriteLine($"Found {allCodes.TotalElements} transaction codes");
-            
+            var allCodes        = await m_TransactionCodeRepository.FindAll(new TransactionCodeFilterQuery(), new Pageable());
             var loanPaymentCode = allCodes.Items.FirstOrDefault(c => c.Code == "289");
 
             if (loanPaymentCode == null)
             {
-                Console.WriteLine("Transaction code '289' not found!");
-                Console.WriteLine("Available codes:");
-                foreach (var code in allCodes.Items.Take(10))
-                {
-                    Console.WriteLine($"  Code: {code.Code}, Description: {code.Name}");
-                }
                 return false;
             }
-
-            Console.WriteLine($"Found transaction code '289': {loanPaymentCode.Name}");
 
             // Create a transaction request for loan payment
             var transactionRequest = new TransactionCreateRequest
                                      {
                                          FromAccountNumber = account.AccountNumber,
                                          FromCurrencyId    = loan.CurrencyId,
-                                         ToAccountNumber   = "000000000000",
+                                         ToAccountNumber   = null,
                                          ToCurrencyId      = loan.CurrencyId,
                                          Amount            = paymentAmount,
                                          CodeId            = loanPaymentCode.Id,
                                          Purpose           = "loan payment"
                                      };
 
-            Console.WriteLine("Creating transaction...");
             var result = await m_transactionService.Create(transactionRequest);
 
-            if (result.Value != null)
-            {
-                Console.WriteLine($"Transaction created successfully! ID: {result.Value.Id}");
-                return true;
-            }
-            else
-            {
-                Console.WriteLine("Transaction creation failed - result.Value is null");
-                return false;
-            }
+            return result.Value != null;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR in ProcessPaymentAsync: {ex.Message}");
             return false;
         }
     }
 
     public async Task CreateNextInstallmentIfNeededAsync(Loan loan, IInstallmentRepository installmentRepository)
     {
-        Console.WriteLine($"Checking if next installment needed for loan {loan.Id}");
         var totalInstallments = await installmentRepository.GetInstallmentCountForLoanAsync(loan.Id);
-        Console.WriteLine($"Total installments: {totalInstallments}, Loan period: {loan.Period}");
 
         if (totalInstallments < loan.Period)
         {
-            Console.WriteLine("Creating next installment...");
             var latestInstallment = await installmentRepository.GetLatestInstallmentForLoanAsync(loan.Id);
 
             var newInstallment = new Installment
@@ -248,25 +187,16 @@ public class LoanHostedService
                                  };
 
             await installmentRepository.Add(newInstallment);
-            Console.WriteLine($"Created new installment {newInstallment.Id} due on {newInstallment.ExpectedDueDate}");
-        }
-        else
-        {
-            Console.WriteLine("All installments already created");
         }
     }
 
     public async Task CheckLoanCompletionAsync(Loan loan, ILoanRepository loanRepository, IInstallmentRepository installmentRepository)
     {
-        Console.WriteLine($"Checking loan completion for {loan.Id}");
         var allPaid           = await installmentRepository.AreAllInstallmentsPaidAsync(loan.Id);
         var totalInstallments = await installmentRepository.GetInstallmentCountForLoanAsync(loan.Id);
 
-        Console.WriteLine($"All paid: {allPaid}, Total installments: {totalInstallments}");
-
         if (allPaid && totalInstallments >= loan.Period)
         {
-            Console.WriteLine("Loan completed! Closing loan...");
             var updatedLoan = new Loan
                               {
                                   Id           = loan.Id,
@@ -284,11 +214,6 @@ public class LoanHostedService
                               };
 
             await loanRepository.Update(updatedLoan);
-            Console.WriteLine("Loan status updated to Closed");
-        }
-        else
-        {
-            Console.WriteLine("Loan not yet completed");
         }
     }
 
@@ -427,7 +352,7 @@ public class LoanHostedService
             // Create a transaction request for loan disbursement
             var transactionRequest = new TransactionCreateRequest
                                      {
-                                         FromAccountNumber = "000000000000", // Bank is the source, can be empty for deposits
+                                         FromAccountNumber = null, // Bank is the source, can be empty for deposits
                                          FromCurrencyId    = loan.CurrencyId,
                                          ToAccountNumber   = account.AccountNumber,
                                          ToCurrencyId      = loan.CurrencyId,
