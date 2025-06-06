@@ -35,6 +35,8 @@ public class StockExchangeEntityConfiguration : IEntityTypeConfiguration<StockEx
         builder.Property(exchange => exchange.CurrencyId);
 
         builder.Property(exchange => exchange.TimeZone);
+        builder.Property(exchange => exchange.MarketOpen);
+        builder.Property(exchange => exchange.MarketClose);
 
         builder.Property(exchange => exchange.CreatedAt)
                .IsRequired();

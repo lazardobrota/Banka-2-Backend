@@ -115,6 +115,7 @@ public static partial class Seeder
                                                                    Status           = true
                                                                };
 
+        // MASSIVELY INCREASED: For BusinessLoan1 (USD account)
         public static readonly AccountModel ForeignAccount02 = new()
                                                                {
                                                                    Id               = Guid.Parse("1befdb51-989a-4e1f-b7bd-333cf29421b3"),

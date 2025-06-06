@@ -90,6 +90,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
+        services.AddHostedService<DatabaseBackgroundService>(); //TODO: CHECK
         services.AddSingleton<DatabaseBackgroundService>();
         services.AddSingleton<OrderRealtimeProcessor>();
 
