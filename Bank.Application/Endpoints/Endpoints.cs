@@ -55,6 +55,23 @@ public static partial class Endpoints
         public const string GetOne      = $"{Base}/{{id:guid}}";
         public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
     }
+
+    public static class Quote
+    {
+        public const string Base = $"{ApiBase}/quotes";
+
+        public const string Create        = $"{Base}";
+        public const string ProcessQuotes = $"{Base}/process";
+    }
+
+    public static class Asset
+    {
+        public const string Base = $"{ApiBase}/assets";
+
+        public const string GetAll           = $"{Base}";
+        public const string GetAllForActuary = $"actuaries/{{id:guid}}/assets";
+        public const string GetOne           = $"{Base}/{{id:guid}}";
+    }
 }
 
 #endregion
@@ -306,7 +323,7 @@ public static partial class Endpoints
 {
     public static class StockExchange
     {
-        public const string Base   = $"{ApiBase}/exchanges";
+        public const string Base   = $"{ApiBase}/stock-exchanges";
         public const string GetAll = $"{Base}";
         public const string GetOne = $"{Base}/{{id:guid}}";
         public const string Create = $"{Base}";
@@ -319,10 +336,12 @@ public static partial class Endpoints
     {
         public const string Base = $"{ApiBase}/orders";
 
-        public const string GetAll = $"{Base}";
-        public const string GetOne = $"{Base}/{{id:guid}}";
-        public const string Create = $"{Base}";
-        public const string Update = $"{Base}/{{id:guid}}";
+        public const string GetAll  = $"{Base}";
+        public const string GetOne  = $"{Base}/{{id:guid}}";
+        public const string Create  = $"{Base}";
+        public const string Update  = $"{Base}/{{id:guid}}";
+        public const string Approve = $"{Base}/{{id:guid}}/approve";
+        public const string Decline = $"{Base}/{{id:guid}}/decline";
     }
 }
 

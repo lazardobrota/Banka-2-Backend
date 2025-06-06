@@ -15,6 +15,8 @@ public interface IRedisRepository
 {
     Task<bool> AddOrder(Order order);
 
+    Task<bool> RemoveOrders(List<RedisOrder> orders);
+
     Task<List<RedisOrder>> FindAllOrders();
 
     Task<List<RedisOrder>> FindAllStockOrders();
@@ -61,6 +63,14 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
                                              MessagePackSerializer.Serialize(order.ToRedis()));
 
         return true;
+    }
+
+    public async Task<bool> RemoveOrders(List<RedisOrder> orders)
+    {
+        var result = await m_RedisDatabase.KeyDeleteAsync(orders.Select(order => (RedisKey)order.ToKey())
+                                                                .ToArray());
+
+        return result == orders.Count;
     }
 
     public async Task<List<RedisOrder>> FindAllOrders()

@@ -2,8 +2,8 @@
 using Bank.Application.Queries;
 using Bank.Database.Core;
 using Bank.ExchangeService.Models;
+using Bank.Permissions.Services;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
@@ -20,21 +20,25 @@ public interface IOrderRepository
 
     Task<Order> Update(Order order);
 
-    Task<Order> UpdateStatus(Guid id, OrderStatus status);
+    Task<Order?> UpdateStatus(Guid id, OrderStatus status);
+
+    Task<bool> Approve(Guid id);
+
+    Task<bool> Decline(Guid id);
 
     Task<bool> UpdateStatus(List<Guid> ids, OrderStatus status);
 }
 
-public class OrderRepository(IAuthorizationService authorizationService, IDatabaseContextFactory<DatabaseContext> contextFactory) : IOrderRepository
+public class OrderRepository(IDatabaseContextFactory<DatabaseContext> contextFactory, IAuthorizationServiceFactory authorizationServiceFactory) : IOrderRepository
 {
-    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory       = contextFactory;
-    private readonly IAuthorizationService                    m_AuthorizationService = authorizationService;
+    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory              = contextFactory;
+    private readonly IAuthorizationServiceFactory             m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Page<Order>> FindAll(OrderFilterQuery filter, Pageable pageable)
     {
         await using var context = await m_ContextFactory.CreateContext;
 
-        var orderQuery = context.Orders.AsQueryable();
+        var orderQuery = context.Orders.Include(order => order.Security).AsQueryable();
 
         if (filter.Status != OrderStatus.Invalid)
             orderQuery = orderQuery.Where(order => order.Status == filter.Status);
@@ -52,7 +56,8 @@ public class OrderRepository(IAuthorizationService authorizationService, IDataba
     {
         await using var context = await m_ContextFactory.CreateContext;
 
-        return await context.Orders.FirstOrDefaultAsync(order => order.Id == id);
+        return await context.Orders.Include(order => order.Security)
+                            .FirstOrDefaultAsync(order => order.Id == id);
     }
 
     public async Task<Order> Add(Order order)
@@ -77,17 +82,50 @@ public class OrderRepository(IAuthorizationService authorizationService, IDataba
         return order;
     }
 
-    public async Task<Order> UpdateStatus(Guid id, OrderStatus status)
+    public async Task<Order?> UpdateStatus(Guid id, OrderStatus status)
     {
-        await using var context = await m_ContextFactory.CreateContext;
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
-        await context.Orders.Where(order => order.Id == id)
-                     .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(order => order.Status, status));
+        var result = await context.Orders.Where(order => order.Id == id)
+                                  .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(order => order.Status, status)
+                                                                                .SetProperty(order => order.SupervisorId, authorizationService.UserId)
+                                                                                .SetProperty(order => order.ModifiedAt,   DateTime.UtcNow));
 
-        var order = await context.Orders.AsNoTracking()
+        if (result != 1)
+            return null;
+
+        var order = await context.Orders.Include(order => order.Security)
+                                 .AsNoTracking()
                                  .FirstOrDefaultAsync(order => order.Id == id);
 
         return order!;
+    }
+
+    public async Task<bool> Approve(Guid id)
+    {
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
+        var result = await context.Orders.Where(order => order.Id == id && order.Status == OrderStatus.NeedsApproval)
+                                  .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(order => order.Status, OrderStatus.Active)
+                                                                                .SetProperty(order => order.SupervisorId, authorizationService.UserId)
+                                                                                .SetProperty(order => order.ModifiedAt,   DateTime.UtcNow));
+
+        return result == 1;
+    }
+
+    public async Task<bool> Decline(Guid id)
+    {
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
+        var result = await context.Orders.Where(order => order.Id == id && order.Status == OrderStatus.NeedsApproval)
+                                  .ExecuteUpdateAsync(setProperty => setProperty.SetProperty(order => order.Status, OrderStatus.Declined)
+                                                                                .SetProperty(order => order.SupervisorId, authorizationService.UserId)
+                                                                                .SetProperty(order => order.ModifiedAt,   DateTime.UtcNow));
+
+        return result == 1;
     }
 
     public async Task<bool> UpdateStatus(List<Guid> ids, OrderStatus status)

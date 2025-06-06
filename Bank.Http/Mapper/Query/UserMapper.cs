@@ -35,6 +35,10 @@ public static class UserMapper
         collection.Add(nameof(query.Role)
                        .ToCamelCase(), ((int)query.Role).ToString());
 
+        if (query.Permissions is not 0)
+            collection.Add(nameof(query.Permissions)
+                           .ToCamelCase(), query.Permissions.ToString());
+
         if (query.Ids.Count > 0)
             foreach (var id in query.Ids)
                 collection.Add(nameof(query.Ids)

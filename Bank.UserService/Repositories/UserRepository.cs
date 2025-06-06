@@ -63,7 +63,10 @@ public class UserRepository(IDatabaseContextFactory<ApplicationContext> contextF
 
         if (userFilterQuery.Role != Role.Invalid)
             userQuery = userQuery.Where(user => user.Role == userFilterQuery.Role);
-
+        
+        if (userFilterQuery.Permissions != (int)Permission.Invalid)
+            userQuery = userQuery.Where(user => (user.Permissions & userFilterQuery.Permissions) == userFilterQuery.Permissions);
+        
         int totalElements = await userQuery.CountAsync();
 
         var users = await userQuery.Skip((pageable.Page - 1) * pageable.Size)

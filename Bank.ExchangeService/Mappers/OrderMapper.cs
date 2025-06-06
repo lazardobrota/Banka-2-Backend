@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Domain;
+using Bank.Application.Extensions;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Models;
@@ -23,7 +24,8 @@ public static class OrderMapper
                    Supervisor    = supervisor,
                    CreatedAt     = order.CreatedAt,
                    ModifiedAt    = order.ModifiedAt,
-                   Account       = account
+                   Account       = account,
+                   Security      = order.Security!.ToSecuritySimpleResponse()
                };
     }
 
@@ -32,8 +34,10 @@ public static class OrderMapper
         return new RedisOrder
                {
                    Id                = order.Id,
+                   SecurityId        = order.SecurityId,
                    Ticker            = order.Security!.Ticker, //TODO: make sure its not null
-                   OrderType         = order.OrderType,
+                   SecurityType      = order.Security!.SecurityType,
+                   Type              = order.OrderType,
                    RemainingPortions = order.Quantity,
                    LimitPrice        = order.LimitPrice,
                    StopPrice         = order.StopPrice,
@@ -43,7 +47,7 @@ public static class OrderMapper
                };
     }
 
-    public static Order ToOrder(this OrderCreateRequest createRequest, Guid accountId)
+    public static Order ToOrder(this OrderCreateRequest createRequest, Guid accountId, bool approvesTrade)
     {
         return new Order
                {
@@ -56,7 +60,7 @@ public static class OrderMapper
                    LimitPrice    = createRequest.LimitPrice,
                    StopPrice     = createRequest.StopPrice,
                    Direction     = createRequest.Direction,
-                   Status        = OrderStatus.Active,
+                   Status        = approvesTrade ? OrderStatus.Active : OrderStatus.NeedsApproval,
                    CreatedAt     = DateTime.UtcNow,
                    ModifiedAt    = DateTime.UtcNow,
                    AccountId     = accountId,
@@ -77,8 +81,32 @@ public static class OrderMapper
         if (key is null)
             return order;
 
-        order.Id = new Guid(Convert.FromBase64String(key.Split(":")[2]));
+        var keyParts = key.Split(":");
+
+        order.Id = new Guid(Convert.FromBase64String(keyParts[2]));
+
+        order.SecurityType = (SecurityType)keyParts[1]
+        .ParseIntOrDefault();
 
         return order;
+    }
+
+    public static string ToKey(this RedisOrder order)
+    {
+        return $"order:{(int)order.SecurityType}:{Convert.ToBase64String(order.Id.ToByteArray())}";
+    }
+
+    public static Asset ToAsset(this RedisOrder order, Quote quote, Guid actuaryId)
+    {
+        return new Asset
+               {
+                   Id           = Guid.NewGuid(),
+                   ActuaryId    = actuaryId,
+                   SecurityId   = order.SecurityId,
+                   Quantity     = order.RemainingPortions,
+                   AveragePrice = order.Direction == Direction.Buy ? quote.AskPrice : quote.BidPrice,
+                   CreatedAt    = DateTime.UtcNow,
+                   ModifiedAt   = DateTime.UtcNow
+               };
     }
 }

@@ -5,11 +5,10 @@ using Bank.Application.Endpoints;
 using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
-using Bank.Database.Core;
 using Bank.Link.Core;
 using Bank.Permissions.Services;
 using Bank.UserService.BackgroundServices;
-using Bank.UserService.Database;
+using Bank.UserService.Configurations;
 using Bank.UserService.Database.Seeders;
 using Bank.UserService.Mappers;
 using Bank.UserService.Models;
@@ -39,30 +38,28 @@ public interface ITransactionService
 }
 
 public class TransactionService(
-    ITransactionRepository                      transactionRepository,
-    IAccountRepository                          accountRepository,
-    ICurrencyRepository                         currencyRepository,
-    IDatabaseContextFactory<ApplicationContext> contextFactory,
-    IExchangeService                            exchangeService,
-    Lazy<TransactionBackgroundService>          transactionBackgroundServiceLazy,
-    Lazy<IDataService>                          dataServiceLazy,
-    IAuthorizationServiceFactory                authorizationServiceFactory,
-    ITransactionCodeRepository                  transactionCodeRepository,
-    IExternalUserData                           externalUserData,
-    IUserRepository                             userRepository
+    ITransactionRepository             transactionRepository,
+    IAccountRepository                 accountRepository,
+    ICurrencyRepository                currencyRepository,
+    IExchangeService                   exchangeService,
+    Lazy<TransactionBackgroundService> transactionBackgroundServiceLazy,
+    Lazy<IDataService>                 dataServiceLazy,
+    IAuthorizationServiceFactory       authorizationServiceFactory,
+    ITransactionCodeRepository         transactionCodeRepository,
+    IExternalUserData                  externalUserData,
+    IUserRepository                    userRepository
 ) : ITransactionService
 {
-    private readonly ITransactionRepository                      m_TransactionRepository            = transactionRepository;
-    private readonly ITransactionCodeRepository                  m_TransactionCodeRepository        = transactionCodeRepository;
-    private readonly IAccountRepository                          m_AccountRepository                = accountRepository;
-    private readonly ICurrencyRepository                         m_CurrencyRepository               = currencyRepository;
-    private readonly IAuthorizationServiceFactory                m_AuthorizationServiceFactory      = authorizationServiceFactory;
-    private readonly IExchangeService                            m_ExchangeService                  = exchangeService;
-    private readonly IUserRepository                             m_UserRepository                   = userRepository;
-    private readonly IDatabaseContextFactory<ApplicationContext> m_ContextFactory                   = contextFactory;
-    private readonly IExternalUserData                           m_ExternalUserData                 = externalUserData;
-    private readonly Lazy<TransactionBackgroundService>          m_TransactionBackgroundServiceLazy = transactionBackgroundServiceLazy;
-    private readonly Lazy<IDataService>                          m_DataServiceLazy                  = dataServiceLazy;
+    private readonly ITransactionRepository             m_TransactionRepository            = transactionRepository;
+    private readonly ITransactionCodeRepository         m_TransactionCodeRepository        = transactionCodeRepository;
+    private readonly IAccountRepository                 m_AccountRepository                = accountRepository;
+    private readonly ICurrencyRepository                m_CurrencyRepository               = currencyRepository;
+    private readonly IAuthorizationServiceFactory       m_AuthorizationServiceFactory      = authorizationServiceFactory;
+    private readonly IExchangeService                   m_ExchangeService                  = exchangeService;
+    private readonly IUserRepository                    m_UserRepository                   = userRepository;
+    private readonly IExternalUserData                  m_ExternalUserData                 = externalUserData;
+    private readonly Lazy<TransactionBackgroundService> m_TransactionBackgroundServiceLazy = transactionBackgroundServiceLazy;
+    private readonly Lazy<IDataService>                 m_DataServiceLazy                  = dataServiceLazy;
 
     private TransactionBackgroundService TransactionBackgroundService => m_TransactionBackgroundServiceLazy.Value;
     private IDataService                 Data                         => m_DataServiceLazy.Value;
@@ -140,8 +137,9 @@ public class TransactionService(
     {
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
-        // if (authorizationService.Permissions != Permission.Bank && !authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode))
-        // return Result.BadRequest<Transaction>("Invalid confirmation code");
+        if (Configuration.Application.Profile == Profile.Production && authorizationService.Permissions != Permission.Bank &&
+            !authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode))
+            return Result.BadRequest<Transaction>("Invalid confirmation code");
 
         if (createTransaction.FromAccountNumber == null && createTransaction.ToAccountNumber == null)
             return Result.BadRequest<Transaction>("No valid account provided.");
@@ -186,12 +184,12 @@ public class TransactionService(
         var isSecurity = transactionCode.Code == Seeder.TransactionCode.TransactionCode280.Code || transactionCode.Code == Seeder.TransactionCode.TransactionCode286.Code;
 
         if (isSecurity && createTransaction.FromAccountNumber is null) // Security
-            return await PrepareToAccountTransaction(createTransaction.ToPrepareToAccountTransaction(transactionCode, toAccount, toCurrency),
-                                                     TransactionBackgroundService.ExternalTransactions);
+            return await PrepareSecurityToAccountTransaction(createTransaction.ToPrepareSecurityToAccountTransaction(transactionCode, toAccount, fromCurrency, toCurrency,
+                                                                                                                     exchangeDetails));
 
         if (isSecurity && createTransaction.ToAccountNumber is null) // Security
-            return await PrepareFromAccountTransaction(createTransaction.ToPrepareFromAccountTransaction(transactionCode, fromAccount, fromCurrency),
-                                                       TransactionBackgroundService.ExternalTransactions);
+            return await PrepareSecurityFromAccountTransaction(createTransaction.ToPrepareSecurityFromAccountTransaction(transactionCode, fromAccount, fromCurrency, toCurrency,
+                                                                                                                         exchangeDetails));
 
         if (bankCodeFrom == null || bankCodeTo == null)
             return Result.BadRequest<Transaction>("No account provided.");
@@ -266,6 +264,37 @@ public class TransactionService(
         return Result.Ok(transaction);
     }
 
+    private async Task<Result<Transaction>> PrepareSecurityFromAccountTransaction(PrepareSecurityAccountTransaction prepareTransaction)
+    {
+        if (prepareTransaction.Account is null || prepareTransaction.FromCurrency is null || prepareTransaction.ToCurrency is null || prepareTransaction.ExchangeDetails is null ||
+            prepareTransaction.Amount <= 0)
+            return Result.BadRequest<Transaction>("Invalid data.");
+
+        var transaction = prepareTransaction.ToTransaction(true);
+
+        await m_TransactionRepository.Add(transaction);
+
+        if (!prepareTransaction.Account.TryFindAccount(prepareTransaction.FromCurrency.Id, out var accountId))
+            return Result.BadRequest<Transaction>("Account does not have currency.");
+
+        var result = await m_AccountRepository.DecreaseAvailableBalance(accountId, prepareTransaction.FromCurrency.Id,
+                                                                        prepareTransaction.ExchangeDetails.AverageRate * prepareTransaction.Amount,
+                                                                        prepareTransaction.ExchangeDetails.AverageRate * prepareTransaction.Amount);
+
+        if (result is not true)
+        {
+            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
+
+            return Result.BadRequest<Transaction>("Some error");
+        }
+
+        var processTransaction = prepareTransaction.ToProcessTransaction(transaction.Id, true);
+
+        TransactionBackgroundService.ExternalTransactions.Enqueue(processTransaction);
+
+        return Result.Ok(transaction);
+    }
+
     private async Task<Result<Transaction>> PrepareToAccountTransaction(PrepareToAccountTransaction prepareTransaction, ConcurrentQueue<ProcessTransaction> transactionQueue)
     {
         if (prepareTransaction.Account is null || prepareTransaction.Currency is null || prepareTransaction.Amount <= 0)
@@ -308,6 +337,30 @@ public class TransactionService(
         var processTransaction = prepareTransaction.ToProcessTransaction(transaction.Id);
 
         TransactionBackgroundService.InternalTransactions.Enqueue(processTransaction);
+
+        return Result.Ok(transaction);
+    }
+
+    private async Task<Result<Transaction>> PrepareSecurityToAccountTransaction(PrepareSecurityAccountTransaction prepareTransaction)
+    {
+        if (prepareTransaction.Account is null || prepareTransaction.FromCurrency is null || prepareTransaction.ToCurrency is null || prepareTransaction.ExchangeDetails is null ||
+            prepareTransaction.Amount <= 0)
+            return Result.BadRequest<Transaction>("Invalid data.");
+
+        var transaction = prepareTransaction.ToTransaction(false);
+
+        await m_TransactionRepository.Add(transaction);
+
+        if (!prepareTransaction.Account.TryFindAccount(prepareTransaction.ToCurrency.Id, out _))
+        {
+            await m_TransactionRepository.UpdateStatus(transaction.Id, TransactionStatus.Failed);
+
+            return Result.BadRequest<Transaction>("Account does not have currency.");
+        }
+
+        var processTransaction = prepareTransaction.ToProcessTransaction(transaction.Id, false);
+
+        TransactionBackgroundService.ExternalTransactions.Enqueue(processTransaction);
 
         return Result.Ok(transaction);
     }
@@ -695,7 +748,7 @@ public class TransactionService(
         }
 
         var transferSucceeded = await m_AccountRepository.DecreaseBalance(accountId, processTransaction.FromCurrencyId, processTransaction.FromAmount,
-                                                                          processTransaction.FromAmount);
+                                                                          processTransaction.FromBankAmount);
 
         await m_TransactionRepository.UpdateStatus(processTransaction.TransactionId, transferSucceeded ? TransactionStatus.Completed : TransactionStatus.Failed);
 

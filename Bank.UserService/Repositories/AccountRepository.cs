@@ -97,6 +97,9 @@ public class AccountRepository(IDatabaseContextFactory<ApplicationContext> conte
         if (!string.IsNullOrEmpty(accountFilterQuery.Number))
             accountQuery = accountQuery.Where(account => EF.Functions.ILike(account.Number, $"%{accountFilterQuery.Number}%"));
 
+        if (accountFilterQuery.Ids.Count > 0)
+            accountQuery = accountQuery.Where(account => accountFilterQuery.Ids.Contains(account.Id));
+        
         if (accountFilterQuery.Status != null)
             accountQuery = accountQuery.Where(account => account.Status == accountFilterQuery.Status.Value);
 

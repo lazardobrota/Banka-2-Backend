@@ -83,7 +83,8 @@ public class LoanRepository(IDatabaseContextFactory<ApplicationContext> contextF
 
         context.Loans.Add(loan);
         await context.SaveChangesAsync();
-        return loan;
+        return await context.Loans.IncludeAll()
+                            .FirstAsync(l => l.Id == loan.Id);
     }
 
     public async Task<bool> AddRange(IEnumerable<Loan> loans)

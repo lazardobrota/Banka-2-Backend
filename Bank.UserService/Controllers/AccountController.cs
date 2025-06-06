@@ -60,7 +60,7 @@ public class AccountController(IAccountService accountService) : ControllerBase
         return result.ActionResult;
     }
 
-    [Authorize(Permission.Client)]
+    [Authorize]
     [HttpPut(Endpoints.Account.UpdateClient)]
     public async Task<ActionResult<AccountResponse>> Update([FromBody] AccountUpdateClientRequest accountUpdateClientRequest, [FromRoute] Guid id)
     {

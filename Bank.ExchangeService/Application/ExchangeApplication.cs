@@ -1,6 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Net.Mime;
+using System.IdentityModel.Tokens.Jwt;
 
 using Bank.Application;
 using Bank.Database;
@@ -11,7 +9,6 @@ using Bank.ExchangeService.Database.Examples;
 using Bank.ExchangeService.Database.Processors;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
-using Bank.ExchangeService.Http;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 using Bank.Http;
@@ -85,6 +82,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IOrderService, OrderService>();
         services.AddSingleton<IRedisRepository, RedisRepository>();
         services.AddSingleton<ISecurityService, SecurityService>();
+        services.AddSingleton<IAssetRepository, AssetRepository>();
+        services.AddSingleton<IAssetService, AssetService>();
 
         return services;
     }
@@ -105,6 +104,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IRealtimeProcessor, PersistentRealtimeProcessor>();
         services.AddSingleton<IRealtimeProcessor, WebSocketRealtimeProcessor>();
         services.AddSingleton<IRealtimeProcessor, OrderRealtimeProcessor>();
+        services.AddSingleton<FakeRealtimeSecurityBackgroundService>();
 
         return services;
     }
@@ -122,14 +122,14 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddUserServiceHttpClient();
 
-        services.AddHttpClient(Configuration.HttpClient.GetLatestStocks, httpClient =>
-                                                                         {
-                                                                             httpClient.BaseAddress = new Uri(Configuration.Security.Stock.GetLatest);
-
-                                                                             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames
-                                                                                                                                                             .Application.Json));
-                                                                         })
-                .AddHttpMessageHandler<AlpacaKeyMessageHandler>();
+        // services.AddHttpClient(Configuration.HttpClient.GetLatestStocks, httpClient =>
+        //                                                                  {
+        //                                                                      httpClient.BaseAddress = new Uri(Configuration.Security.Stock.GetLatest);
+        //
+        //                                                                      httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames
+        //                                                                                                                                                      .Application.Json));
+        //                                                                  })
+        //         .AddHttpMessageHandler<AlpacaKeyMessageHandler>();
 
         return services;
     }
