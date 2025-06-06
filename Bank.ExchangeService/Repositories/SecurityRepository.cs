@@ -91,9 +91,7 @@ public class SecurityRepository(IDatabaseContextFactory<DatabaseContext> context
                                              QuoteIntervalType.ThreeMonths => DateTime.UtcNow.Date.AddMonths(-3),
                                              QuoteIntervalType.Year        => DateTime.UtcNow.Date.AddYears(-1),
                                              QuoteIntervalType.Max         => inPast ? DateTime.MinValue : DateTime.MaxValue,
-                                             _ => inPast
-                                                  ? DateTime.UtcNow.Date.AddDays(-1)
-                                                  : DateTime.UtcNow.Date.AddDays(1) //TODO Remove .AddDays(-1) from DateTime.UtcNow.Date.AddDays(-1)
+                                             _                             => inPast ? DateTime.UtcNow.Date : DateTime.UtcNow.Date.AddDays(1)
                                          });
 
         var fromDate = inPast ? date : DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
