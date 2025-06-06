@@ -38,9 +38,13 @@ public static class InstallmentMapper
 
     public static Installment Update(this Installment installment, InstallmentUpdateRequest updateRequest)
     {
-        installment.ActualDueDate = updateRequest.ActualDueDate ?? installment.ActualDueDate;
-        installment.Status        = updateRequest.Status        ?? installment.Status;
-        installment.ModifiedAt    = DateTime.UtcNow;
+        if (updateRequest.ActualDueDate.HasValue)
+        {
+            installment.ActualDueDate = DateTime.SpecifyKind(updateRequest.ActualDueDate.Value, DateTimeKind.Utc);
+        }
+    
+        installment.Status     = updateRequest.Status ?? installment.Status;
+        installment.ModifiedAt = DateTime.UtcNow;
 
         return installment;
     }
