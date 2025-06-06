@@ -17,6 +17,8 @@ public interface IAssetRepository
 {
     Task<Page<Asset>> FindAll(AssetFilterQuery filter, Pageable pageable);
 
+    Task<Page<Asset>> FindAllByActuaryId(Guid actuaryId, Pageable pageable);
+
     Task<Asset?> FindById(Guid id);
 
     public Task<List<Asset>> FindAllAssetsBySecurityAndActuary(List<(Guid SecurityId, Guid ActuaryId)> securityActuaryList);
@@ -52,6 +54,29 @@ public class AssetRepository(IDatabaseContextFactory<DatabaseContext> contextFac
 
         var totalElements = await assetQuery.CountAsync();
 
+        return new Page<Asset>(assets, pageable.Page, pageable.Size, totalElements);
+    }
+
+    public async Task<Page<Asset>> FindAllByActuaryId(Guid actuaryId, Pageable pageable)
+    {
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
+        var assetQuery = context.Assets.IncludeAll()
+                                .Where(asset => asset.ActuaryId == actuaryId)
+                                .AsQueryable();
+
+        if (authorizationService.Permissions == Permission.Client || authorizationService.Permissions == Permission.Employee)
+            assetQuery = assetQuery.Where(asset => asset.ActuaryId == authorizationService.UserId);
+
+        assetQuery = assetQuery.OrderByDescending(asset => asset.ModifiedAt);
+
+        var assets = await assetQuery.Skip((pageable.Page - 1) * pageable.Size)
+                                     .Take(pageable.Size)
+                                     .ToListAsync();
+
+        var totalElements = await assetQuery.CountAsync();
+    
         return new Page<Asset>(assets, pageable.Page, pageable.Size, totalElements);
     }
 
