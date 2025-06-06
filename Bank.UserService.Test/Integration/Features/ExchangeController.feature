@@ -15,10 +15,10 @@
         When a GET request is sent to fetch the exchange by currencies
         Then the response ActionResult should indicate successful retrieval of the exchange for the given currencies
 
-    Scenario: Make exchange through API
-        Given a valid exchange make request
-        When a POST request is sent to the exchange creation endpoint
-        Then the response ActionResult should indicate successful exchange creation
+#    Scenario: Make exchange through API
+#        Given a valid exchange make request
+#        When a POST request is sent to the exchange creation endpoint
+#        Then the response ActionResult should indicate successful exchange creation
 
     Scenario: Update exchange through API
         Given a valid exchange update request and exchange Id

@@ -18,12 +18,12 @@ public static partial class Example
     {
         public static readonly TransactionCreateRequest CreateRequest = new()
                                                                         {
-                                                                            FromAccountNumber = Seeder.Account.DomesticAccount01.AccountNumber,
+                                                                            FromAccountNumber = "222000000000000111", //Seeder.Account.DomesticAccount01.AccountNumber,
                                                                             FromCurrencyId    = Seeder.Currency.SerbianDinar.Id,
-                                                                            ToAccountNumber   = Seeder.Account.ForeignAccount01.Number,
+                                                                            ToAccountNumber   = "222000000000000331", //Seeder.Account.ForeignAccount01.Number,
                                                                             ToCurrencyId      = Seeder.Currency.Euro.Id,
                                                                             Amount            = 10.05m,
-                                                                            CodeId            = Seeder.TransactionCode.TransactionCode224.Id,
+                                                                            CodeId            = Seeder.TransactionCode.TransactionCode289.Id,
                                                                             ReferenceNumber   = "2345454333",
                                                                             Purpose           = "Placanje fakture"
                                                                         };
