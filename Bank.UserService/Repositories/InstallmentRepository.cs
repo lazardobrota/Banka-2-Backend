@@ -74,7 +74,8 @@ public class InstallmentRepository(IDatabaseContextFactory<ApplicationContext> c
 
         context.Installments.Add(installment);
         await context.SaveChangesAsync();
-        return installment;
+        return await context.Installments.IncludeAll()
+                                    .FirstAsync(i => i.Id == installment.Id);;
     }
 
     public async Task<bool> AddRange(IEnumerable<Installment> installments)
