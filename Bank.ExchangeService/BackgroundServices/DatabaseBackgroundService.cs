@@ -44,11 +44,11 @@ public class DatabaseBackgroundService(
 
         using var client = m_HttpClientFactory.CreateClient();
 
-        Context.SeedStockExchanges()
-               .Wait();
-
         if (Configuration.Application.Profile == Profile.Testing)
         {
+            Context.SeedHardcodedStockExchanges()
+                   .Wait();
+            
             Context.SeedFutureContractHardcoded()
                    .Wait();
 
@@ -57,7 +57,7 @@ public class DatabaseBackgroundService(
 
             Context.SeedStockHardcoded()
                    .Wait();
-
+    
             Context.SeedOptionHardcoded()
                    .Wait();
 
@@ -67,9 +67,6 @@ public class DatabaseBackgroundService(
             Context.SeedAssetsHardcoded()
                     .Wait();
 
-            Context.SeedHardcodedStockExchanges()
-                   .Wait();
-
             return;
         }
 
@@ -77,6 +74,9 @@ public class DatabaseBackgroundService(
 
         m_RedisRepository.Clear();
 
+        Context.SeedStockExchanges()
+               .Wait();
+        
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
