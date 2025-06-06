@@ -85,17 +85,8 @@ public static class StockSeederExtension
 
         var stockExchanges = await context.StockExchanges.ToListAsync();
 
-        var stocks = body.Select(stockResponse =>
-                                 {
-                                     var exchange = stockExchanges.Find(exchange => exchange.Acronym == stockResponse.StockExchangeAcronym);
-
-                                     return exchange != null && stockResponse.Tradable
-                                            ? stockResponse.ToStock(exchange.Id)
-                                                           .ToSecurity()
-                                            : null;
-                                 })
-                         .Where(security => security != null)
-                         .Select(security => security!)
+        var stocks = body.Select(stockResponse => stockResponse.ToStock(Seeder.StockExchange.IEX.Id)
+                                                               .ToSecurity())
                          .ToList();
 
         await context.Securities.AddRangeAsync(stocks);
