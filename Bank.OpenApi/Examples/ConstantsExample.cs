@@ -43,6 +43,7 @@ public static partial class Example
         public const string Acronym                    = "Acronym";
         public const string MIC                        = "MIC";
         public const string ForexPairName              = "Forex Pair Name";
+        public const string SecurityName              = "Security Name";
         public const string FutureContractName         = "Future Contract Name";
         public const string StockName                  = "Stock Name";
         public const string OptionName                 = "Option Name";

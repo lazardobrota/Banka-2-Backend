@@ -4,9 +4,9 @@ using Bank.Application.Queries;
 using Bank.Application.Requests;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Mappers;
-using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
 using Bank.Http.Clients.User;
+using Bank.Permissions.Services;
 
 namespace Bank.ExchangeService.Services;
 
@@ -18,14 +18,28 @@ public interface IOrderService
 
     Task<Result<OrderResponse>> Create(OrderCreateRequest request);
 
+    Task<Result> Approve(Guid id);
+
+    Task<Result> Decline(Guid id);
+
     Task<Result<OrderResponse>> Update(OrderUpdateRequest request, Guid id);
 }
 
-public class OrderService(IOrderRepository orderRepository, ISecurityRepository securityRepository, IUserServiceHttpClient userServiceHttpClient) : IOrderService
+public class OrderService(
+    IOrderRepository             orderRepository,
+    ISecurityRepository          securityRepository,
+    IUserServiceHttpClient       userServiceHttpClient,
+    IRedisRepository             redisRepository,
+    IAuthorizationServiceFactory authorizationService,
+    IAssetRepository             assetRepository
+) : IOrderService
 {
-    private readonly IOrderRepository       m_OrderRepository       = orderRepository;
-    private readonly ISecurityRepository    m_SecurityRepository    = securityRepository;
-    private readonly IUserServiceHttpClient m_UserServiceHttpClient = userServiceHttpClient;
+    private readonly IOrderRepository             m_OrderRepository             = orderRepository;
+    private readonly IAssetRepository             m_AssetRepository             = assetRepository;
+    private readonly ISecurityRepository          m_SecurityRepository          = securityRepository;
+    private readonly IUserServiceHttpClient       m_UserServiceHttpClient       = userServiceHttpClient;
+    private readonly IRedisRepository             m_RedisRepository             = redisRepository;
+    private readonly IAuthorizationServiceFactory m_AuthorizationServiceFactory = authorizationService;
 
     public async Task<Result<Page<OrderResponse>>> GetAll(OrderFilterQuery orderFilterQuery, Pageable pageable)
     {
@@ -97,6 +111,9 @@ public class OrderService(IOrderRepository orderRepository, ISecurityRepository 
 
     public async Task<Result<OrderResponse>> Create(OrderCreateRequest request)
     {
+        if (request.Direction == Direction.Sell && await m_AssetRepository.HasAsset(request.SecurityId, request.ActuaryId, request.Quantity) is false)
+            return Result.BadRequest<OrderResponse>("No such asset available to sell.");
+
         var userFilter = new UserFilterQuery
                          {
                              Ids = [request.ActuaryId, request.SupervisorId]
@@ -115,24 +132,55 @@ public class OrderService(IOrderRepository orderRepository, ISecurityRepository 
         var userPage    = await userPageTask;
         var accountPage = await accountPageTask;
 
-        if (request.SupervisorId == Guid.Empty && userPage.PageSize != 1 || request.SupervisorId != Guid.Empty && userPage.PageSize != 2 || accountPage.PageSize != 1)
+        if (request.SupervisorId == Guid.Empty && userPage.TotalElements != 1 || request.SupervisorId != Guid.Empty && userPage.TotalElements != 2 ||
+            accountPage.TotalElements != 1)
             return Result.BadRequest<OrderResponse>("Bad request");
 
-        // TODO interval??
-        // var security = await m_SecurityRepository.FindById(request.SecurityId, new QuoteFilterIntervalQuery { Interval = QuoteIntervalType.Day  });
-        Security security = null!;
+        var security = await m_SecurityRepository.FindByIdSimple(request.SecurityId);
 
-        // if (security is null) TODO: Uncomment
-        // return Result.BadRequest<OrderResponse>("Could not find Security");
+        if (security is null)
+            return Result.BadRequest<OrderResponse>("Could not find Security");
 
-        if (security.SettlementDate != DateOnly.MinValue && security.SettlementDate < DateOnly.FromDateTime(DateTime.Now)) //TODO should decline, check if present
+        if (security.SettlementDate != DateOnly.MinValue && security.SettlementDate < DateOnly.FromDateTime(DateTime.Now))
             return Result.BadRequest<OrderResponse>("Security settlement date has passed");
 
-        var userResponses = userPage.Items.ToDictionary(userResponse => userResponse.Id, userResponse => userResponse);
+        var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+        var userResponses        = userPage.Items.ToDictionary(userResponse => userResponse.Id, userResponse => userResponse);
 
-        var order = await m_OrderRepository.Add(request.ToOrder(accountPage.Items[0].Id));
+        var approvesTrade = authorizationService.Permissions == Permission.ApproveTrade;
+
+        var order = await m_OrderRepository.Add(request.ToOrder(accountPage.Items[0].Id, approvesTrade));
+
+        order.Security = security;
+
+        if (approvesTrade)
+            await m_RedisRepository.AddOrder(order);
 
         return Result.Ok(order.ToResponse(userResponses[order.ActuaryId], order.SupervisorId == null ? null : userResponses[order.SupervisorId.Value], accountPage.Items[0]));
+    }
+
+    public async Task<Result> Approve(Guid id)
+    {
+        var result = await m_OrderRepository.Approve(id);
+
+        if (result is false)
+            return Result.BadRequest("Cannot approve order.");
+
+        var order = await m_OrderRepository.FindById(id);
+
+        await m_RedisRepository.AddOrder(order!);
+
+        return Result.Ok();
+    }
+
+    public async Task<Result> Decline(Guid id)
+    {
+        var result = await m_OrderRepository.Decline(id);
+
+        if (result is false)
+            return Result.BadRequest("Cannot decline order.");
+
+        return Result.Ok();
     }
 
     public async Task<Result<OrderResponse>> Update(OrderUpdateRequest request, Guid id)

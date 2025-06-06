@@ -242,10 +242,52 @@ public static partial class Seeder
                                                           Activated                  = true,
                                                           Permissions                = new Permissions(Permission.Client)
                                                       };
+        
+        public static readonly ClientModel Actuary01 = new()
+                                                      {
+                                                          Id                         = Guid.Parse("6d14d187-b610-49d8-af7b-7656ef23edd5"),
+                                                          FirstName                  = "Milica",
+                                                          LastName                   = "Petrović",
+                                                          Role                       = Role.Client,
+                                                          BankId                     = Seeder.Bank.Bank02.Id,
+                                                          DateOfBirth                = new DateOnly(1912, 9, 9),
+                                                          Gender                     = Gender.Female,
+                                                          UniqueIdentificationNumber = "0512983290007",
+                                                          Email                      = "actuary01@gmail.com",
+                                                          PhoneNumber                = "+38166456789",
+                                                          Address                    = "Terazije 23",
+                                                          Password                   = "actuary01",
+                                                          Salt                       = Guid.NewGuid(),
+                                                          CreatedAt                  = DateTime.UtcNow,
+                                                          ModifiedAt                 = DateTime.UtcNow,
+                                                          Activated                  = true,
+                                                          Permissions                = new Permissions(Permission.Client, Permission.Trade)
+                                                      };
+        
+        public static readonly ClientModel Actuary02 = new()
+                                                       {
+                                                           Id                         = Guid.Parse("42c78897-ecb9-4817-af50-4ad3423c8264"),
+                                                           FirstName                  = "Nikola",
+                                                           LastName                   = "Jovanović",
+                                                           Role                       = Role.Client,
+                                                           BankId                     = Seeder.Bank.Bank02.Id,
+                                                           DateOfBirth                = new DateOnly(1973, 10, 5),
+                                                           Gender                     = Gender.Male,
+                                                           UniqueIdentificationNumber = "0512983290007",
+                                                           Email                      = "actuary02@gmail.com",
+                                                           PhoneNumber                = "+38166456789",
+                                                           Address                    = "Terazije 23",
+                                                           Password                   = "actuary02",
+                                                           Salt                       = Guid.NewGuid(),
+                                                           CreatedAt                  = DateTime.UtcNow,
+                                                           ModifiedAt                 = DateTime.UtcNow,
+                                                           Activated                  = true,
+                                                           Permissions                = new Permissions(Permission.Client, Permission.Trade)
+                                                       };
 
         public static readonly ImmutableArray<ClientModel> All =
         [
-            Bank, Client01, Client02, Client03, Client04, Client05, Client06, Client07, Client08, Client09, Client10
+            Bank, Client01, Client02, Client03, Client04, Client05, Client06, Client07, Client08, Client09, Client10, Actuary01, Actuary02
         ];
     }
 }

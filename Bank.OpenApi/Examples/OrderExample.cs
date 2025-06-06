@@ -41,6 +41,7 @@ public static partial class Example
                                                                    CreatedAt     = DateTime.Now,
                                                                    ModifiedAt    = DateTime.Now,
                                                                    Account       = Account.DefaultResponse,
+                                                                   Security      = Security.DefaultSimpleResponse,
                                                                };
     }
 }

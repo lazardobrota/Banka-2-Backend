@@ -1,4 +1,5 @@
 ﻿using Bank.Application.Domain;
+using Bank.Application.Responses;
 using Bank.ExchangeService.Models;
 
 namespace Bank.ExchangeService.Mappers;
@@ -134,6 +135,28 @@ public static class SecurityMapper
                    StockExchangeId = stock.StockExchangeId,
                    Quotes          = stock.Quotes,
                    SecurityType    = SecurityType.Stock,
+               };
+    }
+
+    public static SecuritySimpleResponse ToSecuritySimpleResponse(this Security security, CurrencySimpleResponse? stockExchangeCurrency = null, CurrencySimpleResponse? baseCurrency = null, CurrencySimpleResponse? quoteCurrency = null)
+    {
+        return new SecuritySimpleResponse
+               {
+                   Id             = security.Id,
+                   SecurityType   = security.SecurityType,
+                   Name           = security.Name,
+                   Ticker         = security.Ticker,
+                   StockExchange  = stockExchangeCurrency == null ? null : security.StockExchange!.ToResponse(stockExchangeCurrency),
+                   BaseCurrency   = baseCurrency,
+                   QuoteCurrency  = quoteCurrency,
+                   ExchangeRate   = security.ExchangeRate,
+                   Liquidity      = security.Liquidity,
+                   StrikePrice    = security.StrikePrice,
+                   OpenInterest   = security.OpenInterest,
+                   SettlementDate = security.SettlementDate,
+                   OptionType     = security.OptionType,
+                   ContractSize   = security.ContractSize,
+                   ContractUnit   = security.ContractUnit,
                };
     }
 }

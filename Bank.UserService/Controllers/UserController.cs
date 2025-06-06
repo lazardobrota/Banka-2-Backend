@@ -15,8 +15,8 @@ public class UserController(IUserService userService) : ControllerBase
 {
     private readonly IUserService m_UserService = userService;
 
-    [Authorize(Permission.Admin, Permission.Employee)]
     [HttpGet(Endpoints.User.GetAll)]
+    [Authorize(Permission.Bank, Permission.Admin, Permission.Employee)]
     public async Task<ActionResult<Page<UserResponse>>> GetAll([FromQuery] UserFilterQuery userFilterQuery, [FromQuery] Pageable pageable)
     {
         var result = await m_UserService.GetAll(userFilterQuery, pageable);

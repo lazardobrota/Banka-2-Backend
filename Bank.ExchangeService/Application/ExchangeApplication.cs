@@ -6,6 +6,7 @@ using Bank.ExchangeService.BackgroundServices;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Examples;
+using Bank.ExchangeService.Database.Processors;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
 using Bank.ExchangeService.Repositories;
@@ -38,6 +39,7 @@ public class ExchangeApplication
         builder.Services.AddInMemoryDatabaseServices();
         builder.Services.AddHostedServices();
         builder.Services.AddBackgroundServices();
+        builder.Services.AddRealtimeProcessors();
         builder.Services.AddHttpServices();
 
         builder.Services.AddCors();
@@ -79,21 +81,33 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IOrderRepository, OrderRepository>();
         services.AddSingleton<IOrderService, OrderService>();
         services.AddSingleton<IRedisRepository, RedisRepository>();
+        services.AddSingleton<ISecurityService, SecurityService>();
+        services.AddSingleton<IAssetRepository, AssetRepository>();
+        services.AddSingleton<IAssetService, AssetService>();
 
         return services;
     }
 
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
-        services.AddHostedService<DatabaseBackgroundService>();
-        services.AddSingleton<OrderBackgroundService>();
+        services.AddHostedService<DatabaseBackgroundService>(); //TODO: CHECK
+        services.AddSingleton<DatabaseBackgroundService>();
+        services.AddSingleton<OrderRealtimeProcessor>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddRealtimeProcessors(this IServiceCollection services)
+    {
+        services.AddSingleton<IRealtimeProcessor, OrderRealtimeProcessor>();
+        services.AddSingleton<FakeRealtimeSecurityBackgroundService>();
 
         return services;
     }
 
     public static IServiceCollection AddHostedServices(this IServiceCollection services)
     {
-        //services.AddHostedService<ApplicationHostedService>();
+        services.AddHostedService<ApplicationHostedService>();
 
         return services;
     }
@@ -103,6 +117,15 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient();
         services.AddHttpContextAccessor();
         services.AddUserServiceHttpClient();
+
+        // services.AddHttpClient(Configuration.HttpClient.GetLatestStocks, httpClient =>
+        //                                                                  {
+        //                                                                      httpClient.BaseAddress = new Uri(Configuration.Security.Stock.GetLatest);
+        //
+        //                                                                      httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames
+        //                                                                                                                                                      .Application.Json));
+        //                                                                  })
+        //         .AddHttpMessageHandler<AlpacaKeyMessageHandler>();
 
         return services;
     }
