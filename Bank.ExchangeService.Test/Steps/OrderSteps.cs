@@ -98,8 +98,7 @@ public class OrderSteps(ScenarioContext context, IOrderService orderService)
         result.Value.StopPrice.ShouldBe(Example.Entity.Order.CreateRequest.StopPrice);
         result.Value.LimitPrice.ShouldBe(Example.Entity.Order.CreateRequest.LimitPrice);
         result.Value.Direction.ShouldBe(Example.Entity.Order.CreateRequest.Direction);
-        result.Value.Status.ShouldBe(OrderStatus.Active);
-        //result.Value.Supervisor.Id.ShouldBe(Example.Entity.Order.CreateRequest.SupervisorId);
+        result.Value.Status.ShouldBe(OrderStatus.NeedsApproval);
         result.Value.Account.AccountNumber.ShouldBe(Example.Entity.Order.CreateRequest.AccountNumber);
     }
 

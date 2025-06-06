@@ -21,7 +21,7 @@ public static partial class Example
 
         public static readonly InstallmentUpdateRequest UpdateRequest = new()
                                                                         {
-                                                                            ActualDueDate = new(2025, 6, 15),
+                                                                            ActualDueDate = new DateTime(2025, 6, 15, 0, 0, 0, DateTimeKind.Utc),
                                                                             Status        = InstallmentStatus.Paid
                                                                         };
 

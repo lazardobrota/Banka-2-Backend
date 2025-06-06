@@ -75,10 +75,12 @@ public class InstallmentService(IInstallmentRepository installmentRepository, IL
             return Result.NotFound<InstallmentResponse>($"Loan with ID {createRequest.LoanId} not found");
 
         var installment = createRequest.ToInstallment();
+        
+        var loanResponse = loan.ToLoanResponse();
 
         var createdInstallment = await m_InstallmentRepository.Add(installment);
 
-        return Result.Ok(createdInstallment.ToResponse());
+        return Result.Ok(createdInstallment.ToResponse(loanResponse));
     }
 
     public async Task<Result<InstallmentResponse>> Update(InstallmentUpdateRequest request, Guid id)

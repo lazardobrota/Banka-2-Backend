@@ -70,6 +70,10 @@ public class Hooks
                        .OnApplicationStarted()
                        .Wait();
 
+        serviceProvider.GetRequiredService<CurrencyExchangeBackgroundService>()
+                       .OnApplicationStarted(CancellationToken.None)
+                       .Wait();
+
         return services;
     }
 }

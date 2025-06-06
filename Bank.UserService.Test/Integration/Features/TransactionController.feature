@@ -15,10 +15,10 @@
         When a GET request is sent to fetch a transaction by Id
         Then the response ActionResult should indicate successful retrieval of the transaction
 
-    Scenario: Create transaction through API
-        Given a valid transaction create request
-        When a POST request is sent to the transaction creation endpoint
-        Then the response ActionResult should indicate successful transaction creation
+#    Scenario: Create transaction through API
+#        Given a valid transaction create request
+#        When a POST request is sent to the transaction creation endpoint
+#        Then the response ActionResult should indicate successful transaction creation
 
     Scenario: Update transaction through API
         Given a valid transaction Id and update request

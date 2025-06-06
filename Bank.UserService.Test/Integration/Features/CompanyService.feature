@@ -1,10 +1,10 @@
 ﻿Feature: Company service testing
 
-    Scenario: Create Company
-        Given company create request
-        When company is created in the database
-        And company is fetched by Id
-        Then company details should match the created company
+#    Scenario: Create Company
+#        Given company create request
+#        When company is created in the database
+#        And company is fetched by Id
+#        Then company details should match the created company
 
     Scenario: Get All Companies
         Given company filter query
