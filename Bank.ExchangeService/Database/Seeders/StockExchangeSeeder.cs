@@ -204,7 +204,7 @@ public static class StockExchangeSeederExtension
     public static async Task SeedStockExchanges(this DatabaseContext context)
     {
         // Only seed IEX in production
-        await context.StockExchanges.AddAsync(Seeder.StockExchange.IEX);
+        await context.StockExchanges.AddRangeAsync(Seeder.StockExchange.IEX, Seeder.StockExchange.ForexMarket);
         await context.SaveChangesAsync();
     }
 
