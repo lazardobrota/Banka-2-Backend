@@ -48,7 +48,7 @@ public class DatabaseBackgroundService(
         {
             Context.SeedHardcodedStockExchanges()
                    .Wait();
-            
+
             Context.SeedFutureContractHardcoded()
                    .Wait();
 
@@ -57,15 +57,15 @@ public class DatabaseBackgroundService(
 
             Context.SeedStockHardcoded()
                    .Wait();
-    
+
             Context.SeedOptionHardcoded()
                    .Wait();
 
             Context.SeedOrdersHardcoded()
-                    .Wait();
+                   .Wait();
 
             Context.SeedAssetsHardcoded()
-                    .Wait();
+                   .Wait();
 
             return;
         }
@@ -76,7 +76,7 @@ public class DatabaseBackgroundService(
 
         Context.SeedStockExchanges()
                .Wait();
-        
+
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
                .Wait();
         

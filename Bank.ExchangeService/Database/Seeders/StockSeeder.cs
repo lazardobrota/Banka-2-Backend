@@ -84,7 +84,7 @@ public static class StockSeederExtension
             throw new Exception("List of stocks can't be null");
 
         var stockExchanges = await context.StockExchanges.ToListAsync();
-
+        
         var stocks = body.Select(stockResponse => stockResponse.Tradable
                                                   ? stockResponse.ToStock(Seeder.StockExchange.IEX.Id)
                                                                  .ToSecurity()
