@@ -49,6 +49,9 @@ public class DatabaseBackgroundService(
 
         if (Configuration.Application.Profile == Profile.Testing)
         {
+            Context.SeedHardcodedStockExchanges()
+                   .Wait();
+            
             Context.SeedFutureContractHardcoded()
                    .Wait();
 
@@ -67,9 +70,6 @@ public class DatabaseBackgroundService(
             Context.SeedAssetsHardcoded()
                     .Wait();
 
-            Context.SeedHardcodedStockExchanges()
-                   .Wait();
-
             return;
         }
 
@@ -79,19 +79,19 @@ public class DatabaseBackgroundService(
 
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
                .Wait();
-
+        
         Context.SeedStock(client)
                .Wait();
-
+        
         Context.SeedForexPair(client, m_UserServiceHttpClient, m_SecurityRepository)
                .Wait();
-
+        
         Context.SeedOptionsAndQuotes(client, m_SecurityRepository, m_QuoteRepository)
                .Wait();
-
+        
         Context.SeedForexPairQuotes(client, m_UserServiceHttpClient, m_SecurityRepository, m_QuoteRepository)
                .Wait();
-
+        
         Context.SeedStockQuotes(client, m_SecurityRepository, m_QuoteRepository)
                .Wait();
 

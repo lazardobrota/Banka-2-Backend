@@ -142,7 +142,7 @@ public static class OptionSeederExtension
                 using var response = await httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
-                    return;
+                    break;
 
                 var body = await response.Content.ReadFromJsonAsync<FetchOptionsResponse>();
 
