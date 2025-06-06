@@ -1,10 +1,9 @@
-﻿using Bank.Application.Domain;
+using Bank.Application.Domain;
 using Bank.ExchangeService.Models;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
 using OrderModel = Order;
-
 
 public static partial class Seeder
 {

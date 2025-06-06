@@ -94,7 +94,7 @@ public static class OptionSeederExtension
         if (context.Securities.Any(security => security.SecurityType == SecurityType.Option))
             return;
 
-        await context.Securities.AddRangeAsync(Seeder.Option.AmazonPutOption, Seeder.Option.AppleCallOption, Seeder.Option.MicrosoftCallOption, Seeder.Option.TeslaPutOption);
+        await context.Securities.AddRangeAsync(Seeder.Option.AmazonPutOption, Seeder.Option.AppleCallOption, Seeder.Option.MicrosoftCallOption);
 
         await context.SaveChangesAsync();
     }

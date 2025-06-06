@@ -10,16 +10,15 @@ public static partial class Example
     {
         public static readonly OrderCreateRequest CreateRequest = new()
                                                                   {
-                                                                      ActuaryId     = Guid.Parse("a8be210e-84f9-472e-9f0a-f2f334dcb20a"),
+                                                                      ActuaryId     = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"),
                                                                       OrderType     = OrderType.Market,
                                                                       Quantity      = 100,
                                                                       ContractCount = 10,
                                                                       StopPrice     = 222.22m,
                                                                       LimitPrice    = 250.75m,
                                                                       Direction     = Direction.Buy,
-                                                                      SupervisorId  = Guid.Parse("e1f3de40-719e-4b5f-8e4d-d42f06e4a411"),
-                                                                      AccountNumber = "000000005",
-                                                                      SecurityId    = Guid.Parse("9000bb03-afac-4ab5-80f3-980a0ed898f2")
+                                                                      AccountNumber = "222000000000000531",
+                                                                      SecurityId    = Guid.Parse("c426aed1-9c27-4da1-aa51-6cf1045528d8")
                                                                   };
 
         public static readonly OrderUpdateRequest UpdateRequest = new()
