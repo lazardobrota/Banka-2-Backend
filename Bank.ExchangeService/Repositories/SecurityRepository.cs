@@ -1,13 +1,9 @@
-﻿using System.Linq.Expressions;
-
-using Bank.Application.Domain;
+﻿using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.Database.Core;
-using Bank.ExchangeService.Model;
 using Bank.ExchangeService.Models;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
 
@@ -90,12 +86,14 @@ public class SecurityRepository(IDatabaseContextFactory<DatabaseContext> context
 
         var date = DateOnly.FromDateTime(filter.Interval switch
                                          {
-                                             QuoteIntervalType.Week        => DateTime.Today.AddDays(-7),
-                                             QuoteIntervalType.Month       => DateTime.Today.AddMonths(-1),
-                                             QuoteIntervalType.ThreeMonths => DateTime.Today.AddMonths(-3),
-                                             QuoteIntervalType.Year        => DateTime.Today.AddYears(-1),
+                                             QuoteIntervalType.Week        => DateTime.UtcNow.Date.AddDays(-7),
+                                             QuoteIntervalType.Month       => DateTime.UtcNow.Date.AddMonths(-1),
+                                             QuoteIntervalType.ThreeMonths => DateTime.UtcNow.Date.AddMonths(-3),
+                                             QuoteIntervalType.Year        => DateTime.UtcNow.Date.AddYears(-1),
                                              QuoteIntervalType.Max         => inPast ? DateTime.MinValue : DateTime.MaxValue,
-                                             _                             => inPast ? DateTime.Today : DateTime.Today.AddDays(1)
+                                             _ => inPast
+                                                  ? DateTime.UtcNow.Date.AddDays(-1)
+                                                  : DateTime.UtcNow.Date.AddDays(1) //TODO Remove .AddDays(-1) from DateTime.UtcNow.Date.AddDays(-1)
                                          });
 
         var fromDate = inPast ? date : DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
@@ -202,39 +200,3 @@ public class SecurityRepository(IDatabaseContextFactory<DatabaseContext> context
                                      });
     }
 }
-
-// public static partial class RepositoryExtensions
-// {
-//     public static IIncludableQueryable<Security, object?> IncludeAll(this DbSet<Security> set)
-//     {
-//         return set.Include(security =>  security.Quotes)
-//                   .ThenIncludeAll(security => security.Quotes, nameof(Quote.Security))
-//                   .Include(security => security.StockExchange);
-//     }
-//
-//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Security?> value,
-//                                                                                  Expression<Func<TEntity, Security?>> navigationExpression, params string[] excludeProperties)
-//     where TEntity : class
-//     {
-//         IIncludableQueryable<TEntity, object?> query = value;
-//     
-//         if (!excludeProperties.Contains(nameof(Security.Quotes)))
-//             query = query.Include(navigationExpression)
-//                          .ThenInclude(security =>  security!.Quotes);
-//     
-//         return query;
-//     }
-//
-//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Security>>value,
-//                                                                                  Expression<Func<TEntity, List<Security>>> navigationExpression, params string[] excludeProperties)
-//     where TEntity : class
-//     {
-//         IIncludableQueryable<TEntity, object?> query = value;
-//
-//         if (!excludeProperties.Contains(nameof(Security.Quotes)))
-//             query = query.Include(navigationExpression)
-//                          .ThenInclude(security =>  security.Quotes);
-//
-//         return query;
-//     }
-// }

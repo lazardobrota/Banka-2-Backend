@@ -54,8 +54,9 @@ public static class AccountMapper
 
         if (query.Ids.Count > 0)
             foreach (var id in query.Ids)
-                collection.Add(nameof(query.Ids).ToCamelCase(), id.ToString());
-        
+                collection.Add(nameof(query.Ids)
+                               .ToCamelCase(), id.ToString());
+
         return collection;
     }
 }

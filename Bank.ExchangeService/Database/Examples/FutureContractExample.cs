@@ -28,7 +28,6 @@ public static partial class Example
                                                                                  AskSize                      = 40,
                                                                                  BidSize                      = 80,
                                                                                  ContractCount                = 1
-
                                                                              };
 
         public static readonly FutureContractResponse Response = new()
@@ -53,7 +52,6 @@ public static partial class Example
                                                                      AskSize                      = 40,
                                                                      BidSize                      = 80,
                                                                      ContractCount                = 1
-
                                                                  };
 
         public static readonly FutureContractDailyResponse DailyResponse = new()

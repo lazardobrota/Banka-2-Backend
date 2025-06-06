@@ -18,43 +18,25 @@ public class QuoteRepository(IDatabaseContextFactory<DatabaseContext> contextFac
     {
         await using var context = await m_ContextFactory.CreateContext;
 
-        await context.Quotes.AddRangeAsync(quotes);
+        await context.Quotes.AddRangeAsync(quotes.Select(quote => new Quote
+                                                                  {
+                                                                      Id                = quote.Id,
+                                                                      SecurityId        = quote.SecurityId,
+                                                                      AskPrice          = quote.AskPrice,
+                                                                      BidPrice          = quote.BidPrice,
+                                                                      AskSize           = quote.AskSize,
+                                                                      BidSize           = quote.BidSize,
+                                                                      HighPrice         = quote.HighPrice,
+                                                                      LowPrice          = quote.LowPrice,
+                                                                      ClosePrice        = quote.ClosePrice,
+                                                                      OpeningPrice      = quote.OpeningPrice,
+                                                                      Volume            = quote.Volume,
+                                                                      ContractCount     = quote.ContractCount,
+                                                                      ImpliedVolatility = quote.ImpliedVolatility,
+                                                                      CreatedAt         = quote.CreatedAt,
+                                                                      ModifiedAt        = quote.ModifiedAt
+                                                                  }));
 
         return await context.SaveChangesAsync() == quotes.Count;
     }
 }
-
-// public static partial class RepositoryExtensions
-// {
-//     public static IIncludableQueryable<Quote, object?> IncludeAll(this DbSet<Quote> set)
-//     {
-//         return set.Include(quote => quote.Security)
-//                   .ThenIncludeAll(quote => quote.Security, nameof(Security.Quotes));
-//     }
-//
-//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Quote?> value,
-//                                                                                  Expression<Func<TEntity, Quote?>> navigationExpression, params string[] excludeProperties)
-//     where TEntity : class
-//     {
-//         IIncludableQueryable<TEntity, object?> query = value;
-//     
-//         if (!excludeProperties.Contains(nameof(Quote.Security)))
-//             query = query.Include(navigationExpression)
-//                          .ThenInclude(quote =>    quote!.Security);
-//     
-//         return query;
-//     }
-//
-//     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, List<Quote>>value,
-//                                                                                  Expression<Func<TEntity, List<Quote>>> navigationExpression, params string[] excludeProperties)
-//     where TEntity : class
-//     {
-//         IIncludableQueryable<TEntity, object?> query = value;
-//
-//         if (!excludeProperties.Contains(nameof(Quote.Security)))
-//             query = query.Include(navigationExpression)
-//                          .ThenInclude(quote =>    quote.Security);
-//
-//         return query;
-//     }
-// }

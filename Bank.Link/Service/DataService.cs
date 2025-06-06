@@ -15,7 +15,7 @@ internal interface IDataService
     CurrencyResponse? GetCurrencyByCode(string code);
 
     TransactionCodeResponse? GetTransactionCodeById(Guid id);
-    
+
     TransactionCodeResponse? GetTransactionCodeByCode(string code);
 
     AccountTypeResponse? GetAccountType(string accountNumber);

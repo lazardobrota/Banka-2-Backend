@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 
 using Bank.Application;
 using Bank.Database;
@@ -91,13 +91,18 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
         services.AddSingleton<DatabaseBackgroundService>();
-        services.AddSingleton<OrderRealtimeProcessor>();
+        services.AddSingleton<ForexPairBackgroundService>();
+        services.AddSingleton<OptionBackgroundService>();
+        services.AddSingleton<StockBackgroundService>();
 
         return services;
     }
 
     public static IServiceCollection AddRealtimeProcessors(this IServiceCollection services)
     {
+        services.AddSingleton<IRealtimeProcessor, InMemoryRealtimeProcessor>();
+        services.AddSingleton<IRealtimeProcessor, PersistentRealtimeProcessor>();
+        services.AddSingleton<IRealtimeProcessor, WebSocketRealtimeProcessor>();
         services.AddSingleton<IRealtimeProcessor, OrderRealtimeProcessor>();
         services.AddSingleton<FakeRealtimeSecurityBackgroundService>();
 

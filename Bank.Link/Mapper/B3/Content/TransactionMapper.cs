@@ -34,7 +34,7 @@ internal static class TransactionMapper
     {
         return JsonContent.Create(request);
     }
-    
+
     internal static HttpContent ToContent(this Request.B3.TransactionNotifyStatusRequest request)
     {
         return JsonContent.Create(request);

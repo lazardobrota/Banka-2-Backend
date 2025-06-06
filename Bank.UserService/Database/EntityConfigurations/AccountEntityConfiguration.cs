@@ -22,7 +22,7 @@ public class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
                .HasMaxLength(9)
                .IsFixedLength()
                .IsRequired();
-        
+
         builder.Property(account => account.Office)
                .HasMaxLength(4)
                .IsFixedLength()

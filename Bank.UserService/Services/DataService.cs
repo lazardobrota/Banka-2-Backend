@@ -110,8 +110,8 @@ public class DataService(
 
         DefaultCurrency = await m_CurrencyRepository.FindByCode(Configuration.Exchange.DefaultCurrencyCode) ?? throw new Exception("Invalid default currency.");
 
-        BankAccount    = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id) ?? throw new Exception("Invalid bank account.");
-        
+        BankAccount = await m_AccountRepository.FindById(Seeder.Account.BankAccount.Id) ?? throw new Exception("Invalid bank account.");
+
         CountryAccount = await m_AccountRepository.FindById(Seeder.Account.CountryAccount.Id) ?? throw new Exception("Invalid country account.");
 
         return true;

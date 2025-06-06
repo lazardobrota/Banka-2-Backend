@@ -72,7 +72,7 @@ internal class B3UserDataLink(BankData bankData, IHttpClientFactory httpClientFa
         var requestData = notifyStatusRequest.ToB3();
 
         var response = await httpClient.PutAsync(domain, requestData.ToContent());
-        
+
         return response.IsSuccessStatusCode;
     }
 }

@@ -2,30 +2,26 @@
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Seeders;
-using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Repositories;
 using Bank.Http.Clients.User;
-
-using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.BackgroundServices;
 
 public class DatabaseBackgroundService(
-    IServiceProvider                          serviceProvider,
-    IHttpClientFactory                        httpClientFactory,
-    IUserServiceHttpClient                    userServiceHttpClient,
-    IHubContext<SecurityHub, ISecurityClient> securityHub
+    IServiceProvider       serviceProvider,
+    IHttpClientFactory     httpClientFactory,
+    IUserServiceHttpClient userServiceHttpClient,
+    IRedisRepository       redisRepository
 )
 {
-    private readonly IServiceProvider                          m_ServiceProvider       = serviceProvider;
-    private readonly IHttpClientFactory                        m_HttpClientFactory     = httpClientFactory;
-    private readonly IUserServiceHttpClient                    m_UserServiceHttpClient = userServiceHttpClient;
-    private readonly IHubContext<SecurityHub, ISecurityClient> m_SecurityHub           = securityHub;
-    private          ISecurityRepository                       m_SecurityRepository    = null!;
-    private          IQuoteRepository                          m_QuoteRepository       = null!;
-    private          Timer?                                    m_SecurityTimer;
-    private          bool                                      m_IsProcessRunning = false;
-    private          int                                       m_IterationCount   = 0;
+    private readonly IServiceProvider       m_ServiceProvider       = serviceProvider;
+    private readonly IHttpClientFactory     m_HttpClientFactory     = httpClientFactory;
+    private readonly IUserServiceHttpClient m_UserServiceHttpClient = userServiceHttpClient;
+    private readonly IRedisRepository       m_RedisRepository       = redisRepository;
+    private          ISecurityRepository    m_SecurityRepository    = null!;
+    private          IQuoteRepository       m_QuoteRepository       = null!;
+    private          bool                   m_IsProcessRunning      = false;
+    private          int                    m_IterationCount        = 0;
 
     private DatabaseContext Context =>
     m_ServiceProvider.CreateScope()
@@ -79,6 +75,8 @@ public class DatabaseBackgroundService(
 
         Console.WriteLine("Wait for 'Seeding Completed' message");
 
+        m_RedisRepository.Clear();
+
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
                .Wait();
 
@@ -98,71 +96,7 @@ public class DatabaseBackgroundService(
                .Wait();
 
         Console.WriteLine("Seeding Completed");
-
-        InitializeTimers();
     }
 
     public void OnApplicationStopped() { }
-
-    public void InitializeTimers()
-    {
-        m_SecurityTimer = new Timer(_ => SecurityTimerCallBack()
-                                    .Wait(), null, TimeSpan.FromMinutes(Configuration.Security.Global.LatestTimeFrameInMinutes),
-                                    TimeSpan.FromMinutes(Configuration.Security.Global.LatestTimeFrameInMinutes));
-    }
-
-    private async Task SecurityTimerCallBack()
-    {
-        if (m_IsProcessRunning)
-            return;
-
-        m_IsProcessRunning = true;
-
-        try
-        {
-            //TODO Add more Alpaca API keys for stocks and options to work at the same time
-            if (m_IterationCount < Configuration.Security.Global.HistoryTimeFrameInMinutes)
-                await FetchStocksLatest();
-            else
-            {
-                Task.WaitAll(FetchOptionLatest(), FetchForexPairLatest());
-            }
-
-            m_IterationCount = (m_IterationCount + 1) % Configuration.Security.Global.HistoryTimeFrameInMinutes;
-        }
-        finally
-        {
-            m_IsProcessRunning = false;
-        }
-    }
-
-    private async Task FetchStocksLatest()
-    {
-        using var scope              = m_ServiceProvider.CreateScope();
-        var       context            = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-        var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
-        var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
-
-        await context.SeedQuoteStocksLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository, m_SecurityHub);
-    }
-
-    private async Task FetchForexPairLatest()
-    {
-        using var scope              = m_ServiceProvider.CreateScope();
-        var       context            = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-        var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
-        var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
-
-        await context.SeedForexPairLatest(m_HttpClientFactory.CreateClient(), m_UserServiceHttpClient, securityRepository, quoteRepository, m_SecurityHub);
-    }
-
-    private async Task FetchOptionLatest()
-    {
-        using var scope              = m_ServiceProvider.CreateScope();
-        var       context            = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-        var       securityRepository = scope.ServiceProvider.GetRequiredService<ISecurityRepository>();
-        var       quoteRepository    = scope.ServiceProvider.GetRequiredService<IQuoteRepository>();
-
-        await context.SeedOptionsLatest(m_HttpClientFactory.CreateClient(), securityRepository, quoteRepository, m_SecurityHub);
-    }
 }

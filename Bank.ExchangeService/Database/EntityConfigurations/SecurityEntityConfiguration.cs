@@ -68,6 +68,6 @@ public class SecurityEntityConfiguration : IEntityTypeConfiguration<Security>
         builder.HasMany(security => security.Quotes)
                .WithOne(quote => quote.Security)
                .HasForeignKey(quote => quote.SecurityId)
-               .OnDelete(DeleteBehavior.Cascade);
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

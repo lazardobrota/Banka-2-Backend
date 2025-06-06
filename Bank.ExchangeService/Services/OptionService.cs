@@ -17,10 +17,11 @@ public interface IOptionService
     Task<Result<OptionDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter);
 }
 
-public class OptionService(ISecurityRepository securityRepository, IUserServiceHttpClient userServiceHttpClient) : IOptionService
+public class OptionService(ISecurityRepository securityRepository, IRedisRepository redisRepository, IUserServiceHttpClient userServiceHttpClient) : IOptionService
 {
     private readonly ISecurityRepository    m_SecurityRepository    = securityRepository;
     private readonly IUserServiceHttpClient m_UserServiceHttpClient = userServiceHttpClient;
+    private readonly IRedisRepository       m_RedisRepository       = redisRepository;
 
     public async Task<Result<Page<OptionSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
@@ -44,6 +45,24 @@ public class OptionService(ISecurityRepository securityRepository, IUserServiceH
 
         if (currencyResponse is null)
             throw new Exception($"No Currency with Id: {security.StockExchange!.CurrencyId}");
+
+        if (filter.Interval == QuoteIntervalType.Day)
+        {
+            var redisQuotes = (await m_RedisRepository.FindAllOptionQuotes(security.Ticker)).Select(redisQuote => redisQuote.ToQuote(security.Id))
+                                                                                            .OrderByDescending(quote => quote.CreatedAt)
+                                                                                            .ToList();
+
+            var lastRedisQuoteDate = redisQuotes.LastOrDefault() == null
+                                     ? DateTime.UtcNow
+                                     : redisQuotes.Last()
+                                                  .CreatedAt;
+
+            var quotesBeforeRedisStarted = security.Quotes.SkipWhile(quote => quote.CreatedAt >= lastRedisQuoteDate)
+                                                   .ToList();
+
+            redisQuotes.AddRange(quotesBeforeRedisStarted);
+            security.Quotes = redisQuotes;
+        }
 
         return Result.Ok(security.ToOption()
                                  .ToResponse(currencyResponse));
