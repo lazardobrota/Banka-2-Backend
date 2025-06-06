@@ -203,6 +203,9 @@ public static class StockExchangeSeederExtension
 {
     public static async Task SeedStockExchanges(this DatabaseContext context)
     {
+        if (context.StockExchanges.Any())
+            return;
+        
         // Only seed IEX in production
         await context.StockExchanges.AddRangeAsync(Seeder.StockExchange.IEX, Seeder.StockExchange.ForexMarket);
         await context.SaveChangesAsync();
@@ -210,6 +213,9 @@ public static class StockExchangeSeederExtension
 
     public static async Task SeedHardcodedStockExchanges(this DatabaseContext context)
     {
+        if (context.StockExchanges.Any())
+            return;
+        
         // Seed all exchanges in development/staging
         await context.StockExchanges.AddRangeAsync(Seeder.StockExchange.Nasdaq, Seeder.StockExchange.IEX, Seeder.StockExchange.ASX, Seeder.StockExchange.EDGADark,
                                                    Seeder.StockExchange.ClearStreet, Seeder.StockExchange.MarexIreland, Seeder.StockExchange.BorsaItaliana,

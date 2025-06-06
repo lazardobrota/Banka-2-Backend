@@ -352,105 +352,110 @@ public static class QuoteSeederExtension
         var lastQuote = context.Quotes.Include(quote => quote.Security)
                                .Where(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.Stock)
                                .OrderByDescending(quote => quote.CreatedAt)
-                               .First();
+                               .FirstOrDefault();
 
         var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
 
-        var symbols = string.Join(",", stocks.Values.Select(stock => stock.Ticker)
-                                             .ToList());
-
-        string? nextPage = null;
-
-        var query = HttpUtility.ParseQueryString(string.Empty);
-        query["symbols"]        = symbols;
-        var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
-
-        var request = new HttpRequestMessage
-                      {
-                          Method     = HttpMethod.Get,
-                          RequestUri = new Uri($"{Configuration.Security.Stock.GetLatest}?{query}"),
-                          Headers =
-                          {
-                              { "accept", "application/json" },
-                              { "APCA-API-KEY-ID", apiKey },
-                              { "APCA-API-SECRET-KEY", apiSecret },
-                          }
-                      };
-
-        var response = await httpClient.SendAsync(request);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
-            return;
-        }
-
-        var bodyLatest = await response.Content.ReadFromJsonAsync<Dictionary<string, FetchStockSnapshotResponse>>();
-
-        if (bodyLatest is null)
-        {
-            Console.WriteLine($"RESULT IS NULL");
-            return;
-        }
-
-        query            = HttpUtility.ParseQueryString(string.Empty);
-        query["symbols"] = symbols;
-
-        query["start"] = hasSeededBefore
-                         ? lastQuote!.CreatedAt.ToUniversalTime()
-                                     .ToString("yyyy-MM-ddTHH:mm:ssZ")
-                         : Configuration.Security.Stock.FromDateTime;
-
-        // query["end"] = Configuration.Security.Stock.ToDateTime;
-
-        query["limit"]     = "10000";
-        query["timeframe"] = $"{Configuration.Security.Global.HistoryTimeFrameInMinutes}Min";
+        var batches = stocks.Values.Select(stock => stock.Ticker)
+                            .ToList()
+                            .Chunk(1000);
 
         var quotes = new List<QuoteModel>();
-
-        do
+        
+        foreach (var batch in batches)
         {
-            if (!string.IsNullOrEmpty(nextPage))
-                query["page_token"] = nextPage;
-            else
-                query.Remove("page_token");
+            var     symbols  = string.Join(",", batch);
+            string? nextPage = null;
 
-            (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["symbols"]        = symbols;
+            var (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
 
-            request = new HttpRequestMessage
-                      {
-                          Method     = HttpMethod.Get,
-                          RequestUri = new Uri($"{Configuration.Security.Stock.GetHistoryApi}?{query}"),
-                          Headers =
+            var request = new HttpRequestMessage
                           {
-                              { "accept", "application/json" },
-                              { "APCA-API-KEY-ID", apiKey },
-                              { "APCA-API-SECRET-KEY", apiSecret },
-                          }
-                      };
+                              Method     = HttpMethod.Get,
+                              RequestUri = new Uri($"{Configuration.Security.Stock.GetLatest}?{query}"),
+                              Headers =
+                              {
+                                  { "accept", "application/json" },
+                                  { "APCA-API-KEY-ID", apiKey },
+                                  { "APCA-API-SECRET-KEY", apiSecret },
+                              }
+                          };
 
-            response = await httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)
-                break;
-
-            var body = await response.Content.ReadFromJsonAsync<FetchStockBarsResponse>();
-
-            if (body is null)
-                break;
-
-            foreach (var pair in body.Bars)
             {
-                if (!bodyLatest.TryGetValue(pair.Key, out var fetchStockSnapshotResponse) || fetchStockSnapshotResponse.LatestQuote is null)
-                    continue;
-
-                var stockId     = stocks[pair.Key].Id;
-                var latestQuote = fetchStockSnapshotResponse.LatestQuote!;
-                quotes.AddRange(pair.Value.Select(bar => bar.ToQuote(stockId, latestQuote.AskSize, latestQuote.BidSize)));
+                Console.WriteLine($"RESPONSE | {response.StatusCode} | {await response.Content.ReadAsStringAsync()}");
+                return;
             }
 
-            nextPage = body.NextPage;
-        } while (!string.IsNullOrEmpty(nextPage));
+            var bodyLatest = await response.Content.ReadFromJsonAsync<Dictionary<string, FetchStockSnapshotResponse>>();
+
+            if (bodyLatest is null)
+            {
+                Console.WriteLine($"RESULT IS NULL");
+                return;
+            }
+
+            query            = HttpUtility.ParseQueryString(string.Empty);
+            query["symbols"] = symbols;
+
+            query["start"] = hasSeededBefore
+                             ? lastQuote!.CreatedAt.ToUniversalTime()
+                                         .ToString("yyyy-MM-ddTHH:mm:ssZ")
+                             : Configuration.Security.Stock.FromDateTime;
+
+            // query["end"] = Configuration.Security.Stock.ToDateTime;
+
+            query["limit"]     = "10000";
+            query["timeframe"] = $"{Configuration.Security.Global.HistoryTimeFrameInMinutes}Min";
+
+            do
+            {
+                if (!string.IsNullOrEmpty(nextPage))
+                    query["page_token"] = nextPage;
+                else
+                    query.Remove("page_token");
+
+                (apiKey, apiSecret) = Configuration.Security.Keys.AlpacaApiKeyAndSecret;
+
+                request = new HttpRequestMessage
+                          {
+                              Method     = HttpMethod.Get,
+                              RequestUri = new Uri($"{Configuration.Security.Stock.GetHistoryApi}?{query}"),
+                              Headers =
+                              {
+                                  { "accept", "application/json" },
+                                  { "APCA-API-KEY-ID", apiKey },
+                                  { "APCA-API-SECRET-KEY", apiSecret },
+                              }
+                          };
+
+                response = await httpClient.SendAsync(request);
+
+                if (!response.IsSuccessStatusCode)
+                    break;
+
+                var body = await response.Content.ReadFromJsonAsync<FetchStockBarsResponse>();
+
+                if (body is null)
+                    break;
+
+                foreach (var pair in body.Bars)
+                {
+                    if (!bodyLatest.TryGetValue(pair.Key, out var fetchStockSnapshotResponse) || fetchStockSnapshotResponse.LatestQuote is null)
+                        continue;
+
+                    var stockId     = stocks[pair.Key].Id;
+                    var latestQuote = fetchStockSnapshotResponse.LatestQuote!;
+                    quotes.AddRange(pair.Value.Select(bar => bar.ToQuote(stockId, latestQuote.AskSize, latestQuote.BidSize)));
+                }
+
+                nextPage = body.NextPage;
+            } while (!string.IsNullOrEmpty(nextPage));
+        }
 
         await quoteRepository.CreateQuotes(quotes);
     }
