@@ -138,7 +138,8 @@ public static class SecurityMapper
                };
     }
 
-    public static SecuritySimpleResponse ToSecuritySimpleResponse(this Security security, CurrencySimpleResponse? stockExchangeCurrency = null, CurrencySimpleResponse? baseCurrency = null, CurrencySimpleResponse? quoteCurrency = null)
+    public static SecuritySimpleResponse ToSecuritySimpleResponse(this Security           security,            CurrencySimpleResponse? stockExchangeCurrency = null,
+                                                                  CurrencySimpleResponse? baseCurrency = null, CurrencySimpleResponse? quoteCurrency         = null)
     {
         return new SecuritySimpleResponse
                {

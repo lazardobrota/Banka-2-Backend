@@ -1,10 +1,5 @@
-﻿using System.Linq.Expressions;
-
-using Bank.Database.Core;
+﻿using Bank.Database.Core;
 using Bank.ExchangeService.Models;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 using DatabaseContext = Bank.ExchangeService.Database.DatabaseContext;
 

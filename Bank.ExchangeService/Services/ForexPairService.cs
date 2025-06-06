@@ -23,7 +23,7 @@ public class ForexPairService(ISecurityRepository securityRepository, IUserServi
 {
     private readonly ISecurityRepository    m_SecurityRepository    = securityRepository;
     private readonly IUserServiceHttpClient m_UserServiceHttpClient = userServiceHttpClient;
-    private readonly IRedisRepository       m_RedisRepository         = redisRepository;
+    private readonly IRedisRepository       m_RedisRepository       = redisRepository;
 
     public async Task<Result<Page<ForexPairSimpleResponse>>> GetAll(QuoteFilterQuery quoteFilterQuery, Pageable pageable)
     {
@@ -70,17 +70,24 @@ public class ForexPairService(ISecurityRepository securityRepository, IUserServi
 
         if (filter.Interval == QuoteIntervalType.Day)
         {
-            var redisQuotes = (await m_RedisRepository.FindAllStockQuotes(security.Ticker)).Select(redisQuote => redisQuote.ToQuote(security.Id))
-                                                                                           .OrderByDescending(quote => quote.CreatedAt)
-                                                                                           .ToList();
+            var redisQuotes = (await m_RedisRepository.FindAllForexPairQuotes(security.Ticker)).Select(redisQuote => redisQuote.ToQuote(security.Id))
+                                                                                               .OrderByDescending(quote => quote.CreatedAt)
+                                                                                               .ToList();
 
-            var lastRedisQuotesDate = redisQuotes.LastOrDefault() == null ? DateTime.UtcNow : redisQuotes.Last().CreatedAt;
-            redisQuotes.AddRange( security.Quotes.SkipWhile(quote => quote.CreatedAt >= lastRedisQuotesDate));
+            var lastRedisQuoteDate = redisQuotes.LastOrDefault() == null
+                                     ? DateTime.UtcNow
+                                     : redisQuotes.Last()
+                                                  .CreatedAt;
+
+            var quotesBeforeRedisStarted = security.Quotes.SkipWhile(quote => quote.CreatedAt >= lastRedisQuoteDate)
+                                                   .ToList();
+
+            redisQuotes.AddRange(quotesBeforeRedisStarted);
             security.Quotes = redisQuotes;
         }
 
         return Result.Ok(security.ToForexPair()
-                                  .ToResponse(currencyResponse, currencyBaseResponse, currencyQuoteResponse));
+                                 .ToResponse(currencyResponse, currencyBaseResponse, currencyQuoteResponse));
     }
 
     public async Task<Result<ForexPairDailyResponse>> GetOneDaily(Guid id, QuoteFilterIntervalQuery filter)

@@ -224,7 +224,7 @@ public static class QuoteMapper
                    ContractCount     = quote.ContractCount
                };
     }
-    
+
     public static RedisQuote MapKey(this RedisQuote quote, string? key)
     {
         if (key is null)
@@ -239,9 +239,12 @@ public static class QuoteMapper
                                  "s" => SecurityType.Stock,
                                  _   => throw new ArgumentOutOfRangeException()
                              };
-        
-        quote.Ticker = key[1].ToString();
-        quote.Time   = DateTime.UtcNow.Date.AddSeconds(keySplit[2].DecodeBase64ToInt());
+
+        quote.Ticker = key[1]
+        .ToString();
+
+        quote.Time = DateTime.UtcNow.Date.AddSeconds(keySplit[2]
+                                                     .DecodeBase64ToInt());
 
         return quote;
     }

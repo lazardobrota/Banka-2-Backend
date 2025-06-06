@@ -53,8 +53,16 @@ public class StockService(ISecurityRepository securityRepository, IUserServiceHt
             var redisQuotes = (await m_RedisRepository.FindAllStockQuotes(security.Ticker)).Select(redisQuote => redisQuote.ToQuote(security.Id))
                                                                                            .OrderByDescending(quote => quote.CreatedAt)
                                                                                            .ToList();
-            
-            redisQuotes.AddRange( security.Quotes.SkipWhile(quote => quote.CreatedAt >= redisQuotes.Last().CreatedAt));
+
+            var lastRedisQuoteDate = redisQuotes.LastOrDefault() == null
+                                     ? DateTime.UtcNow
+                                     : redisQuotes.Last()
+                                                  .CreatedAt;
+
+            var quotesBeforeRedisStarted = security.Quotes.SkipWhile(quote => quote.CreatedAt >= lastRedisQuoteDate)
+                                                   .ToList();
+
+            redisQuotes.AddRange(quotesBeforeRedisStarted);
             security.Quotes = redisQuotes;
         }
 

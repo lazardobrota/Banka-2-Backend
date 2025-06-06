@@ -15,7 +15,7 @@ public class WebSocketRealtimeProcessor(IHubContext<SecurityHub, ISecurityClient
         foreach (var quote in quotes)
         {
             var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse();
-            
+
             await m_SecurityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
                                .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
         }
@@ -26,7 +26,7 @@ public class WebSocketRealtimeProcessor(IHubContext<SecurityHub, ISecurityClient
         foreach (var quote in quotes)
         {
             var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse();
-            
+
             await m_SecurityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
                                .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
         }
@@ -37,7 +37,7 @@ public class WebSocketRealtimeProcessor(IHubContext<SecurityHub, ISecurityClient
         foreach (var quote in quotes)
         {
             var quoteLatestSimpleResponse = quote.ToLatestSimpleResponse();
-            
+
             await m_SecurityHub.Clients.Group(quoteLatestSimpleResponse.SecurityTicker)
                                .ReceiveSecurityUpdate(quoteLatestSimpleResponse);
         }

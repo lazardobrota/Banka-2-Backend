@@ -50,7 +50,7 @@ public class RedisOrder
 
     [Key(6)]
     public required Direction Direction { set; get; }
-    
+
     [Key(7)]
     public required bool AllOrNone { set; get; }
 }

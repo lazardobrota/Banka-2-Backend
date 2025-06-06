@@ -21,9 +21,9 @@ public static partial class Endpoints
         public const string Base      = $"{ApiBase}/stock";
         public const string BaseDaily = $"{Base}/daily";
 
-        public const string GetAll       = $"{Base}";
-        public const string GetOne       = $"{Base}/{{id:guid}}";
-        public const string GetOneDaily  = $"{BaseDaily}/{{id:guid}}";
+        public const string GetAll      = $"{Base}";
+        public const string GetOne      = $"{Base}/{{id:guid}}";
+        public const string GetOneDaily = $"{BaseDaily}/{{id:guid}}";
     }
 
     public static class ForexPair

@@ -2,24 +2,26 @@
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database;
 using Bank.ExchangeService.Database.Seeders;
-using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Repositories;
 using Bank.Http.Clients.User;
 
-using Microsoft.AspNetCore.SignalR;
-
 namespace Bank.ExchangeService.BackgroundServices;
 
-public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpClientFactory httpClientFactory, IUserServiceHttpClient userServiceHttpClient)
+public class DatabaseBackgroundService(
+    IServiceProvider       serviceProvider,
+    IHttpClientFactory     httpClientFactory,
+    IUserServiceHttpClient userServiceHttpClient,
+    IRedisRepository       redisRepository
+)
 {
     private readonly IServiceProvider       m_ServiceProvider       = serviceProvider;
     private readonly IHttpClientFactory     m_HttpClientFactory     = httpClientFactory;
     private readonly IUserServiceHttpClient m_UserServiceHttpClient = userServiceHttpClient;
+    private readonly IRedisRepository       m_RedisRepository       = redisRepository;
     private          ISecurityRepository    m_SecurityRepository    = null!;
     private          IQuoteRepository       m_QuoteRepository       = null!;
-    private          Timer?                 m_SecurityTimer;
-    private          bool                   m_IsProcessRunning = false;
-    private          int                    m_IterationCount   = 0;
+    private          bool                   m_IsProcessRunning      = false;
+    private          int                    m_IterationCount        = 0;
 
     private DatabaseContext Context =>
     m_ServiceProvider.CreateScope()
@@ -63,6 +65,8 @@ public class DatabaseBackgroundService(IServiceProvider serviceProvider, IHttpCl
         }
 
         Console.WriteLine("Wait for 'Seeding Completed' message");
+
+        m_RedisRepository.Clear();
 
         Context.SeedFutureContractsAndQuotes(m_SecurityRepository, m_QuoteRepository)
                .Wait();

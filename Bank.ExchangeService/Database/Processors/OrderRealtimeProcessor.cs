@@ -33,7 +33,7 @@ public class OrderRealtimeProcessor(IRedisRepository redisRepository, IUserServi
     public async Task ProcessStockQuotes(List<Quote> quotes)
     {
         var stockOrders = await m_RedisRepository.FindAllStockOrders();
-        
+
         var orderQuoteList = quotes.GroupJoin(stockOrders, quote => quote.Security!.Ticker, order => order.Ticker, (quote, orders) => new { quote, orders })
                                    .SelectMany(group => group.orders.Select(order => new { group.quote, order }))
                                    .Where(pair => pair.order.OrderType is not OrderType.Market || pair.order.Direction is not Direction.Buy  || true)
@@ -80,7 +80,7 @@ public class OrderRealtimeProcessor(IRedisRepository redisRepository, IUserServi
             var buyOrders = orders.Where(order => order.Direction is Direction.Buy)
                                   .ToList();
 
-            for (int index = 0; index < buyOrders.Count; index ++)
+            for (int index = 0; index < buyOrders.Count; index++)
             {
                 currentOrder = buyOrders[index];
 
@@ -102,7 +102,7 @@ public class OrderRealtimeProcessor(IRedisRepository redisRepository, IUserServi
     public async Task ProcessForexQuotes(List<Quote> quotes) //TODO: check for values
     {
         var stockOrders = await m_RedisRepository.FindAllStockOrders();
-        
+
         var orderQuoteList = quotes.GroupJoin(stockOrders, quote => quote.Security!.Ticker, order => order.Ticker, (quote, orders) => new { quote, orders })
                                    .SelectMany(group => group.orders.Select(order => new { group.quote, order }))
                                    .Where(pair => pair.order.OrderType is not OrderType.Market || pair.order.Direction is not Direction.Buy  || true)
@@ -149,7 +149,7 @@ public class OrderRealtimeProcessor(IRedisRepository redisRepository, IUserServi
             var buyOrders = orders.Where(order => order.Direction is Direction.Buy)
                                   .ToList();
 
-            for (int index = 0; index < buyOrders.Count; index ++)
+            for (int index = 0; index < buyOrders.Count; index++)
             {
                 currentOrder = buyOrders[index];
 

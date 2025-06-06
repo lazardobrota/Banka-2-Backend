@@ -21,7 +21,7 @@ public interface IAuthorizationService
     public string RegenerateToken();
 
     public string ConfirmationCode();
-    
+
     public string GenerateTokenFor(Guid userId, Permissions permissions);
 
     public bool IsConfirmationCodeValid(string? confirmationCode);
@@ -82,7 +82,7 @@ internal class AuthorizationService : IAuthorizationService
 
         return totp.VerifyTotp(DateTime.UtcNow, confirmationCode, out _);
     }
-    
+
     public string ConfirmationCode()
     {
         var totp = new Totp(UserId.ToByteArray(), mode: OtpHashMode.Sha256, timeCorrection: TimeCorrection.UncorrectedInstance);

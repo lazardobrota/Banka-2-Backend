@@ -8,7 +8,6 @@ using Bank.ExchangeService.Database.Processors;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
-using Bank.Http.Clients.User;
 
 namespace Bank.ExchangeService.BackgroundServices;
 

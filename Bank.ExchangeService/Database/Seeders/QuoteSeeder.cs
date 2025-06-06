@@ -1,15 +1,12 @@
-﻿using System.Globalization;
-using System.Web;
+﻿using System.Web;
 
 using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
-using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
 
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bank.ExchangeService.Database.Seeders;
@@ -351,15 +348,13 @@ public static class QuoteSeederExtension
     public static async Task SeedStockQuotes(this DatabaseContext context, HttpClient httpClient, ISecurityRepository securityRepository, IQuoteRepository quoteRepository)
     {
         bool hasSeededBefore = context.Quotes.Any(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.Stock);
-        
+
         var lastQuote = context.Quotes.Include(quote => quote.Security)
                                .Where(quote => quote.Security != null && quote.Security.SecurityType == SecurityType.Stock)
                                .OrderByDescending(quote => quote.CreatedAt)
                                .First();
 
         var stocks = (await securityRepository.FindAll(SecurityType.Stock)).ToDictionary(stock => stock.Ticker, stock => stock);
-
-        
 
         var symbols = string.Join(",", stocks.Values.Select(stock => stock.Ticker)
                                              .ToList());
@@ -401,7 +396,10 @@ public static class QuoteSeederExtension
         query            = HttpUtility.ParseQueryString(string.Empty);
         query["symbols"] = symbols;
 
-        query["start"] = hasSeededBefore ? lastQuote!.CreatedAt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ") : Configuration.Security.Stock.FromDateTime;
+        query["start"] = hasSeededBefore
+                         ? lastQuote!.CreatedAt.ToUniversalTime()
+                                     .ToString("yyyy-MM-ddTHH:mm:ssZ")
+                         : Configuration.Security.Stock.FromDateTime;
 
         // query["end"] = Configuration.Security.Stock.ToDateTime;
 

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 
+using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
 
@@ -15,31 +16,31 @@ public class PersistentRealtimeProcessor(IQuoteRepository quoteRepository) : IRe
 
     public async Task ProcessStockQuotes(List<Quote> quotes)
     {
-        if (m_StockTimer.Elapsed.Seconds < 15 * 60) //TODO: change to Configuration
+        if (m_StockTimer.Elapsed.Seconds < Configuration.Security.Global.HistoryTimeFrameInMinutes * 60)
             return;
-        
+
         m_StockTimer.Restart();
-        
+
         await m_QuoteRepository.CreateQuotes(quotes);
     }
 
     public async Task ProcessForexQuotes(List<Quote> quotes)
     {
-        if (m_ForexTimer.Elapsed.Seconds < 15 * 60) //TODO: change to Configuration
+        if (m_ForexTimer.Elapsed.Seconds < Configuration.Security.Global.HistoryTimeFrameInMinutes * 60)
             return;
-        
+
         m_ForexTimer.Restart();
-        
+
         await m_QuoteRepository.CreateQuotes(quotes);
     }
 
     public async Task ProcessOptionQuotes(List<Quote> quotes)
     {
-        if (m_OptionTimer.Elapsed.Seconds < 15 * 60) //TODO: change to Configuration
+        if (m_OptionTimer.Elapsed.Seconds < Configuration.Security.Global.HistoryTimeFrameInMinutes * 60)
             return;
-        
+
         m_OptionTimer.Restart();
-        
+
         await m_QuoteRepository.CreateQuotes(quotes);
     }
 }

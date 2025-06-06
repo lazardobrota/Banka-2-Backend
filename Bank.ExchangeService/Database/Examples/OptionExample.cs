@@ -27,9 +27,9 @@ public static partial class Example
                                                              CreatedAt                    = DateTime.UtcNow,
                                                              ModifiedAt                   = DateTime.UtcNow,
                                                              StockExchange                = null!,
-                                                             Quotes = [],
-                                                             AskSize = 50,
-                                                             BidSize = 150,
+                                                             Quotes                       = [],
+                                                             AskSize                      = 50,
+                                                             BidSize                      = 150,
                                                              ContractCount                = 1
                                                          };
 
@@ -77,7 +77,6 @@ public static partial class Example
                                                                        ModifiedAt                   = DateTime.UtcNow,
                                                                        StockExchange                = null!,
                                                                        Quotes                       = [],
-                                                                       
                                                                    };
     }
 }

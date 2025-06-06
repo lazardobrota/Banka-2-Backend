@@ -362,11 +362,12 @@ public static class UserMapper
                    Address                    = response.Client.Address,
                    Role                       = response.Client.Role,
                    Permissions                = new Permissions(response.Client.Permissions),
-                   BankId                     = Seeder.Bank.All.First(bank => bank.Code == response.AccountNumber[..3]).Id,
-                   CreatedAt                  = DateTime.UtcNow,
-                   ModifiedAt                 = DateTime.UtcNow,
-                   Employed                   = null,
-                   Activated                  = false
+                   BankId = Seeder.Bank.All.First(bank => bank.Code == response.AccountNumber[..3])
+                                  .Id,
+                   CreatedAt  = DateTime.UtcNow,
+                   ModifiedAt = DateTime.UtcNow,
+                   Employed   = null,
+                   Activated  = false
                };
     }
 }

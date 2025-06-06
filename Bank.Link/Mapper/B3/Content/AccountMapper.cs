@@ -30,7 +30,7 @@ internal static class AccountMapper
                    ModifiedAt        = DateTime.UtcNow
                };
     }
-    
+
     internal static ClientResponse ToNative(this Response.B3.AccountClientResponse response)
     {
         return new ClientResponse
@@ -52,7 +52,7 @@ internal static class AccountMapper
                    Activated                  = false
                };
     }
-    
+
     internal static ClientSimpleResponse ToSimpleNative(this Response.B3.AccountClientResponse response)
     {
         return new ClientSimpleResponse

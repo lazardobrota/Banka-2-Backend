@@ -1,7 +1,5 @@
 ﻿using System.Collections.Immutable;
 
-using Bank.Link.Configurations;
-
 using Configuration = Bank.UserService.Configurations.Configuration;
 
 namespace Bank.UserService.Database.Seeders;
@@ -17,7 +15,7 @@ public static partial class Seeder
                                                       Id         = Guid.Parse("d5b232ec-03a6-4b78-9479-6300787c2a0b"),
                                                       Name       = "Bank 1",
                                                       Code       = "111",
-                                                      BaseUrl    = Configuration.ExternalBank.Bank1BaseUrl, 
+                                                      BaseUrl    = Configuration.ExternalBank.Bank1BaseUrl,
                                                       CreatedAt  = DateTime.UtcNow,
                                                       ModifiedAt = DateTime.UtcNow
                                                   };

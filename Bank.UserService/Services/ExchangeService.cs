@@ -123,18 +123,18 @@ public class ExchangeService(
 
         if (account is null || fromCurrency is null || toCurrency is null || transactionCode is null || exchangeDetails is null)
             return Result.BadRequest<ExchangeResponse>("Invalid data.");
-        
+
         await TransactionService.PrepareInternalTransaction(new PrepareInternalTransaction
                                                             {
-                                                                FromAccount       = account,
-                                                                FromCurrency      = fromCurrency,
-                                                                ToAccount         = account,
-                                                                ToCurrency        = toCurrency,
-                                                                Amount            = exchangeMakeExchangeRequest.Amount,
-                                                                ExchangeDetails   = exchangeDetails,
-                                                                TransactionCode   = transactionCode,
-                                                                ReferenceNumber   = null,
-                                                                Purpose           = "Currency Exchange"
+                                                                FromAccount     = account,
+                                                                FromCurrency    = fromCurrency,
+                                                                ToAccount       = account,
+                                                                ToCurrency      = toCurrency,
+                                                                Amount          = exchangeMakeExchangeRequest.Amount,
+                                                                ExchangeDetails = exchangeDetails,
+                                                                TransactionCode = transactionCode,
+                                                                ReferenceNumber = null,
+                                                                Purpose         = "Currency Exchange"
                                                             });
 
         return Result.Ok<ExchangeResponse>();

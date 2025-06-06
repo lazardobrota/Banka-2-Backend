@@ -98,7 +98,7 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-    
+
     public static IServiceCollection AddRealtimeProcessors(this IServiceCollection services)
     {
         services.AddSingleton<IRealtimeProcessor, InMemoryRealtimeProcessor>();

@@ -4,12 +4,9 @@ using System.Web;
 using Bank.Application.Domain;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
-using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
-
-using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
@@ -109,7 +106,7 @@ public static class OptionSeederExtension
         var stocks = (await securityRepository.FindAll(SecurityType.Stock)).Where(stock => s_StockOptions.Contains(stock.Ticker))
                                                                            .Select(security => security.ToStock())
                                                                            .ToList();
-        
+
         var     toDate     = Configuration.Security.Option.ToDateTime;
         string? nextPage   = null;
         var     securities = new List<SecurityModel>();
@@ -141,6 +138,7 @@ public static class OptionSeederExtension
                                       { "APCA-API-SECRET-KEY", apiSecret },
                                   },
                               };
+
                 using var response = await httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)

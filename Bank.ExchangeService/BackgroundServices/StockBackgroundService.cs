@@ -5,13 +5,10 @@ using Bank.Application.Extensions;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
 using Bank.ExchangeService.Database.Processors;
-using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
 using Bank.Http.Clients.User;
-
-using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.BackgroundServices;
 

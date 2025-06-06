@@ -45,7 +45,6 @@ public static partial class Example
                                                             AskSize                      = 24,
                                                             BidSize                      = 13,
                                                             ContractCount                = 1
-
                                                         };
 
         public static readonly StockDailyResponse DailyResponse = new()

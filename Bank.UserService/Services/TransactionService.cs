@@ -141,7 +141,7 @@ public class TransactionService(
         var authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
         // if (authorizationService.Permissions != Permission.Bank && !authorizationService.IsConfirmationCodeValid(createTransaction.ConfirmationCode))
-            // return Result.BadRequest<Transaction>("Invalid confirmation code");
+        // return Result.BadRequest<Transaction>("Invalid confirmation code");
 
         if (createTransaction.FromAccountNumber == null && createTransaction.ToAccountNumber == null)
             return Result.BadRequest<Transaction>("No valid account provided.");
@@ -353,7 +353,7 @@ public class TransactionService(
 
         if (result is false)
             return Result.BadRequest<Transaction>("External bank account does not exist.");
-        
+
         var transaction = prepareTransaction.ToTransaction();
 
         await m_TransactionRepository.Add(transaction);

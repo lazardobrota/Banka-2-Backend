@@ -15,7 +15,7 @@ internal static partial class Request
             public          long    CallbackId            { set; get; }
             public          string? ExternalTransactionId { set; get; }
         }
-        
+
         internal class TransactionNotifyStatusRequest
         {
             public required bool Success { set; get; }

@@ -10,7 +10,7 @@ namespace Bank.ExchangeService.Controllers;
 public class SecurityController(ISecurityService securityService) : ControllerBase
 {
     private readonly ISecurityService m_SecurityService = securityService;
-    
+
     [HttpGet(Endpoints.Security.GetOneSimple)]
     public async Task<ActionResult<SecuritySimpleResponse>> GetOneSimple([FromRoute] Guid id)
     {

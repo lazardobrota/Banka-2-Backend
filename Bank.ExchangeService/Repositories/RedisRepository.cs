@@ -44,6 +44,8 @@ public interface IRedisRepository
     Task<RedisQuote?> FindLatestOptionQuote(string ticker);
 
     Task<List<RedisKey>> FindAllKeys(RedisValue pattern);
+
+    Task Clear();
 }
 
 public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRedisRepository
@@ -146,7 +148,8 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
                                                                     {
                                                                         string keyHex = $"s:{quote.Security!.Ticker}:{((int)timeSinceMidnight.TotalSeconds).EncodeToBase64()}";
 
-                                                                        tasks.Add(redisBatch.StringSetAsync(keyHex, MessagePackSerializer.Serialize(quote.ToRedis())));
+                                                                        tasks.Add(redisBatch.StringSetAsync(keyHex, MessagePackSerializer.Serialize(quote.ToRedis()),
+                                                                                                            TimeSpan.FromDays(1)));
                                                                     }
 
                                                                     redisBatch.Execute();
@@ -173,7 +176,8 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
                                                                     {
                                                                         string keyHex = $"f:{quote.Security!.Ticker}:{((int)timeSinceMidnight.TotalSeconds).EncodeToBase64()}";
 
-                                                                        tasks.Add(redisBatch.StringSetAsync(keyHex, MessagePackSerializer.Serialize(quote.ToRedis())));
+                                                                        tasks.Add(redisBatch.StringSetAsync(keyHex, MessagePackSerializer.Serialize(quote.ToRedis()),
+                                                                                                            TimeSpan.FromDays(1)));
                                                                     }
 
                                                                     redisBatch.Execute();
@@ -198,9 +202,9 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
                                                                     foreach (var quote in batch)
                                                                     {
                                                                         string keyHex = $"o:{quote.Security!.Ticker}:{((int)timeSinceMidnight.TotalSeconds).EncodeToBase64()}";
-                                                                        Console.WriteLine($"--- Redis | Option | Key: {keyHex} | Time: {((int)timeSinceMidnight.TotalSeconds)}");
 
-                                                                        tasks.Add(redisBatch.StringSetAsync(keyHex, MessagePackSerializer.Serialize(quote.ToRedis())));
+                                                                        tasks.Add(redisBatch.StringSetAsync(keyHex, MessagePackSerializer.Serialize(quote.ToRedis()),
+                                                                                                            TimeSpan.FromDays(1)));
                                                                     }
 
                                                                     redisBatch.Execute();
@@ -220,7 +224,8 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
         return redisValues.Zip(keys, (value, key) => (key, value))
                           .AsParallel()
                           .WithDegreeOfParallelism(4)
-                          .Select(redisValue => MessagePackSerializer.Deserialize<RedisQuote>(redisValue.value).MapKey(redisValue.key))
+                          .Select(redisValue => MessagePackSerializer.Deserialize<RedisQuote>(redisValue.value)
+                                                                     .MapKey(redisValue.key))
                           .ToList();
     }
 
@@ -233,7 +238,8 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
         return redisValues.Zip(keys, (value, key) => (key, value))
                           .AsParallel()
                           .WithDegreeOfParallelism(4)
-                          .Select(redisValue => MessagePackSerializer.Deserialize<RedisQuote>(redisValue.value).MapKey(redisValue.key))
+                          .Select(redisValue => MessagePackSerializer.Deserialize<RedisQuote>(redisValue.value)
+                                                                     .MapKey(redisValue.key))
                           .ToList();
     }
 
@@ -246,7 +252,8 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
         return redisValues.Zip(keys, (value, key) => (key, value))
                           .AsParallel()
                           .WithDegreeOfParallelism(4)
-                          .Select(redisValue => MessagePackSerializer.Deserialize<RedisQuote>(redisValue.value).MapKey(redisValue.key))
+                          .Select(redisValue => MessagePackSerializer.Deserialize<RedisQuote>(redisValue.value)
+                                                                     .MapKey(redisValue.key))
                           .ToList();
     }
 
@@ -323,5 +330,10 @@ public class RedisRepository(IConnectionMultiplexer connectionMultiplexer) : IRe
         } while (curcor is not 0);
 
         return keys;
+    }
+
+    public async Task Clear()
+    {
+        await m_RedisServer.ExecuteAsync("flushdb");
     }
 }

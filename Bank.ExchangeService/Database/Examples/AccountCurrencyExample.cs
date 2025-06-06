@@ -6,7 +6,6 @@ public static partial class Example
 {
     public static class AccountCurrency
     {
-
         public static readonly AccountCurrencyResponse Response = new()
                                                                   {
                                                                       Id               = Guid.Parse("d4e5f6a7-b8c9-40d1-a2b3-c4d5e6f78901"),

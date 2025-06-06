@@ -16,9 +16,9 @@ public static partial class Configuration
 
         public static class Stock
         {
-            public const string GetAllApi       = "https://paper-api.alpaca.markets/v2/assets";
-            public const string GetHistoryApi   = "https://data.alpaca.markets/v2/stocks/bars";
-            public const string GetLatest       = "https://data.alpaca.markets/v2/stocks/snapshots";
+            public const string GetAllApi     = "https://paper-api.alpaca.markets/v2/assets";
+            public const string GetHistoryApi = "https://data.alpaca.markets/v2/stocks/bars";
+            public const string GetLatest     = "https://data.alpaca.markets/v2/stocks/snapshots";
 
             public static readonly string FromDateTime = EnvironmentUtilities.GetStringVariable("BANK_EXCHANGE_SECURITY_STOCK_FROM_DATE");
 

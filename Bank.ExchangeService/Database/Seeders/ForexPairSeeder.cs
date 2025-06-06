@@ -6,13 +6,10 @@ using Bank.Application.Domain;
 using Bank.Application.Queries;
 using Bank.Application.Responses;
 using Bank.ExchangeService.Configurations;
-using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.Mappers;
 using Bank.ExchangeService.Models;
 using Bank.ExchangeService.Repositories;
 using Bank.Http.Clients.User;
-
-using Microsoft.AspNetCore.SignalR;
 
 namespace Bank.ExchangeService.Database.Seeders;
 
@@ -175,9 +172,11 @@ public static class ForexPairSeederExtension
         var forexPairs         = (await securityRepository.FindAll(SecurityType.ForexPair)).ToList();
         var tickerAndForexPair = forexPairs.ToDictionary(forexPair => forexPair.Ticker, forexPair => forexPair);
 
-        var fromDate = hasSeededBefore ? forexPairs.First()
-                                 .CreatedAt : DateTime.MinValue;
-        
+        var fromDate = hasSeededBefore
+                       ? forexPairs.First()
+                                   .CreatedAt
+                       : DateTime.MinValue;
+
         var currencies = await userServiceHttpClient.GetAllSimpleCurrencies(new CurrencyFilterQuery());
 
         if (currencies.Count == 0)
@@ -186,11 +185,11 @@ public static class ForexPairSeederExtension
         var apiKey = Configuration.Security.Keys.ApiKeyForex;
         var quotes = new List<Quote>();
 
-        var     query    = HttpUtility.ParseQueryString(string.Empty);
+        var query = HttpUtility.ParseQueryString(string.Empty);
         query["function"]   = "FX_DAILY";
         query["outputsize"] = hasSeededBefore ? "compact" : "full";
         query["apikey"]     = apiKey;
-        
+
         foreach (var currencyFrom in currencies)
         {
             foreach (var currencyTo in currencies)
@@ -199,11 +198,11 @@ public static class ForexPairSeederExtension
                     continue;
 
                 query["from_symbol"] = $"{currencyFrom.Code}";
-                query["to_symbol"] = $"{currencyTo.Code}";
-                
+                query["to_symbol"]   = $"{currencyTo.Code}";
+
                 var request = new HttpRequestMessage
                               {
-                                  Method = HttpMethod.Get,
+                                  Method     = HttpMethod.Get,
                                   RequestUri = new Uri($"{Configuration.Security.ForexPair.GetDataApi}?{query}"),
                                   Headers =
                                   {
@@ -227,13 +226,13 @@ public static class ForexPairSeederExtension
 
                 if (!tickerAndForexPair.TryGetValue($"{currencyFrom.Code}{currencyTo.Code}", out var forexPair))
                     continue;
-                
+
                 foreach (var pair in body.Quotes)
                 {
                     var date = DateTime.ParseExact(pair.Key, "yyyy-MM-dd", CultureInfo.InvariantCulture)
                                        .ToUniversalTime()
                                        .AddHours(2);
-                    
+
                     if (hasSeededBefore && date < fromDate)
                         continue;
 
