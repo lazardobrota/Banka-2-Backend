@@ -63,6 +63,23 @@ public static class TransactionMapper
                };
     }
 
+    public static PrepareSecurityAccountTransaction ToPrepareSecurityFromAccountTransaction(this TransactionCreateRequest createRequest, TransactionCode transactionCode,
+                                                                                            Account?                      account, Currency? fromCurrency, Currency? toCurrency,
+                                                                                            ExchangeDetails?              exchangeDetails)
+    {
+        return new PrepareSecurityAccountTransaction
+               {
+                   Account         = account,
+                   FromCurrency    = fromCurrency,
+                   ToCurrency      = toCurrency,
+                   TransactionCode = transactionCode,
+                   ExchangeDetails = exchangeDetails,
+                   Amount          = createRequest.Amount,
+                   Purpose         = createRequest.Purpose,
+                   Profit          = createRequest.Profit
+               };
+    }
+
     public static PrepareToAccountTransaction ToPrepareToAccountTransaction(this TransactionCreateRequest createRequest, TransactionCode transactionCode, Account? account,
                                                                             Currency?                     currency)
     {
@@ -87,6 +104,23 @@ public static class TransactionMapper
                    TransactionCode = transactionCode,
                    Amount          = createRequest.Amount,
                    Purpose         = createRequest.Purpose
+               };
+    }
+
+    public static PrepareSecurityAccountTransaction ToPrepareSecurityToAccountTransaction(this TransactionCreateRequest createRequest, TransactionCode transactionCode,
+                                                                                          Account?                      account,       Currency? fromCurrency, Currency? toCurrency,
+                                                                                          ExchangeDetails?              exchangeDetails)
+    {
+        return new PrepareSecurityAccountTransaction
+               {
+                   Account         = account,
+                   FromCurrency    = fromCurrency,
+                   ToCurrency      = toCurrency,
+                   TransactionCode = transactionCode,
+                   ExchangeDetails = exchangeDetails,
+                   Amount          = createRequest.Amount,
+                   Purpose         = createRequest.Purpose,
+                   Profit          = createRequest.Profit
                };
     }
 
@@ -193,6 +227,26 @@ public static class TransactionMapper
                    Purpose      = toAccountTransaction.Purpose,
                    CreatedAt    = DateTime.UtcNow,
                    ModifiedAt   = DateTime.UtcNow
+               };
+    }
+
+    public static Transaction ToTransaction(this PrepareSecurityAccountTransaction securityAccountTransaction, bool isFromAccount)
+    {
+        return new Transaction
+               {
+                   Id             = Guid.NewGuid(),
+                   ToAccountId    = isFromAccount is not true ? securityAccountTransaction.Account!.Id : null,
+                   ToCurrencyId   = securityAccountTransaction.ToCurrency!.Id,
+                   ToAmount       = isFromAccount is not true ? securityAccountTransaction.Amount * securityAccountTransaction!.ExchangeDetails!.InverseAverageRate : 0,
+                   FromAccountId  = isFromAccount is not false ? securityAccountTransaction.Account!.Id : null,
+                   FromCurrencyId = securityAccountTransaction.FromCurrency!.Id,
+                   FromAmount     = isFromAccount is not false ? securityAccountTransaction.Amount * securityAccountTransaction!.ExchangeDetails!.AverageRate : 0,
+                   CodeId         = securityAccountTransaction.TransactionCode.Id,
+                   TaxAmount      = Math.Max(securityAccountTransaction.Profit  * securityAccountTransaction!.ExchangeDetails!.InverseAverageRate * 0.15m, 0),
+                   Status         = TransactionStatus.Pending,
+                   Purpose        = securityAccountTransaction.Purpose,
+                   CreatedAt      = DateTime.UtcNow,
+                   ModifiedAt     = DateTime.UtcNow
                };
     }
 
@@ -304,6 +358,23 @@ public static class TransactionMapper
                    ToAmount       = toAccountTransaction.Amount,
                    FromBankAmount = 0,
                    IsDirect       = true
+               };
+    }
+
+    public static ProcessTransaction ToProcessTransaction(this PrepareSecurityAccountTransaction securityAccountTransaction, Guid transactionId, bool isFromAccount)
+    {
+        return new ProcessTransaction
+               {
+                   TransactionId  = transactionId,
+                   ToAccountId    = isFromAccount is not true ? securityAccountTransaction.Account!.Id : Guid.Empty,
+                   ToCurrencyId   = securityAccountTransaction.ToCurrency!.Id,
+                   ToAmount       = isFromAccount is not true ? securityAccountTransaction.Amount * securityAccountTransaction!.ExchangeDetails!.InverseAverageRate : 0,
+                   FromAccountId  = isFromAccount is not false ? securityAccountTransaction.Account!.Id : Guid.Empty,
+                   FromCurrencyId = securityAccountTransaction.FromCurrency!.Id,
+                   FromAmount     = isFromAccount is not false ? securityAccountTransaction.Amount * securityAccountTransaction!.ExchangeDetails!.AverageRate : 0,
+                   FromBankAmount = isFromAccount is not false ? securityAccountTransaction.Amount * securityAccountTransaction!.ExchangeDetails!.AverageRate : 0,
+                   Profit         = isFromAccount is not true ? securityAccountTransaction.Profit  * securityAccountTransaction!.ExchangeDetails!.InverseAverageRate : 0,
+                   IsDirect       = false
                };
     }
 

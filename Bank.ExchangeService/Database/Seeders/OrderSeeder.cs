@@ -1,4 +1,4 @@
-﻿using Bank.Application.Domain;
+using Bank.Application.Domain;
 using Bank.ExchangeService.Models;
 
 namespace Bank.ExchangeService.Database.Seeders;
@@ -11,13 +11,13 @@ public static partial class Seeder
     {
         public static readonly OrderModel Order01 = new()
                                                     {
-                                                        Id            = Guid.Parse("f3ecca8a-f33e-4201-9edd-a323d3e10cf9"),
-                                                        ActuaryId     = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"), //GUID USER
-                                                        AccountId     = Guid.Parse("5d5fa996-9533-421c-a319-cd43ff41d86f"), //GUID USER
-                                                        SupervisorId  = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"),
-                                                        SecurityId    = Option.AppleCallOption.Id,
+                                                        Id            = Guid.Parse("fde50c25-8515-4c83-a89b-fa6a6c01c254"),
+                                                        ActuaryId     = Guid.Parse("b503387d-b9b5-41a2-9621-ee205c48a9cf"), //GUID USER
+                                                        AccountId     = Guid.Parse("633419a2-21d5-420c-a951-a4a1b9b351c0"), //GUID USER
+                                                        SupervisorId  = Guid.Parse("f38ac169-0865-4baa-afb7-56e422b5cf82"),
+                                                        SecurityId    = Stock.Apple.Id,
                                                         OrderType     = OrderType.Market,
-                                                        Quantity      = 0,
+                                                        Quantity      = 8,
                                                         ContractCount = 0,
                                                         LimitPrice    = 0,
                                                         StopPrice     = 0,
@@ -25,17 +25,17 @@ public static partial class Seeder
                                                         Status        = OrderStatus.Canceled,
                                                         CreatedAt     = DateTime.UtcNow,
                                                         ModifiedAt    = DateTime.UtcNow,
-                                                        AllOrNone     = false
+                                                        AllOrNone     = true
                                                     };
 
         public static readonly OrderModel Order02 = new()
                                                     {
-                                                        Id            = Guid.Parse("f1cf9aa0-f48d-447e-98c5-a2bc0c0f79a6"),
-                                                        ActuaryId     = Guid.Parse("5817c260-e4a9-4dc1-87d9-2fa12af157d9"), //GUID USER
-                                                        AccountId     = Guid.Parse("5d5fa996-9533-421c-a319-cd43ff41d86f"), //GUID USER
-                                                        SecurityId    = Option.MicrosoftCallOption.Id,
+                                                        Id            = Guid.Parse("40962c3c-f8da-48c8-bc43-a94e5534276f"),
+                                                        ActuaryId     = Guid.Parse("f38ac169-0865-4baa-afb7-56e422b5cf82"),
+                                                        AccountId     = Guid.Parse("e4df2e9b-a57f-460e-a79e-c6b1e47ef4ab"),
+                                                        SecurityId    = Stock.Microsoft.Id,
                                                         OrderType     = OrderType.Market,
-                                                        Quantity      = 0,
+                                                        Quantity      = 5,
                                                         ContractCount = 0,
                                                         LimitPrice    = 0,
                                                         StopPrice     = 0,
@@ -43,12 +43,12 @@ public static partial class Seeder
                                                         Status        = OrderStatus.Active,
                                                         CreatedAt     = DateTime.UtcNow,
                                                         ModifiedAt    = DateTime.UtcNow,
-                                                        AllOrNone     = false
+                                                        AllOrNone     = true
                                                     };
     }
 }
 
-public static class OrderSeederExtansion
+public static class OrderSeederExtension
 {
     public static async Task SeedOrdersHardcoded(this DatabaseContext context)
     {

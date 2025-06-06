@@ -17,28 +17,34 @@ public interface IAssetRepository
 {
     Task<Page<Asset>> FindAll(AssetFilterQuery filter, Pageable pageable);
 
+    Task<Page<Asset>> FindAllByActuaryId(Guid actuaryId, Pageable pageable);
+
     Task<Asset?> FindById(Guid id);
 
+    public Task<List<Asset>> FindAllAssetsBySecurityAndActuary(List<(Guid SecurityId, Guid ActuaryId)> securityActuaryList);
+
     Task<bool> Add(Asset asset);
+
+    Task<bool> HasAsset(Guid securityId, Guid actuaryId, int quantity);
 
     Task<bool> Remove(Asset asset);
 }
 
-public class AssetRepository(IAuthorizationService authorizationService, IDatabaseContextFactory<DatabaseContext> contextFactory) : IAssetRepository
+public class AssetRepository(IDatabaseContextFactory<DatabaseContext> contextFactory, IAuthorizationServiceFactory authorizationServiceFactory) : IAssetRepository
 {
-    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory = contextFactory;
-
-    private readonly IAuthorizationService m_AuthorizationService = authorizationService;
+    private readonly IDatabaseContextFactory<DatabaseContext> m_ContextFactory              = contextFactory;
+    private readonly IAuthorizationServiceFactory             m_AuthorizationServiceFactory = authorizationServiceFactory;
 
     public async Task<Page<Asset>> FindAll(AssetFilterQuery filter, Pageable pageable)
     {
-        await using var context = await m_ContextFactory.CreateContext;
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
 
         var assetQuery = context.Assets.IncludeAll()
                                 .AsQueryable();
 
-        if (m_AuthorizationService.Permissions == Permission.Client || m_AuthorizationService.Permissions == Permission.Employee)
-            assetQuery = assetQuery.Where(asset => asset.ActuaryId == m_AuthorizationService.UserId);
+        if (authorizationService.Permissions == Permission.Client || authorizationService.Permissions == Permission.Employee)
+            assetQuery = assetQuery.Where(asset => asset.ActuaryId == authorizationService.UserId);
 
         assetQuery = assetQuery.OrderByDescending(asset => asset.ModifiedAt);
 
@@ -51,12 +57,46 @@ public class AssetRepository(IAuthorizationService authorizationService, IDataba
         return new Page<Asset>(assets, pageable.Page, pageable.Size, totalElements);
     }
 
+    public async Task<Page<Asset>> FindAllByActuaryId(Guid actuaryId, Pageable pageable)
+    {
+        await using var context              = await m_ContextFactory.CreateContext;
+        var             authorizationService = m_AuthorizationServiceFactory.AuthorizationService;
+
+        var assetQuery = context.Assets.IncludeAll()
+                                .Where(asset => asset.ActuaryId == actuaryId)
+                                .AsQueryable();
+
+        if (authorizationService.Permissions == Permission.Client || authorizationService.Permissions == Permission.Employee)
+            assetQuery = assetQuery.Where(asset => asset.ActuaryId == authorizationService.UserId);
+
+        assetQuery = assetQuery.OrderByDescending(asset => asset.ModifiedAt);
+
+        var assets = await assetQuery.Skip((pageable.Page - 1) * pageable.Size)
+                                     .Take(pageable.Size)
+                                     .ToListAsync();
+
+        var totalElements = await assetQuery.CountAsync();
+    
+        return new Page<Asset>(assets, pageable.Page, pageable.Size, totalElements);
+    }
+
     public async Task<Asset?> FindById(Guid id)
     {
         await using var context = await m_ContextFactory.CreateContext;
 
         return await context.Assets.IncludeAll()
                             .FirstOrDefaultAsync(asset => asset.Id == id);
+    }
+
+    public async Task<List<Asset>> FindAllAssetsBySecurityAndActuary(List<(Guid SecurityId, Guid ActuaryId)> securityActuaryList)
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var assets = await context.Assets.IncludeAll()
+                                  .ToListAsync();
+
+        return assets.Where(asset => securityActuaryList.Contains((asset.SecurityId, asset.ActuaryId)))
+                     .ToList();
     }
 
     public async Task<bool> Add(Asset asset)
@@ -80,6 +120,16 @@ public class AssetRepository(IAuthorizationService authorizationService, IDataba
         return true;
     }
 
+    public async Task<bool> HasAsset(Guid securityId, Guid actuaryId, int quantity)
+    {
+        await using var context = await m_ContextFactory.CreateContext;
+
+        var result = await context.Assets.Where(dbAsset => dbAsset.ActuaryId == actuaryId && dbAsset.SecurityId == securityId && dbAsset.Quantity >= quantity)
+                                  .AnyAsync();
+
+        return result;
+    }
+
     public async Task<bool> Remove(Asset asset)
     {
         await using var context = await m_ContextFactory.CreateContext;
@@ -97,7 +147,6 @@ public static partial class RepositoryExtensions
     public static IIncludableQueryable<Asset, object?> IncludeAll(this DbSet<Asset> set)
     {
         return set.Include(asset => asset.Security);
-        // .ThenIncludeAll(asset => asset.Security); TODO
     }
 
     public static IIncludableQueryable<TEntity, object?> ThenIncludeAll<TEntity>(this IIncludableQueryable<TEntity, Asset?> value,

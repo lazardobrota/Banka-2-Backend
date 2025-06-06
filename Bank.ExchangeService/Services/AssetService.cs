@@ -12,6 +12,8 @@ public interface IAssetService
 {
     Task<Result<Page<AssetResponse>>> GetAll(AssetFilterQuery filter, Pageable pageable);
 
+    Task<Result<Page<AssetResponse>>> GetAllByActuaryId(Guid actuaryId, Pageable pageable);
+
     Task<Result<AssetResponse>> GetOne(Guid id);
 }
 
@@ -24,6 +26,29 @@ public class AssetService(IAssetRepository assetRepository, IUserServiceHttpClie
     {
         var assets = await m_AssetRepository.FindAll(filter, pageable);
 
+        var userQuery = new UserFilterQuery
+                        {
+                            Ids = assets.Items.Select(asset => asset.ActuaryId)
+                                        .Distinct()
+                                        .ToList()
+                        };
+
+        var userPageable = Pageable.Create(1, userQuery.Ids.Count);
+
+        var userPage = await m_UserServiceHttpClient.GetAllUsers(userQuery, userPageable);
+
+        var userDictionary = userPage.Items.ToDictionary(user => user.Id, user => user);
+
+        var result = assets.Items.Select(asset => asset.ToResponse(userDictionary[asset.ActuaryId]))
+                           .ToList();
+
+        return Result.Ok(new Page<AssetResponse>(result, assets.PageNumber, assets.PageSize, assets.TotalElements));
+    }
+
+    public async Task<Result<Page<AssetResponse>>> GetAllByActuaryId(Guid actuaryId, Pageable pageable)
+    {
+        var assets = await m_AssetRepository.FindAllByActuaryId(actuaryId, pageable);
+        
         var userQuery = new UserFilterQuery
                         {
                             Ids = assets.Items.Select(asset => asset.ActuaryId)

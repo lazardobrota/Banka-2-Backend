@@ -69,6 +69,9 @@ public class DatabaseBackgroundService(
                     .Wait();
 
             Context.SeedAssetsHardcoded()
+                    .Wait();
+
+            Context.SeedHardcodedStockExchanges()
                    .Wait();
 
             return;

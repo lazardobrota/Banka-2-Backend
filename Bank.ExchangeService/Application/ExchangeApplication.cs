@@ -1,6 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Net.Mime;
 
 using Bank.Application;
 using Bank.Database;
@@ -11,7 +9,6 @@ using Bank.ExchangeService.Database.Examples;
 using Bank.ExchangeService.Database.Processors;
 using Bank.ExchangeService.Database.WebSockets;
 using Bank.ExchangeService.HostedServices;
-//using Bank.ExchangeService.Http;
 using Bank.ExchangeService.Repositories;
 using Bank.ExchangeService.Services;
 using Bank.Http;
@@ -95,18 +92,14 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<DatabaseBackgroundService>();
         services.AddSingleton<OrderRealtimeProcessor>();
-        // services.AddSingleton<ForexPairBackgroundService>();
-        // services.AddSingleton<OptionBackgroundService>();
-        // services.AddSingleton<StockBackgroundService>();
 
         return services;
     }
-    
+
     public static IServiceCollection AddRealtimeProcessors(this IServiceCollection services)
     {
-        // services.AddSingleton<IRealtimeProcessor, InMemoryRealtimeProcessor>();
-        // services.AddSingleton<IRealtimeProcessor, PersistentRealtimeProcessor>();
-        // services.AddSingleton<IRealtimeProcessor, WebSocketRealtimeProcessor>();
+        services.AddSingleton<IRealtimeProcessor, OrderRealtimeProcessor>();
+        services.AddSingleton<FakeRealtimeSecurityBackgroundService>();
 
         return services;
     }

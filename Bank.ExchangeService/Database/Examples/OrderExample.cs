@@ -39,6 +39,7 @@ public static partial class Example
                                                             Status        = UpdateRequest.Status,
                                                             Supervisor    = null!,
                                                             Account       = null!,
+                                                            Security      = null!,
                                                             CreatedAt     = DateTime.UtcNow,
                                                             ModifiedAt    = DateTime.UtcNow,
                                                         };
